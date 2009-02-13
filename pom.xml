@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.sf.taverna</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.1.2008-11-03</version>
+		<version>0.1.2009-02-12</version>
 	</parent>
 	<groupId>net.sf.taverna</groupId>
 	<artifactId>wsdl-generic</artifactId>
@@ -17,13 +17,13 @@
 
 	<build>
 		<plugins>
-			<plugin>
+			<!--<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<skip>false</skip>
 				</configuration>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
 
@@ -38,20 +38,7 @@
 			<name>myGrid Repository</name>
 			<url>http://www.mygrid.org.uk/maven/repository</url>
 		</repository>
-		<repository>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots />
-			<id>mygrid-snapshot-repository</id>
-			<name>myGrid Snapshot Repository</name>
-			<url>
-				http://www.mygrid.org.uk/maven/snapshot-repository
-			</url>
-		</repository>
 	</repositories>
-	
-
 
 	<dependencies>
 		<dependency>
