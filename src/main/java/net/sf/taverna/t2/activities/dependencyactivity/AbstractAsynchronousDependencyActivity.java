@@ -368,7 +368,7 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 									continue;
 								}
 							}						}
-						else if (dependencyType.equals(ARTIFACTS)){
+						else if (dependencyType.equals(ARTIFACTS) && this.getClass().getClassLoader() instanceof LocalArtifactClassLoader){
 							LocalArtifactClassLoader cl = (LocalArtifactClassLoader) this.getClass().getClassLoader(); // this class is always loaded with LocalArtifactClassLoader
 							LocalRepository rep  = (LocalRepository) cl.getRepository();
 							for (BasicArtifact art : ((DependencyActivityConfigurationBean) activity
