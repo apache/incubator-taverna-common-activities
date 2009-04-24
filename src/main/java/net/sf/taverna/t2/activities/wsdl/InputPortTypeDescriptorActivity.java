@@ -10,7 +10,7 @@ import net.sf.taverna.wsdl.parser.UnknownOperationException;
 /**
  * Interface for an activity such as {@link WSDLActivity} and
  * {@link XMLInputSplitterActivity} that can provide {@link TypeDescriptor}s for
- * it's inputs.
+ * its inputs.
  * 
  * @author Stian Soiland-Reyes
  * 
