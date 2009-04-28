@@ -38,8 +38,10 @@ import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.utils.XMLUtils;
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -51,10 +53,16 @@ import org.xml.sax.SAXException;
  * Webservices based upon a WSDL with Literal style.
  * 
  * @author Stuart Owen
+ * @author Stian Soiland-Reyes
  * 
  */
 @SuppressWarnings("unchecked")
 public class LiteralBodyBuilder extends AbstractBodyBuilder {
+
+	private static Logger logger = Logger.getLogger(LiteralBodyBuilder.class);
+
+	private static final String TYPE = "type";
+	private static final String NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
 
 	public LiteralBodyBuilder(String style, WSDLParser parser, String operationName, List<TypeDescriptor> inputDescriptors) {
 		super(style, parser, operationName,inputDescriptors);
@@ -73,7 +81,7 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 		SOAPBodyElement body = super.build(inputMap);
 
 		if (getStyle() == Style.DOCUMENT) {
-			stripTypeAttributes(body);
+			fixTypeAttributes(body);
 		}
 
 		return body;
@@ -90,34 +98,59 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 			return XMLUtils.StringToElement("", inputName, "");
 		}
 	}
-
-	private void stripTypeAttributes(Node parent) {
+	
+		private void fixTypeAttributes(Node parent) {
 		if (parent.getNodeType() == Node.ELEMENT_NODE) {
 			Element el = (Element) parent;
 			if (parent.hasAttributes()) {
-				NamedNodeMap map = parent.getAttributes();
+				NamedNodeMap attributes = parent.getAttributes();
 				List<Node> attributeNodesForRemoval = new ArrayList<Node>();
-				for (int i = 0; i < map.getLength(); i++) {
-					Node node = map.item(i);
-
-					if ((node.getLocalName() != null && node.getLocalName()
-							.equals("type"))
-							|| (node.getPrefix() != null && node.getPrefix()
-									.equals("xmlns"))) {
-						attributeNodesForRemoval.add(node);
+				for (int i = 0; i < attributes.getLength(); i++) {
+					Node node = attributes.item(i);
+					
+					if ((node.getNamespaceURI().equals(NS_XSI) && node.getLocalName().equals(TYPE))) {
+						// TAV-712 - don't just strip out xsi:type - let's fix the
+						// name prefixes instead
+						
+						String xsiType = node.getTextContent();
+						// Resolve prefix of xsi type
+						String[] xsiTypeSplitted = xsiType.split(":", 2);
+						String xsiTypePrefix = "";
+						String xsiTypeName;
+						if (xsiTypeSplitted.length == 1) {
+							// No prefix
+							xsiTypeName = xsiTypeSplitted[0];
+						} else {
+							xsiTypePrefix = xsiTypeSplitted[0];
+							xsiTypeName = xsiTypeSplitted[1];
+						}
+						
+						String xsiTypeNS;
+						if (parent instanceof MessageElement) {
+							xsiTypeNS = ((MessageElement)parent).getNamespaceURI(xsiTypePrefix);
+						} else {
+							xsiTypeNS = node
+									.lookupNamespaceURI(xsiTypePrefix);
+						}
+						// Use global namespace prefixes						
+						String newPrefix = namespaceMappings.get(xsiTypeNS);
+						if (newPrefix == null) {
+							logger.warn("Can't find prefix for xsi:type namespace " + xsiTypeNS + " - keeping old " + xsiType);
+						} else {
+							String newXsiType = newPrefix + ":" + xsiTypeName;
+							node.setTextContent(newXsiType);	
+							logger.info("Replacing " + xsiType + " with " + newXsiType);
+						}
 					}
 				}
-
 				for (Node node : attributeNodesForRemoval) {
 					el.removeAttributeNS(node.getNamespaceURI(), node
 							.getLocalName());
 				}
 			}
 		}
-
-		if (parent.hasChildNodes()) {
-			for (int i = 0; i < parent.getChildNodes().getLength(); i++)
-				stripTypeAttributes(parent.getChildNodes().item(i));
+		for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
+			fixTypeAttributes(parent.getChildNodes().item(i));
 		}
 	}
 
