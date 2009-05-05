@@ -108,7 +108,7 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 				for (int i = 0; i < attributes.getLength(); i++) {
 					Node node = attributes.item(i);
 					
-					if ((node.getNamespaceURI().equals(NS_XSI) && node.getLocalName().equals(TYPE))) {
+					if (NS_XSI.equals(node.getNamespaceURI()) && TYPE.equals(node.getLocalName())) {
 						// TAV-712 - don't just strip out xsi:type - let's fix the
 						// name prefixes instead
 						
