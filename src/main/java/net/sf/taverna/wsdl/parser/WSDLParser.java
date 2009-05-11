@@ -142,7 +142,12 @@ public class WSDLParser {
 
 		if (!symbolTableMap.containsKey(wsdlLocation)) {
 			SymbolTable symbolTable = new SymbolTable(new NoopFactory()
-					.getBaseTypeMapping(), true, false, false);									
+					.getBaseTypeMapping(), true, false, false);	
+			
+			// Avoid printouts like
+			// {http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.wsdl}GetMultipleResourcePropertiesResponse already exists
+			symbolTable.setQuiet(true);
+			
 			symbolTable.populate(wsdlLocation);
 			symbolTableMap.put(wsdlLocation, symbolTable);
 			operationMap.put(wsdlLocation, determineOperations());
