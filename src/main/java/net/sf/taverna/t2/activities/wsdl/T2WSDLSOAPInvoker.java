@@ -181,7 +181,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		 getParser().getWSDLLocation());
 
 		 // Get the appropriate security agent
-		 CredentialManager credManager;
+		 /*CredentialManager credManager;
 		 try {
 		 credManager = CredentialManager.getInstance();
 		 SecurityAgentManager saManager =
@@ -199,7 +199,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		 } catch (CMNotInitialisedException e) {
 		 // TODO Auto-generated catch block
 		 e.printStackTrace();
-		 }
+		 }*/
 	}
 
 	/**
