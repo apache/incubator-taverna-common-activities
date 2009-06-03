@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.wsdl.Binding;
 import javax.wsdl.BindingOperation;
@@ -58,8 +59,7 @@ import org.apache.axis.wsdl.symbolTable.Parameter;
 import org.apache.axis.wsdl.symbolTable.Parameters;
 import org.apache.axis.wsdl.symbolTable.SymbolTable;
 import org.apache.axis.wsdl.symbolTable.TypeEntry;
-import org.apache.log4j.Logger;
-//import org.apache.wsif.providers.soap.apacheaxis.WSIFDynamicProvider_ApacheAxis;
+import org.apache.log4j.Logger; //import org.apache.wsif.providers.soap.apacheaxis.WSIFDynamicProvider_ApacheAxis;
 //import org.apache.wsif.util.WSIFPluggableProviders;
 import org.xml.sax.SAXException;
 
@@ -78,13 +78,25 @@ import com.ibm.wsdl.extensions.soap.SOAPOperationImpl;
 
 @SuppressWarnings("unchecked")
 public class WSDLParser {
-	
-	private static final String GET_RESOURCE_PROPERTY_METHOD = "GetResourceProperty";
 
-	private static final String GET_RESOURCE_PROPERTY_ACTION = "http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/GetResourceProperty";
+	private static final String GET_SERVICE_SECURITY_METADATA_REQUEST = "GetServiceSecurityMetadataRequest";
+
+	private static final String GET_SERVICE_SECURITY_METADATA = "getServiceSecurityMetadata";
+
+	private static final String SET_TERMINATION_TIME = "SetTerminationTime";
+
+	private static final String GET_RESOURCE_PROPERTY = "GetResourceProperty";
+
+	private static final String DESTROY = "Destroy";
+
+	private static final String SERVICE_SECURITY_URI = "http://security.introduce.cagrid.nci.nih.gov/ServiceSecurity/";
+
+	private static final String RESOURCE_LIFETIME_URI = "http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceLifetime/";
+
+	private static final String RESOURCE_PROPERTIES_URI = "http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/";
 
 	private static Logger logger = Logger.getLogger(WSDLParser.class);
-	
+
 	private String wsdlLocation;
 
 	/**
@@ -124,8 +136,8 @@ public class WSDLParser {
 	 * Constructor which takes the location of the base wsdl file, and begins to
 	 * process it
 	 * 
-	 * @param wsdlLocation -
-	 *            the location of the wsdl file
+	 * @param wsdlLocation
+	 *            - the location of the wsdl file
 	 * @throws ParserConfigurationException
 	 * @throws WSDLException
 	 * @throws IOException
@@ -134,20 +146,21 @@ public class WSDLParser {
 	public WSDLParser(String wsdlLocation) throws ParserConfigurationException,
 			WSDLException, IOException, SAXException {
 
-		this.wsdlLocation = wsdlLocation;						
-		
-//		WSIFPluggableProviders.overrideDefaultProvider(
-//				"http://schemas.xmlsoap.org/wsdl/soap/",
-//				new WSIFDynamicProvider_ApacheAxis());
+		this.wsdlLocation = wsdlLocation;
+
+		// WSIFPluggableProviders.overrideDefaultProvider(
+		// "http://schemas.xmlsoap.org/wsdl/soap/",
+		// new WSIFDynamicProvider_ApacheAxis());
 
 		if (!symbolTableMap.containsKey(wsdlLocation)) {
 			SymbolTable symbolTable = new SymbolTable(new NoopFactory()
-					.getBaseTypeMapping(), true, false, false);	
-			
+					.getBaseTypeMapping(), true, false, false);
+
 			// Avoid printouts like
-			// {http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.wsdl}GetMultipleResourcePropertiesResponse already exists
+			// {http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.wsdl}GetMultipleResourcePropertiesResponse
+			// already exists
 			symbolTable.setQuiet(true);
-			
+
 			symbolTable.populate(wsdlLocation);
 			symbolTableMap.put(wsdlLocation, symbolTable);
 			operationMap.put(wsdlLocation, determineOperations());
@@ -188,7 +201,7 @@ public class WSDLParser {
 	public Definition getDefinition() {
 		return getSymbolTable().getDefinition();
 	}
-	
+
 	public List<String> getOperationEndpointLocations(String operationName) {
 		List<String> result = new ArrayList<String>();
 		Collection<Service> services = getDefinition().getServices().values();
@@ -199,8 +212,8 @@ public class WSDLParser {
 				if (port.getBinding().equals(binding)) {
 					for (Object obj : port.getExtensibilityElements()) {
 						if (obj instanceof SOAPAddress) {
-							SOAPAddress address = (SOAPAddress)obj;
-							String endpoint=address.getLocationURI();
+							SOAPAddress address = (SOAPAddress) obj;
+							String endpoint = address.getLocationURI();
 							result.add(endpoint);
 						}
 					}
@@ -230,7 +243,8 @@ public class WSDLParser {
 	/**
 	 * Provides the PortType for a given operation.
 	 * 
-	 * @param operationName the name of the operation the PortType is required for.
+	 * @param operationName
+	 *            the name of the operation the PortType is required for.
 	 * @return the PortType
 	 */
 	public PortType getPortType(String operationName) {
@@ -384,10 +398,11 @@ public class WSDLParser {
 		return result;
 	}
 
-	public QName getOperationQname(String operationName) throws UnknownOperationException {
+	public QName getOperationQname(String operationName)
+			throws UnknownOperationException {
 		if (getStyle().equals("document")) {
 			try {
-			// Get the QName of the first element of the input message
+				// Get the QName of the first element of the input message
 				return ((Part) getBindingOperation(operationName)
 						.getOperation().getInput().getMessage()
 						.getOrderedParts(null).get(0)).getElementName();
@@ -402,7 +417,7 @@ public class WSDLParser {
 			return new QName(ns, operationName);
 		}
 	}
-	
+
 	/**
 	 * Returns either literal or encoded, describing the 'use' for this
 	 * operation
@@ -500,18 +515,53 @@ public class WSDLParser {
 	}
 
 	/**
+	 * SOAP actions/operations that if present indicates a WSRF service.
+	 * <p>
+	 * Used by {@link #checkWSRF()}
+	 * 
+	 * @return A {@link Map} mapping SOAP operation name to SOAP action URI.
+	 */
+	protected Map<String, String> getWSRFPredictorOperations() {
+		Map<String, String> operations = new HashMap<String, String>();
+
+		operations.put(GET_RESOURCE_PROPERTY, RESOURCE_PROPERTIES_URI
+				+ GET_RESOURCE_PROPERTY);
+		
+		operations.put(DESTROY, RESOURCE_LIFETIME_URI + DESTROY);
+		
+		operations.put(SET_TERMINATION_TIME, RESOURCE_LIFETIME_URI
+				+ SET_TERMINATION_TIME);
+		
+		operations.put(GET_SERVICE_SECURITY_METADATA, SERVICE_SECURITY_URI
+				+ GET_SERVICE_SECURITY_METADATA_REQUEST);
+
+		return operations;
+	}
+
+	/**
 	 * Check if this is a WSRF-resource property supporting binding.
+	 * <p>
+	 * The service is determined to be WSRF-supporting if the WSDL contains at
+	 * least one of the operations specified by
+	 * {@link #getWSRFPredictorOperations()}.
 	 * 
 	 */
 	protected void checkWSRF() {
-		String actionURI;
-		try {
-			actionURI = getSOAPActionURI(GET_RESOURCE_PROPERTY_METHOD);
-		} catch (UnknownOperationException e) {
-			isWsrfService = false;
-			return;
+		isWsrfService = false;
+		for (Entry<String, String> resourceEntry : getWSRFPredictorOperations()
+				.entrySet()) {
+			String actionURI;
+			try {
+				actionURI = getSOAPActionURI(resourceEntry.getKey());
+			} catch (UnknownOperationException e) {
+				continue;
+			}
+			isWsrfService = resourceEntry.getValue().equals(actionURI);
+			if (isWsrfService) {
+				// Just need to match one of the predictors
+				break;
+			}
 		}
-		isWsrfService = GET_RESOURCE_PROPERTY_ACTION.equals(actionURI);
 	}
 
 	private SymbolTable getSymbolTable() {
@@ -558,7 +608,9 @@ public class WSDLParser {
 
 	private void setStyleForBinding(SOAPBinding soapBinding) {
 		String style = soapBinding.getStyle();
-		if (style==null) style="document"; //soap spec specifies to default to document if missing.
+		if (style == null)
+			style = "document"; // soap spec specifies to default to document if
+								// missing.
 		styleMap.put(getWSDLLocation(), style);
 	}
 
@@ -630,13 +682,13 @@ public class WSDLParser {
 
 	private BindingOperation getBindingOperation(String operationName)
 			throws UnknownOperationException {
-		BindingOperation result = bindingOperations
-				.get(operationName);
+		BindingOperation result = bindingOperations.get(operationName);
 		if (result == null) {
 			Binding binding = getBinding(operationName);
 			if (binding != null) {
 				List bindings = binding.getBindingOperations();
-				for (Iterator iterator = bindings.iterator(); iterator.hasNext();) {
+				for (Iterator iterator = bindings.iterator(); iterator
+						.hasNext();) {
 					BindingOperation bindingOperation = (BindingOperation) iterator
 							.next();
 					if (bindingOperation.getOperation().getName().equals(
@@ -679,13 +731,12 @@ public class WSDLParser {
 				} else {
 					if (type.isSimpleType()) {
 						result = constructForSimpleType(type);
-					}
-					else {
+					} else {
 						result = constructComplexType((DefinedType) type);
 					}
 				}
 			} else {
-				result = constructArrayType(type);				
+				result = constructArrayType(type);
 			}
 		} else {
 			if (type.getQName().getLocalPart().equals("Map")) {
@@ -701,13 +752,13 @@ public class WSDLParser {
 
 	private TypeDescriptor constructForSimpleType(TypeEntry type) {
 		Set nested = type.getNestedTypes(getSymbolTable(), true);
-		
-		TypeDescriptor result = constructType((TypeEntry)nested.toArray()[0]);
+
+		TypeDescriptor result = constructType((TypeEntry) nested.toArray()[0]);
 		result.setQname(type.getQName());
 		result.setName(type.getQName().getLocalPart());
 		return result;
 	}
-	
+
 	private ArrayTypeDescriptor constructMapType(TypeEntry type) {
 		ArrayTypeDescriptor result = new ArrayTypeDescriptor();
 		TypeEntry mapItem = getSymbolTable().getType(type.getItemQName());
@@ -789,9 +840,9 @@ public class WSDLParser {
 		result.setElementType(constructType(type.getRefType()));
 		result.setType(type.getQName().getLocalPart());
 		result.setQname(type.getQName());
-		
-		result.setWrapped(type.getItemQName()!=null);
-		
+
+		result.setWrapped(type.getItemQName() != null);
+
 		return result;
 	}
 
@@ -816,8 +867,7 @@ public class WSDLParser {
 	}
 
 	private ComplexTypeDescriptor copyFromCache(String key) {
-		ComplexTypeDescriptor cached = cachedComplexTypes
-				.get(key);
+		ComplexTypeDescriptor cached = cachedComplexTypes.get(key);
 		ComplexTypeDescriptor result = new ComplexTypeDescriptor();
 		result.setQname(cached.getQname());
 		result.setElements(cached.getElements());
