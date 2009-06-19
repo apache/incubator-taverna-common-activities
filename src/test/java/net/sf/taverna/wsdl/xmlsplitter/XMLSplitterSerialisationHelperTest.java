@@ -41,7 +41,8 @@ public class XMLSplitterSerialisationHelperTest {
 	public void testScuflNS() throws Exception {
 		assertEquals("namespace should be equal",XScufl.XScuflNS,XMLSplitterSerialisationHelper.XScuflNS);
 	}
-	
+
+    @Test
 	public void testCyclicToElement() throws Exception {
 		ComplexTypeDescriptor a = new ComplexTypeDescriptor();
 		a.setName("a");
@@ -69,6 +70,7 @@ public class XMLSplitterSerialisationHelperTest {
 
 	}
 
+    @Test
 	public void testCyclicToElement2() throws Exception {
 		ComplexTypeDescriptor a = new ComplexTypeDescriptor();
 		a.setName("a");
@@ -88,6 +90,7 @@ public class XMLSplitterSerialisationHelperTest {
 				xml);
 	}
 
+    @Test
 	public void testCyclicFromElement() throws Exception {
 		String xml = "<s:extensions xmlns:s=\"http://org.embl.ebi.escience/xscufl/0.1alpha\"><s:complextype optional=\"false\" unbounded=\"false\" typename=\"typename\" name=\"a\" qname=\"{namespace}typename\"><s:elements><s:complextype id=\"{namespace}typename\" /></s:elements></s:complextype></s:extensions>";
 		Element el = new SAXBuilder().build(new StringReader(xml))
@@ -120,6 +123,7 @@ public class XMLSplitterSerialisationHelperTest {
 	 * 
 	 * @throws Exception
 	 */
+    @Test
 	public void testCorrectQName() throws Exception {
 		TypeDescriptor desc = XMLSplitterSerialisationHelper
 				.extensionXMLToTypeDescriptor(new SAXBuilder().build(

@@ -31,11 +31,13 @@
  *               by   $Author: stain $
  * Created on 04-May-2006
  *****************************************************************/
-package net.sf.taverna.wsdl.soap;
+package net.sf.taverna.wsdl.integration;
 
+import net.sf.taverna.wsdl.soap.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,10 +54,8 @@ import org.junit.Test;
 public class WSDLSOAPInvokerTest  implements LocationConstants {
 
 	@SuppressWarnings("unchecked")
-	@Test
-    @Ignore("Integration test")
-	public void testPrimitive() throws Exception {
-
+	@Test    
+	public void testPrimitive() throws Exception {        
 		WSDLParser wsdlParser = new WSDLParser(WSDL_TEST_BASE
 				+ "KEGG.wsdl");
 		List<String> outputNames = new ArrayList<String>();
@@ -87,8 +87,7 @@ public class WSDLSOAPInvokerTest  implements LocationConstants {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Test
-    @Ignore("Integration test")
+	@Test    
 	public void testComplexDocStyle() throws Exception {
 
 		WSDLParser wsdlParser = new WSDLParser(WSDL_TEST_BASE
@@ -122,10 +121,10 @@ public class WSDLSOAPInvokerTest  implements LocationConstants {
 		assertTrue("unexpected end to result", xml.endsWith("/eInfoResult>"));
 
 	}
-
-	@Ignore("endpoint failing")
+	
 	@SuppressWarnings("unchecked")
 	@Test
+    @Ignore("Throws out of memory error. Needs to use menagerie webservice")
 	//TODO: set up an equivalent test on Phoebus - this service is unreliable.
 	public void testComplexMultiRef() throws Exception {
 
@@ -157,8 +156,7 @@ public class WSDLSOAPInvokerTest  implements LocationConstants {
 				thing.getClass());
 
 	}
-
-	@Ignore
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testMultirefWithOutputNamespaced() throws Exception {
@@ -179,8 +177,7 @@ public class WSDLSOAPInvokerTest  implements LocationConstants {
 	}
 
 	@SuppressWarnings("unchecked")
-	@Test
-    @Ignore("Integration test")
+	@Test    
 	public void testSOAPEncoded() throws Exception {
 		WSDLParser wsdlParser = new WSDLParser(
 				"http://www.mygrid.org.uk/menagerie/xfire/Primatives-re?wsdl");
@@ -202,8 +199,7 @@ public class WSDLSOAPInvokerTest  implements LocationConstants {
 				outputThing.getClass());
 		assertEquals("The output should be fred","fred",outputThing);
 	}
-
-	@Ignore("Host is unreachable")
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testDocumentNamespace() throws Exception {
@@ -229,8 +225,7 @@ public class WSDLSOAPInvokerTest  implements LocationConstants {
 	// can't always assume the return will be nested in a tag named the same as
 	// the output message part.
 	@SuppressWarnings("unchecked")
-	@Test
-    @Ignore("Integration test")
+	@Test    
 	public void testEncodedDifferentOutputName() throws Exception {
 		System.setProperty("taverna.wsdl.timeout", "1");
 		WSDLParser wsdlParser = new WSDLParser(

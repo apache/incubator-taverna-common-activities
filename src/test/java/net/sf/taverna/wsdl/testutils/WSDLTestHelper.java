@@ -28,4 +28,6 @@ public class WSDLTestHelper implements LocationConstants {
 		return WSDLParserTest.class.getResource(WSDL_RESOURCE_BASE+resourceName).toExternalForm();
 	}
 
+    
+
 }
