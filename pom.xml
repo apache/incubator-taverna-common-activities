@@ -9,7 +9,7 @@
     <groupId>net.sf.taverna</groupId>
     <artifactId>wsdl-generic</artifactId>
     <packaging>jar</packaging>
-	<version>1.4</version>
+	<version>1.5-SNAPSHOT</version>
     <name>wsdl-generic</name>
     <description>
 		WSDL handling classes that are shared between Taverna 1 and 2
@@ -58,9 +58,9 @@
         </repository>
     </repositories>
     <scm>
-        <connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.4</connection>
-        <developerConnection>scm:svn:https://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.4</developerConnection>
-        <url>http://code.google.com/p/taverna/source/browse/#svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.4</url>
+        <connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</connection>
+        <developerConnection>scm:svn:https://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</developerConnection>
+        <url>http://code.google.com/p/taverna/source/browse/#svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</url>
     </scm>
 
     <dependencies>
