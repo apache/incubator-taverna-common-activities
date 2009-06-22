@@ -1,6 +1,5 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>net.sf.taverna</groupId>
@@ -10,7 +9,7 @@
     <groupId>net.sf.taverna</groupId>
     <artifactId>wsdl-generic</artifactId>
     <packaging>jar</packaging>
-	<version>1.4-SNAPSHOT</version>
+	<version>1.4</version>
     <name>wsdl-generic</name>
     <description>
 		WSDL handling classes that are shared between Taverna 1 and 2
@@ -59,9 +58,9 @@
         </repository>
     </repositories>
     <scm>
-        <connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</connection>
-        <developerConnection>scm:svn:https://taverna.googlecode.com/svn/taverna/utils/wsdl-generic/trunk/</developerConnection>
-        <url>http://code.google.com/p/taverna/source/browse/#svn/taverna/utils/wsdl-generic/trunk/</url>
+        <connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.4</connection>
+        <developerConnection>scm:svn:https://taverna.googlecode.com/svn/taverna/utils/wsdl-generic/tags/wsdl-generic-1.4</developerConnection>
+        <url>http://code.google.com/p/taverna/source/browse/#svn/taverna/utils/wsdl-generic/tags/wsdl-generic-1.4</url>
     </scm>
 
     <dependencies>
@@ -110,7 +109,7 @@
         <dependency>
             <groupId>uk.org.mygrid.taverna.scufl</groupId>
             <artifactId>scufl-model</artifactId>
-			<version>1.7.2.1-SNAPSHOT</version>
+			<version>1.7.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
