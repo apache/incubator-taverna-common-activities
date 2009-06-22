@@ -58,9 +58,9 @@
         </repository>
     </repositories>
     <scm>
-        <connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.4</connection>
-        <developerConnection>scm:svn:https://taverna.googlecode.com/svn/taverna/utils/wsdl-generic/tags/wsdl-generic-1.4</developerConnection>
-        <url>http://code.google.com/p/taverna/source/browse/#svn/taverna/utils/wsdl-generic/tags/wsdl-generic-1.4</url>
+        <connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</connection>
+        <developerConnection>scm:svn:https://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</developerConnection>
+        <url>http://code.google.com/p/taverna/source/browse/#svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</url>
     </scm>
 
     <dependencies>
