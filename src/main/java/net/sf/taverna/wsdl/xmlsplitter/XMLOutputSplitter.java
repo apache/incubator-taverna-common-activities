@@ -149,7 +149,8 @@ public class XMLOutputSplitter {
 								.isWrapped()) {
 					boolean isXMLContent = outputTypes[i].contains("text/xml");
 					result.put(child.getName(), extractDataListFromChildList(
-							child.getChildren(), isXMLContent));
+							children, isXMLContent));
+                    break;
 				} else {
 					if (outputTypes[i].equals("'text/xml'")
 							|| outputTypes[i].equals("l('text/xml')")) {
