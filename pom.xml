@@ -9,7 +9,9 @@
     <groupId>net.sf.taverna</groupId>
     <artifactId>wsdl-generic</artifactId>
     <packaging>jar</packaging>
-	<version>1.5-SNAPSHOT</version>
+
+	<version>1.5</version>
+
     <name>wsdl-generic</name>
     <description>
 		WSDL handling classes that are shared between Taverna 1 and 2
@@ -124,4 +126,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>

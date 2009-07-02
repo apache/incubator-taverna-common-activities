@@ -20,12 +20,30 @@
  ******************************************************************************/
 package net.sf.taverna.wsdl.testutils;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import net.sf.taverna.wsdl.parser.WSDLParserTest;
 
 public class WSDLTestHelper implements LocationConstants {
 	
 	public static String wsdlResourcePath(String resourceName) throws Exception {
 		return WSDLParserTest.class.getResource(WSDL_RESOURCE_BASE+resourceName).toExternalForm();
+	}
+
+    public String getResourceContentsString(String resourceName) throws Exception {
+		InputStream stream = WSDLTestHelper.class.getResourceAsStream("/"+resourceName);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+		String content="";
+		String line="";
+		while( (line = reader.readLine()) != null) {
+			content+=line;
+		}
+
+		reader.close();
+
+		return content;
+
 	}
 
     

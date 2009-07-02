@@ -65,6 +65,7 @@ import org.xml.sax.SAXException;
 
 import com.ibm.wsdl.extensions.soap.SOAPBindingImpl;
 import com.ibm.wsdl.extensions.soap.SOAPOperationImpl;
+import org.apache.axis.wsdl.symbolTable.SchemaUtils;
 
 /**
  * A Parser for processing WSDL files to determine information about available
@@ -841,8 +842,15 @@ public class WSDLParser {
 		result.setType(type.getQName().getLocalPart());
 		result.setQname(type.getQName());
 
-		result.setWrapped(type.getItemQName() != null);
-
+        //this checks for 2 cases to determine for wrapped -
+        // first whether the axis SchemaUtils identifies it as being wrapped by being defined using the xsd:sequence compositor and containing only elements declarations. (see http://cmedia.glos.ac.uk/software/axis/docs/apiDocs/org/apache/axis/wsdl/symbolTable/SchemaUtils.html#getComplexElementRestrictionBase(org.w3c.dom.Node,%20org.apache.axis.wsdl.symbolTable.SymbolTable)
+        // the second case, for which isWrapped will always return false, is for array definitions that restrict the soapenc:Array type.
+        //    - the second case is not WS-I compliant: http://www.ws-i.org/Profiles/BasicProfile-1.1.html
+        //    - but can be treated equivalent to the first case, so also therefore assumed as being wrapped. IBM recommends manuall editing the WSDL to replace the restricted array definition with one defined using xsd:sequence - see http://www.ibm.com/developerworks/lotus/library/domino8-WS-I/
+        boolean wrapped=SchemaUtils.isWrappedType(type.getNode()) || SchemaUtils.getComplexElementRestrictionBase(type.getNode(), getSymbolTable())!=null;
+        
+		result.setWrapped(wrapped);
+        
 		return result;
 	}
 
