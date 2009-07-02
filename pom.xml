@@ -10,7 +10,7 @@
     <artifactId>wsdl-generic</artifactId>
     <packaging>jar</packaging>
 
-	<version>1.5</version>
+	<version>1.6-SNAPSHOT</version>
 
     <name>wsdl-generic</name>
     <description>
