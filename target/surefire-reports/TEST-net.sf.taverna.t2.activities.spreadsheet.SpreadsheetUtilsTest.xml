@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" skipped="0" tests="4" time="0.031" failures="0" name="net.sf.taverna.t2.activities.spreadsheet.SpreadsheetUtilsTest">
+  <properties>
+    <property value="Apple Inc." name="java.vendor"/>
+    <property value="/Users/davidwithers/.m2/repository" name="localRepository"/>
+    <property value="SUN_STANDARD" name="sun.java.launcher"/>
+    <property value="../Resources/Eclipse.icns" name="env.APP_ICON_172"/>
+    <property value="HotSpot Client Compiler" name="sun.management.compiler"/>
+    <property value="../Resources/Eclipse.icns" name="env.APP_ICON_26194"/>
+    <property value="61e800" name="env.SECURITYSESSIONID"/>
+    <property value="Mac OS X" name="os.name"/>
+    <property value="1" name="env.JAVA_STARTED_ON_FIRST_THREAD_26194"/>
+    <property value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/jsfd.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/classes.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/ui.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/laf.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/sunrsasign.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/jsse.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/jce.jar:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Classes/charsets.jar" name="sun.boot.class.path"/>
+    <property value="/var/folders/2S/2S788uR8GL8g+od7wDVoEk+++TI/-Tmp-/" name="env.TMPDIR"/>
+    <property value="Sun Microsystems Inc." name="java.vm.specification.vendor"/>
+    <property value="1.5.0_19-b02-304" name="java.runtime.version"/>
+    <property value="/tmp/launch-QXkyIZ/Render" name="env.Apple_PubSub_Socket_Render"/>
+    <property value="/tmp/launch-zSPQpj/:0" name="env.DISPLAY"/>
+    <property value="davidwithers" name="user.name"/>
+    <property value="davidwithers" name="env.USER"/>
+    <property value="/bin/bash" name="env.SHELL"/>
+    <property value="0x1F5:0:0" name="env.__CF_USER_TEXT_ENCODING"/>
+    <property value="true" name="awt.nativeDoubleBuffering"/>
+    <property value="/usr/bin:/bin:/usr/sbin:/sbin" name="env.PATH"/>
+    <property value="en" name="user.language"/>
+    <property value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Libraries" name="sun.boot.library.path"/>
+    <property value="1.5.0_19" name="java.version"/>
+    <property value="" name="user.timezone"/>
+    <property value="32" name="sun.arch.data.model"/>
+    <property value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/endorsed" name="java.endorsed.dirs"/>
+    <property value="" name="sun.cpu.isalist"/>
+    <property value="MacRoman" name="sun.jnu.encoding"/>
+    <property value="sun.io" name="file.encoding.pkg"/>
+    <property value="/" name="file.separator"/>
+    <property value="Java Platform API Specification" name="java.specification.name"/>
+    <property value="49.0" name="java.class.version"/>
+    <property value="US" name="user.country"/>
+    <property value="/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home" name="java.home"/>
+    <property value="mixed mode, sharing" name="java.vm.info"/>
+    <property value="davidwithers" name="env.LOGNAME"/>
+    <property value="10.5.7" name="os.version"/>
+    <property value=":" name="path.separator"/>
+    <property value="1.5.0_19-137" name="java.vm.version"/>
+    <property value="apple.awt.CPrinterJob" name="java.awt.printerjob"/>
+    <property value="UnicodeLittle" name="sun.io.unicode.encoding"/>
+    <property value="apple.awt.CToolkit" name="awt.toolkit"/>
+    <property value="1" name="env.JAVA_STARTED_ON_FIRST_THREAD_172"/>
+    <property value="../Resources/Eclipse.icns" name="env.APP_ICON_25943"/>
+    <property value="/Users/davidwithers" name="user.home"/>
+    <property value="Sun Microsystems Inc." name="java.specification.vendor"/>
+    <property value=".:/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java" name="java.library.path"/>
+    <property value="1" name="env.JAVA_STARTED_ON_FIRST_THREAD_25943"/>
+    <property value="http://www.apple.com/" name="java.vendor.url"/>
+    <property value="Apple Inc." name="java.vm.vendor"/>
+    <property value="false" name="gopherProxySet"/>
+    <property value="Java(TM) 2 Runtime Environment, Standard Edition" name="java.runtime.name"/>
+    <property value="/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/aspectjrt-1.5.3.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/commons-cli-1.0.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/doxia-sink-api-1.0-alpha-9.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/jsch-0.1.27.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/jtidy-4aug2000r7-dev.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-artifact-3.0-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-core-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-embedder-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-lifecycle-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-model-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-plugin-api-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-profile-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-project-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-reporting-api-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-toolchain-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/maven-workspace-2.1-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/plexus-classworlds-1.2-alpha-12.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/plexus-container-default-1.0-alpha-44.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/plexus-interactivity-api-1.0-alpha-6.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/plexus-interpolation-1.0-SNAPSHOT.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/plexus-utils-1.5.1.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/wagon-file-1.0-beta-2.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/wagon-http-lightweight-1.0-beta-2.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/wagon-http-shared-1.0-beta-2.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/wagon-provider-api-1.0-beta-2.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/wagon-ssh-1.0-beta-2.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/wagon-ssh-common-1.0-beta-2.jar:/Applications/eclipse/plugins/org.maven.ide.components.maven_embedder_2.1.0.20080530-2300/jars/wagon-ssh-external-1.0-beta-2.jar" name="java.class.path"/>
+    <property value="Java Virtual Machine Specification" name="java.vm.specification.name"/>
+    <property value="1.0" name="java.vm.specification.version"/>
+    <property value="little" name="sun.cpu.endian"/>
+    <property value="unknown" name="sun.os.patch.level"/>
+    <property value="/Users/davidwithers" name="env.HOME"/>
+    <property value="/Users/davidwithers/Documents/workspace2/spreadsheet-import-activity/target/test-classes:/Users/davidwithers/Documents/workspace2/spreadsheet-import-activity/target/classes:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/core/reference-api/0.8/reference-api-0.8.jar:/Users/davidwithers/.m2/repository/org/springframework/spring-tx/2.5.4/spring-tx-2.5.4.jar:/Users/davidwithers/.m2/repository/commons-logging/commons-logging/1.1/commons-logging-1.1.jar:/Users/davidwithers/.m2/repository/org/springframework/spring-beans/2.5.4/spring-beans-2.5.4.jar:/Users/davidwithers/.m2/repository/org/springframework/spring-core/2.5.4/spring-core-2.5.4.jar:/Users/davidwithers/.m2/repository/org/springframework/spring-context/2.5.4/spring-context-2.5.4.jar:/Users/davidwithers/.m2/repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/core/workflowmodel-api/0.8/workflowmodel-api-0.8.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/infrastructure/spi-discovery-api/1.11/spi-discovery-api-1.11.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/lang/observer/0.5/observer-0.5.jar:/Users/davidwithers/.m2/repository/log4j/log4j/1.2.13/log4j-1.2.13.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/infrastructure/raven/1.11/raven-1.11.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/infrastructure/raven-log4j/1.11/raven-log4j-1.11.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/infrastructure/appconfig/1.11/appconfig-1.11.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/infrastructure/launcher-api/1.11/launcher-api-1.11.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/infrastructure/prelauncher/1.11/prelauncher-1.11.jar:/Users/davidwithers/.m2/repository/jdom/jdom/1.0/jdom-1.0.jar:/Users/davidwithers/.m2/repository/org/apache/poi/poi/3.5-beta6/poi-3.5-beta6.jar:/Users/davidwithers/.m2/repository/org/apache/poi/poi-ooxml/3.5-beta6/poi-ooxml-3.5-beta6.jar:/Users/davidwithers/.m2/repository/org/apache/poi/ooxml-schemas/1.0/ooxml-schemas-1.0.jar:/Users/davidwithers/.m2/repository/org/apache/xmlbeans/xmlbeans/2.3.0/xmlbeans-2.3.0.jar:/Users/davidwithers/.m2/repository/stax/stax-api/1.0.1/stax-api-1.0.1.jar:/Users/davidwithers/.m2/repository/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar:/Users/davidwithers/.m2/repository/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar:/Users/davidwithers/.m2/repository/org/odftoolkit/odfdom-java/0.7/odfdom-java-0.7.jar:/Users/davidwithers/.m2/repository/xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar:/Users/davidwithers/.m2/repository/junit/junit/4.4/junit-4.4.jar:/Users/davidwithers/.m2/repository/net/sf/taverna/t2/core/workflowmodel-impl/0.8/workflowmodel-impl-0.8.jar:/Users/davidwithers/.m2/repository/com/thoughtworks/xstream/xstream/1.2.1/xstream-1.2.1.jar:/Users/davidwithers/.m2/repository/xpp3/xpp3_min/1.1.3.4.O/xpp3_min-1.1.3.4.O.jar:" name="surefire.test.class.path"/>
+    <property value="/var/folders/2S/2S788uR8GL8g+od7wDVoEk+++TI/-Tmp-/" name="java.io.tmpdir"/>
+    <property value="http://bugreport.apple.com/" name="java.vendor.url.bug"/>
+    <property value="org.apache.maven.cli.MavenCli" name="env.JAVA_MAIN_CLASS_35442"/>
+    <property value="/tmp/launch-xeaUoI/Listeners" name="env.SSH_AUTH_SOCK"/>
+    <property value="legacy" name="env.COMMAND_MODE"/>
+    <property value="i386" name="os.arch"/>
+    <property value="apple.awt.CGraphicsEnvironment" name="java.awt.graphicsenv"/>
+    <property value="/Library/Java/Extensions:/System/Library/Java/Extensions:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/ext" name="java.ext.dirs"/>
+    <property value="1050.1.5.0_19-304" name="mrj.version"/>
+    <property value="/Users/davidwithers/Documents/workspace2/spreadsheet-import-activity" name="user.dir"/>
+    <property value="
+" name="line.separator"/>
+    <property value="Java HotSpot(TM) Client VM" name="java.vm.name"/>
+    <property value="/Users/davidwithers/Documents/workspace2/spreadsheet-import-activity" name="basedir"/>
+    <property value="true" name="maven.mode.standalone"/>
+    <property value="MacRoman" name="file.encoding"/>
+    <property value="1.5" name="java.specification.version"/>
+  </properties>
+  <testcase classname="net.sf.taverna.t2.activities.spreadsheet.SpreadsheetUtilsTest" time="0.006" name="testGetColumnIndex"/>
+  <testcase classname="net.sf.taverna.t2.activities.spreadsheet.SpreadsheetUtilsTest" time="0.001" name="testGetColumnLabel"/>
+  <testcase classname="net.sf.taverna.t2.activities.spreadsheet.SpreadsheetUtilsTest" time="0.001" name="testGetPortNameStringMapOfStringString"/>
+  <testcase classname="net.sf.taverna.t2.activities.spreadsheet.SpreadsheetUtilsTest" time="0.001" name="testGetPortNameIntMapOfStringString"/>
+</testsuite>
