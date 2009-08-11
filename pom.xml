@@ -11,7 +11,16 @@
 	<version>0.1</version>
 	<name>Taverna 2 Spreadsheet Import Activity</name>
 	<description>Activity to import data from spreadsheet files</description>
+	
 	<repositories>
+		<repository>
+			<id>mygrid-repository</id>
+			<name>myGrid Repository</name>
+			<url>http://www.mygrid.org.uk/maven/repository</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 		<repository>
 			<id>odftoolkit</id>
 			<name>Odftoolkit Repository</name>
