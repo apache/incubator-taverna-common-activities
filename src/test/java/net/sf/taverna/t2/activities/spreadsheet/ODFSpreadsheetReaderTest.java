@@ -20,8 +20,11 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.spreadsheet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- *
+ * Unit tests for {@link net.sf.taverna.t2.activities.spreadsheet.ODFSpreadsheetReader}.
  *
  * @author David Withers
  */
@@ -120,6 +123,16 @@ public class ODFSpreadsheetReaderTest {
 
 	}
 
+	@Test(expected=SpreadsheetReadException.class)
+	public void testReadException() throws Exception {
+		SpreadsheetReader spreadsheetReader = new ODFSpreadsheetReader();
+		spreadsheetReader.read(new ByteArrayInputStream(new byte[0]), new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
+			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
+			}
+			
+		});
+	}	
+	
 	@Test
 	public void testReadAllRows() throws Exception {
 		SpreadsheetReader spreadsheetReader = new ODFSpreadsheetReader();

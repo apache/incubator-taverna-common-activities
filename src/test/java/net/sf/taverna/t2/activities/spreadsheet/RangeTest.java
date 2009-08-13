@@ -94,8 +94,16 @@ public class RangeTest {
 	@Test
 	public void testRangeRange() {
 		Range rangeCopy = new Range(range);
+		assertEquals(rangeCopy, range);
 		assertEquals(range.getStart(), rangeCopy.getStart());
 		assertEquals(range.getEnd(), rangeCopy.getEnd());
+		range = new Range(0, 7, range);
+		rangeCopy = new Range(range);
+		assertFalse(rangeCopy.equals(new Range(2,3)));
+		assertEquals(rangeCopy, range);
+		assertEquals(range.getStart(), rangeCopy.getStart());
+		assertEquals(range.getEnd(), rangeCopy.getEnd());
+		assertArrayEquals(range.getRangeValues(), rangeCopy.getRangeValues());
 	}
 
 	/**
@@ -113,6 +121,8 @@ public class RangeTest {
 	@Test
 	public void testGetRangeValues() {
 		assertArrayEquals(new int[] { 1, 2, 3, 4, 5 }, range.getRangeValues());
+		Range range2 = new Range(0, 7, range);
+		assertArrayEquals(new int[] { 0, 6, 7 }, range2.getRangeValues());
 	}
 
 	/**
