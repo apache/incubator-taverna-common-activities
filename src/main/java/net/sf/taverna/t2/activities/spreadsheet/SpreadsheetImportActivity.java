@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +58,7 @@ import org.apache.log4j.Logger;
 public class SpreadsheetImportActivity extends
 		AbstractAsynchronousActivity<SpreadsheetImportConfiguration> {
 
-	private static final String INPUT_PORT_NAME = "file";
+	private static final String INPUT_PORT_NAME = "fileurl";
 
 	private static Logger logger = Logger.getLogger(SpreadsheetImportActivity.class);
 
@@ -200,6 +202,9 @@ public class SpreadsheetImportActivity extends
 				} catch (FileNotFoundException e) {
 					logger.warn("Input spreadsheet file does not exist", e);
 					callback.fail("Input spreadsheet file does not exist", e);
+				} catch (IOException e) {
+					logger.warn("Error reading spreadsheet", e);
+					callback.fail("Error reading spreadsheet", e);
 				}
 			}
 
@@ -209,7 +214,7 @@ public class SpreadsheetImportActivity extends
 	
 	private InputStream getInputStream(InvocationContext context,
 			ReferenceService referenceService, T2Reference inputRef)
-			throws FileNotFoundException {
+			throws IOException {
 		InputStream inputStream = null;
 
 		Identified identified = referenceService.resolveIdentifier(inputRef, null, context);
@@ -221,9 +226,15 @@ public class SpreadsheetImportActivity extends
 				if (externalReference instanceof ValueCarryingExternalReference<?>) {
 					ValueCarryingExternalReference<?> vcer = (ValueCarryingExternalReference<?>) externalReference;
 					if (String.class.isAssignableFrom(vcer.getValueType())) {
-						String fileName = (String) vcer.getValue();
-						logger.debug("Input spreadsheet file name is '" + fileName + "'");
-						inputStream = new FileInputStream(fileName);
+						String input = (String) vcer.getValue();
+						try {
+							URL url = new URL(input);
+							inputStream = url.openStream();
+							logger.debug("Input spreadsheet url is '" + input + "'");
+						} catch (MalformedURLException e) {
+							logger.debug("Input spreadsheet file name is '" + input + "'");
+							inputStream = new FileInputStream(input);
+						}
 					}
 					break;
 				} else {
