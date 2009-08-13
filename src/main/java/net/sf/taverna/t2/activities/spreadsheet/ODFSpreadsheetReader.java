@@ -58,7 +58,6 @@ public class ODFSpreadsheetReader implements SpreadsheetReader {
 			String rowsPath = ("//table:table[1]/table:table-row");
 			rowList = (NodeList) xpath.evaluate(rowsPath, odfContent, XPathConstants.NODESET);
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new SpreadsheetReadException("The spreadsheet file could not be read", e);
 		}
 
