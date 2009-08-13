@@ -133,7 +133,6 @@ public class ExcelSpreadsheetReader implements SpreadsheetReader {
 			default:
 				break;
 			}
-			break;
 		default:
 			break;
 		}
