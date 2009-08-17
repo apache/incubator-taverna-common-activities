@@ -41,13 +41,11 @@ import org.junit.Test;
  */
 public class ODFSpreadsheetReaderTest {
 
-	/**
-	 *
-	 *
-	 * @throws java.lang.Exception
-	 */
+	private SpreadsheetReader spreadsheetReader;
+
 	@Before
 	public void setUp() throws Exception {
+		spreadsheetReader = new ODFSpreadsheetReader();
 	}
 
 	/**
@@ -55,7 +53,6 @@ public class ODFSpreadsheetReaderTest {
 	 */
 	@Test
 	public void testRead() throws Exception {
-		ODFSpreadsheetReader spreadsheetReader = new ODFSpreadsheetReader();
 		String[] testFiles2 = new String[] { "/test-spreadsheet.ods" };
 		for (int i = 0; i < testFiles2.length; i++) {
 			final List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4, 5));
@@ -125,7 +122,6 @@ public class ODFSpreadsheetReaderTest {
 
 	@Test(expected=SpreadsheetReadException.class)
 	public void testReadException() throws Exception {
-		SpreadsheetReader spreadsheetReader = new ODFSpreadsheetReader();
 		spreadsheetReader.read(new ByteArrayInputStream(new byte[0]), new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
 			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
 			}
@@ -135,7 +131,6 @@ public class ODFSpreadsheetReaderTest {
 	
 	@Test
 	public void testReadAllRows() throws Exception {
-		SpreadsheetReader spreadsheetReader = new ODFSpreadsheetReader();
 		String[] testFiles2 = new String[] { "/test-spreadsheet.ods" };
 		for (int i = 0; i < testFiles2.length; i++) {
 			final List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7,
@@ -212,7 +207,6 @@ public class ODFSpreadsheetReaderTest {
 
 	@Test
 	public void testIgnoreBlankRows() throws Exception {
-		SpreadsheetReader spreadsheetReader = new ODFSpreadsheetReader();
 		String[] testFiles2 = new String[] { "/test-spreadsheet.ods" };
 		for (int i = 0; i < testFiles2.length; i++) {
 			final List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12, 13, 14));

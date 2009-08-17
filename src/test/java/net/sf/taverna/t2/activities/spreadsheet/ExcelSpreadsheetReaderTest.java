@@ -24,12 +24,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -39,6 +42,14 @@ import org.junit.Test;
  */
 public class ExcelSpreadsheetReaderTest {
 
+	private SpreadsheetReader spreadsheetReader;
+	private String[] testFiles = new String[] {"/test-spreadsheet.xlsx" , "/test-spreadsheet.xls"};
+
+	@Before
+	public void setUp() throws Exception {
+		spreadsheetReader = new ExcelSpreadsheetReader();
+	}
+
 	/**
 	 * Test method for
 	 * {@link net.sf.taverna.t2.activities.spreadsheet.ExcelSpreadsheetReader#read(java.io.InputStream, net.sf.taverna.t2.activities.spreadsheet.SpreadsheetRowProcessor)}
@@ -47,8 +58,6 @@ public class ExcelSpreadsheetReaderTest {
 	 */
 	@Test
 	public void testRead() throws Exception {
-		SpreadsheetReader spreadsheetReader = new ExcelSpreadsheetReader();
-		String[] testFiles = new String[] {"/test-spreadsheet.xlsx" , "/test-spreadsheet.xls"};
 		for (int i = 0; i < testFiles.length; i++) {
 			final List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4, 5));
 			spreadsheetReader.read(getClass().getResourceAsStream(testFiles[i]), new Range(0, 5),
@@ -113,14 +122,40 @@ public class ExcelSpreadsheetReaderTest {
 		}
 	}
 
+	@Test(expected=SpreadsheetReadException.class)
+	public void testReadIOException() throws Exception {
+		spreadsheetReader.read(new InputStream() {
+			public int read() throws IOException {
+				throw new IOException();
+			}			
+		}, new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
+			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
+			}			
+		});
+	}	
+	
+	@Test(expected=SpreadsheetReadException.class)
+	public void testReadInvalidFormatException() throws Exception {
+		spreadsheetReader.read(getClass().getResourceAsStream("/test-spreadsheet.ods"), new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
+			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
+			}			
+		});
+	}	
+	
+	@Test(expected=SpreadsheetReadException.class)
+	public void testReadIllegalArgumentException() throws Exception {
+		spreadsheetReader.read(getClass().getResourceAsStream("/test-spreadsheet.csv"), new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
+			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
+			}			
+		});
+	}	
+	
 	@Test
 	public void testReadAllRows() throws Exception {
-		SpreadsheetReader spreadsheetReader = new ExcelSpreadsheetReader();
-		String[] testFiles2 = new String[] {"/test-spreadsheet.xlsx" , "/test-spreadsheet.xls"};
-		for (int i = 0; i < testFiles2.length; i++) {
+		for (int i = 0; i < testFiles.length; i++) {
 			final List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7,
 					8, 9, 10, 11, 12, 13, 14));
-			spreadsheetReader.read(getClass().getResourceAsStream(testFiles2[i]), new Range(0, -1), new Range(0, 4), false,
+			spreadsheetReader.read(getClass().getResourceAsStream(testFiles[i]), new Range(0, -1), new Range(0, 4), false,
 					new SpreadsheetRowProcessor() {
 
 						public void processRow(int rowIndex, Map<Integer, String> row) {
@@ -192,11 +227,9 @@ public class ExcelSpreadsheetReaderTest {
 
 	@Test
 	public void testIgnoreBlankRows() throws Exception {
-		SpreadsheetReader spreadsheetReader = new ExcelSpreadsheetReader();
-		String[] testFiles2 = new String[] {"/test-spreadsheet.xlsx" , "/test-spreadsheet.xls"};
-		for (int i = 0; i < testFiles2.length; i++) {
+		for (int i = 0; i < testFiles.length; i++) {
 			final List<Integer> rows = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3, 4, 9, 10, 11, 12, 13, 14));
-			spreadsheetReader.read(getClass().getResourceAsStream(testFiles2[i]), new Range(0, -1), new Range(0, 4), true,
+			spreadsheetReader.read(getClass().getResourceAsStream(testFiles[i]), new Range(0, -1), new Range(0, 4), true,
 					new SpreadsheetRowProcessor() {
 
 						public void processRow(int rowIndex, Map<Integer, String> row) {

@@ -33,6 +33,11 @@ import org.junit.Test;
  */
 public class SpreadsheetUtilsTest {
 
+	@Test
+	public void testSpreadsheetUtils() {
+		assertNotNull(new SpreadsheetUtils());
+	}
+	
 	/**
 	 * Test method for {@link net.sf.taverna.t2.activities.spreadsheet.SpreadsheetUtils#getColumnIndex(java.lang.String)}.
 	 */
