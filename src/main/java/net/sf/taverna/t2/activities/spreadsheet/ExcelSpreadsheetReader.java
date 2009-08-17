@@ -54,6 +54,8 @@ public class ExcelSpreadsheetReader implements SpreadsheetReader {
 					"The file does not have a compatible spreadsheet format", e);
 		} catch (IOException e) {
 			throw new SpreadsheetReadException("The spreadsheet stream could not be read", e);
+		} catch (IllegalArgumentException e) {
+			throw new SpreadsheetReadException("The spreadsheet stream could not be read", e);
 		}
 
 		DataFormatter dataFormatter = new DataFormatter();
