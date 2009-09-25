@@ -23,8 +23,8 @@ package net.sf.taverna.t2.activities.spreadsheet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import com.csvreader.CsvReader;
 
@@ -42,7 +42,7 @@ public class CSVSpreadsheetReader implements SpreadsheetReader {
 		CsvReader csvReader = new CsvReader(new InputStreamReader(inputStream));
 		csvReader.setSkipEmptyRecords(false);
 
-		Map<Integer, String> currentDataRow = new HashMap<Integer, String>();
+		SortedMap<Integer, String> currentDataRow = new TreeMap<Integer, String>();
 
 		try {
 			while(csvReader.readRecord()) {
@@ -61,7 +61,7 @@ public class CSVSpreadsheetReader implements SpreadsheetReader {
 								if (!ignoreBlankRows || !blankRow) {
 									rowProcessor.processRow(rowIndex, currentDataRow);
 								}
-								currentDataRow = new HashMap<Integer, String>();
+								currentDataRow = new TreeMap<Integer, String>();
 							}
 						}
 					}

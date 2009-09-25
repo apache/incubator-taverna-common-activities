@@ -20,7 +20,7 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.spreadsheet;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * Interface for processing a row of data from a {@link ExcelSpreadsheetReader}.
@@ -30,13 +30,13 @@ import java.util.Map;
 public interface SpreadsheetRowProcessor {
 
 	/**
-	 * Called by the {@link ExcelSpreadsheetReader} when all the cells of a row have been read.
+	 * Called by a {@link SpreadsheetReader} when all the cells of a row have been read.
 	 * 
 	 * @param rowIndex
 	 *            the index of the spreadsheet row
 	 * @param rowData
 	 *            the map of column index -> cell data for the spreadsheet row
 	 */
-	public void processRow(int rowIndex, Map<Integer, String> rowData);
+	public void processRow(int rowIndex, SortedMap<Integer, String> rowData);
 
 }

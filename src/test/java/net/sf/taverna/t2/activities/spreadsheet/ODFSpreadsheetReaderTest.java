@@ -24,11 +24,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 import java.util.Map.Entry;
 
 import org.junit.Before;
@@ -59,7 +60,7 @@ public class ODFSpreadsheetReaderTest {
 			spreadsheetReader.read(getClass().getResourceAsStream(testFiles2[i]), new Range(0, 5), new Range(0, 4), false,
 					new SpreadsheetRowProcessor() {
 
-						public void processRow(int rowIndex, Map<Integer, String> row) {
+						public void processRow(int rowIndex, SortedMap<Integer, String> row) {
 							assertTrue(rows.remove((Integer) rowIndex));
 							List<Integer> columns = new ArrayList<Integer>(Arrays.asList(0, 1, 2,
 									3, 4));
@@ -122,10 +123,22 @@ public class ODFSpreadsheetReaderTest {
 
 	@Test(expected=SpreadsheetReadException.class)
 	public void testReadException() throws Exception {
-		spreadsheetReader.read(new ByteArrayInputStream(new byte[0]), new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
-			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
+		spreadsheetReader.read(getClass().getResourceAsStream("/test-spreadsheet.csv"), new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
+			public void processRow(int rowIndex, SortedMap<Integer, String> rowData) {				
 			}
 			
+		});
+	}	
+	
+	@Test(expected=RuntimeException.class)
+	public void testReadRuntimeException() throws Exception {
+		spreadsheetReader.read(new InputStream() {
+			public int read() throws IOException {
+				throw new RuntimeException();
+			}			
+		}, new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
+			public void processRow(int rowIndex, SortedMap<Integer, String> rowData) {				
+			}			
 		});
 	}	
 	
@@ -138,7 +151,7 @@ public class ODFSpreadsheetReaderTest {
 			spreadsheetReader.read(getClass().getResourceAsStream(testFiles2[i]), new Range(0, -1), new Range(0, 4), false,
 					new SpreadsheetRowProcessor() {
 
-						public void processRow(int rowIndex, Map<Integer, String> row) {
+						public void processRow(int rowIndex, SortedMap<Integer, String> row) {
 							assertTrue(rows.remove((Integer) rowIndex));
 							List<Integer> columns = new ArrayList<Integer>(Arrays.asList(0, 1, 2,
 									3, 4));
@@ -213,7 +226,7 @@ public class ODFSpreadsheetReaderTest {
 			spreadsheetReader.read(getClass().getResourceAsStream(testFiles2[i]), new Range(0, -1), new Range(0, 4), true,
 					new SpreadsheetRowProcessor() {
 
-						public void processRow(int rowIndex, Map<Integer, String> row) {
+						public void processRow(int rowIndex, SortedMap<Integer, String> row) {
 							assertTrue(rows.remove((Integer) rowIndex));
 							List<Integer> columns = new ArrayList<Integer>(Arrays.asList(0, 1, 2,
 									3, 4));

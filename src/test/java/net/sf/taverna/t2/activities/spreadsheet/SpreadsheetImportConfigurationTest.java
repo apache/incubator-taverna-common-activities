@@ -51,6 +51,7 @@ public class SpreadsheetImportConfigurationTest {
 		assertEquals(new Range(0, -1), configuration.getRowRange());
 		assertEquals("", configuration.getEmptyCellValue());
 		assertEquals(SpreadsheetEmptyCellPolicy.EMPTY_STRING, configuration.getEmptyCellPolicy());
+		assertEquals(SpreadsheetOutputFormat.PORT_PER_COLUMN, configuration.getOutputFormat());
 		assertEquals(Collections.EMPTY_MAP, configuration.getColumnNames());
 		assertEquals(true, configuration.isAllRows());
 		assertEquals(false, configuration.isExcludeFirstRow());
@@ -70,6 +71,8 @@ public class SpreadsheetImportConfigurationTest {
 		configuration.setEmptyCellPolicy(SpreadsheetEmptyCellPolicy.GENERATE_ERROR);
 		configuration.setEmptyCellValue("NO VALUE");
 		configuration.setColumnNames(Collections.singletonMap("D", "delta"));
+		configuration.setOutputFormat(SpreadsheetOutputFormat.SINGLE_PORT);
+		configuration.setCsvDelimiter(" ");
 		SpreadsheetImportConfiguration newConfiguration = new SpreadsheetImportConfiguration(configuration);
 		assertEquals(configuration, newConfiguration);
 	}
@@ -233,6 +236,30 @@ public class SpreadsheetImportConfigurationTest {
 	public void testHashCode() {
 		assertEquals(configuration.hashCode(), configuration.hashCode());
 		assertEquals(configuration.hashCode(), new SpreadsheetImportConfiguration().hashCode());
+	}
+
+	@Test
+	public void testGetOutputFormat() {
+		assertEquals(SpreadsheetOutputFormat.PORT_PER_COLUMN, configuration.getOutputFormat());
+	}
+
+	@Test
+	public void testSetOutputFormat() {
+		configuration.setOutputFormat(SpreadsheetOutputFormat.PORT_PER_COLUMN);
+		assertEquals(SpreadsheetOutputFormat.PORT_PER_COLUMN, configuration.getOutputFormat());
+		configuration.setOutputFormat(SpreadsheetOutputFormat.SINGLE_PORT);
+		assertEquals(SpreadsheetOutputFormat.SINGLE_PORT, configuration.getOutputFormat());
+	}
+
+	@Test
+	public void testGetCsvDelimiter() {
+		assertEquals(",", configuration.getCsvDelimiter());
+	}
+
+	@Test
+	public void testSetCsvDelimiter() {
+		configuration.setCsvDelimiter("'");
+		assertEquals("'", configuration.getCsvDelimiter());
 	}
 
 }

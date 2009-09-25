@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.Map.Entry;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
@@ -49,6 +51,9 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 
 import org.apache.log4j.Logger;
 
+import com.csvreader.CsvWriter;
+
+
 /**
  * An {@link net.sf.taverna.t2.workflowmodel.processor.activity.Activity} that reads spreadsheet
  * files.
@@ -59,6 +64,8 @@ public class SpreadsheetImportActivity extends
 		AbstractAsynchronousActivity<SpreadsheetImportConfiguration> {
 
 	private static final String INPUT_PORT_NAME = "fileurl";
+
+	private static final String OUTPUT_PORT_NAME = "output";
 
 	private static Logger logger = Logger.getLogger(SpreadsheetImportActivity.class);
 
@@ -73,6 +80,10 @@ public class SpreadsheetImportActivity extends
 	private String missingCellValue;
 
 	private SpreadsheetEmptyCellPolicy emptyCellPolicy;
+
+	private SpreadsheetOutputFormat outputFormat;
+
+	private String csvDelimiter;
 
 	/**
 	 * Constructs a SpreadsheetImport activity.
@@ -94,6 +105,10 @@ public class SpreadsheetImportActivity extends
 		logger.debug("Setting empty cell value to " + missingCellValue);
 		emptyCellPolicy = configurationBean.getEmptyCellPolicy();
 		logger.debug("Setting empty cell policy to " + emptyCellPolicy);
+		outputFormat = configurationBean.getOutputFormat();
+		logger.debug("Setting output format to " + outputFormat);
+		csvDelimiter = configurationBean.getCsvDelimiter();
+		logger.debug("Setting output format to " + outputFormat);
 		configurePorts();
 	}
 
@@ -102,10 +117,14 @@ public class SpreadsheetImportActivity extends
 		addInput(INPUT_PORT_NAME, 0, false, null, null);
 
 		removeOutputs();
-		for (int column = columnRange.getStart(); column <= columnRange.getEnd(); column++) {
-			if (columnRange.contains(column)) {
-				addOutput(SpreadsheetUtils.getPortName(column, columnNames), 1, 1);
+		if (outputFormat.equals(SpreadsheetOutputFormat.PORT_PER_COLUMN)) {
+			for (int column = columnRange.getStart(); column <= columnRange.getEnd(); column++) {
+				if (columnRange.contains(column)) {
+					addOutput(SpreadsheetUtils.getPortName(column, columnNames), 1, 1);
+				}
 			}
+		} else {
+			addOutput(OUTPUT_PORT_NAME, 0, 0);
 		}
 	}
 
@@ -123,44 +142,30 @@ public class SpreadsheetImportActivity extends
 
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 
-				final InvocationContext context = callback.getContext();
-				final ReferenceService referenceService = context.getReferenceService();
+				InvocationContext context = callback.getContext();
+				ReferenceService referenceService = context.getReferenceService();
 
 				try {
 					T2Reference inputRef = data.get(INPUT_PORT_NAME);
 
-					final Map<String, List<T2Reference>> outputLists = new HashMap<String, List<T2Reference>>();
-					for (Port port : getOutputPorts()) {
-						outputLists.put(port.getName(), new ArrayList<T2Reference>());
-					}
-
-					SpreadsheetRowProcessor spreadsheetRowProcessor = new SpreadsheetRowProcessor() {
-
-						public void processRow(int rowIndex, Map<Integer, String> row) {
-							for (Entry<Integer, String> entry : row.entrySet()) {
-								String column = SpreadsheetUtils.getPortName(entry.getKey(),
-										columnNames);
-								Object value = entry.getValue();
-								if (value == null) {
-									if (emptyCellPolicy
-											.equals(SpreadsheetEmptyCellPolicy.GENERATE_ERROR)) {
-										value = referenceService.getErrorDocumentService()
-												.registerError(
-														"Missing data for spreadsheet cell "
-																+ column + row, 0);
-									} else if (emptyCellPolicy
-											.equals(SpreadsheetEmptyCellPolicy.EMPTY_STRING)) {
-										value = "";
-									} else {
-										value = missingCellValue;
-									}
-								}
-								T2Reference id = referenceService.register(value, 0, true, context);
-								outputLists.get(column).add(id);
-							}
+					SpreadsheetRowProcessor spreadsheetRowProcessor = null;
+					Map<String, List<T2Reference>> outputLists = null;
+					StringWriter output = null;
+					
+					if (outputFormat.equals(SpreadsheetOutputFormat.PORT_PER_COLUMN)) {
+						outputLists = new HashMap<String, List<T2Reference>>();
+						for (Port port : getOutputPorts()) {
+							outputLists.put(port.getName(), new ArrayList<T2Reference>());
 						}
-
-					};
+						spreadsheetRowProcessor = new MultiplePortRowProcessor(referenceService, outputLists, context);
+					} else {
+						output = new StringWriter();
+						CsvWriter csvWriter = new CsvWriter(output, csvDelimiter.charAt(0));
+						csvWriter.setEscapeMode(CsvWriter.ESCAPE_MODE_DOUBLED);
+						csvWriter.setTextQualifier('"');
+						csvWriter.setUseTextQualifier(true);
+						spreadsheetRowProcessor = new SingleOutputRowProcessor(csvWriter);
+					}
 
 					InputStream inputStream = getInputStream(context, referenceService, inputRef);
 					if (inputStream == null) {
@@ -172,12 +177,19 @@ public class SpreadsheetImportActivity extends
 						try {
 							new ExcelSpreadsheetReader().read(inputStream, new Range(rowRange),
 									new Range(columnRange), ignoreBlankRows, spreadsheetRowProcessor);
-							inputStream.close();
 						} catch (SpreadsheetReadException e) {
 							inputStream.close();
 							inputStream = getInputStream(context, referenceService, inputRef);
-							new ODFSpreadsheetReader().read(inputStream, new Range(rowRange),
-									new Range(columnRange), ignoreBlankRows, spreadsheetRowProcessor);
+							try {
+								new ODFSpreadsheetReader().read(inputStream, new Range(rowRange),
+										new Range(columnRange), ignoreBlankRows, spreadsheetRowProcessor);
+							} catch (SpreadsheetReadException e2) {
+								inputStream.close();
+								inputStream = getInputStream(context, referenceService, inputRef);
+								new CSVSpreadsheetReader().read(inputStream, new Range(rowRange),
+										new Range(columnRange), ignoreBlankRows, spreadsheetRowProcessor);							
+							}
+						} finally {
 							inputStream.close();
 						}
 					} catch (IOException e1) {
@@ -185,12 +197,17 @@ public class SpreadsheetImportActivity extends
 					}
 
 					// get outputs
-					for (OutputPort outputPort : getOutputPorts()) {
-						String name = outputPort.getName();
-						Object value = outputLists.get(name);
-						T2Reference id = referenceService.register(value, outputPort.getDepth(),
-								true, context);
-						outputData.put(name, id);
+					if (outputFormat.equals(SpreadsheetOutputFormat.PORT_PER_COLUMN)) {
+						for (OutputPort outputPort : getOutputPorts()) {
+							String name = outputPort.getName();
+							Object value = outputLists.get(name);
+							T2Reference id = referenceService.register(value, outputPort.getDepth(),
+									true, context);
+							outputData.put(name, id);
+						}
+					} else {
+						T2Reference id = referenceService.register(output.toString(), 0, true, context);
+						outputData.put(OUTPUT_PORT_NAME, id);
 					}
 					callback.receiveResult(outputData, new int[0]);
 				} catch (ReferenceServiceException e) {
@@ -244,6 +261,95 @@ public class SpreadsheetImportActivity extends
 			}
 		}
 		return inputStream;
+	}
+
+	/**
+	 * SpreadsheetRowProcessor for handling a single output formatted as csv.
+	 *
+	 * @author David Withers
+	 */
+	private final class SingleOutputRowProcessor implements SpreadsheetRowProcessor {
+
+		private final CsvWriter csvWriter;
+
+		/**
+		 * Constructs a new SingleOutputRowProcessor.
+		 * 
+		 * @param csvWriter
+		 */
+		private SingleOutputRowProcessor(CsvWriter csvWriter) {
+			this.csvWriter = csvWriter;
+		}
+
+		public void processRow(int rowIndex, SortedMap<Integer, String> row) {
+			try {
+				for (String value : row.values()) {
+					if (value == null) {
+						if (emptyCellPolicy.equals(SpreadsheetEmptyCellPolicy.GENERATE_ERROR)) {
+							value = "ERROR";
+						} else if (emptyCellPolicy.equals(SpreadsheetEmptyCellPolicy.EMPTY_STRING)) {
+							value = "";
+						} else {
+							value = missingCellValue;
+						}
+					}
+					csvWriter.write(value, true);
+				}
+				csvWriter.endRecord();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	/**
+	 * SpreadsheetRowProcessor for handling multiple outputs.
+	 *
+	 * @author David Withers
+	 */
+	private final class MultiplePortRowProcessor implements SpreadsheetRowProcessor {
+
+		private final ReferenceService referenceService;
+		private final Map<String, List<T2Reference>> outputLists;
+		private final InvocationContext context;
+
+		/**
+		 * Constructs a new MultiplePortRowProcessor.
+		 * 
+		 * @param referenceService
+		 * @param outputLists
+		 * @param context
+		 */
+		private MultiplePortRowProcessor(ReferenceService referenceService,
+				Map<String, List<T2Reference>> outputLists, InvocationContext context) {
+			this.referenceService = referenceService;
+			this.outputLists = outputLists;
+			this.context = context;
+		}
+
+		public void processRow(int rowIndex, SortedMap<Integer, String> row) {
+			for (Entry<Integer, String> entry : row.entrySet()) {
+				String column = SpreadsheetUtils.getPortName(entry.getKey(),
+						columnNames);
+				Object value = entry.getValue();
+				if (value == null) {
+					if (emptyCellPolicy
+							.equals(SpreadsheetEmptyCellPolicy.GENERATE_ERROR)) {
+						value = referenceService.getErrorDocumentService()
+								.registerError(
+										"Missing data for spreadsheet cell "
+												+ column + row, 0);
+					} else if (emptyCellPolicy
+							.equals(SpreadsheetEmptyCellPolicy.EMPTY_STRING)) {
+						value = "";
+					} else {
+						value = missingCellValue;
+					}
+				}
+				T2Reference id = referenceService.register(value, 0, true, context);
+				outputLists.get(column).add(id);
+			}
+		}
 	}
 
 }

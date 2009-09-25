@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 import java.util.Map.Entry;
 
 import org.junit.Before;
@@ -63,7 +63,7 @@ public class ExcelSpreadsheetReaderTest {
 			spreadsheetReader.read(getClass().getResourceAsStream(testFiles[i]), new Range(0, 5),
 					new Range(0, 4), false, new SpreadsheetRowProcessor() {
 
-						public void processRow(int rowIndex, Map<Integer, String> row) {
+						public void processRow(int rowIndex, SortedMap<Integer, String> row) {
 							assertTrue(rows.remove((Integer) rowIndex));
 							List<Integer> columns = new ArrayList<Integer>(Arrays.asList(0, 1, 2,
 									3, 4));
@@ -129,7 +129,7 @@ public class ExcelSpreadsheetReaderTest {
 				throw new IOException();
 			}			
 		}, new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
-			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
+			public void processRow(int rowIndex, SortedMap<Integer, String> rowData) {				
 			}			
 		});
 	}	
@@ -137,7 +137,7 @@ public class ExcelSpreadsheetReaderTest {
 	@Test(expected=SpreadsheetReadException.class)
 	public void testReadInvalidFormatException() throws Exception {
 		spreadsheetReader.read(getClass().getResourceAsStream("/test-spreadsheet.ods"), new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
-			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
+			public void processRow(int rowIndex, SortedMap<Integer, String> rowData) {				
 			}			
 		});
 	}	
@@ -145,7 +145,7 @@ public class ExcelSpreadsheetReaderTest {
 	@Test(expected=SpreadsheetReadException.class)
 	public void testReadIllegalArgumentException() throws Exception {
 		spreadsheetReader.read(getClass().getResourceAsStream("/test-spreadsheet.csv"), new Range(0,1), new Range(0,1), false, new SpreadsheetRowProcessor() {
-			public void processRow(int rowIndex, Map<Integer, String> rowData) {				
+			public void processRow(int rowIndex, SortedMap<Integer, String> rowData) {				
 			}			
 		});
 	}	
@@ -158,7 +158,7 @@ public class ExcelSpreadsheetReaderTest {
 			spreadsheetReader.read(getClass().getResourceAsStream(testFiles[i]), new Range(0, -1), new Range(0, 4), false,
 					new SpreadsheetRowProcessor() {
 
-						public void processRow(int rowIndex, Map<Integer, String> row) {
+						public void processRow(int rowIndex, SortedMap<Integer, String> row) {
 							assertTrue(rows.remove((Integer) rowIndex));
 							List<Integer> columns = new ArrayList<Integer>(Arrays.asList(0, 1, 2,
 									3, 4));
@@ -232,7 +232,7 @@ public class ExcelSpreadsheetReaderTest {
 			spreadsheetReader.read(getClass().getResourceAsStream(testFiles[i]), new Range(0, -1), new Range(0, 4), true,
 					new SpreadsheetRowProcessor() {
 
-						public void processRow(int rowIndex, Map<Integer, String> row) {
+						public void processRow(int rowIndex, SortedMap<Integer, String> row) {
 							assertTrue(rows.remove((Integer) rowIndex));
 							List<Integer> columns = new ArrayList<Integer>(Arrays.asList(0, 1, 2,
 									3, 4));

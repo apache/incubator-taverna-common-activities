@@ -22,8 +22,8 @@ package net.sf.taverna.t2.activities.spreadsheet;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -68,7 +68,7 @@ public class ExcelSpreadsheetReader implements SpreadsheetReader {
 			logger.debug("No end of row range specified, setting to " + rowRange.getEnd());
 		}
 
-		Map<Integer, String> currentDataRow = new HashMap<Integer, String>();
+		SortedMap<Integer, String> currentDataRow = new TreeMap<Integer, String>();
 
 		for (int rowIndex = rowRange.getStart(); rowIndex <= rowRange.getEnd(); rowIndex++) {
 			boolean blankRow = true;
@@ -91,7 +91,7 @@ public class ExcelSpreadsheetReader implements SpreadsheetReader {
 							if (!ignoreBlankRows || !blankRow) {
 								rowProcessor.processRow(rowIndex, currentDataRow);
 							}
-							currentDataRow = new HashMap<Integer, String>();
+							currentDataRow = new TreeMap<Integer, String>();
 						}
 					}
 				}

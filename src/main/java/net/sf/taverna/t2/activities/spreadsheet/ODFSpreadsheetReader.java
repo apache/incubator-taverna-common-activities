@@ -21,8 +21,8 @@
 package net.sf.taverna.t2.activities.spreadsheet;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -58,6 +58,9 @@ public class ODFSpreadsheetReader implements SpreadsheetReader {
 			String rowsPath = ("//table:table[1]/table:table-row");
 			rowList = (NodeList) xpath.evaluate(rowsPath, odfContent, XPathConstants.NODESET);
 		} catch (Exception e) {
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException) e;
+			}
 			throw new SpreadsheetReadException("The spreadsheet file could not be read", e);
 		}
 
@@ -65,7 +68,7 @@ public class ODFSpreadsheetReader implements SpreadsheetReader {
 			rowRange.setEnd(calculateRowCount(rowList) - 1);
 		}
 
-		Map<Integer, String> currentDataRow = new HashMap<Integer, String>();
+		SortedMap<Integer, String> currentDataRow = new TreeMap<Integer, String>();
 		int rowRep = 0;
 		for (int rowIndex = rowRange.getStart(); rowIndex <= rowRange.getEnd(); rowIndex++) {
 			boolean blankRow = true;
@@ -138,7 +141,7 @@ public class ODFSpreadsheetReader implements SpreadsheetReader {
 						}
 						repeatedRows--;
 					}
-					currentDataRow = new HashMap<Integer, String>();
+					currentDataRow = new TreeMap<Integer, String>();
 				}
 
 			}

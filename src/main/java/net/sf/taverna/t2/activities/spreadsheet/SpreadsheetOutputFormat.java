@@ -20,33 +20,18 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.spreadsheet;
 
-import java.io.InputStream;
-
 /**
- * Interface for reading a spreadsheet from an input stream.
- * 
+ * Enumeration of the formats for output of spreadsheet cell values.
+ * <p>
+ * <dl>
+ * <dt>PORT_PER_COLUMN</dt>
+ * <dd>One port of depth 1 (a list) per column</dd>
+ * <dt>SINGLE_PORT</dt>
+ * <dd>A single port of depth 0, formatted as CSV</dd>
+ * </dl>
+ *
  * @author David Withers
  */
-public interface SpreadsheetReader {
-
-	/**
-	 * Reads an InputStream and passes spreadsheet cell data values, row by row, to the
-	 * rowProcessor.
-	 * 
-	 * @param inputStream
-	 *            the stream to read
-	 * @param rowProcessor
-	 *            the rowProcessor to write rows of data values to
-	 * @param rowRange
-	 *            the rows to read
-	 * @param columnRange
-	 *            the columns to read
-	 * @param ignoreBlankRows
-	 *            whether to ignore blank rows
-	 * @throws SpreadsheetReadException
-	 *             if there's an error reading the stream or the stream is not a valid spreadsheet
-	 */
-	public void read(InputStream inputStream, Range rowRange, Range columnRange, boolean ignoreBlankRows,
-			SpreadsheetRowProcessor rowProcessor) throws SpreadsheetReadException;
-
+public enum SpreadsheetOutputFormat {
+	PORT_PER_COLUMN, SINGLE_PORT
 }

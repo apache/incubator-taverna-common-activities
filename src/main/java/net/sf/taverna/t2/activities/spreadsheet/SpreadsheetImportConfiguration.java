@@ -38,7 +38,9 @@ public class SpreadsheetImportConfiguration {
 	private boolean excludeFirstRow = false;
 	private boolean ignoreBlankRows = false;
 	private SpreadsheetEmptyCellPolicy emptyCellPolicy = SpreadsheetEmptyCellPolicy.EMPTY_STRING;
-
+	private SpreadsheetOutputFormat outputFormat = SpreadsheetOutputFormat.PORT_PER_COLUMN;
+	private String csvDelimiter = ",";
+	
 	/**
 	 * Constructs a new SpreadsheetImportConfiguration.
 	 */
@@ -60,6 +62,8 @@ public class SpreadsheetImportConfiguration {
 		this.excludeFirstRow = configuration.excludeFirstRow;
 		this.emptyCellPolicy = configuration.emptyCellPolicy;
 		this.ignoreBlankRows = configuration.ignoreBlankRows;
+		this.outputFormat = configuration.outputFormat;
+		this.csvDelimiter = configuration.csvDelimiter;
 	}
 
 	/**
@@ -214,9 +218,46 @@ public class SpreadsheetImportConfiguration {
 		this.emptyCellPolicy = emptyCellPolicy;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	/**
+	 * Returns the outputFormat. The default value is
+	 * <code>SpreadsheetOutputFormat.PORT_PER_COLUMN</code>.
+	 * 
+	 * @return the value of outputFormat
 	 */
+	public SpreadsheetOutputFormat getOutputFormat() {
+		return outputFormat;
+	}
+
+	/**
+	 * Sets the outputFormat.
+	 * 
+	 * @param outputFormat
+	 *            the new value for outputFormat
+	 */
+	public void setOutputFormat(SpreadsheetOutputFormat outputFormat) {
+		this.outputFormat = outputFormat;
+	}
+
+	/**
+	 * Returns the delimiter for CSV formatted output. The default value is
+	 * <code>","</code>.
+	 * 
+	 * @return the delimiter for CSV formatted output
+	 */
+	public String getCsvDelimiter() {
+		return csvDelimiter;
+	}
+
+	/**
+	 * Sets the delimiter for CSV formatted output.
+	 * 
+	 * @param outputFormat
+	 *            the new delimiter for CSV formatted output
+	 */
+	public void setCsvDelimiter(String csvDelimiter) {
+		this.csvDelimiter = csvDelimiter;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -224,57 +265,86 @@ public class SpreadsheetImportConfiguration {
 		result = prime * result + (allRows ? 1231 : 1237);
 		result = prime * result + ((columnNames == null) ? 0 : columnNames.hashCode());
 		result = prime * result + ((columnRange == null) ? 0 : columnRange.hashCode());
+		result = prime * result + ((csvDelimiter == null) ? 0 : csvDelimiter.hashCode());
 		result = prime * result + ((emptyCellPolicy == null) ? 0 : emptyCellPolicy.hashCode());
 		result = prime * result + ((emptyCellValue == null) ? 0 : emptyCellValue.hashCode());
 		result = prime * result + (excludeFirstRow ? 1231 : 1237);
 		result = prime * result + (ignoreBlankRows ? 1231 : 1237);
+		result = prime * result + ((outputFormat == null) ? 0 : outputFormat.hashCode());
 		result = prime * result + ((rowRange == null) ? 0 : rowRange.hashCode());
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		SpreadsheetImportConfiguration other = (SpreadsheetImportConfiguration) obj;
-		if (allRows != other.allRows)
+		if (allRows != other.allRows) {
 			return false;
+		}
 		if (columnNames == null) {
-			if (other.columnNames != null)
+			if (other.columnNames != null) {
 				return false;
-		} else if (!columnNames.equals(other.columnNames))
+			}
+		} else if (!columnNames.equals(other.columnNames)) {
 			return false;
+		}
 		if (columnRange == null) {
-			if (other.columnRange != null)
+			if (other.columnRange != null) {
 				return false;
-		} else if (!columnRange.equals(other.columnRange))
+			}
+		} else if (!columnRange.equals(other.columnRange)) {
 			return false;
+		}
+		if (csvDelimiter == null) {
+			if (other.csvDelimiter != null) {
+				return false;
+			}
+		} else if (!csvDelimiter.equals(other.csvDelimiter)) {
+			return false;
+		}
 		if (emptyCellPolicy == null) {
-			if (other.emptyCellPolicy != null)
+			if (other.emptyCellPolicy != null) {
 				return false;
-		} else if (!emptyCellPolicy.equals(other.emptyCellPolicy))
+			}
+		} else if (!emptyCellPolicy.equals(other.emptyCellPolicy)) {
 			return false;
+		}
 		if (emptyCellValue == null) {
-			if (other.emptyCellValue != null)
+			if (other.emptyCellValue != null) {
 				return false;
-		} else if (!emptyCellValue.equals(other.emptyCellValue))
+			}
+		} else if (!emptyCellValue.equals(other.emptyCellValue)) {
 			return false;
-		if (excludeFirstRow != other.excludeFirstRow)
+		}
+		if (excludeFirstRow != other.excludeFirstRow) {
 			return false;
-		if (ignoreBlankRows != other.ignoreBlankRows)
+		}
+		if (ignoreBlankRows != other.ignoreBlankRows) {
 			return false;
+		}
+		if (outputFormat == null) {
+			if (other.outputFormat != null) {
+				return false;
+			}
+		} else if (!outputFormat.equals(other.outputFormat)) {
+			return false;
+		}
 		if (rowRange == null) {
-			if (other.rowRange != null)
+			if (other.rowRange != null) {
 				return false;
-		} else if (!rowRange.equals(other.rowRange))
+			}
+		} else if (!rowRange.equals(other.rowRange)) {
 			return false;
+		}
 		return true;
 	}
 
