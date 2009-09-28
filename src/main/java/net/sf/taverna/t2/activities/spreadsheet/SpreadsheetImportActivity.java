@@ -160,7 +160,11 @@ public class SpreadsheetImportActivity extends
 						spreadsheetRowProcessor = new MultiplePortRowProcessor(referenceService, outputLists, context);
 					} else {
 						output = new StringWriter();
-						CsvWriter csvWriter = new CsvWriter(output, csvDelimiter.charAt(0));
+						char csvDelimiterCharacter = ',';
+						if (csvDelimiter != null && csvDelimiter.length() > 0) {
+							csvDelimiterCharacter = csvDelimiter.charAt(0);
+						}
+						CsvWriter csvWriter = new CsvWriter(output, csvDelimiterCharacter);
 						csvWriter.setEscapeMode(CsvWriter.ESCAPE_MODE_DOUBLED);
 						csvWriter.setTextQualifier('"');
 						csvWriter.setUseTextQualifier(true);
