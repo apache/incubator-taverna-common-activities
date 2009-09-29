@@ -52,7 +52,7 @@ import bsh.Interpreter;
 public class BeanshellActivity extends
 	AbstractAsynchronousDependencyActivity<BeanshellActivityConfigurationBean> {
 
-	private BeanshellActivityConfigurationBean configurationBean;
+	protected BeanshellActivityConfigurationBean configurationBean;
 
 	private static Logger logger = Logger.getLogger(BeanshellActivity.class);
 	
