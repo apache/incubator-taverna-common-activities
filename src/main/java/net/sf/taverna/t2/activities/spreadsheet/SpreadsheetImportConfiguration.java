@@ -30,21 +30,31 @@ import java.util.Map;
  */
 public class SpreadsheetImportConfiguration {
 
-	private Range columnRange = new Range(0, 1);
-	private Range rowRange = new Range(0, -1);
-	private String emptyCellValue = "";
-	private Map<String, String> columnNames = new HashMap<String, String>();
-	private boolean allRows = true;
-	private boolean excludeFirstRow = false;
-	private boolean ignoreBlankRows = false;
-	private SpreadsheetEmptyCellPolicy emptyCellPolicy = SpreadsheetEmptyCellPolicy.EMPTY_STRING;
-	private SpreadsheetOutputFormat outputFormat = SpreadsheetOutputFormat.PORT_PER_COLUMN;
-	private String csvDelimiter = ",";
+	private Range columnRange;
+	private Range rowRange;
+	private String emptyCellValue;
+	private Map<String, String> columnNames;
+	private boolean allRows;
+	private boolean excludeFirstRow;
+	private boolean ignoreBlankRows;
+	private SpreadsheetEmptyCellPolicy emptyCellPolicy;
+	private SpreadsheetOutputFormat outputFormat;
+	private String csvDelimiter;
 	
 	/**
 	 * Constructs a new SpreadsheetImportConfiguration.
 	 */
 	public SpreadsheetImportConfiguration() {
+		columnRange = new Range(0, 1);
+		rowRange = new Range(0, -1);
+		emptyCellValue = "";
+		columnNames = new HashMap<String, String>();
+		allRows = true;
+		excludeFirstRow = false;
+		ignoreBlankRows = false;
+		emptyCellPolicy = SpreadsheetEmptyCellPolicy.EMPTY_STRING;
+		outputFormat = SpreadsheetOutputFormat.PORT_PER_COLUMN;
+		csvDelimiter = ",";
 	}
 
 	/**
@@ -54,16 +64,16 @@ public class SpreadsheetImportConfiguration {
 	 * @param configuration
 	 */
 	public SpreadsheetImportConfiguration(SpreadsheetImportConfiguration configuration) {
-		this.columnRange = configuration.columnRange;
-		this.rowRange = configuration.rowRange;
-		this.emptyCellValue = configuration.emptyCellValue;
-		this.columnNames = new HashMap<String, String>(configuration.columnNames);
-		this.allRows = configuration.allRows;
-		this.excludeFirstRow = configuration.excludeFirstRow;
-		this.emptyCellPolicy = configuration.emptyCellPolicy;
-		this.ignoreBlankRows = configuration.ignoreBlankRows;
-		this.outputFormat = configuration.outputFormat;
-		this.csvDelimiter = configuration.csvDelimiter;
+		columnRange = configuration.columnRange;
+		rowRange = configuration.rowRange;
+		emptyCellValue = configuration.emptyCellValue;
+		columnNames = new HashMap<String, String>(configuration.columnNames);
+		allRows = configuration.allRows;
+		excludeFirstRow = configuration.excludeFirstRow;
+		emptyCellPolicy = configuration.emptyCellPolicy;
+		ignoreBlankRows = configuration.ignoreBlankRows;
+		outputFormat = configuration.outputFormat;
+		csvDelimiter = configuration.csvDelimiter;
 	}
 
 	/**
@@ -225,7 +235,7 @@ public class SpreadsheetImportConfiguration {
 	 * @return the value of outputFormat
 	 */
 	public SpreadsheetOutputFormat getOutputFormat() {
-		return outputFormat;
+		return outputFormat == null ? SpreadsheetOutputFormat.PORT_PER_COLUMN : outputFormat;
 	}
 
 	/**
@@ -245,7 +255,7 @@ public class SpreadsheetImportConfiguration {
 	 * @return the delimiter for CSV formatted output
 	 */
 	public String getCsvDelimiter() {
-		return csvDelimiter;
+		return csvDelimiter == null ? "," : csvDelimiter;
 	}
 
 	/**

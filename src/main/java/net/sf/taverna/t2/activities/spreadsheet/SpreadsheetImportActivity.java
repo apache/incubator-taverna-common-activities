@@ -102,13 +102,13 @@ public class SpreadsheetImportActivity extends
 		ignoreBlankRows = configurationBean.isIgnoreBlankRows();
 		columnNames = configurationBean.getColumnNames();
 		missingCellValue = configurationBean.getEmptyCellValue();
-		logger.debug("Setting empty cell value to " + missingCellValue);
+		logger.debug("Setting empty cell value to '" + missingCellValue + "'");
 		emptyCellPolicy = configurationBean.getEmptyCellPolicy();
 		logger.debug("Setting empty cell policy to " + emptyCellPolicy);
 		outputFormat = configurationBean.getOutputFormat();
 		logger.debug("Setting output format to " + outputFormat);
 		csvDelimiter = configurationBean.getCsvDelimiter();
-		logger.debug("Setting output format to " + outputFormat);
+		logger.debug("Setting csv delimiter to '" + csvDelimiter + "'");
 		configurePorts();
 	}
 
