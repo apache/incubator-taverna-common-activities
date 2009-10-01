@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>spreadsheet-import-activity</artifactId>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.3</version>
 	<name>Taverna 2 Spreadsheet Import Activity</name>
 	<description>Activity to import data from spreadsheet files</description>
 
