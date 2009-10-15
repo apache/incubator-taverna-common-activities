@@ -2,13 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>taverna-workbench</artifactId>
 		<groupId>net.sf.taverna.t2</groupId>
-		<version>2.1-beta-2</version>
+		<artifactId>activities</artifactId>
+		<version>0.9-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>spreadsheet-import-activity</artifactId>
-	<version>0.3</version>
 	<name>Taverna 2 Spreadsheet Import Activity</name>
 	<description>Activity to import data from spreadsheet files</description>
 
@@ -74,7 +73,7 @@
 		<dependency>
 			<groupId>net.sf.taverna.t2.activities</groupId>
 			<artifactId>activity-test-utils</artifactId>
-			<version>${t2.activities.version}</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
