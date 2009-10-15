@@ -37,6 +37,11 @@ public class BeanshellActivityConfigurationBean extends DependencyActivityConfig
 
 	private String script;
 	
+	public BeanshellActivityConfigurationBean() {
+		super();
+		this.script = "";
+	}
+
 	/**
 	 * @return the Beanshell script
 	 */
