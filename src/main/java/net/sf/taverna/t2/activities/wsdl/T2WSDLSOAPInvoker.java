@@ -45,13 +45,6 @@
 
 package net.sf.taverna.t2.activities.wsdl;
 
-import net.sf.taverna.raven.repository.ArtifactNotFoundException;
-import net.sf.taverna.raven.repository.ArtifactStateException;
-import net.sf.taverna.t2.activities.wsdl.wss4j.T2WSDoAllSender;
-import net.sf.taverna.t2.security.credentialmanager.*;
-import net.sf.taverna.t2.security.agents.*;
-import net.sf.taverna.t2.security.requests.*;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -65,11 +58,9 @@ import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.soap.WSDLSOAPInvoker;
 
 import org.apache.axis.EngineConfiguration;
-import org.apache.axis.Handler;
 import org.apache.axis.client.Call;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.log4j.Logger;
-import org.apache.ws.axis.security.handler.WSDoAllHandler;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -129,12 +120,26 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			return;
 		}
 		
-		//Element endpointRefElem = wsrfDoc.getRootElement();
-		Element endpointRefElem = wsrfDoc.getRootElement().getChild(ENDPOINT_REFERENCE, wsaNS);
-		if (endpointRefElem == null) {
-			logger.warn("Could not find " + ENDPOINT_REFERENCE);
-			return;
+		
+		Element endpointRefElem = null;
+		Element wsrfRoot = wsrfDoc.getRootElement();
+		if (wsrfRoot.getNamespace().equals(wsaNS)
+				&& wsrfRoot.getName().equals(ENDPOINT_REFERENCE)) {
+			endpointRefElem = wsrfRoot;
+		} else {
+			// Only look for child if the parent is not an EPR
+			Element childEndpoint = wsrfRoot.getChild(
+					ENDPOINT_REFERENCE, wsaNS);
+			if (childEndpoint != null) {
+				// Support wrapped endpoint reference for backward compatibility 
+				// and convenience (T2-677)
+				endpointRefElem = childEndpoint;
+			} else {
+				logger.warn("Unexpected element name for endpoint reference, but inserting anyway: " + wsrfRoot.getQualifiedName());
+				endpointRefElem = wsrfRoot;
+			}
 		}
+
 		Element refPropsElem = endpointRefElem.getChild(REFERENCE_PROPERTIES, wsaNS);
 		if (refPropsElem == null) {
 			logger.warn("Could not find " + REFERENCE_PROPERTIES);
