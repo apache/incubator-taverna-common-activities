@@ -110,22 +110,27 @@ public class WSDLSOAPInvoker {
 	 * @throws Exception
 	 */
 	public Map<String, Object> invoke(Map inputMap) throws Exception {
-		return invoke(inputMap, null);
+		return invoke(inputMap, (EngineConfiguration)null);
 	}
 
 	/**
-	 * Invokes the webservice with the supplied input Map, and returns a Map
-	 * containing the outputs, mapped against their output names.
-	 * 
-	 * @param inputMap
-	 * @return
-	 * @throws Exception
+	 * Invokes the webservice with the supplied input Map and axis engine configuration, 
+	 * and returns a Map containing the outputs, mapped against their output names.
 	 */
 	public Map<String, Object> invoke(Map inputMap, EngineConfiguration config)
 			throws Exception {
 		
 		Call call = getCall(config);
-		
+		return invoke(inputMap, call);
+	}
+	
+	/**
+	 * Invokes the webservice with the supplied input Map and preconfigured axis call, 
+	 * and returns a Map containing the outputs, mapped against their output names.
+	 */
+	public Map<String, Object> invoke(Map inputMap, Call call)
+			throws Exception {
+			
 		call.setTimeout(getTimeout());
 
 		SOAPEnvelope requestEnv = makeRequestEnvelope(inputMap);
