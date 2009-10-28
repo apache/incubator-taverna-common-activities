@@ -1,0 +1,1901 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="urn:hgu.webservice.services" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="urn:hgu.webservice.services" xmlns:intf="urn:hgu.webservice.services" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns1="http://mdb.WSDLGenerated.hgu" xmlns:tns2="http://CommonSubmission.WSDLGenerated.hgu" xmlns:tns3="http://SubmissionQuery.WSDLGenerated.hgu" xmlns:tns4="http://data.util.webservice.hgu" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.3
+Built on Oct 05, 2005 (05:23:37 EDT)-->
+ <wsdl:types>
+  <schema targetNamespace="http://mdb.WSDLGenerated.hgu" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://SubmissionQuery.WSDLGenerated.hgu"/>
+   <import namespace="urn:hgu.webservice.services"/>
+   <import namespace="http://CommonSubmission.WSDLGenerated.hgu"/>
+   <import namespace="http://data.util.webservice.hgu"/>
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+   <complexType name="QueryDetails">
+    <sequence>
+     <element name="substring" nillable="true" type="soapenc:string"/>
+     <element name="startEmbryoStage" nillable="true" type="soapenc:string"/>
+     <element name="stopEmbryoStage" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SearchResult">
+    <sequence>
+
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="id" nillable="true" type="soapenc:string"/>
+     <element name="path" nillable="true" type="soapenc:string"/>
+     <element name="stage" nillable="true" type="soapenc:string"/>
+     <element name="match" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ComponentDetails">
+    <sequence>
+
+     <element name="componentNode" type="xsd:boolean"/>
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="id" nillable="true" type="soapenc:string"/>
+     <element name="fullName" nillable="true" type="soapenc:string"/>
+     <element name="childrenId" nillable="true" type="impl:ArrayOf_soapenc_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="SliceDefinition">
+    <sequence>
+
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="x" type="xsd:double"/>
+     <element name="y" type="xsd:double"/>
+     <element name="z" type="xsd:double"/>
+     <element name="theta" type="xsd:double"/>
+     <element name="phi" type="xsd:double"/>
+     <element name="distance" type="xsd:double"/>
+    </sequence>
+   </complexType>
+
+   <complexType name="SliceDetails">
+    <sequence>
+     <element name="slice" nillable="true" type="xsd:base64Binary"/>
+     <element name="width" type="xsd:int"/>
+     <element name="height" type="xsd:int"/>
+     <element name="x_offset" type="xsd:int"/>
+     <element name="y_offset" type="xsd:int"/>
+    </sequence>
+   </complexType>
+
+   <complexType name="SliceTranslationItem">
+    <sequence>
+     <element name="id" nillable="true" type="soapenc:string"/>
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="patchID" nillable="true" type="impl:ArrayOf_soapenc_string"/>
+     <element name="slicePosition" nillable="true" type="tns1:SliceDefinition"/>
+    </sequence>
+   </complexType>
+   <complexType name="FileByteArray">
+
+    <sequence>
+     <element name="type" nillable="true" type="soapenc:string"/>
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="width" type="xsd:int"/>
+     <element name="height" type="xsd:int"/>
+     <element name="fileInByte" nillable="true" type="xsd:base64Binary"/>
+    </sequence>
+   </complexType>
+   <complexType name="SpeciesInfo">
+
+    <sequence>
+     <element name="species" nillable="true" type="soapenc:string"/>
+     <element name="defaultStageType" nillable="true" type="soapenc:string"/>
+     <element name="IDPrefix" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ComponentFullDetails">
+    <sequence>
+     <element name="componentNode" type="xsd:boolean"/>
+
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="id" nillable="true" type="soapenc:string"/>
+     <element name="fullName" nillable="true" type="soapenc:string"/>
+     <element name="parentId" nillable="true" type="impl:ArrayOf_soapenc_string"/>
+     <element name="childrenId" nillable="true" type="impl:ArrayOf_soapenc_string"/>
+     <element name="synonyms" nillable="true" type="impl:ArrayOf_soapenc_string"/>
+     <element name="startEmbryoStage" nillable="true" type="soapenc:string"/>
+     <element name="stopEmbryoStage" nillable="true" type="soapenc:string"/>
+     <element name="embryoStage" nillable="true" type="soapenc:string"/>
+
+     <element name="abbreviation" nillable="true" type="soapenc:string"/>
+     <element name="deleted" type="xsd:boolean"/>
+     <element name="printFlag" type="xsd:boolean"/>
+     <element name="printName" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="Region2DDetails">
+    <sequence>
+     <element name="viewID" nillable="true" type="soapenc:string"/>
+
+     <element name="slicePosition" nillable="true" type="tns1:SliceDefinition"/>
+     <element name="region" nillable="true" type="tns1:SliceDetails"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema targetNamespace="urn:hgu.webservice.services" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://SubmissionQuery.WSDLGenerated.hgu"/>
+   <import namespace="http://CommonSubmission.WSDLGenerated.hgu"/>
+   <import namespace="http://data.util.webservice.hgu"/>
+
+   <import namespace="http://mdb.WSDLGenerated.hgu"/>
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="ArrayOf_tns2_SearchResult">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns1:SearchResult[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+
+   <complexType name="ArrayOf_soapenc_string">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns2_ComponentDetails">
+    <complexContent>
+
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns1:ComponentDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns2_SliceTranslationItem">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns1:SliceTranslationItem[]"/>
+
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns3_GeneDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:GeneDetails[]"/>
+     </restriction>
+    </complexContent>
+
+   </complexType>
+   <complexType name="ArrayOf_tns3_MutantDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:MutantDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns3_LinkedSubmissionItem">
+
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:LinkedSubmissionItem[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns3_PublicationDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:PublicationDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns3_ExpressionInComponentDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:ExpressionInComponentDetails[]"/>
+     </restriction>
+
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns3_OriginalImageDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:OriginalImageDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+
+   <complexType name="ArrayOf_tns2_SliceDefinition">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns1:SliceDefinition[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns3_DomainImageDetails">
+    <complexContent>
+
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:DomainImageDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns3_AcknowledgementGroupDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:AcknowledgementGroupDetails[]"/>
+
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns3_SubmissionShortDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:SubmissionShortDetails[]"/>
+     </restriction>
+    </complexContent>
+
+   </complexType>
+   <complexType name="ArrayOf_tns3_SubmissionCoreDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns2:SubmissionCoreDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns4_SubmissionSearchDetails">
+
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns3:SubmissionSearchDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns4_GeneExpressedQueryShortDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns3:GeneExpressedQueryShortDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns2_FileByteArray">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns1:FileByteArray[]"/>
+     </restriction>
+
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns4_ComponentExpressQueryShortDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns3:ComponentExpressQueryShortDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+
+   <complexType name="ArrayOf_tns4_Region2DExpressQueryShortDetails">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns3:Region2DExpressQueryShortDetails[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="ArrayOf_tns5_Assay">
+    <complexContent>
+
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="tns4:Assay[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+  </schema>
+  <schema targetNamespace="http://CommonSubmission.WSDLGenerated.hgu" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://SubmissionQuery.WSDLGenerated.hgu"/>
+   <import namespace="urn:hgu.webservice.services"/>
+
+   <import namespace="http://data.util.webservice.hgu"/>
+   <import namespace="http://mdb.WSDLGenerated.hgu"/>
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="DBInfo">
+    <sequence>
+     <element name="DBName" nillable="true" type="soapenc:string"/>
+     <element name="Version" nillable="true" type="soapenc:string"/>
+     <element name="IDPrefix" nillable="true" type="soapenc:string"/>
+    </sequence>
+
+   </complexType>
+   <complexType name="GeneDetails">
+    <sequence>
+     <element name="symbol" nillable="true" type="soapenc:string"/>
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="ID" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="PersonDetails">
+
+    <sequence>
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="lab" nillable="true" type="soapenc:string"/>
+     <element name="address" nillable="true" type="soapenc:string"/>
+     <element name="city" nillable="true" type="soapenc:string"/>
+     <element name="postcode" nillable="true" type="soapenc:string"/>
+     <element name="country" nillable="true" type="soapenc:string"/>
+     <element name="phoneNumber" nillable="true" type="soapenc:string"/>
+     <element name="faxNumber" nillable="true" type="soapenc:string"/>
+
+     <element name="email" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="MutantDetails">
+    <sequence>
+     <element name="gene" nillable="true" type="soapenc:string"/>
+     <element name="father" nillable="true" type="soapenc:string"/>
+     <element name="mother" nillable="true" type="soapenc:string"/>
+    </sequence>
+
+   </complexType>
+   <complexType name="SpecimenDetails">
+    <sequence>
+     <element name="species" nillable="true" type="soapenc:string"/>
+     <element name="strain" nillable="true" type="soapenc:string"/>
+     <element name="sex" nillable="true" type="soapenc:string"/>
+     <element name="wildType" type="xsd:boolean"/>
+     <element name="mutants" nillable="true" type="impl:ArrayOf_tns3_MutantDetails"/>
+     <element name="stageFormat" nillable="true" type="soapenc:string"/>
+
+     <element name="stage" nillable="true" type="soapenc:string"/>
+     <element name="assayType" nillable="true" type="soapenc:string"/>
+     <element name="fixationMethod" nillable="true" type="soapenc:string"/>
+     <element name="embedding" nillable="true" type="soapenc:string"/>
+     <element name="notes" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="LinkedSubmissionItem">
+    <sequence>
+
+     <element name="type" nillable="true" type="soapenc:string"/>
+     <element name="submissionID" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="PublicationDetails">
+    <sequence>
+     <element name="authors" nillable="true" type="soapenc:string"/>
+     <element name="journal" nillable="true" type="soapenc:string"/>
+     <element name="title" nillable="true" type="soapenc:string"/>
+
+     <element name="volume" nillable="true" type="soapenc:string"/>
+     <element name="issue" nillable="true" type="soapenc:string"/>
+     <element name="year" type="xsd:short"/>
+     <element name="pages" nillable="true" type="soapenc:string"/>
+     <element name="DB" nillable="true" type="soapenc:string"/>
+     <element name="accessionNo" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="LinkDetails">
+
+    <sequence>
+     <element name="linkedSubmission" nillable="true" type="impl:ArrayOf_tns3_LinkedSubmissionItem"/>
+     <element name="linkedPublication" nillable="true" type="impl:ArrayOf_tns3_PublicationDetails"/>
+    </sequence>
+   </complexType>
+   <complexType name="ProbeDetails">
+    <sequence>
+     <element name="probeName" nillable="true" type="soapenc:string"/>
+     <element name="cloneName" nillable="true" type="soapenc:string"/>
+
+     <element name="type" nillable="true" type="soapenc:string"/>
+     <element name="gene" nillable="true" type="tns2:GeneDetails"/>
+     <element name="nucleotide" nillable="true" type="soapenc:string"/>
+     <element name="accessionNumber" nillable="true" type="impl:ArrayOf_soapenc_string"/>
+     <element name="db1" nillable="true" type="soapenc:string"/>
+     <element name="source" nillable="true" type="soapenc:string"/>
+     <element name="coveredRegion" nillable="true" type="soapenc:string"/>
+     <element name="startLoc" type="xsd:int"/>
+     <element name="endLoc" type="xsd:int"/>
+
+     <element name="descriptionNotes" nillable="true" type="soapenc:string"/>
+     <element name="originType" nillable="true" type="soapenc:string"/>
+     <element name="strain" nillable="true" type="soapenc:string"/>
+     <element name="stageFormat" nillable="true" type="soapenc:string"/>
+     <element name="stage" nillable="true" type="soapenc:string"/>
+     <element name="tissue" nillable="true" type="soapenc:string"/>
+     <element name="cellLineDatabase" nillable="true" type="soapenc:string"/>
+     <element name="cellLineAccessionNo" nillable="true" type="soapenc:string"/>
+     <element name="cellLineNote" nillable="true" type="soapenc:string"/>
+
+     <element name="probeType" nillable="true" type="soapenc:string"/>
+     <element name="geneType" nillable="true" type="soapenc:string"/>
+     <element name="labelProduct" nillable="true" type="soapenc:string"/>
+     <element name="visualizationMethod" nillable="true" type="soapenc:string"/>
+     <element name="raisedIn" nillable="true" type="soapenc:string"/>
+     <element name="supplier" nillable="true" type="soapenc:string"/>
+     <element name="catalogueNo" nillable="true" type="soapenc:string"/>
+     <element name="sandwich" nillable="true" type="impl:ArrayOf_soapenc_string"/>
+    </sequence>
+
+   </complexType>
+   <complexType name="ExpressionInfoDetails">
+    <sequence>
+     <element name="patternID" nillable="true" type="soapenc:string"/>
+     <element name="strengthID" nillable="true" type="soapenc:string"/>
+     <element name="notes" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ExpressionInComponentDetails">
+
+    <sequence>
+     <element name="compID" nillable="true" type="soapenc:string"/>
+     <element name="expressionInfo" nillable="true" type="tns2:ExpressionInfoDetails"/>
+    </sequence>
+   </complexType>
+   <complexType name="OriginalImageDetails">
+    <sequence>
+     <element name="position" nillable="true" type="tns1:SliceDefinition"/>
+     <element name="ImageFileByteArray" nillable="true" type="tns1:FileByteArray"/>
+
+     <element name="category" type="xsd:int"/>
+     <element name="notes" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="DomainImageDetails">
+    <sequence>
+     <element name="WlzFileByteArray" nillable="true" type="tns1:FileByteArray"/>
+     <element name="expressionInfo" nillable="true" type="tns2:ExpressionInfoDetails"/>
+     <element name="method" nillable="true" type="soapenc:string"/>
+
+     <element name="sectionPositions" nillable="true" type="impl:ArrayOf_tns2_SliceDefinition"/>
+    </sequence>
+   </complexType>
+   <complexType name="GeneExpressionDetails">
+    <sequence>
+     <element name="embryoStage" nillable="true" type="soapenc:string"/>
+     <element name="stagingQuality" nillable="true" type="soapenc:string"/>
+     <element name="assayQuality" nillable="true" type="soapenc:string"/>
+     <element name="result" nillable="true" type="impl:ArrayOf_tns3_ExpressionInComponentDetails"/>
+
+     <element name="originalImages" nillable="true" type="impl:ArrayOf_tns3_OriginalImageDetails"/>
+     <element name="associatedImages" nillable="true" type="impl:ArrayOf_tns3_OriginalImageDetails"/>
+     <element name="domainImages" nillable="true" type="impl:ArrayOf_tns3_DomainImageDetails"/>
+     <element name="wholemountImages" nillable="true" type="impl:ArrayOf_tns3_DomainImageDetails"/>
+    </sequence>
+   </complexType>
+   <complexType name="AcknowledgementGroupDetails">
+    <sequence>
+     <element name="name" nillable="true" type="soapenc:string"/>
+
+     <element name="address" nillable="true" type="soapenc:string"/>
+     <element name="city" nillable="true" type="soapenc:string"/>
+     <element name="country" nillable="true" type="soapenc:string"/>
+     <element name="URL" nillable="true" type="soapenc:string"/>
+     <element name="reason" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="AcknowledgementDetails">
+    <sequence>
+
+     <element name="projectName" nillable="true" type="soapenc:string"/>
+     <element name="groups" nillable="true" type="impl:ArrayOf_tns3_AcknowledgementGroupDetails"/>
+    </sequence>
+   </complexType>
+   <complexType name="SubmissionDetails">
+    <sequence>
+     <element name="ID" nillable="true" type="soapenc:string"/>
+     <element name="status" nillable="true" type="soapenc:string"/>
+     <element name="source" nillable="true" type="soapenc:string"/>
+
+     <element name="validation" nillable="true" type="soapenc:string"/>
+     <element name="lastModificationTime" nillable="true" type="soapenc:string"/>
+     <element name="assayType" nillable="true" type="soapenc:string"/>
+     <element name="authors" nillable="true" type="soapenc:string"/>
+     <element name="contact" nillable="true" type="tns2:PersonDetails"/>
+     <element name="editor" nillable="true" type="tns2:PersonDetails"/>
+     <element name="specimen" nillable="true" type="tns2:SpecimenDetails"/>
+     <element name="reference" nillable="true" type="tns2:LinkDetails"/>
+     <element name="probe" nillable="true" type="tns2:ProbeDetails"/>
+
+     <element name="results" nillable="true" type="tns2:GeneExpressionDetails"/>
+     <element name="notes" nillable="true" type="soapenc:string"/>
+     <element name="acknowledgement" nillable="true" type="tns2:AcknowledgementDetails"/>
+    </sequence>
+   </complexType>
+   <complexType name="SubmissionCoreDetails">
+    <sequence>
+     <element name="ID" nillable="true" type="soapenc:string"/>
+     <element name="status" nillable="true" type="soapenc:string"/>
+
+     <element name="source" nillable="true" type="soapenc:string"/>
+     <element name="validation" nillable="true" type="soapenc:string"/>
+     <element name="lastModificationTime" nillable="true" type="soapenc:string"/>
+     <element name="assayType" nillable="true" type="soapenc:string"/>
+     <element name="authors" nillable="true" type="soapenc:string"/>
+     <element name="contact" nillable="true" type="tns2:PersonDetails"/>
+     <element name="editor" nillable="true" type="tns2:PersonDetails"/>
+     <element name="specimen" nillable="true" type="tns2:SpecimenDetails"/>
+     <element name="reference" nillable="true" type="tns2:LinkDetails"/>
+
+     <element name="probe" nillable="true" type="tns2:ProbeDetails"/>
+     <element name="embryoStage" nillable="true" type="soapenc:string"/>
+     <element name="stagingQuality" nillable="true" type="soapenc:string"/>
+     <element name="assayQuality" nillable="true" type="soapenc:string"/>
+     <element name="notes" nillable="true" type="soapenc:string"/>
+     <element name="acknowledgement" nillable="true" type="tns2:AcknowledgementDetails"/>
+    </sequence>
+   </complexType>
+   <complexType name="SubmissionShortDetails">
+
+    <sequence>
+     <element name="ID" nillable="true" type="soapenc:string"/>
+     <element name="geneSymbol" nillable="true" type="soapenc:string"/>
+     <element name="contactName" nillable="true" type="soapenc:string"/>
+     <element name="embryoStage" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+  </schema>
+  <schema targetNamespace="http://SubmissionQuery.WSDLGenerated.hgu" xmlns="http://www.w3.org/2001/XMLSchema">
+
+   <import namespace="urn:hgu.webservice.services"/>
+   <import namespace="http://CommonSubmission.WSDLGenerated.hgu"/>
+   <import namespace="http://data.util.webservice.hgu"/>
+   <import namespace="http://mdb.WSDLGenerated.hgu"/>
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="SubmissionSearchDetails">
+    <sequence>
+     <element name="rank" type="xsd:double"/>
+     <element name="submission" nillable="true" type="tns2:SubmissionShortDetails"/>
+
+    </sequence>
+   </complexType>
+   <complexType name="GeneExpressedQueryShortDetails">
+    <sequence>
+     <element name="geneSymbol" nillable="true" type="soapenc:string"/>
+     <element name="submissions" nillable="true" type="impl:ArrayOf_tns4_SubmissionSearchDetails"/>
+    </sequence>
+   </complexType>
+   <complexType name="ComponentExpressQueryShortDetails">
+
+    <sequence>
+     <element name="componentID" nillable="true" type="soapenc:string"/>
+     <element name="submissions" nillable="true" type="impl:ArrayOf_tns3_SubmissionShortDetails"/>
+    </sequence>
+   </complexType>
+   <complexType name="Region2DExpressQueryShortDetails">
+    <sequence>
+     <element name="expressionRegion" nillable="true" type="tns1:Region2DDetails"/>
+     <element name="submissions" nillable="true" type="impl:ArrayOf_tns3_SubmissionShortDetails"/>
+
+    </sequence>
+   </complexType>
+   <complexType name="RegionExpressQueryShortDetails">
+    <sequence>
+     <element name="wlzFile" nillable="true" type="tns1:FileByteArray"/>
+     <element name="submissions" nillable="true" type="impl:ArrayOf_tns3_SubmissionShortDetails"/>
+    </sequence>
+   </complexType>
+  </schema>
+
+  <schema targetNamespace="http://data.util.webservice.hgu" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://SubmissionQuery.WSDLGenerated.hgu"/>
+   <import namespace="urn:hgu.webservice.services"/>
+   <import namespace="http://CommonSubmission.WSDLGenerated.hgu"/>
+   <import namespace="http://mdb.WSDLGenerated.hgu"/>
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="Assay">
+    <sequence>
+     <element name="description" nillable="true" type="soapenc:string"/>
+
+     <element name="url" nillable="true" type="soapenc:string"/>
+    </sequence>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="whatGeneInStageResponse">
+
+      <wsdl:part name="whatGeneInStageReturn" type="impl:ArrayOf_tns4_GeneExpressedQueryShortDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getComponentTreeResponse1">
+
+      <wsdl:part name="getComponentTreeReturn" type="impl:ArrayOf_tns2_ComponentDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAbstractNodesRequest">
+
+      <wsdl:part name="in0" type="impl:ArrayOf_soapenc_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRootComponentsRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getComponentTreeRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="queryResponse">
+
+      <wsdl:part name="queryReturn" type="impl:ArrayOf_tns2_SearchResult"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRegionGivenComponentResponse">
+
+      <wsdl:part name="getRegionGivenComponentReturn" type="tns1:FileByteArray"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatEntryGivenGeneResponse">
+
+      <wsdl:part name="whatEntryGivenGeneReturn" type="impl:ArrayOf_tns4_GeneExpressedQueryShortDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getWholemount2DRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+      <wsdl:part name="in1" type="tns1:SliceDefinition"/>
+
+      <wsdl:part name="in2" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAssayResponse">
+
+      <wsdl:part name="getAssayReturn" type="impl:ArrayOf_tns5_Assay"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getWholemount2DInfoResponse">
+
+      <wsdl:part name="getWholemount2DInfoReturn" type="impl:ArrayOf_tns2_SliceTranslationItem"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRegionGivenComponentRequest">
+
+      <wsdl:part name="in0" type="xsd:boolean"/>
+
+      <wsdl:part name="in1" type="impl:ArrayOf_soapenc_string"/>
+
+      <wsdl:part name="in2" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getComponentTreeResponse">
+
+      <wsdl:part name="getComponentTreeReturn" type="impl:ArrayOf_tns2_ComponentDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="existResponse">
+
+      <wsdl:part name="existReturn" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getComponentFullDetailsRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getStagesRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getComponentFullDetailsResponse">
+
+      <wsdl:part name="getComponentFullDetailsReturn" type="tns1:ComponentFullDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSpeciesInfoResponse">
+
+      <wsdl:part name="getSpeciesInfoReturn" type="tns1:SpeciesInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatComponentExpressGeneResponse">
+
+      <wsdl:part name="whatComponentExpressGeneReturn" type="impl:ArrayOf_tns4_ComponentExpressQueryShortDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getWholemount2DResponse">
+
+      <wsdl:part name="getWholemount2DReturn" type="tns1:SliceDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getComponentTreeRequest1">
+
+   </wsdl:message>
+
+   <wsdl:message name="getSliceRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+      <wsdl:part name="in1" type="soapenc:string"/>
+
+      <wsdl:part name="in2" type="tns1:SliceDefinition"/>
+
+      <wsdl:part name="in3" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSubmissionCoreRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatWholemountRegionExpressGeneRequest">
+
+      <wsdl:part name="in0" type="impl:ArrayOf_soapenc_string"/>
+
+      <wsdl:part name="in1" type="soapenc:string"/>
+
+      <wsdl:part name="in2" type="xsd:boolean"/>
+
+      <wsdl:part name="in3" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="queryRequest">
+
+      <wsdl:part name="in0" type="tns1:QueryDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getStagesWithReconstructionResponse">
+
+      <wsdl:part name="getStagesWithReconstructionReturn" type="impl:ArrayOf_soapenc_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="logResponse">
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllCoreSubmissionsRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="whatGeneInStageRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+      <wsdl:part name="in1" type="soapenc:string"/>
+
+      <wsdl:part name="in2" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="logRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatComponentExpressGeneRequest">
+
+      <wsdl:part name="in0" type="impl:ArrayOf_soapenc_string"/>
+
+      <wsdl:part name="in1" type="soapenc:string"/>
+
+      <wsdl:part name="in2" type="soapenc:string"/>
+
+      <wsdl:part name="in3" type="xsd:boolean"/>
+
+      <wsdl:part name="in4" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getStagesResponse">
+
+      <wsdl:part name="getStagesReturn" type="impl:ArrayOf_soapenc_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatGeneGivenRegionResponse">
+
+      <wsdl:part name="whatGeneGivenRegionReturn" type="impl:ArrayOf_tns4_GeneExpressedQueryShortDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSliceResponse">
+
+      <wsdl:part name="getSliceReturn" type="tns1:SliceDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSubmissionAssayImageRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDBInfoResponse">
+
+      <wsdl:part name="getDBInfoReturn" type="tns2:DBInfo"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getWholemount2DInfoRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getGeneRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getGeneResponse">
+
+      <wsdl:part name="getGeneReturn" type="tns2:GeneDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllSubmissionsRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getTimedNodesResponse">
+
+      <wsdl:part name="getTimedNodesReturn" type="impl:ArrayOf_soapenc_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSpeciesInfoRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="whatGeneGivenRegionRequest">
+
+      <wsdl:part name="in0" type="impl:ArrayOf_tns2_FileByteArray"/>
+
+      <wsdl:part name="in1" type="soapenc:string"/>
+
+      <wsdl:part name="in2" type="xsd:boolean"/>
+
+      <wsdl:part name="in3" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDBInfoRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getSubmissionRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatVoxelRegionExpressGeneResponse">
+
+      <wsdl:part name="whatVoxelRegionExpressGeneReturn" type="tns3:RegionExpressQueryShortDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatWholemountRegionExpressGeneResponse">
+
+      <wsdl:part name="whatWholemountRegionExpressGeneReturn" type="impl:ArrayOf_tns4_Region2DExpressQueryShortDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllGeneResponse">
+
+      <wsdl:part name="getAllGeneReturn" type="impl:ArrayOf_tns3_GeneDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getStagesWithReconstructionRequest">
+
+      <wsdl:part name="in0" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRootComponentsRequest1">
+
+   </wsdl:message>
+
+   <wsdl:message name="getSubmissionAssayImageResponse">
+
+      <wsdl:part name="getSubmissionAssayImageReturn" type="impl:ArrayOf_tns3_OriginalImageDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSubmissionCoreResponse">
+
+      <wsdl:part name="getSubmissionCoreReturn" type="tns2:SubmissionCoreDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllCoreSubmissionsResponse">
+
+      <wsdl:part name="getAllCoreSubmissionsReturn" type="impl:ArrayOf_tns3_SubmissionCoreDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="existRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatEntryGivenGeneRequest">
+
+      <wsdl:part name="in0" type="impl:ArrayOf_soapenc_string"/>
+
+      <wsdl:part name="in1" type="soapenc:string"/>
+
+      <wsdl:part name="in2" type="soapenc:string"/>
+
+      <wsdl:part name="in3" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllSubmissionsResponse">
+
+      <wsdl:part name="getAllSubmissionsReturn" type="impl:ArrayOf_tns3_SubmissionShortDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAssayRequest">
+
+      <wsdl:part name="in0" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatVoxelRegionExpressGeneRequest">
+
+      <wsdl:part name="in0" type="impl:ArrayOf_soapenc_string"/>
+
+      <wsdl:part name="in1" type="soapenc:string"/>
+
+      <wsdl:part name="in2" type="xsd:boolean"/>
+
+      <wsdl:part name="in3" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRootComponentsResponse1">
+
+      <wsdl:part name="getRootComponentsReturn" type="tns1:ComponentDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllGeneRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getRootComponentsResponse">
+
+      <wsdl:part name="getRootComponentsReturn" type="tns1:ComponentDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSubmissionResponse">
+
+      <wsdl:part name="getSubmissionReturn" type="tns2:SubmissionDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatGeneGivenComponentRequest">
+
+      <wsdl:part name="in0" type="impl:ArrayOf_soapenc_string"/>
+
+      <wsdl:part name="in1" type="soapenc:string"/>
+
+      <wsdl:part name="in2" type="xsd:boolean"/>
+
+      <wsdl:part name="in3" type="xsd:int"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAbstractNodesResponse">
+
+      <wsdl:part name="getAbstractNodesReturn" type="impl:ArrayOf_soapenc_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="whatGeneGivenComponentResponse">
+
+      <wsdl:part name="whatGeneGivenComponentReturn" type="impl:ArrayOf_tns4_GeneExpressedQueryShortDetails"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getTimedNodesRequest">
+
+      <wsdl:part name="in0" type="impl:ArrayOf_soapenc_string"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="WebService">
+
+      <wsdl:operation name="log" parameterOrder="in0">
+
+         <wsdl:input message="impl:logRequest" name="logRequest"/>
+
+         <wsdl:output message="impl:logResponse" name="logResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="query" parameterOrder="in0">
+
+         <wsdl:input message="impl:queryRequest" name="queryRequest"/>
+
+         <wsdl:output message="impl:queryResponse" name="queryResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRootComponents" parameterOrder="in0">
+
+         <wsdl:input message="impl:getRootComponentsRequest" name="getRootComponentsRequest"/>
+
+         <wsdl:output message="impl:getRootComponentsResponse" name="getRootComponentsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRootComponents">
+
+         <wsdl:input message="impl:getRootComponentsRequest1" name="getRootComponentsRequest1"/>
+
+         <wsdl:output message="impl:getRootComponentsResponse1" name="getRootComponentsResponse1"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getComponentTree" parameterOrder="in0">
+
+         <wsdl:input message="impl:getComponentTreeRequest" name="getComponentTreeRequest"/>
+
+         <wsdl:output message="impl:getComponentTreeResponse" name="getComponentTreeResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getComponentTree">
+
+         <wsdl:input message="impl:getComponentTreeRequest1" name="getComponentTreeRequest1"/>
+
+         <wsdl:output message="impl:getComponentTreeResponse1" name="getComponentTreeResponse1"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTimedNodes" parameterOrder="in0">
+
+         <wsdl:input message="impl:getTimedNodesRequest" name="getTimedNodesRequest"/>
+
+         <wsdl:output message="impl:getTimedNodesResponse" name="getTimedNodesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAbstractNodes" parameterOrder="in0">
+
+         <wsdl:input message="impl:getAbstractNodesRequest" name="getAbstractNodesRequest"/>
+
+         <wsdl:output message="impl:getAbstractNodesResponse" name="getAbstractNodesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSlice" parameterOrder="in0 in1 in2 in3">
+
+         <wsdl:input message="impl:getSliceRequest" name="getSliceRequest"/>
+
+         <wsdl:output message="impl:getSliceResponse" name="getSliceResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getWholemount2DInfo" parameterOrder="in0">
+
+         <wsdl:input message="impl:getWholemount2DInfoRequest" name="getWholemount2DInfoRequest"/>
+
+         <wsdl:output message="impl:getWholemount2DInfoResponse" name="getWholemount2DInfoResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getWholemount2D" parameterOrder="in0 in1 in2">
+
+         <wsdl:input message="impl:getWholemount2DRequest" name="getWholemount2DRequest"/>
+
+         <wsdl:output message="impl:getWholemount2DResponse" name="getWholemount2DResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getStagesWithReconstruction" parameterOrder="in0">
+
+         <wsdl:input message="impl:getStagesWithReconstructionRequest" name="getStagesWithReconstructionRequest"/>
+
+         <wsdl:output message="impl:getStagesWithReconstructionResponse" name="getStagesWithReconstructionResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRegionGivenComponent" parameterOrder="in0 in1 in2">
+
+         <wsdl:input message="impl:getRegionGivenComponentRequest" name="getRegionGivenComponentRequest"/>
+
+         <wsdl:output message="impl:getRegionGivenComponentResponse" name="getRegionGivenComponentResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSpeciesInfo">
+
+         <wsdl:input message="impl:getSpeciesInfoRequest" name="getSpeciesInfoRequest"/>
+
+         <wsdl:output message="impl:getSpeciesInfoResponse" name="getSpeciesInfoResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getComponentFullDetails" parameterOrder="in0">
+
+         <wsdl:input message="impl:getComponentFullDetailsRequest" name="getComponentFullDetailsRequest"/>
+
+         <wsdl:output message="impl:getComponentFullDetailsResponse" name="getComponentFullDetailsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getStages">
+
+         <wsdl:input message="impl:getStagesRequest" name="getStagesRequest"/>
+
+         <wsdl:output message="impl:getStagesResponse" name="getStagesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDBInfo">
+
+         <wsdl:input message="impl:getDBInfoRequest" name="getDBInfoRequest"/>
+
+         <wsdl:output message="impl:getDBInfoResponse" name="getDBInfoResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getGene" parameterOrder="in0">
+
+         <wsdl:input message="impl:getGeneRequest" name="getGeneRequest"/>
+
+         <wsdl:output message="impl:getGeneResponse" name="getGeneResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllGene">
+
+         <wsdl:input message="impl:getAllGeneRequest" name="getAllGeneRequest"/>
+
+         <wsdl:output message="impl:getAllGeneResponse" name="getAllGeneResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSubmission" parameterOrder="in0">
+
+         <wsdl:input message="impl:getSubmissionRequest" name="getSubmissionRequest"/>
+
+         <wsdl:output message="impl:getSubmissionResponse" name="getSubmissionResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSubmissionCore" parameterOrder="in0">
+
+         <wsdl:input message="impl:getSubmissionCoreRequest" name="getSubmissionCoreRequest"/>
+
+         <wsdl:output message="impl:getSubmissionCoreResponse" name="getSubmissionCoreResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllSubmissions">
+
+         <wsdl:input message="impl:getAllSubmissionsRequest" name="getAllSubmissionsRequest"/>
+
+         <wsdl:output message="impl:getAllSubmissionsResponse" name="getAllSubmissionsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllCoreSubmissions">
+
+         <wsdl:input message="impl:getAllCoreSubmissionsRequest" name="getAllCoreSubmissionsRequest"/>
+
+         <wsdl:output message="impl:getAllCoreSubmissionsResponse" name="getAllCoreSubmissionsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSubmissionAssayImage" parameterOrder="in0">
+
+         <wsdl:input message="impl:getSubmissionAssayImageRequest" name="getSubmissionAssayImageRequest"/>
+
+         <wsdl:output message="impl:getSubmissionAssayImageResponse" name="getSubmissionAssayImageResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="exist" parameterOrder="in0">
+
+         <wsdl:input message="impl:existRequest" name="existRequest"/>
+
+         <wsdl:output message="impl:existResponse" name="existResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatGeneInStage" parameterOrder="in0 in1 in2">
+
+         <wsdl:input message="impl:whatGeneInStageRequest" name="whatGeneInStageRequest"/>
+
+         <wsdl:output message="impl:whatGeneInStageResponse" name="whatGeneInStageResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatEntryGivenGene" parameterOrder="in0 in1 in2 in3">
+
+         <wsdl:input message="impl:whatEntryGivenGeneRequest" name="whatEntryGivenGeneRequest"/>
+
+         <wsdl:output message="impl:whatEntryGivenGeneResponse" name="whatEntryGivenGeneResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatGeneGivenRegion" parameterOrder="in0 in1 in2 in3">
+
+         <wsdl:input message="impl:whatGeneGivenRegionRequest" name="whatGeneGivenRegionRequest"/>
+
+         <wsdl:output message="impl:whatGeneGivenRegionResponse" name="whatGeneGivenRegionResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatGeneGivenComponent" parameterOrder="in0 in1 in2 in3">
+
+         <wsdl:input message="impl:whatGeneGivenComponentRequest" name="whatGeneGivenComponentRequest"/>
+
+         <wsdl:output message="impl:whatGeneGivenComponentResponse" name="whatGeneGivenComponentResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatComponentExpressGene" parameterOrder="in0 in1 in2 in3 in4">
+
+         <wsdl:input message="impl:whatComponentExpressGeneRequest" name="whatComponentExpressGeneRequest"/>
+
+         <wsdl:output message="impl:whatComponentExpressGeneResponse" name="whatComponentExpressGeneResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatWholemountRegionExpressGene" parameterOrder="in0 in1 in2 in3">
+
+         <wsdl:input message="impl:whatWholemountRegionExpressGeneRequest" name="whatWholemountRegionExpressGeneRequest"/>
+
+         <wsdl:output message="impl:whatWholemountRegionExpressGeneResponse" name="whatWholemountRegionExpressGeneResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatVoxelRegionExpressGene" parameterOrder="in0 in1 in2 in3">
+
+         <wsdl:input message="impl:whatVoxelRegionExpressGeneRequest" name="whatVoxelRegionExpressGeneRequest"/>
+
+         <wsdl:output message="impl:whatVoxelRegionExpressGeneResponse" name="whatVoxelRegionExpressGeneResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAssay" parameterOrder="in0">
+
+         <wsdl:input message="impl:getAssayRequest" name="getAssayRequest"/>
+
+         <wsdl:output message="impl:getAssayResponse" name="getAssayResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="maSoapBinding" type="impl:WebService">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="log">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="logRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="logResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="query">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="queryRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="queryResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRootComponents">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRootComponentsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRootComponentsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRootComponents">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRootComponentsRequest1">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRootComponentsResponse1">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getComponentTree">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getComponentTreeRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getComponentTreeResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getComponentTree">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getComponentTreeRequest1">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getComponentTreeResponse1">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTimedNodes">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getTimedNodesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getTimedNodesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAbstractNodes">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAbstractNodesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAbstractNodesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSlice">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSliceRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSliceResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getWholemount2DInfo">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getWholemount2DInfoRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getWholemount2DInfoResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getWholemount2D">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getWholemount2DRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getWholemount2DResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getStagesWithReconstruction">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getStagesWithReconstructionRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getStagesWithReconstructionResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRegionGivenComponent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRegionGivenComponentRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRegionGivenComponentResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSpeciesInfo">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSpeciesInfoRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSpeciesInfoResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getComponentFullDetails">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getComponentFullDetailsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getComponentFullDetailsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getStages">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getStagesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getStagesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDBInfo">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDBInfoRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDBInfoResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getGene">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getGeneRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getGeneResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllGene">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllGeneRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllGeneResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSubmission">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSubmissionRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSubmissionResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSubmissionCore">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSubmissionCoreRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSubmissionCoreResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllSubmissions">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllSubmissionsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllSubmissionsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllCoreSubmissions">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllCoreSubmissionsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllCoreSubmissionsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSubmissionAssayImage">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSubmissionAssayImageRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSubmissionAssayImageResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="exist">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="existRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="existResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatGeneInStage">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="whatGeneInStageRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="whatGeneInStageResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatEntryGivenGene">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="whatEntryGivenGeneRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="whatEntryGivenGeneResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatGeneGivenRegion">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="whatGeneGivenRegionRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="whatGeneGivenRegionResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatGeneGivenComponent">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="whatGeneGivenComponentRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="whatGeneGivenComponentResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatComponentExpressGene">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="whatComponentExpressGeneRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="whatComponentExpressGeneResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatWholemountRegionExpressGene">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="whatWholemountRegionExpressGeneRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="whatWholemountRegionExpressGeneResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="whatVoxelRegionExpressGene">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="whatVoxelRegionExpressGeneRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="whatVoxelRegionExpressGeneResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAssay">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAssayRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAssayResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:hgu.webservice.services" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="WebServiceService">
+
+      <wsdl:port binding="impl:maSoapBinding" name="ma">
+
+         <wsdlsoap:address location="http://genex.hgu.mrc.ac.uk/axis/services/ma"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>
