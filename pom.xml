@@ -25,23 +25,16 @@
 			<artifactId>wsdl-generic</artifactId>
 			<version>${wsdl.generic.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.sf.taverna.t2.security</groupId>
 			<artifactId>credential-manager</artifactId>
 			<version>${t2.security.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sf.taverna.t2.security</groupId>
-			<artifactId>security-agents</artifactId>
-			<version>${t2.security.version}</version>
-		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.apache.ws.security</groupId>
 			<artifactId>wss4j</artifactId>
 			<version>1.5.4</version>
-		</dependency>
-
+		</dependency>-->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

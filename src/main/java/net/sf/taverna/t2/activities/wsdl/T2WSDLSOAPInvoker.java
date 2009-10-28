@@ -18,48 +18,32 @@
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  ******************************************************************************/
-/*
- * Copyright (C) 2003 The University of Manchester 
- *
- * Modifications to the initial code base are copyright of their
- * respective authors, or their employers as appropriate.  Authorship
- * of the modifications may be determined from the ChangeLog placed at
- * the end of this file.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- * USA.
- *
- */
 
 package net.sf.taverna.t2.activities.wsdl;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
-import javax.xml.rpc.ServiceException;
+import javax.swing.JOptionPane;
 
-import net.sf.taverna.wsdl.parser.UnknownOperationException;
+import net.sf.taverna.t2.activities.wsdl.security.GetPasswordDialog;
+import net.sf.taverna.t2.activities.wsdl.security.SecurityProfiles;
+import net.sf.taverna.t2.security.credentialmanager.CMException;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.soap.WSDLSOAPInvoker;
 
 import org.apache.axis.EngineConfiguration;
+import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
+import org.apache.axis.configuration.XMLStringProvider;
+import org.apache.axis.encoding.Base64;
 import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -72,8 +56,7 @@ import org.jdom.output.DOMOutputter;
  * Invokes SOAP based Web Services from T2.
  * 
  * Subclasses WSDLSOAPInvoker used for invoking Web Services from Taverna 1.x
- * and overrides the getCall(EngineConfiguration config) method to enable
- * invocation of secure Web Services using the T2 Security Agents.
+ * and extends it to provide support for invoking secure Web services.
  * 
  * @author Stuart Owen
  * @author Alex Nenadic
@@ -171,103 +154,134 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 	//			.getDocumentElement()));
 	}
 
-	protected void configureSecurity(Call call) {
+	@SuppressWarnings("unchecked")
+	protected void configureSecurity(Call call, WSDLActivityConfigurationBean bean) throws Exception{
+
+		// If security settings require WS-Security - configure the axis call
+		// with appropriate properties
+		String securityProfile = bean.getSecurityProfile();
+		if (securityProfile
+				.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)
+				|| securityProfile
+						.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD)
+				|| securityProfile
+						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)
+				|| securityProfile
+						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)) {
+
+			String username;
+			String password;
+	
+			String[] usernamePasswordPair = getUsernameAndPasswordForService(bean);
+			username = usernamePasswordPair[0];
+			password = usernamePasswordPair[1];
 			
-		// Call's USERNAME_PROPERTY is here simply used to pass the credential's
-		// alias to fetch it from the Keystore. As alias value we use wsdlLocation so that the
-		// credential is tied to a particular service. Once Security Agent picks up the
-		// alias, it will set the USERNAME_PROPERTY to null or to a proper username.
-		// Note that WSS4J's handler WSDoAllSender expects (which is invoked
-		// before our T2DoAllSender takes over) the USERNAME_PROPERTY to be set 
-		// to whatever non-empty value for almost all security operations 
-		// (even for signing, except for encryption), otherwise it raises an exception.
+			call.setProperty(Call.USERNAME_PROPERTY, username);
+			call.setProperty(Call.PASSWORD_PROPERTY, password);
+		}
+		// Basic HTTP AuthN - set HTTP headers
+		else if (securityProfile.equals(SecurityProfiles.HTTP_BASICAUTHN_PLAINTEXTPASSWORD)){
+			// TODO This is not working properly
+			// Get HTTP headers
+			MessageContext context = call.getMessageContext();
+			Hashtable<String, String> headers = (Hashtable<String, String>) context
+					.getProperty(HTTPConstants.REQUEST_HEADERS);
+			if (headers == null) {
+				headers = new Hashtable();
+				context.setProperty(HTTPConstants.REQUEST_HEADERS, headers);
+			}
+			String username;
+			String password;
 
-		 call.setProperty(Call.USERNAME_PROPERTY,
-		 getParser().getWSDLLocation());
-
-		 // Get the appropriate security agent
-		 /*CredentialManager credManager;
-		 try {
-		 credManager = CredentialManager.getInstance();
-		 SecurityAgentManager saManager =
-		 credManager.getSecurityAgentManager();
-		 WSSecurityRequest wsSecReq = new
-		 WSSecurityRequest(getParser().getWSDLLocation(), null);
+			String[] usernamePasswordPair = getUsernameAndPasswordForService(bean);
+			username = usernamePasswordPair[0];
+			password = usernamePasswordPair[1];
 		
-		 WSSecurityAgent sa = (WSSecurityAgent)
-		 saManager.getSecurityAgent((SecurityRequest) wsSecReq);
-		 call.setProperty("security_agent", sa);
-					
-		 } catch (CMException e) {
-		 // TODO Auto-generated catch block
-		 e.printStackTrace();
-		 } catch (CMNotInitialisedException e) {
-		 // TODO Auto-generated catch block
-		 e.printStackTrace();
-		 }*/
+			// Set HTTP Basic AuthN header with Base64 encoded plaintext username and password
+			String authorization = Base64.encode((username + ":" + password).getBytes());
+			headers.put("Authorization", "Basic " + authorization);
+		}
 	}
 
 	/**
-	 * Returns an Axis-based Call, initialised for the operation that needs to
-	 * be invoked.
-	 * 
-	 * @param config
-	 *            - Axis engine configuration containing settings for the
-	 *            transport and WSS4J handlers that will add WS-Security headers
-	 *            to the SOAP envelope in order to make secure WSs invocation.
-	 * @return Call object initialised for the operation that needs to be
-	 *         invoked.
-	 * @throws ServiceException
-	 * @throws UnknownOperationException
-	 * @throws MalformedURLException
+	 * Get username and password from Credential Manager or ask user to supply one.
+	 * Username is the first element of the returned array, and the password is the second.
 	 */
-	@Override
-	protected Call getCall(EngineConfiguration config) throws ServiceException,
-			UnknownOperationException, MalformedURLException {
+	private String[] getUsernameAndPasswordForService(WSDLActivityConfigurationBean bean) throws Exception{
 		
+		String[] username_password;
+		String username;
+		String password;
 		
-		//logger.info("Trying to get classloader for T2WSDoAllSender... " );//+ T2WSDoAllSender.class.getClassLoader());	
-		//logger.info("Classloader = "+T2WSDLSOAPInvoker.class.getClassLoader());
-		//logger.info("Trying to get Classloader for Handler... ");
-		//logger.info("Classloader = "+Handler.class.getClassLoader());
-		//logger.info("Trying to get Classloader for WSDoAllHandler... ");
-		//logger.info("Classloader = "+WSDoAllHandler.class.getClassLoader());
-		
-		/*
-		logger.info("Passing the classloaders for T2WSDoAllSender and wss4j to axis...");
-		ClassLoader t2WSSenderLoader=null, wss4jLoader=null, xmlsecLoader=null;
-		try {
-			t2WSSenderLoader = ((net.sf.taverna.raven.repository.impl.LocalArtifactClassLoader)T2WSDoAllSender.class.getClassLoader()).getRepository().getLoader(new net.sf.taverna.raven.repository.BasicArtifact("net.sf.taverna.t2", "wsdl-activity", "0.3"), null);
-			wss4jLoader = ((net.sf.taverna.raven.repository.impl.LocalArtifactClassLoader)T2WSDoAllSender.class.getClassLoader()).getRepository().getLoader(new net.sf.taverna.raven.repository.BasicArtifact("org.apache.ws.security", "wss4j", "1.5.4-taverna"), null);
-			//xmlsecLoader = ((net.sf.taverna.raven.repository.impl.LocalArtifactClassLoader)T2WSDoAllSender.class.getClassLoader()).getRepository().getLoader(new net.sf.taverna.raven.repository.BasicArtifact("org.apache.santuario", "xmlsec", "1.4.0"), null);
+		// Try to get username and password for this service from Credential Manager first
+        CredentialManager credManager = null;
+        try{
+        	credManager = CredentialManager.getInstance();
+            username_password = credManager.getUsernameAndPasswordForService(bean.getWsdl());
+            if (username_password == null){ 
+            	// There is no username and password for this service in the Credential Manager - ask the user to supply them
+				GetPasswordDialog getPasswordDialog = new GetPasswordDialog(
+						"Credential Manager could not find username and password for service \n"
+								+ bean.getWsdl() +".\nPlease provide username and password.", true);
+    			getPasswordDialog.setLocationRelativeTo(null);
+    			getPasswordDialog.setVisible(true);
 
-		} catch (ArtifactNotFoundException e) {
-			logger.info("Artifact not found");
-			e.printStackTrace();
-		} catch (ArtifactStateException e) {
-			logger.info("Artifact state exception");
-			e.printStackTrace();
+    			username = getPasswordDialog.getUsername(); // get username
+    			password = getPasswordDialog.getPassword(); // get password
+    			boolean shouldSaveUsernameAndPassword = getPasswordDialog.shouldSaveUsernameAndPassword();
+    			if (password == null) { // user cancelled - any of the above two variables is null 
+    				logger
+    				.error("User did not enter username and password for operation "
+    						+ bean.getOperation() + " of service " + bean.getWsdl());
+    				throw new Exception("User did not enter username and password for "
+    						+ bean.getOperation() + " of service " + bean.getWsdl());					
+    			}
+				if (shouldSaveUsernameAndPassword){
+					// Get Credential Manager to save this username and password
+			        try{
+			        	credManager.saveUsernameAndPasswordForService(username, password, bean.getWsdl());
+			        }
+			        catch (CMException cme){
+			        	logger .error("Failed to save username and password for service. Reason " + cme.getMessage());
+			        	JOptionPane.showMessageDialog(null, "Failed to save username and password", "Error message", 0);
+			        }						
+				}
+				username_password = new String[2];
+    			username_password[0] = username;
+    			username_password[1] = password;
+    			return username_password;
+            }
+            else{
+    			System.out.println("Username: " + username_password[0]);
+            	System.out.println("Password: " + username_password[1]);
+    			return username_password;
+            }
+        }
+        catch (CMException cme){
+			logger.error("Failed to instantiate Credential Manager when obtaining username and password for service "
+									+ bean.getWsdl() + ". Reason: " + cme.getMessage());
+           	// Ask user to supply username and password for this service 
+			GetPasswordDialog getPasswordDialog = new GetPasswordDialog(
+					"Credential Manager failed to provide username and password for service \n"
+							+ bean.getWsdl() +".\nPlease provide username and password.", false);
+			getPasswordDialog.setLocationRelativeTo(null);
+			getPasswordDialog.setVisible(true);
+			
+			username = getPasswordDialog.getUsername(); // get username
+			password = getPasswordDialog.getPassword(); // get password
+			
+			if (password == null) { // user cancelled - any of the above two variables is null 
+				logger
+				.error("User did not enter username and password for "
+						+ bean.getOperation() + " of service " + bean.getWsdl() + ". The service invocation will fail.");
+				throw new Exception("User did not enter username and password for "
+						+ bean.getOperation() + " of service " + bean.getWsdl() + ". The service invocation will fail.");					
+			}
+			username_password = new String[2];
+			username_password[0] = username;
+			username_password[1] = password;
+			return username_password;
 		}
-	
-		org.apache.axis.utils.ClassUtils.setClassLoader("net.sf.taverna.t2.activities.wsdl.wss4j.T2WSDoAllSender",t2WSSenderLoader);
-		org.apache.axis.utils.ClassUtils.setClassLoader("org.apache.ws.axis.security.handler.WSDoAllHandler",wss4jLoader);
-		*/
-		
-		//org.apache.axis.utils.ClassUtils.setDefaultClassLoader(T2WSDoAllSender.class.getClassLoader());
-		//org.apache.axis.utils.ClassUtils.setClassLoader("org.apache.axis.Handler",T2WSDLSOAPInvoker.class.getClassLoader());
-		//org.apache.axis.utils.ClassUtils.setClassLoader("net.sf.taverna.t2.activities.wsdl.wss4j.T2WSDoAllSender",T2WSDLSOAPInvoker.class.getClassLoader());
-
-		//		
-//		org.apache.axis.utils.ClassUtils.setClassLoader(org.apache.ws.security.transform.STRTransform.class.getName(), (net.sf.taverna.raven.repository.impl.LocalArtifactClassLoader)STRTransform.class.getClassLoader()).getRepository().getLoader(new net.sf.taverna.raven.repository.BasicArtifact("org.apache.ws.security", "wss4j", "1.5.4"));
-//		org.apache.axis.utils.ClassUtils.setClassLoader(org.apache.xml.security.transforms.Transform.class.getName(), org.apache.xml.security.transforms.Transform.class.getClassLoader());
-		//org.apache.axis.utils.ClassUtils.setClassLoader(WSDoAllHandler.class.getName(), WSDoAllHandler.class.getClassLoader());
-
-		Call call = super.getCall(config);
-		
-		if (config != null) {
-			configureSecurity(call);
-		}
-		return call;
 	}
 	
 	@Override
@@ -284,6 +298,40 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			String wsrfEndpointReference) throws JDOMException, IOException {
 		SAXBuilder builder = new SAXBuilder();
 		return builder.build(new StringReader(wsrfEndpointReference));
+	}
+
+	public Map<String, Object> invoke(Map<String, Object> inputMap,
+			WSDLActivityConfigurationBean bean) throws Exception{
+		
+		String securityProfile = bean.getSecurityProfile();
+		EngineConfiguration wssEngineConfiguration = null;
+		if (securityProfile != null) {
+			// If security settings require WS-Security and not just Basic HTTP AuthN 
+			// - configure the axis engine from the appropriate config strings
+			if (securityProfile.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)){
+				wssEngineConfiguration = new XMLStringProvider(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD_CONFIG);
+			}
+			else if (securityProfile.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD)){
+				wssEngineConfiguration = new XMLStringProvider(SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD_CONFIG);
+			}
+			else if (securityProfile.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)){
+				wssEngineConfiguration = new XMLStringProvider(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTETPASSWORD_CONFIG);
+			}
+			else if (securityProfile.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)){
+				wssEngineConfiguration = new XMLStringProvider(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD_CONFIG);
+			}
+		}
+		
+		Call call = super.getCall(wssEngineConfiguration);
+		
+		// Now that we have an axis Call object, configure any additional 
+		// security properties on it (or its message context or its Transport handler),
+		// such as WS-Security UsernameToken or HTTP Basic AuthN
+		if (securityProfile != null) {
+			configureSecurity(call, bean);
+		}
+		
+		return invoke(inputMap, call);	
 	}
 
 }

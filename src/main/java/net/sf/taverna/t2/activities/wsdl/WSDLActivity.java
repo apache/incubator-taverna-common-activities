@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.taverna.t2.activities.wsdl.security.SecurityProfiles;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.T2Reference;
@@ -41,8 +42,6 @@ import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 
-import org.apache.axis.EngineConfiguration;
-import org.apache.axis.configuration.XMLStringProvider;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -88,16 +87,19 @@ public class WSDLActivity extends
 	public void configure(WSDLActivityConfigurationBean bean)
 			throws ActivityConfigurationException {
 		if (this.configurationBean != null) {
-			throw new IllegalStateException(
-					"Reconfiguring WSDL activity not yet implemented");
+//			throw new IllegalStateException(
+//					"Reconfiguring WSDL activity not yet implemented");
+			this.configurationBean = bean;
 		}
-		this.configurationBean = bean;
-		try {
-			parseWSDL();
-			configurePorts();
-		} catch (Exception ex) {
-			throw new ActivityConfigurationException(
-					"Unable to parse the WSDL", ex);
+		else{
+			this.configurationBean = bean;
+			try {
+				parseWSDL();
+				configurePorts();
+			} catch (Exception ex) {
+				throw new ActivityConfigurationException(
+						"Unable to parse the WSDL", ex);
+			}
 		}
 	}
 
@@ -261,15 +263,9 @@ public class WSDLActivity extends
 							configurationBean.getOperation(), outputNames,
 							endpointReference);
 					WSDLActivityConfigurationBean bean = getConfiguration();
-					EngineConfiguration wssEngineConfiguration = null;
-
-					if (bean.getSecurityProfileString() != null) {
-						wssEngineConfiguration = new XMLStringProvider(bean
-								.getSecurityProfileString());
-					}
 
 					Map<String, Object> invokerOutputMap = invoker.invoke(
-							invokerInputMap, wssEngineConfiguration);
+							invokerInputMap, bean);
 
 					for (String outputName : invokerOutputMap.keySet()) {
 						Object value = invokerOutputMap.get(outputName);

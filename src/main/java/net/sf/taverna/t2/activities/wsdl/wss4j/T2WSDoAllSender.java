@@ -29,8 +29,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
 import net.sf.taverna.t2.activities.wsdl.WSDLActivity;
-import net.sf.taverna.t2.security.agents.SAException;
-import net.sf.taverna.t2.security.agents.WSSecurityAgent;
+//import net.sf.taverna.t2.security.agents.SAException;
+//import net.sf.taverna.t2.security.agents.WSSecurityAgent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -181,7 +181,7 @@ public class T2WSDoAllSender extends WSDoAllSender{
          */
         
         // Get the security agent
-        WSSecurityAgent sa = (WSSecurityAgent) ((MessageContext)reqData.getMsgContext()).getProperty("security_agent");
+       /* WSSecurityAgent sa = (WSSecurityAgent) ((MessageContext)reqData.getMsgContext()).getProperty("security_agent");
    
         // Perform security actions
         for (int i = 0; i < actions.size(); i++) {
@@ -200,7 +200,7 @@ public class T2WSDoAllSender extends WSDoAllSender{
     				} break;
 				}
                 case WSConstants.ENCR:
-                case WSConstants.SIGN:{/*sa.wssSign(doc, reqData); break;*/}
+                case WSConstants.SIGN:{//sa.wssSign(doc, reqData); break;}
                 case WSConstants.ST_SIGNED:
                 case WSConstants.ST_UNSIGNED:
                 case WSConstants.TS:
@@ -211,7 +211,7 @@ public class T2WSDoAllSender extends WSDoAllSender{
                     reqData.setNoSerialization(true);
                     break;
             }
-        } 
+        } */
 
         /*
          * If this is a request then store all signature values. Add ours to

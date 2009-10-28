@@ -30,7 +30,12 @@ package net.sf.taverna.t2.activities.wsdl;
 public class WSDLActivityConfigurationBean {
     private String wsdl;
     private String operation;
-    private String securityProfileString;
+    private String securityProfile;
+    
+    // In the case service requires username and password for authentication,
+    // but do not serialise these variables to file
+    //transient private String username;
+    //transient private String password;
     
     /** Creates a new instance of WSDLActivityConfigurationBean */
     public WSDLActivityConfigurationBean() {
@@ -52,11 +57,27 @@ public class WSDLActivityConfigurationBean {
         this.operation = operation;
     }
 
-	public String getSecurityProfileString() {
-		return securityProfileString;
+	public String getSecurityProfile() {
+		return securityProfile;
 	}
 
-	public void setSecurityProfileString(String securityProfileString) {
-		this.securityProfileString = securityProfileString;
+	public void setSecurityProfile(String securityProfile) {
+		this.securityProfile = securityProfile;
 	}
+
+//	public void setUsername(String username) {
+//		this.username = username;
+//	}
+//
+//	public String getUsername() {
+//		return username;
+//	}
+//
+//	public void setPassword(String password) {
+//		this.password = password;
+//	}
+//
+//	public String getPassword() {
+//		return password;
+//	}
 }
