@@ -55,6 +55,8 @@ public class BeanshellActivity extends
 	protected BeanshellActivityConfigurationBean configurationBean;
 
 	private static Logger logger = Logger.getLogger(BeanshellActivity.class);
+
+	private Interpreter interpreter;
 	
 	public BeanshellActivity() {
 	}
@@ -65,6 +67,17 @@ public class BeanshellActivity extends
 		this.configurationBean = configurationBean;
 		checkGranularDepths();
 		configurePorts(configurationBean);
+		createInterpreter();
+	}
+
+	/**
+	 * Creates the interpreter required to run the beanshell script, and assigns the correct classloader
+	 * setting according to the 
+	 */
+	private void createInterpreter() {
+		interpreter = new Interpreter();
+		
+		
 	}
 
 	/**
@@ -124,52 +137,54 @@ public class BeanshellActivity extends
 					try {
 						classLoader = findClassLoader(configurationBean,
 								workflowRunID);
+						interpreter.setClassLoader(classLoader);
 					} catch (RuntimeException rex) {
 						String message = "Unable to obtain the classloader for Beanshell activity";
 						callback.fail(message, rex);
 						return;
 					}
+					
 				}
-				// Note: Interpreter is local to each invocation
-				Interpreter interpreter = new Interpreter();
-				interpreter.setClassLoader(classLoader);
-				
-				ReferenceService referenceService = callback.getContext().getReferenceService();
-
-				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
-
-				try {
-					// set inputs
-					for (String inputName : data.keySet()) {
-						ActivityInputPort inputPort = getInputPort(inputName);
-						Object input = referenceService.renderIdentifier(data
-								.get(inputName), inputPort
-								.getTranslatedElementClass(), callback
-								.getContext());
-						inputName = sanatisePortName(inputName);
-						interpreter.set(inputName, input);
-					}
-					// run
-					interpreter.eval(configurationBean.getScript());
-					// get outputs
-					for (OutputPort outputPort : getOutputPorts()) {
-						String name = outputPort.getName();
-						Object value = interpreter.get(name);
-						if (value == null) {
-							ErrorDocumentService errorDocService = referenceService.getErrorDocumentService();
-							value = errorDocService.registerError("No value produced for output variable " + name, 
-									outputPort.getDepth());
+								
+				synchronized (interpreter) {
+					
+					ReferenceService referenceService = callback.getContext().getReferenceService();
+	
+					Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
+	
+					try {
+						// set inputs
+						for (String inputName : data.keySet()) {
+							ActivityInputPort inputPort = getInputPort(inputName);
+							Object input = referenceService.renderIdentifier(data
+									.get(inputName), inputPort
+									.getTranslatedElementClass(), callback
+									.getContext());
+							inputName = sanatisePortName(inputName);
+							interpreter.set(inputName, input);
 						}
-						outputData.put(name, referenceService.register(value,
-								outputPort.getDepth(), true, callback
-										.getContext()));
+						// run
+						interpreter.eval(configurationBean.getScript());
+						// get outputs
+						for (OutputPort outputPort : getOutputPorts()) {
+							String name = outputPort.getName();
+							Object value = interpreter.get(name);
+							if (value == null) {
+								ErrorDocumentService errorDocService = referenceService.getErrorDocumentService();
+								value = errorDocService.registerError("No value produced for output variable " + name, 
+										outputPort.getDepth());
+							}
+							outputData.put(name, referenceService.register(value,
+									outputPort.getDepth(), true, callback
+											.getContext()));
+						}
+						callback.receiveResult(outputData, new int[0]);
+					} catch (EvalError e) {
+						callback.fail("Error evaluating the beanshell script " + this, e);
+					} catch (ReferenceServiceException e) {
+						callback.fail(
+								"Error accessing beanshell input/output data for " + this, e);
 					}
-					callback.receiveResult(outputData, new int[0]);
-				} catch (EvalError e) {
-					callback.fail("Error evaluating the beanshell script " + this, e);
-				} catch (ReferenceServiceException e) {
-					callback.fail(
-							"Error accessing beanshell input/output data for " + this, e);
 				}
 			}
 			
