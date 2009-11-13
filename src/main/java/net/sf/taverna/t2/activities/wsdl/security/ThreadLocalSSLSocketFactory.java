@@ -36,6 +36,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.apache.log4j.Logger;
+
 /**
  * An implementation of SSLSocketFactory which delegates to one of two internal
  * SSLSocketFactory implementations. The implementation delegated to is
@@ -51,6 +53,9 @@ import javax.net.ssl.X509TrustManager;
  * 
  */
 public class ThreadLocalSSLSocketFactory extends SSLSocketFactory {
+
+	private static Logger logger = Logger
+	.getLogger(ThreadLocalSSLSocketFactory.class);
 
 	/**
 	 * Calls to open HTTPS connections will trust unsigned certificates afer
@@ -98,7 +103,7 @@ public class ThreadLocalSSLSocketFactory extends SSLSocketFactory {
 			sc = SSLContext.getInstance("SSL");
 		} catch (NoSuchAlgorithmException e1) {
 
-			e1.printStackTrace();
+			logger.error("No SSL algorithm", e1);
 		}
 		TrustManager overlyTrusting = new X509TrustManager() {
 
@@ -121,7 +126,7 @@ public class ThreadLocalSSLSocketFactory extends SSLSocketFactory {
 			sc.init(null, new TrustManager[] { overlyTrusting },
 					new SecureRandom());
 		} catch (KeyManagementException e) {
-			e.printStackTrace();
+			logger.error("Unable to initialize SSLContext", e);
 		}
 		return sc.getSocketFactory();
 
