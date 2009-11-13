@@ -49,7 +49,6 @@ import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.rpc.ServiceException;
 import javax.xml.soap.SOAPException;
-import org.apache.axis.message.SOAPHeaderElement;
 
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
@@ -60,6 +59,7 @@ import org.apache.axis.attachments.AttachmentPart;
 import org.apache.axis.client.Call;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.transport.http.HTTPTransport;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -215,7 +215,7 @@ public class WSDLSOAPInvoker {
 			int minutes = Integer.parseInt(minutesStr.trim());
 			result = minutes * 1000 * 60;
 		} catch (NumberFormatException e) {
-			e.printStackTrace();
+			logger.error("Non-integer timeout", e);
 			return result;
 		}
 		return result;
