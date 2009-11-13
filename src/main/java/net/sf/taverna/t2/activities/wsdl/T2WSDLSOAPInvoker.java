@@ -252,8 +252,8 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
     			return username_password;
             }
             else{
-    			System.out.println("Username: " + username_password[0]);
-            	System.out.println("Password: " + username_password[1]);
+    			logger.info("Username: " + username_password[0]);
+            	logger.info("Password: " + username_password[1]);
     			return username_password;
             }
         }
