@@ -277,8 +277,7 @@ public class WSDLActivity extends
 										.register(value, depth, true, callback
 												.getContext()));
 							} else {
-								System.out
-										.println("Depth not recorded for output:"
+								logger.info("Depth not recorded for output:"
 												+ outputName);
 								// TODO what should the depth be in this case?
 								outputData.put(outputName, referenceService
@@ -297,7 +296,7 @@ public class WSDLActivity extends
 					logger.error("Error invoking WSDL service "
 							+ getConfiguration().getOperation(), e);
 					callback.fail(
-							"An error occurred invoking the WSDLActivity", e);
+							"An error occurred invoking the WSDL service", e);
 					return;
 				}
 
