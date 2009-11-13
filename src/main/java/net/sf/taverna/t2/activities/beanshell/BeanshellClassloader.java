@@ -30,10 +30,15 @@ import net.sf.taverna.raven.repository.ArtifactStateException;
 import net.sf.taverna.raven.repository.Repository;
 import net.sf.taverna.raven.repository.impl.LocalArtifactClassLoader;
 
+import org.apache.log4j.Logger;
+
 public class BeanshellClassloader extends URLClassLoader {
 	private List<Artifact> artifacts;
 	private Repository repo;
 
+	private static Logger logger = Logger
+	.getLogger(BeanshellClassloader.class);
+	
 	public BeanshellClassloader(List<Artifact> artifacts) {
 		super(new URL[] {});
 		this.artifacts = artifacts;
@@ -58,11 +63,9 @@ public class BeanshellClassloader extends URLClassLoader {
 					Class<?> result = cl.loadClass(classname);
 					return result;
 				} catch (ArtifactNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Could not find " + a, e);
 				} catch (ArtifactStateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Invalid  " + a, e);
 				} catch (ClassNotFoundException e) {
 					
 				}
