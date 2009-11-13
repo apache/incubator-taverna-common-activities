@@ -68,7 +68,7 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	public void testAddOutputSplitterToWSDLActivity() throws Exception {
 		AddXMLSplitterEdit edit = new AddXMLSplitterEdit(dataflow,activity,"parameters",false);
 		edit.doEdit();
-		assertEquals("The dataflow should now contain 2 processors",2,dataflow.getProcessors().size());
+		assertEquals("The workflow should now contain 2 services",2,dataflow.getProcessors().size());
 		Processor processor=null;
 		for (Processor p : dataflow.getProcessors()) {
 			if (p.getLocalName().equals("parametersXML")) {
@@ -105,7 +105,7 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	public void testAddInputSplitterToWSDLActivity() throws Exception {
 		AddXMLSplitterEdit edit = new AddXMLSplitterEdit(dataflow,activity,"parameters",true);
 		edit.doEdit();
-		assertEquals("The dataflow should now contain 2 processors",2,dataflow.getProcessors().size());
+		assertEquals("The workflow should now contain 2 services",2,dataflow.getProcessors().size());
 		Processor processor=null;
 		for (Processor p : dataflow.getProcessors()) {
 			if (p.getLocalName().equals("parametersXML")) {
