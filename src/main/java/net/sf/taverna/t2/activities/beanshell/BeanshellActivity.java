@@ -139,7 +139,7 @@ public class BeanshellActivity extends
 								workflowRunID);
 						interpreter.setClassLoader(classLoader);
 					} catch (RuntimeException rex) {
-						String message = "Unable to obtain the classloader for Beanshell activity";
+						String message = "Unable to obtain the classloader for Beanshell service";
 						callback.fail(message, rex);
 						return;
 					}
