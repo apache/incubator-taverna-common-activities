@@ -39,9 +39,9 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		try {
 			while (!parser.Line());
 		} catch (ParseException e) {
-			return new HealthReport("Beanshell Activity",e.getMessage(),Status.SEVERE);
+			return new HealthReport("Beanshell service",e.getMessage(),Status.SEVERE);
 		}
-		return new HealthReport("Beanshell Acitivity","Parsed OK",Status.OK);
+		return new HealthReport("Beanshell service","Parsed OK",Status.OK);
 	}
 
 }
