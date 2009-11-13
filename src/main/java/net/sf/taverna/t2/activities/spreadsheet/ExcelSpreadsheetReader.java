@@ -226,7 +226,7 @@ public class ExcelSpreadsheetReader implements SpreadsheetReader {
 //			// don't care about sheet name for now
 //			// case BoundSheetRecord.sid:
 //			// BoundSheetRecord bsr = (BoundSheetRecord) record;
-//			// System.out.println("New sheet named: " + bsr.getSheetname());
+//			// logger.info("New sheet named: " + bsr.getSheetname());
 //			// break;
 //			case RowRecord.sid:
 //				// RowRecord rowRecord = (RowRecord) record;
