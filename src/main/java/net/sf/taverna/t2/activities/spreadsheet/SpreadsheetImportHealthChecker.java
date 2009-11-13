@@ -36,10 +36,10 @@ public class SpreadsheetImportHealthChecker implements HealthChecker<Spreadsheet
 	}
 
 	public HealthReport checkHealth(SpreadsheetImportActivity activity) {
-		HealthReport healthReport = new HealthReport("Spreadsheet Import Activity", "OK", Status.OK);
+		HealthReport healthReport = new HealthReport("Spreadsheet Import Service", "OK", Status.OK);
 		SpreadsheetImportConfiguration configuration = activity.getConfiguration();
 		if (configuration == null) {
-			healthReport.setMessage("Activity has not been configured");
+			healthReport.setMessage("Service has not been configured");
 			healthReport.setStatus(Status.SEVERE);
 		}
 		return healthReport;
