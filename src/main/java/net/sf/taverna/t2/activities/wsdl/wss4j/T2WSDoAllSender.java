@@ -196,7 +196,7 @@ public class T2WSDoAllSender extends WSDoAllSender{
                 	try {
     					sa.wssUsernameToken(doc, reqData);
     				} catch (SAException e) {
-    					e.printStackTrace();
+    					logger.error("", e);
     				} break;
 				}
                 case WSConstants.ENCR:
