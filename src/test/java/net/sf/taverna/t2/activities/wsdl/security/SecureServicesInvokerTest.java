@@ -79,7 +79,6 @@ public class SecureServicesInvokerTest {
 					"<transport name=\"http\" pivot=\"java:org.apache.axis.transport.http.HTTPSender\"/>"+
 					"</deployment>");
 			
-			//System.err.println(wssEngineConfigurationString);
 			Service service = new Service(wssEngineConfiguration);
 		
 			Call call = new Call(service);			
