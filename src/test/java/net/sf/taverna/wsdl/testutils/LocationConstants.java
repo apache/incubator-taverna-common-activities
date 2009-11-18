@@ -27,6 +27,6 @@ package net.sf.taverna.wsdl.testutils;
  *
  */
 public interface LocationConstants {
-	public static final String WSDL_TEST_BASE="http://www.mygrid.org.uk/taverna-tests/testwsdls/";
+	
 	public static final String WSDL_RESOURCE_BASE="/testwsdls/";
 }
