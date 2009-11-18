@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -8,13 +8,12 @@
     </parent>
     <groupId>net.sf.taverna</groupId>
     <artifactId>wsdl-generic</artifactId>
+    <version>1.6-SNAPSHOT</version>
+
     <packaging>jar</packaging>
-
-	<version>1.6-SNAPSHOT</version>
-
     <name>wsdl-generic</name>
     <description>
-		WSDL handling classes that are shared between Taverna 1 and 2
+        WSDL handling classes that are shared between Taverna 1 and 2
     </description>
 
     <build>
@@ -81,18 +80,11 @@
             <artifactId>log4j</artifactId>
             <version>1.2.12</version>
         </dependency>
-
-		<!--
-			<dependency> <groupId>uk.org.mygrid.resources</groupId>
-			<artifactId>axis</artifactId> <version>1.4-taverna</version>
-			</dependency>
-		-->
         <!--<dependency>
             <groupId>axis</groupId>
             <artifactId>axis</artifactId>
             <version>1.4</version>
         </dependency>
-
         <dependency>
             <groupId>axis</groupId>
             <artifactId>axis-jaxrpc</artifactId>
@@ -107,17 +99,22 @@
             <groupId>axis</groupId>
             <artifactId>axis-wsdl4j</artifactId>
             <version>1.5.1</version>
-        </dependency>-->
-		<dependency>
-            <groupId>net.sf.taverna.t2</groupId>
-            <artifactId>axis-wss4j</artifactId>
-            <version>1.4-1.5.4</version>
         </dependency>
-        
+
+      to make security work inside Raven,
+      instead use a single dependency 
+      that bundles the above together with wss4j:
+    -->
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wss4j</artifactId>
+            <version>1.4-1.5.4-2</version>
+        </dependency>
+
         <dependency>
             <groupId>uk.org.mygrid.taverna.scufl</groupId>
             <artifactId>scufl-model</artifactId>
-			<version>1.7.2.0</version>
+            <version>1.7.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
