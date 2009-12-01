@@ -70,6 +70,11 @@ public class SecurityProfiles {
 	"<parameter name=\"passwordType\" value=\"PasswordText\"/>" +
 	"</handler>"+
 	"</requestFlow>" + 
+	"<responseFlow>" +
+	"<handler type=\"java:org.apache.ws.axis.security.WSDoAllReceiver\">" + 
+	"<parameter name=\"action\" value=\"Timestamp\"/>" +
+	"</handler>"+
+	"</responseFlow>" + 	
 	"</globalConfiguration>" + 
 	"<transport name=\"http\" pivot=\"java:org.apache.axis.transport.http.HTTPSender\"/>"+
 	"</deployment>";
@@ -92,6 +97,11 @@ public class SecurityProfiles {
 	"<parameter name=\"passwordType\" value=\"PasswordDigest\"/>" +
 	"</handler>"+
 	"</requestFlow>" + 
+	"<responseFlow>" +
+	"<handler type=\"java:org.apache.ws.axis.security.WSDoAllReceiver\">" + 
+	"<parameter name=\"action\" value=\"Timestamp\"/>" +
+	"</handler>"+
+	"</responseFlow>" + 
 	"</globalConfiguration>" + 
 	"<transport name=\"http\" pivot=\"java:org.apache.axis.transport.http.HTTPSender\"/>"+
 	"</deployment>";
