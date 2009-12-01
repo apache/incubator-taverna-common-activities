@@ -342,7 +342,7 @@ public class SpreadsheetImportActivity extends
 						value = referenceService.getErrorDocumentService()
 								.registerError(
 										"Missing data for spreadsheet cell "
-												+ column + row, 0);
+												+ column + row, 0, context);
 					} else if (emptyCellPolicy
 							.equals(SpreadsheetEmptyCellPolicy.EMPTY_STRING)) {
 						value = "";
