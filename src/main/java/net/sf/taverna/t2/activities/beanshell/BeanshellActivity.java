@@ -172,7 +172,7 @@ public class BeanshellActivity extends
 							if (value == null) {
 								ErrorDocumentService errorDocService = referenceService.getErrorDocumentService();
 								value = errorDocService.registerError("No value produced for output variable " + name, 
-										outputPort.getDepth());
+										outputPort.getDepth(), callback.getContext());
 							}
 							outputData.put(name, referenceService.register(value,
 									outputPort.getDepth(), true, callback
