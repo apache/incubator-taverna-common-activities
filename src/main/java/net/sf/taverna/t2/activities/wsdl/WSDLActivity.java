@@ -98,7 +98,7 @@ public class WSDLActivity extends
 				configurePorts();
 			} catch (Exception ex) {
 				throw new ActivityConfigurationException(
-						"Unable to parse the WSDL", ex);
+						"Unable to parse the WSDL " + bean.getWsdl(), ex);
 			}
 		}
 	}
