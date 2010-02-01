@@ -22,14 +22,13 @@ package net.sf.taverna.t2.activities.dependencyactivity;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
-
-import org.apache.log4j.Logger;
 
 import net.sf.taverna.raven.appconfig.ApplicationRuntime;
 import net.sf.taverna.raven.prelauncher.BootstrapClassLoader;
@@ -44,6 +43,8 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousAc
 import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.NestedDataflow;
 import net.sf.taverna.t2.workflowmodel.utils.Tools;
+
+import org.apache.log4j.Logger;
 
 /**
  * A parent abstract class for activities that require dependency management, such as
@@ -239,10 +240,15 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 
 		ClassLoaderSharing classLoaderSharing = configurationBean.getClassLoaderSharing();
  		// Get the WorkflowInstanceFacade which contains the current workflow
-		WorkflowInstanceFacade wfFacade = WorkflowInstanceFacade.workflowRunFacades.get(workflowRunID);
+		WeakReference<WorkflowInstanceFacade> wfFacadeRef = WorkflowInstanceFacade.workflowRunFacades.get(workflowRunID);
+		WorkflowInstanceFacade wfFacade = null;		
+		if (wfFacadeRef != null) {
+			wfFacade = wfFacadeRef.get();
+		}
 		Dataflow wf = null;
-		if (wfFacade != null)
-			wf = WorkflowInstanceFacade.workflowRunFacades.get(workflowRunID).getDataflow();
+		if (wfFacade != null) {
+			wf = wfFacade.getDataflow();
+		}
 
 		// Files of dependencies for all activities in the workflow that share the classloading policy
 		HashSet<File> dependencies = new HashSet<File>();
