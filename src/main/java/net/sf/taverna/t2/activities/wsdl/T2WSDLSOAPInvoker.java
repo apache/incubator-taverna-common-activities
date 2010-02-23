@@ -184,11 +184,11 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			// TODO This is not working properly
 			// Get HTTP headers
 			MessageContext context = call.getMessageContext();
-			Hashtable<String, String> headers = (Hashtable<String, String>) context
+			Hashtable<String, String> headers = (Hashtable<String, String>) call
 					.getProperty(HTTPConstants.REQUEST_HEADERS);
 			if (headers == null) {
 				headers = new Hashtable();
-				context.setProperty(HTTPConstants.REQUEST_HEADERS, headers);
+				call.setProperty(HTTPConstants.REQUEST_HEADERS, headers);
 			}
 			String username;
 			String password;
@@ -198,8 +198,9 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			password = usernamePasswordPair[1];
 		
 			// Set HTTP Basic AuthN header with Base64 encoded plaintext username and password
-			String authorization = Base64.encode((username + ":" + password).getBytes());
+			String authorization = Base64.encode((username + ":" + password).getBytes("UTF-8"));
 			headers.put("Authorization", "Basic " + authorization);
+			call.setProperty(HTTPConstants.REQUEST_HEADERS, headers);
 		}
 	}
 
