@@ -107,18 +107,18 @@ public class SecurityProfiles {
 	"</deployment>";
 	
 	/**
-	 * Security profile for Web services that require HTTP Basic Authentication 
-	 * with plaintext password. There is no WS-Security involved.
+	 * Security profile for Web services that require HTTP Basic Authentication. 
+	 * There is no WS-Security involved.
 	 * Such services should typically be invoked over HTTPS.
 	 */
-	public static final String HTTP_BASICAUTHN_PLAINTEXTPASSWORD = "HTTPBasicAuthNPlainTextPassword";
+	public static final String HTTP_BASIC_AUTHN = "HTTPBasicAuthNPlainTextPassword";
 	
 	/**
-	 * Security profile for Web services that require HTTP Basic Authentication 
-	 * with digest password. There is no WS-Security involved.
+	 * Security profile for Web services that require HTTP Digest Authentication. 
+	 * There is no WS-Security involved.
 	 * Such services would typically be invoked over HTTPS.
 	 */
-	public static final String HTTP_BASICAUTHN_DIGESTPASSWORD = "HTTPBasicAuthNDigestPassword";
+	public static final String HTTP_DIGEST_AUTHN = "HTTPDigestAuthN";
 
 
 }

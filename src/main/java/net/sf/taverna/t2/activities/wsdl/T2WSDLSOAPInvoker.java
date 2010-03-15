@@ -180,7 +180,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			call.setProperty(Call.PASSWORD_PROPERTY, password);
 		}
 		// Basic HTTP AuthN - set HTTP headers
-		else if (securityProfile.equals(SecurityProfiles.HTTP_BASICAUTHN_PLAINTEXTPASSWORD)){
+		else if (securityProfile.equals(SecurityProfiles.HTTP_BASIC_AUTHN)){
 			// TODO This is not working properly
 			// Get HTTP headers
 			MessageContext context = call.getMessageContext();
