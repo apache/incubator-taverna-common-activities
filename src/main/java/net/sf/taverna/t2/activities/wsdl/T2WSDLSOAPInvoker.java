@@ -28,9 +28,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-
-import net.sf.taverna.t2.activities.wsdl.security.GetPasswordDialog;
 import net.sf.taverna.t2.activities.wsdl.security.SecurityProfiles;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
@@ -68,7 +65,8 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 	private static final String REFERENCE_PROPERTIES = "ReferenceProperties";
 	private static final String ENDPOINT_REFERENCE = "EndpointReference";
 	private static Logger logger = Logger.getLogger(T2WSDLSOAPInvoker.class);
-	private static final Namespace wsaNS = Namespace.getNamespace("wsa", "http://schemas.xmlsoap.org/ws/2004/03/addressing");
+	private static final Namespace wsaNS = Namespace.getNamespace("wsa",
+			"http://schemas.xmlsoap.org/ws/2004/03/addressing");
 
 	private String wsrfEndpointReference = null;
 
@@ -102,8 +100,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 					+ wsrfEndpointReference, e);
 			return;
 		}
-		
-		
+
 		Element endpointRefElem = null;
 		Element wsrfRoot = wsrfDoc.getRootElement();
 		if (wsrfRoot.getNamespace().equals(wsaNS)
@@ -111,24 +108,27 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			endpointRefElem = wsrfRoot;
 		} else {
 			// Only look for child if the parent is not an EPR
-			Element childEndpoint = wsrfRoot.getChild(
-					ENDPOINT_REFERENCE, wsaNS);
+			Element childEndpoint = wsrfRoot
+					.getChild(ENDPOINT_REFERENCE, wsaNS);
 			if (childEndpoint != null) {
-				// Support wrapped endpoint reference for backward compatibility 
+				// Support wrapped endpoint reference for backward compatibility
 				// and convenience (T2-677)
 				endpointRefElem = childEndpoint;
 			} else {
-				logger.warn("Unexpected element name for endpoint reference, but inserting anyway: " + wsrfRoot.getQualifiedName());
+				logger
+						.warn("Unexpected element name for endpoint reference, but inserting anyway: "
+								+ wsrfRoot.getQualifiedName());
 				endpointRefElem = wsrfRoot;
 			}
 		}
 
-		Element refPropsElem = endpointRefElem.getChild(REFERENCE_PROPERTIES, wsaNS);
+		Element refPropsElem = endpointRefElem.getChild(REFERENCE_PROPERTIES,
+				wsaNS);
 		if (refPropsElem == null) {
 			logger.warn("Could not find " + REFERENCE_PROPERTIES);
 			return;
 		}
-		
+
 		List<Element> refProps = refPropsElem.getChildren();
 		// Make a copy of the list as it would be modified by
 		// prop.detach();
@@ -137,25 +137,26 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			SOAPHeaderElement soapElem;
 			prop.detach();
 			try {
-				org.w3c.dom.Document domDoc = domOutputter.output(new Document(prop));
-				soapElem = new SOAPHeaderElement(domDoc.getDocumentElement());			
+				org.w3c.dom.Document domDoc = domOutputter.output(new Document(
+						prop));
+				soapElem = new SOAPHeaderElement(domDoc.getDocumentElement());
 			} catch (JDOMException e) {
-				logger.warn("Could not translate wsrf element to DOM:\n" + prop, e);
+				logger.warn(
+						"Could not translate wsrf element to DOM:\n" + prop, e);
 				continue;
 			}
 			soapElem.setMustUnderstand(false);
 			soapElem.setActor(null);
 			soapHeaders.add(soapElem);
 		}
-		
-		
 
-//		soapHeaders.add(new SOAPHeaderElement((Element) wsrfDoc
-	//			.getDocumentElement()));
+		// soapHeaders.add(new SOAPHeaderElement((Element) wsrfDoc
+		// .getDocumentElement()));
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void configureSecurity(Call call, WSDLActivityConfigurationBean bean) throws Exception{
+	protected void configureSecurity(Call call,
+			WSDLActivityConfigurationBean bean) throws Exception {
 
 		// If security settings require WS-Security - configure the axis call
 		// with appropriate properties
@@ -171,11 +172,11 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 
 			String username;
 			String password;
-	
+
 			String[] usernamePasswordPair = getUsernameAndPasswordForService(bean);
 			username = usernamePasswordPair[0];
 			password = usernamePasswordPair[1];
-			
+
 			call.setProperty(Call.USERNAME_PROPERTY, username);
 			call.setProperty(Call.PASSWORD_PROPERTY, password);
 		}
@@ -196,95 +197,40 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			String[] usernamePasswordPair = getUsernameAndPasswordForService(bean);
 			username = usernamePasswordPair[0];
 			password = usernamePasswordPair[1];
-		
-			// Set HTTP Basic AuthN header with Base64 encoded plaintext username and password
-			String authorization = Base64.encode((username + ":" + password).getBytes("UTF-8"));
+
+			// Set HTTP Basic AuthN header with Base64 encoded plaintext
+			// username and password
+			String authorization = Base64.encode((username + ":" + password)
+					.getBytes("UTF-8"));
 			headers.put("Authorization", "Basic " + authorization);
 			call.setProperty(HTTPConstants.REQUEST_HEADERS, headers);
 		}
 	}
 
 	/**
-	 * Get username and password from Credential Manager or ask user to supply one.
-	 * Username is the first element of the returned array, and the password is the second.
+	 * Get username and password from Credential Manager or ask user to supply
+	 * one. Username is the first element of the returned array, and the
+	 * password is the second.
 	 */
-	private String[] getUsernameAndPasswordForService(WSDLActivityConfigurationBean bean) throws Exception{
-		
-		String[] username_password;
-		String username;
-		String password;
-		
-		// Try to get username and password for this service from Credential Manager first
-        CredentialManager credManager = null;
-        try{
-        	credManager = CredentialManager.getInstance();
-            username_password = credManager.getUsernameAndPasswordForService(bean.getWsdl());
-            if (username_password == null){ 
-            	// There is no username and password for this service in the Credential Manager - ask the user to supply them
-				GetPasswordDialog getPasswordDialog = new GetPasswordDialog(
-						"Credential Manager could not find username and password for service \n"
-								+ bean.getWsdl() +".\nPlease provide username and password.", true);
-    			getPasswordDialog.setLocationRelativeTo(null);
-    			getPasswordDialog.setVisible(true);
+	private String[] getUsernameAndPasswordForService(
+			WSDLActivityConfigurationBean bean) throws CMException {
 
-    			username = getPasswordDialog.getUsername(); // get username
-    			password = getPasswordDialog.getPassword(); // get password
-    			boolean shouldSaveUsernameAndPassword = getPasswordDialog.shouldSaveUsernameAndPassword();
-    			if (password == null) { // user cancelled - any of the above two variables is null 
-    				logger
-    				.error("User did not enter username and password for operation "
-    						+ bean.getOperation() + " of service " + bean.getWsdl());
-    				throw new Exception("User did not enter username and password for "
-    						+ bean.getOperation() + " of service " + bean.getWsdl());					
-    			}
-				if (shouldSaveUsernameAndPassword){
-					// Get Credential Manager to save this username and password
-			        try{
-			        	credManager.saveUsernameAndPasswordForService(username, password, bean.getWsdl());
-			        }
-			        catch (CMException cme){
-			        	logger .error("Failed to save username and password for service. Reason " + cme.getMessage());
-			        	JOptionPane.showMessageDialog(null, "Failed to save username and password", "Error message", 0);
-			        }						
-				}
-				username_password = new String[2];
-    			username_password[0] = username;
-    			username_password[1] = password;
-    			return username_password;
-            }
-            else{
-    			logger.info("Username: " + username_password[0]);
-            	logger.info("Password: " + username_password[1]);
-    			return username_password;
-            }
-        }
-        catch (CMException cme){
-			logger.error("Failed to instantiate Credential Manager when obtaining username and password for service "
-									+ bean.getWsdl() + ". Reason: " + cme.getMessage());
-           	// Ask user to supply username and password for this service 
-			GetPasswordDialog getPasswordDialog = new GetPasswordDialog(
-					"Credential Manager failed to provide username and password for service \n"
-							+ bean.getWsdl() +".\nPlease provide username and password.", false);
-			getPasswordDialog.setLocationRelativeTo(null);
-			getPasswordDialog.setVisible(true);
-			
-			username = getPasswordDialog.getUsername(); // get username
-			password = getPasswordDialog.getPassword(); // get password
-			
-			if (password == null) { // user cancelled - any of the above two variables is null 
-				logger
-				.error("User did not enter username and password for "
-						+ bean.getOperation() + " of service " + bean.getWsdl() + ". The service invocation will fail.");
-				throw new Exception("User did not enter username and password for "
-						+ bean.getOperation() + " of service " + bean.getWsdl() + ". The service invocation will fail.");					
-			}
-			username_password = new String[2];
-			username_password[0] = username;
-			username_password[1] = password;
-			return username_password;
-		}
+		String[] username_password;
+
+		// Try to get username and password for this service from Credential
+		// Manager (which should pop up UI if needed)
+		CredentialManager credManager = null;
+		credManager = CredentialManager.getInstance();
+		username_password = credManager.getUsernameAndPasswordForService(bean
+				.getWsdl());
+		if (username_password == null) {
+			throw new CMException("No username/password provided for service " + bean.getWsdl());
+		} 
+		logger.info("Username: " + username_password[0]);
+		logger.info("Password: " + username_password[1]);
+		return username_password;
 	}
-	
+
 	@Override
 	protected List<SOAPHeaderElement> makeSoapHeaders() {
 		List<SOAPHeaderElement> soapHeaders = new ArrayList<SOAPHeaderElement>(
@@ -302,37 +248,44 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 	}
 
 	public Map<String, Object> invoke(Map<String, Object> inputMap,
-			WSDLActivityConfigurationBean bean) throws Exception{
-		
+			WSDLActivityConfigurationBean bean) throws Exception {
+
 		String securityProfile = bean.getSecurityProfile();
 		EngineConfiguration wssEngineConfiguration = null;
 		if (securityProfile != null) {
-			// If security settings require WS-Security and not just Basic HTTP AuthN 
+			// If security settings require WS-Security and not just Basic HTTP
+			// AuthN
 			// - configure the axis engine from the appropriate config strings
-			if (securityProfile.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)){
-				wssEngineConfiguration = new XMLStringProvider(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD_CONFIG);
-			}
-			else if (securityProfile.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD)){
-				wssEngineConfiguration = new XMLStringProvider(SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD_CONFIG);
-			}
-			else if (securityProfile.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)){
-				wssEngineConfiguration = new XMLStringProvider(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTETPASSWORD_CONFIG);
-			}
-			else if (securityProfile.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)){
-				wssEngineConfiguration = new XMLStringProvider(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD_CONFIG);
+			if (securityProfile
+					.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)) {
+				wssEngineConfiguration = new XMLStringProvider(
+						SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD_CONFIG);
+			} else if (securityProfile
+					.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD)) {
+				wssEngineConfiguration = new XMLStringProvider(
+						SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD_CONFIG);
+			} else if (securityProfile
+					.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)) {
+				wssEngineConfiguration = new XMLStringProvider(
+						SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTETPASSWORD_CONFIG);
+			} else if (securityProfile
+					.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)) {
+				wssEngineConfiguration = new XMLStringProvider(
+						SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD_CONFIG);
 			}
 		}
-		
+
 		Call call = super.getCall(wssEngineConfiguration);
-		
-		// Now that we have an axis Call object, configure any additional 
-		// security properties on it (or its message context or its Transport handler),
+
+		// Now that we have an axis Call object, configure any additional
+		// security properties on it (or its message context or its Transport
+		// handler),
 		// such as WS-Security UsernameToken or HTTP Basic AuthN
 		if (securityProfile != null) {
 			configureSecurity(call, bean);
 		}
-		
-		return invoke(inputMap, call);	
+
+		return invoke(inputMap, call);
 	}
 
 }
