@@ -23,14 +23,15 @@ package net.sf.taverna.t2.activities.wsdl;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.taverna.t2.activities.wsdl.security.SecurityProfiles;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.soap.WSDLSOAPInvoker;
 
@@ -38,9 +39,7 @@ import org.apache.axis.EngineConfiguration;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
 import org.apache.axis.configuration.XMLStringProvider;
-import org.apache.axis.encoding.Base64;
 import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -170,40 +169,20 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 				|| securityProfile
 						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)) {
 
-			String username;
-			String password;
-
-			String[] usernamePasswordPair = getUsernameAndPasswordForService(bean);
-			username = usernamePasswordPair[0];
-			password = usernamePasswordPair[1];
-
-			call.setProperty(Call.USERNAME_PROPERTY, username);
-			call.setProperty(Call.PASSWORD_PROPERTY, password);
-		}
-		// Basic HTTP AuthN - set HTTP headers
-		else if (securityProfile.equals(SecurityProfiles.HTTP_BASIC_AUTHN)){
-			// TODO This is not working properly
-			// Get HTTP headers
+			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, false);
+			call.setProperty(Call.USERNAME_PROPERTY, usernamePassword.getUsername());
+			call.setProperty(Call.PASSWORD_PROPERTY, usernamePassword.getPasswordAsString());
+			usernamePassword.resetPassword();
+		} else if (securityProfile.equals(SecurityProfiles.HTTP_BASIC_AUTHN)){
+			// Basic HTTP AuthN - set HTTP headers
+			// pathrecursion allowed
+			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, true);
 			MessageContext context = call.getMessageContext();
-			Hashtable<String, String> headers = (Hashtable<String, String>) call
-					.getProperty(HTTPConstants.REQUEST_HEADERS);
-			if (headers == null) {
-				headers = new Hashtable();
-				call.setProperty(HTTPConstants.REQUEST_HEADERS, headers);
-			}
-			String username;
-			String password;
-
-			String[] usernamePasswordPair = getUsernameAndPasswordForService(bean);
-			username = usernamePasswordPair[0];
-			password = usernamePasswordPair[1];
-
-			// Set HTTP Basic AuthN header with Base64 encoded plaintext
-			// username and password
-			String authorization = Base64.encode((username + ":" + password)
-					.getBytes("UTF-8"));
-			headers.put("Authorization", "Basic " + authorization);
-			call.setProperty(HTTPConstants.REQUEST_HEADERS, headers);
+			context.setUsername(usernamePassword.getUsername());
+			context.setPassword(usernamePassword.getPasswordAsString());
+			usernamePassword.resetPassword();
+		} else {
+			logger.error("Unknown security profile " + securityProfile);
 		}
 	}
 
@@ -212,22 +191,20 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 	 * one. Username is the first element of the returned array, and the
 	 * password is the second.
 	 */
-	private String[] getUsernameAndPasswordForService(
-			WSDLActivityConfigurationBean bean) throws CMException {
-
-		String[] username_password;
+	protected UsernamePassword getUsernameAndPasswordForService(
+			WSDLActivityConfigurationBean bean, boolean usePathRecursion) throws CMException {
 
 		// Try to get username and password for this service from Credential
 		// Manager (which should pop up UI if needed)
 		CredentialManager credManager = null;
 		credManager = CredentialManager.getInstance();
-		username_password = credManager.getUsernameAndPasswordForService(bean
-				.getWsdl());
+		String wsdl = bean
+				.getWsdl();
+		URI serviceUri = URI.create(wsdl); 
+		UsernamePassword username_password = credManager.getUsernameAndPasswordForService(serviceUri, usePathRecursion, null);
 		if (username_password == null) {
 			throw new CMException("No username/password provided for service " + bean.getWsdl());
 		} 
-		logger.info("Username: " + username_password[0]);
-		logger.info("Password: " + username_password[1]);
 		return username_password;
 	}
 
