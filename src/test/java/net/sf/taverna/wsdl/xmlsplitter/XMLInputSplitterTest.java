@@ -64,7 +64,6 @@ public class XMLInputSplitterTest implements LocationConstants {
 		Map<String,String> outputMap = splitter.execute(inputMap);
 		assertNotNull("there should be an output named 'output'",outputMap.containsKey("output"));
 		String xml = outputMap.get("output");
-		System.out.println(xml);
 		// empty string as <block> as it is not nillable
 		assertTrue(xml.contains("<block xmlns=\"\"></block>"));
 		// minOccurs=0 - so it should not be there
@@ -78,7 +77,8 @@ public class XMLInputSplitterTest implements LocationConstants {
 		TypeDescriptor descriptor = parser.getOperationInputParameters("Query").get(0);
 		XMLInputSplitter splitter = new XMLInputSplitter(descriptor,new String[]{"version","block"},new String[]{"text/plain","text/plain"},new String[]{"output"});
 		Map<String,Object> inputMap = new HashMap<String, Object>();
-		inputMap.put("version", "nil");
+		// Magic string meaning insert xsi:nil=true
+		inputMap.put("version", "xsi:nil");
 		Map<String,String> outputMap = splitter.execute(inputMap);
 		assertNotNull("there should be an output named 'output'",outputMap.containsKey("output"));
 		String xml = outputMap.get("output");
@@ -86,7 +86,9 @@ public class XMLInputSplitterTest implements LocationConstants {
 		// empty string as <block> as it is not nillable
 		assertTrue(xml.contains("<block xmlns=\"\"></block>"));
 		// FIXME: Should not really allow nil=true here, as version is not nillable! 
-		assertTrue(xml.contains("<version xmlns=\"\" nil=\"true\" />"));
+		assertTrue(xml.contains("<version xmlns=\"\" " +
+				"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+				"xsi:nil=\"true\" />"));
 	} 
 	
 	

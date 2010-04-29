@@ -108,7 +108,7 @@ public class XMLInputSplitter {
 				if (elementType.isOptional()) {
 					continue;
 				} if (elementType.isNillable()) {
-					dataObject = "nil";
+					dataObject = "xsi:nil";
 				} else {
 					dataObject="";
 				}
@@ -174,19 +174,19 @@ public class XMLInputSplitter {
 		} else {
 			dataElement = new Element(key);
 			setDataElementNamespace(key, dataElement);
-			if (dataObject.toString().equals("nil")) {
-				dataElement.setAttribute("nil", "true"); // changes nil value
-				// to nil=true
-				// attribute.
+			Namespace xsiNs = org.jdom.Namespace
+				.getNamespace("xsi",
+						"http://www.w3.org/2001/XMLSchema-instance");
+			if (dataObject.toString().equals("xsi:nil")) {
+				dataElement.setAttribute("nil", "true", xsiNs); // changes nil value
 			} else {
 				if (dataObject instanceof byte[]) {
+				
 					dataElement
 							.setAttribute(
 									"type",
 									"xsd:base64Binary",
-									org.jdom.Namespace
-											.getNamespace("xsi",
-													"http://www.w3.org/2001/XMLSchema-instance"));
+									xsiNs);
 					dataObject = Base64
 							.encode(((byte[]) dataObject));
 				}
