@@ -42,6 +42,12 @@ public class TypeDescriptor {
 
 	private QName qname;
 
+	private boolean nillable = false;
+
+	public boolean isNillable() {
+		return nillable;
+	}
+
 	public QName getQname() {
 		if (qname != null)
 			return qname;
@@ -271,5 +277,11 @@ public class TypeDescriptor {
 			parents.remove(descKey);
 		}
 		return result;
+	}
+
+	public void setNillable(boolean nillable) {
+		this.nillable  = nillable;
+		
+		
 	}
 }

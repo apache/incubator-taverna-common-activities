@@ -31,6 +31,7 @@ import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.testutils.LocationConstants;
 import net.sf.taverna.wsdl.testutils.WSDLTestHelper;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class XMLInputSplitterTest implements LocationConstants {
@@ -48,8 +49,45 @@ public class XMLInputSplitterTest implements LocationConstants {
 		String xml = outputMap.get("output");
 		assertTrue(xml.startsWith("<parameters xmlns=\"http://www.ncbi.nlm.nih.gov/soap/eutils/einfo\">"));
 		assertTrue(xml.contains("<db>pubmed</db>"));
-		assertTrue(xml.contains("<tool></tool>"));
+		assertTrue(! xml.contains("<tool"));
 		assertTrue(xml.contains("<email>bob.monkhouse@itv.com</email>"));
 	} 
+	
+	
+	@Test
+	public void testOptional() throws Exception {
+		WSDLParser parser = new WSDLParser(WSDLTestHelper.wsdlResourcePath("VSOi.wsdl"));
+		TypeDescriptor descriptor = parser.getOperationInputParameters("Query").get(0);
+		XMLInputSplitter splitter = new XMLInputSplitter(descriptor,new String[]{"version","block"},new String[]{"text/plain","text/plain"},new String[]{"output"});
+		Map<String,Object> inputMap = new HashMap<String, Object>();
+		// connect none of the inputs
+		Map<String,String> outputMap = splitter.execute(inputMap);
+		assertNotNull("there should be an output named 'output'",outputMap.containsKey("output"));
+		String xml = outputMap.get("output");
+		System.out.println(xml);
+		// empty string as <block> as it is not nillable
+		assertTrue(xml.contains("<block xmlns=\"\"></block>"));
+		// minOccurs=0 - so it should not be there
+		assertTrue(! xml.contains("<version>"));
+	} 
+	
+	
+	@Test
+	public void testNillable() throws Exception {
+		WSDLParser parser = new WSDLParser(WSDLTestHelper.wsdlResourcePath("VSOi.wsdl"));
+		TypeDescriptor descriptor = parser.getOperationInputParameters("Query").get(0);
+		XMLInputSplitter splitter = new XMLInputSplitter(descriptor,new String[]{"version","block"},new String[]{"text/plain","text/plain"},new String[]{"output"});
+		Map<String,Object> inputMap = new HashMap<String, Object>();
+		inputMap.put("version", "nil");
+		Map<String,String> outputMap = splitter.execute(inputMap);
+		assertNotNull("there should be an output named 'output'",outputMap.containsKey("output"));
+		String xml = outputMap.get("output");
+		System.out.println(xml);
+		// empty string as <block> as it is not nillable
+		assertTrue(xml.contains("<block xmlns=\"\"></block>"));
+		// FIXME: Should not really allow nil=true here, as version is not nillable! 
+		assertTrue(xml.contains("<version xmlns=\"\" nil=\"true\" />"));
+	} 
+	
 	
 }

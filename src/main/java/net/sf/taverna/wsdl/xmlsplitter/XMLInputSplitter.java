@@ -103,9 +103,16 @@ public class XMLInputSplitter {
 		ComplexTypeDescriptor complexDescriptor = (ComplexTypeDescriptor) typeDescriptor;
 		for (TypeDescriptor elementType : complexDescriptor.getElements()) {
 			String key = elementType.getName();
-
-			Object dataObject = inputMap.get(key);
-			if (dataObject==null) dataObject="";
+			Object dataObject = inputMap.get(key);			
+			if (dataObject==null) {
+				if (elementType.isOptional()) {
+					continue;
+				} if (elementType.isNillable()) {
+					dataObject = "nil";
+				} else {
+					dataObject="";
+				}
+			}
 
 			if (dataObject instanceof List) {
 				Element arrayElement = buildElementFromObject(key, "");

@@ -827,6 +827,7 @@ public class WSDLParser {
 			ElementDecl el = (ElementDecl) iterator.next();
 			TypeDescriptor elType = constructType(el.getType());
 			elType.setOptional(el.getOptional() || el.getMinOccursIs0());
+			elType.setNillable(el.getNillable());
 			elType.setUnbounded(el.getMaxOccursIsUnbounded());
 			elType.setName(el.getQName().getLocalPart());
 			elType.setQname(el.getQName());
