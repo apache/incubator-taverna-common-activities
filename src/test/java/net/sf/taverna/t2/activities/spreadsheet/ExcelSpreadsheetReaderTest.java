@@ -97,7 +97,7 @@ public class ExcelSpreadsheetReaderTest {
 									if (cell.getKey().equals(0)) {
 										assertEquals("true", cell.getValue());
 									} else if (cell.getKey().equals(1)) {
-										assertTrue(cell.getValue().matches("Mon Jun 15 00:00:00 ... 2009"));
+										assertTrue("Unexpected date format: " + cell.getValue(), cell.getValue().matches("Mon Jun 15 00:00:00 ....? 2009"));
 									} else if (cell.getKey().equals(2)) {
 										assertNull(cell.getValue());
 									} else if (cell.getKey().equals(3)) {
@@ -192,7 +192,7 @@ public class ExcelSpreadsheetReaderTest {
 									if (cell.getKey().equals(0)) {
 										assertEquals("true", cell.getValue());
 									} else if (cell.getKey().equals(1)) {
-										assertTrue(cell.getValue().matches("Mon Jun 15 00:00:00 ... 2009"));
+										assertTrue("Unexpected date format: " + cell.getValue(), cell.getValue().matches("Mon Jun 15 00:00:00 ....? 2009"));
 									} else if (cell.getKey().equals(2)) {
 										assertNull(cell.getValue());
 									} else if (cell.getKey().equals(3)) {
@@ -266,7 +266,7 @@ public class ExcelSpreadsheetReaderTest {
 									if (cell.getKey().equals(0)) {
 										assertEquals("true", cell.getValue());
 									} else if (cell.getKey().equals(1)) {
-										assertTrue(cell.getValue().matches("Mon Jun 15 00:00:00 ... 2009"));
+										assertTrue("Unexpected date format: " + cell.getValue(), cell.getValue().matches("Mon Jun 15 00:00:00 ....? 2009"));
 									} else if (cell.getKey().equals(2)) {
 										assertNull(cell.getValue());
 									} else if (cell.getKey().equals(3)) {
