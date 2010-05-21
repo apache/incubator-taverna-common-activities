@@ -21,27 +21,40 @@
 package net.sf.taverna.t2.activities.beanshell;
 
 import java.io.StringReader;
+import java.util.Collections;
+import java.util.List;
 
+import net.sf.taverna.t2.workflowmodel.Processor;
+import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
 import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport.Status;
+import net.sf.taverna.t2.visit.VisitReport;
+import net.sf.taverna.t2.visit.VisitReport.Status;
 import bsh.ParseException;
 import bsh.Parser;
 
 public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellActivity> {
 
-	public boolean canHandle(Object subject) {
+	public boolean canVisit(Object subject) {
 		return (subject!=null && subject instanceof BeanshellActivity);
 	}
 
-	public HealthReport checkHealth(BeanshellActivity activity) {
+	public VisitReport visit(BeanshellActivity activity, List<Object> ancestors) {
+		Processor p = (Processor) VisitReport.findAncestor(ancestors, Processor.class);
+		if (p == null) {
+			return null;
+		}
 		Parser parser = new Parser(new StringReader(activity.getConfiguration().getScript()));
 		try {
 			while (!parser.Line());
 		} catch (ParseException e) {
-			return new HealthReport("Beanshell service",e.getMessage(),Status.SEVERE);
+			return new VisitReport(HealthCheck.getInstance(), p ,e.getMessage(), HealthCheck.INVALID_SCRIPT, Status.SEVERE);
 		}
-		return new HealthReport("Beanshell service","Parsed OK",Status.OK);
+		return new VisitReport(HealthCheck.getInstance(), p, "Beanshell service script parsed OK",HealthCheck.NO_PROBLEM, Status.OK);
 	}
+
+	public boolean isTimeConsuming() {
+		return false;
+	}
+
 
 }
