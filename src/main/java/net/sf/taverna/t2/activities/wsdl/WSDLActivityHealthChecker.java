@@ -32,45 +32,66 @@ import java.util.List;
 import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport.Status;
+import net.sf.taverna.t2.visit.VisitReport;
+import net.sf.taverna.t2.visit.VisitReport.Status;
+import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
+import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
+import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
+import net.sf.taverna.t2.workflowmodel.processor.activity.DisabledActivity;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 
 import org.xml.sax.SAXException;
 
-public class WSDLActivityHealthChecker implements HealthChecker<WSDLActivity> {
+public class WSDLActivityHealthChecker extends RemoteHealthChecker {
+	
+	private Activity activity;
 
-	public boolean canHandle(Object subject) {
-		return subject != null && subject instanceof WSDLActivity;
+	public boolean canVisit(Object subject) {
+		if (subject == null) {
+			return false;
+		}
+		if (subject instanceof WSDLActivity) {
+			return true;
+		}
+		if (subject instanceof DisabledActivity) {
+			return (((DisabledActivity) subject).getActivity() instanceof WSDLActivity);
+		}
+		return false;
 	}
 
-	public HealthReport checkHealth(WSDLActivity activity) {
-		List<HealthReport> reports = new ArrayList<HealthReport>();
+	public VisitReport visit(Object o, List<Object> ancestors) {
+		List<VisitReport> reports = new ArrayList<VisitReport>();
+		activity = (Activity) o;
 		
-
 		WSDLParser parser;
 		try {
-			parser = new WSDLParser(activity.getConfiguration().getWsdl());
-			reports.add(testWSDL(activity.getConfiguration().getWsdl()));
-			reports.add(testEndpoint(parser, activity.getConfiguration()
+			WSDLActivityConfigurationBean configuration = null;
+			if (activity instanceof WSDLActivity) {
+				configuration = (WSDLActivityConfigurationBean) activity.getConfiguration();
+			} else if (activity instanceof DisabledActivity) {
+				configuration = (WSDLActivityConfigurationBean) ((DisabledActivity) activity).getActivityConfiguration();
+			}
+			parser = new WSDLParser(configuration.getWsdl());
+			reports.add(testWSDL(configuration.getWsdl()));
+
+			reports.add(testEndpoint(parser, configuration
 					.getOperation()));
-			reports.add(testStyleAndUse(parser, activity.getConfiguration()
+			reports.add(testStyleAndUse(parser, configuration
 					.getOperation()));
 
 		} catch (ParserConfigurationException e) {
-			reports.add(new HealthReport("WSDL Activity","Error whilst parsing the WSDL:"+e.getMessage(),Status.SEVERE));
+			reports.add(new VisitReport(HealthCheck.getInstance(), activity, "Error whilst parsing the WSDL:"+e.getMessage(), HealthCheck.BAD_WSDL, Status.SEVERE));
 		} catch (WSDLException e) {
-			reports.add(new HealthReport("WSDL Activity","Error whilst parsing the WSDL:"+e.getMessage(),Status.SEVERE));
+			reports.add(new VisitReport(HealthCheck.getInstance(), activity, "Error whilst parsing the WSDL:"+e.getMessage(), HealthCheck.BAD_WSDL, Status.SEVERE));
 		} catch (IOException e) {
-			reports.add(new HealthReport("WSDL Activity","Communication error whilst parsing the WSDL:"+e.getMessage(),Status.SEVERE));
+			reports.add(new VisitReport(HealthCheck.getInstance(), activity, "Communication error whilst parsing the WSDL:"+e.getMessage(),HealthCheck.IO_PROBLEM, Status.SEVERE));
 		} catch (SAXException e) {
-			reports.add(new HealthReport("WSDL Activity","XML error whilst parsing the WSDL:"+e.getMessage(),Status.SEVERE));
+			reports.add(new VisitReport(HealthCheck.getInstance(), activity, "XML error whilst parsing the WSDL:"+e.getMessage(),HealthCheck.BAD_WSDL, Status.SEVERE));
 		}
 
-		Status status = highestStatus(reports);
-		HealthReport report = new HealthReport("WSDL Activity", "",
+		Status status = VisitReport.getWorstStatus(reports);
+		VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "WSDL Activity report", HealthCheck.NO_PROBLEM,
 				status, reports);
 
 		return report;
@@ -84,133 +105,80 @@ public class WSDLActivityHealthChecker implements HealthChecker<WSDLActivity> {
 		return httpConnection.getResponseCode();
 	}
 
-	private HealthReport testWSDL(String wsdl) {
-		HealthReport report;
+	private VisitReport testWSDL(String wsdl) {
+		VisitReport report;
 		try {
 			URL url = new URL(wsdl);
 			URLConnection connection = url.openConnection();
 			if (connection instanceof HttpURLConnection) {
 				int code = pingURL((HttpURLConnection) connection, 15000);
 				if (code != 200) {
-					report = new HealthReport("WSDL Test",
-							"Pinging the WSDL did not responded with " + code
-									+ " rather than 200", Status.WARNING);
+					report = new VisitReport(HealthCheck.getInstance(), activity,
+							"Pinging the WSDL responded with " + code
+									+ " rather than 200", HealthCheck.CONNECTION_PROBLEM, Status.WARNING);
 				} else {
-					report = new HealthReport("WSDL Test", "The WSDL ["
-							+ wsdl + "] responded OK", Status.OK);
+					report = new VisitReport(HealthCheck.getInstance(), activity, "The WSDL ["
+							+ wsdl + "] responded OK", HealthCheck.NO_PROBLEM, Status.OK);
 				}
 			}
 			else {
-				report = new HealthReport("WSDL Test","The WSDL is not HTTP based which may affect workflow portability",Status.WARNING);
+				report = new VisitReport(HealthCheck.getInstance(), activity, "The WSDL is not HTTP based which may affect workflow portability", HealthCheck.NOT_HTTP, Status.WARNING);
 			}
 		} catch (MalformedURLException e) {
-			report = new HealthReport("WSDL Test",
-					"There was a problem with the WSDL URL:" + e.getMessage(),
+			report = new VisitReport(HealthCheck.getInstance(), activity,
+					"There was a problem with the WSDL URL:" + e.getMessage(), HealthCheck.INVALID_URL,
 					Status.SEVERE);
 		} catch (SocketTimeoutException e) {
-			report = new HealthReport(
-							"WSDL Test",
-							"Reading the WSDL tool longer than 15 seconds to get a response",
+			report = new VisitReport(HealthCheck.getInstance(), activity,
+							"Reading the WSDL tool longer than 15 seconds to get a response", HealthCheck.TIME_OUT, 
 							Status.WARNING);
 		} catch (IOException e) {
-			report = new HealthReport("WSDL Test",
-					"There was an error opening the WSDL:" + e.getMessage(),
+			report = new VisitReport(HealthCheck.getInstance(), activity,
+					"There was an error opening the WSDL:" + e.getMessage(), HealthCheck.IO_PROBLEM, 
 					Status.WARNING);
 		}
 		return report;
 	}
 
-	private Status highestStatus(List<HealthReport> reports) {
-		Status status = Status.OK;
-		for (HealthReport report : reports) {
-			if (report.getStatus().equals(Status.WARNING)
-					&& status.equals(Status.OK))
-				status = report.getStatus();
-			if (report.getStatus().equals(Status.SEVERE))
-				status = Status.SEVERE;
-		}
-		return status;
-	}
-
-	private HealthReport testStyleAndUse(WSDLParser parser, String operationName) {
-		HealthReport report;
+	private VisitReport testStyleAndUse(WSDLParser parser, String operationName) {
+		VisitReport report;
 		String style = parser.getStyle().toLowerCase();
 		String use = "?";
 		try {
 			use = parser.getUse(operationName).toLowerCase();
 			if (use.equals("literal") && style.equals("rpc")) {
-				report = new HealthReport("Style and Use",
-						"RPC/Literal is not officially supported by Taverna",
+				report = new VisitReport(HealthCheck.getInstance(), activity,
+						"RPC/Literal is not supported by Taverna", HealthCheck.UNSUPPORTED_STYLE, 
 						Status.SEVERE);
 			} else {
-				report = new HealthReport("Style and Use", style + "/"
-						+ use + " is OK", Status.OK);
+				report = new VisitReport(HealthCheck.getInstance(), activity, style + "/"
+						+ use + " is OK", HealthCheck.NO_PROBLEM, Status.OK);
 			}
 		} catch (UnknownOperationException e) {
-			report = new HealthReport("Style and Use",
-					"Unable to find use for operation:" + operationName,
+			report = new VisitReport(HealthCheck.getInstance(), activity,
+					"Unable to find use for operation:" + operationName, HealthCheck.UNKNOWN_OPERATION,
 					Status.SEVERE);
 		}
 		return report;
 	}
 
-	private HealthReport testEndpoint(WSDLParser parser, String operationName) {
-		List<HealthReport> reports = new ArrayList<HealthReport>();
+	private VisitReport testEndpoint(WSDLParser parser, String operationName) {
+		List<VisitReport> reports = new ArrayList<VisitReport>();
 		List<String> endpoints = parser
 				.getOperationEndpointLocations(operationName);
 		for (String endpoint : endpoints) {
-			URL url;
-			try {
-				url = new URL(endpoint);
-
-				URLConnection connection = url.openConnection();
-				if (connection instanceof HttpURLConnection) {
-					int code = pingURL((HttpURLConnection) connection, 15000);
-					if (code == 404) {
-						reports
-								.add(new HealthReport(
-										"Endpoint test",
-										"The endpoint ["
-												+ endpoint
-												+ "] responded, but a response code of "
-												+ code, Status.WARNING));
-					} else {
-						reports
-								.add(new HealthReport(
-										"Endpoint test",
-										"The endpoint ["
-												+ endpoint
-												+ "] responded, with a response code of "
-												+ code, Status.OK));
-					}
-
-				}
-			} catch (MalformedURLException e) {
-				reports.add(new HealthReport("Endpoint test",
-						"There was a problem with the endpoint[" + endpoint
-								+ "] URL:" + e.getMessage(), Status.SEVERE));
-			} catch (SocketTimeoutException e) {
-				reports.add(new HealthReport("Endpoint test",
-						"The endpoint[" + endpoint
-								+ "] took more than 15 seconds to respond",
-						Status.SEVERE));
-			} catch (IOException e) {
-				reports.add(new HealthReport("Endpoint test",
-						"There was an error contacting the endpoint["
-								+ endpoint + "]:" + e.getMessage(),
-						Status.SEVERE));
-			}
+			reports.add(RemoteHealthChecker.contactEndpoint(activity, endpoint));
 		}
 
-		Status status = highestStatus(reports);
+		Status status = VisitReport.getWorstStatus(reports);
 		if (reports.size()==1) {
 			return reports.get(0);
 		}
 		else if (reports.size()==0) {
-			return new HealthReport("Enpoint test","No service endpoint could be determined from the WSDL",Status.SEVERE);
+			return new VisitReport(HealthCheck.getInstance(), activity, "No service endpoint could be determined from the WSDL", HealthCheck.NO_ENDPOINTS, Status.SEVERE);
 		}
 		else {
-			return new HealthReport("Endpoint tests", "", status, reports);
+			return new VisitReport(HealthCheck.getInstance(), activity, "Endpoint tests",  HealthCheck.NO_PROBLEM, status, reports);
 		}
 	}
 

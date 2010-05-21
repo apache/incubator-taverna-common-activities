@@ -22,10 +22,12 @@ package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.List;
 
+import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
 import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport.Status;
+import net.sf.taverna.t2.visit.VisitReport;
+import net.sf.taverna.t2.visit.VisitReport.Status;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.xmlsplitter.XMLSplitterSerialisationHelper;
 
@@ -35,27 +37,31 @@ import org.jdom.input.SAXBuilder;
 
 public class XMLInputSplitterHealthChecker implements HealthChecker<XMLInputSplitterActivity> {
 
-	public boolean canHandle(Object subject) {
+	public boolean canVisit(Object subject) {
 		return subject!=null && subject instanceof XMLInputSplitterActivity;
 	}
 
-	public HealthReport checkHealth(XMLInputSplitterActivity activity) {
+	public VisitReport visit(XMLInputSplitterActivity activity, List<Object> ancestors) {
 		String xml = activity.getConfiguration().getWrappedTypeXML();
 		Element element;
 		try {
 			element = new SAXBuilder().build(new StringReader(xml)).getRootElement();
 		} catch (JDOMException e) {
-			return new HealthReport("XMLInputSplitter Activity","Error reading the configuration XML:"+e.getMessage(),Status.SEVERE);
+			return new VisitReport(HealthCheck.getInstance(), activity, "Error reading the configuration XML:"+e.getMessage(), HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
 		} catch (IOException e) {
-			return new HealthReport("XMLInputSplitter Activity","Error reading the configuration XML:"+e.getMessage(),Status.SEVERE);
+			return new VisitReport(HealthCheck.getInstance(), activity, "Error reading the configuration XML:"+e.getMessage(), HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
 		}
 		TypeDescriptor typeDescriptor = XMLSplitterSerialisationHelper.extensionXMLToTypeDescriptor(element);
 		if (typeDescriptor==null) {
-			return new HealthReport("XMLInputSplitter Activity","The datatype is NULL",Status.SEVERE);
+			return new VisitReport(HealthCheck.getInstance(), activity, "The datatype is NULL", HealthCheck.NULL_DATATYPE, Status.SEVERE);
 		}
 		else {
-			return new HealthReport("XMLInputSplitter Activity","The datatype is declared OK",Status.OK);
+			return new VisitReport(HealthCheck.getInstance(), activity, "The datatype is declared OK", HealthCheck.NO_PROBLEM, Status.OK);
 		}
+	}
+
+	public boolean isTimeConsuming() {
+		return false;
 	}
 
 }
