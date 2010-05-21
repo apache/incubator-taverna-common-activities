@@ -23,7 +23,11 @@ package net.sf.taverna.t2.activities.spreadsheet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport.Status;
+
+import java.util.ArrayList;
+
+import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
+import net.sf.taverna.t2.visit.VisitReport.Status;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,11 +42,15 @@ public class SpreadsheetImportHealthCheckerTest {
 	private SpreadsheetImportHealthChecker healthChecker;
 	
 	private SpreadsheetImportActivity activity;
+	private ArrayList ancestors;
 	
 	@Before
 	public void setUp() throws Exception {
+		EditsImpl ei = new EditsImpl();
 		healthChecker = new SpreadsheetImportHealthChecker();
 		activity = new SpreadsheetImportActivity();
+		ancestors = new ArrayList();
+		ancestors.add(ei.createProcessor("fred"));
 	}
 
 	/**
@@ -50,9 +58,9 @@ public class SpreadsheetImportHealthCheckerTest {
 	 */
 	@Test
 	public void testCanHandle() {
-		assertTrue(healthChecker.canHandle(activity));
-		assertFalse(healthChecker.canHandle(null));
-		assertFalse(healthChecker.canHandle(""));
+		assertTrue(healthChecker.canVisit(activity));
+		assertFalse(healthChecker.canVisit(null));
+		assertFalse(healthChecker.canVisit(""));
 	}
 
 	/**
@@ -61,10 +69,10 @@ public class SpreadsheetImportHealthCheckerTest {
 	 */
 	@Test
 	public void testCheckHealth() throws Exception {
-		assertEquals(Status.SEVERE, healthChecker.checkHealth(activity).getStatus());
+		assertEquals(Status.SEVERE, healthChecker.visit(activity, ancestors).getStatus());
 		SpreadsheetImportConfiguration configuration = new SpreadsheetImportConfiguration();
 		activity.configure(configuration);
-		assertEquals(Status.OK, healthChecker.checkHealth(activity).getStatus());
+		assertEquals(Status.OK, healthChecker.visit(activity, ancestors).getStatus());
 	}
 
 }

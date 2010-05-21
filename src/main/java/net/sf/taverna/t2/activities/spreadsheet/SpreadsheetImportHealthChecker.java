@@ -20,9 +20,14 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.spreadsheet;
 
+import java.util.List;
+
+import net.sf.taverna.t2.workflowmodel.Processor;
+import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
 import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport;
-import net.sf.taverna.t2.workflowmodel.health.HealthReport.Status;
+import net.sf.taverna.t2.visit.VisitReport;
+import net.sf.taverna.t2.visit.VisitReport.Status;
+
 
 /**
  * Health checker for SpreadsheetImport activities.
@@ -31,18 +36,24 @@ import net.sf.taverna.t2.workflowmodel.health.HealthReport.Status;
  */
 public class SpreadsheetImportHealthChecker implements HealthChecker<SpreadsheetImportActivity> {
 
-	public boolean canHandle(Object subject) {
+	public boolean canVisit(Object subject) {
 		return (subject != null && subject instanceof SpreadsheetImportActivity);
 	}
 
-	public HealthReport checkHealth(SpreadsheetImportActivity activity) {
-		HealthReport healthReport = new HealthReport("Spreadsheet Import Service", "OK", Status.OK);
+	public VisitReport visit(SpreadsheetImportActivity activity, List<Object> ancestors) {
+		Processor p = (Processor) VisitReport.findAncestor(ancestors, Processor.class);
+		if (p == null) {
+			return null;
+		}
 		SpreadsheetImportConfiguration configuration = activity.getConfiguration();
 		if (configuration == null) {
-			healthReport.setMessage("Service has not been configured");
-			healthReport.setStatus(Status.SEVERE);
+			return new VisitReport(HealthCheck.getInstance(), p, "Spreadsheet import has not been configured", HealthCheck.NO_CONFIGURATION, Status.SEVERE);
 		}
-		return healthReport;
+		return new VisitReport(HealthCheck.getInstance(), p, "Spreadsheet OK", HealthCheck.NO_PROBLEM, Status.OK);
+	}
+
+	public boolean isTimeConsuming() {
+		return false;
 	}
 
 }
