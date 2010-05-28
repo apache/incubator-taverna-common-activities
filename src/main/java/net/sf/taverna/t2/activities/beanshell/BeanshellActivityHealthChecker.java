@@ -21,12 +21,16 @@
 package net.sf.taverna.t2.activities.beanshell;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import net.sf.taverna.t2.workflowmodel.Processor;
 import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
 import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
+import net.sf.taverna.t2.activities.dependencyactivity.AbstractAsynchronousDependencyActivity.FileExtFilter;
 import net.sf.taverna.t2.visit.VisitReport;
 import net.sf.taverna.t2.visit.VisitReport.Status;
 import bsh.ParseException;
@@ -43,13 +47,39 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		if (p == null) {
 			return null;
 		}
+		List<VisitReport> reports = new ArrayList<VisitReport>();
+		
 		Parser parser = new Parser(new StringReader(activity.getConfiguration().getScript()));
 		try {
 			while (!parser.Line());
+			reports.add(new VisitReport(HealthCheck.getInstance(), p, "Script OK", HealthCheck.NO_PROBLEM, Status.OK));
 		} catch (ParseException e) {
-			return new VisitReport(HealthCheck.getInstance(), p ,e.getMessage(), HealthCheck.INVALID_SCRIPT, Status.SEVERE);
+			reports.add(new VisitReport(HealthCheck.getInstance(), p ,e.getMessage(), HealthCheck.INVALID_SCRIPT, Status.SEVERE));
 		}
-		return new VisitReport(HealthCheck.getInstance(), p, "Beanshell service script parsed OK",HealthCheck.NO_PROBLEM, Status.OK);
+		
+		// Check if we can find all the API consumer's dependencies
+		LinkedHashSet<String> localDependencies = activity.getConfiguration().getLocalDependencies();
+		List<String> jarFiles = Arrays.asList(BeanshellActivity.libDir.list(new FileExtFilter(".jar"))); // URLs of all jars found in the lib directory 
+		for (String jar : localDependencies) {
+			if (jarFiles.contains(jar)){
+				localDependencies.remove(jar);
+			}
+		}
+		if (localDependencies.isEmpty()){ // all dependencies found
+			reports.add(new VisitReport(HealthCheck.getInstance(), p, "Beanshell dependencies found", HealthCheck.NO_PROBLEM, Status.OK));
+		}
+		else{
+			VisitReport vr = new VisitReport(HealthCheck.getInstance(), p, "Beanshell dependencies missing", HealthCheck.MISSING_DEPENDENCY, Status.SEVERE);
+			vr.setProperty("dependencies", localDependencies);
+			reports.add(vr);
+		}
+		
+		Status status = VisitReport.getWorstStatus(reports);
+		VisitReport report = new VisitReport(HealthCheck.getInstance(), p, "Beanshell report", HealthCheck.NO_PROBLEM,
+				status, reports);
+
+		return report;
+
 	}
 
 	public boolean isTimeConsuming() {
