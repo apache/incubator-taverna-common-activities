@@ -59,7 +59,8 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		
 		// Check if we can find all the API consumer's dependencies
 		LinkedHashSet<String> localDependencies = activity.getConfiguration().getLocalDependencies();
-		List<String> jarFiles = Arrays.asList(BeanshellActivity.libDir.list(new FileExtFilter(".jar"))); // URLs of all jars found in the lib directory 
+		String[] libJars = BeanshellActivity.libDir.list(new FileExtFilter(".jar"));
+		List<String> jarFiles = (libJars == null) ? new ArrayList<String>() : Arrays.asList(libJars); // URLs of all jars found in the lib directory 
 		for (String jar : localDependencies) {
 			if (jarFiles.contains(jar)){
 				localDependencies.remove(jar);
