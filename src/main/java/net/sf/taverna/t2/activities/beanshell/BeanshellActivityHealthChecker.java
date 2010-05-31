@@ -57,14 +57,19 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 			reports.add(new VisitReport(HealthCheck.getInstance(), p ,e.getMessage(), HealthCheck.INVALID_SCRIPT, Status.SEVERE));
 		}
 		
-		// Check if we can find all the API consumer's dependencies
-		LinkedHashSet<String> localDependencies = activity.getConfiguration().getLocalDependencies();
-		String[] libJars = BeanshellActivity.libDir.list(new FileExtFilter(".jar"));
-		List<String> jarFiles = (libJars == null) ? new ArrayList<String>() : Arrays.asList(libJars); // URLs of all jars found in the lib directory 
-		for (String jar : localDependencies) {
+		// Check if we can find all the Beanshell's dependencies
+		LinkedHashSet<String> localDependencies = new LinkedHashSet<String>();
+		localDependencies.addAll(activity.getConfiguration().getLocalDependencies());
+
+		if (!localDependencies.isEmpty()) {
+		String[] jarArray = BeanshellActivity.libDir.list(new FileExtFilter(".jar"));
+		if (jarArray != null) {
+		    List<String> jarFiles = Arrays.asList(jarArray); // URLs of all jars found in the lib directory 
+		    for (String jar : localDependencies) {
 			if (jarFiles.contains(jar)){
-				localDependencies.remove(jar);
+			    localDependencies.remove(jar);
 			}
+		    }
 		}
 		if (localDependencies.isEmpty()){ // all dependencies found
 			reports.add(new VisitReport(HealthCheck.getInstance(), p, "Beanshell dependencies found", HealthCheck.NO_PROBLEM, Status.OK));
@@ -72,9 +77,11 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		else{
 			VisitReport vr = new VisitReport(HealthCheck.getInstance(), p, "Beanshell dependencies missing", HealthCheck.MISSING_DEPENDENCY, Status.SEVERE);
 			vr.setProperty("dependencies", localDependencies);
+			vr.setProperty("directory", BeanshellActivity.libDir);
 			reports.add(vr);
 		}
 		
+		}
 		Status status = VisitReport.getWorstStatus(reports);
 		VisitReport report = new VisitReport(HealthCheck.getInstance(), p, "Beanshell report", HealthCheck.NO_PROBLEM,
 				status, reports);
