@@ -84,7 +84,12 @@ public final class WSDLActivityDescriptorChecker implements HealthChecker<InputP
 
 					if (dl.getSink().equals(pip)) {
 						Port source = dl.getSource();
-						reports.addAll(checkSource(source, d, (Activity) o, aip));
+						Set<VisitReport> subReports = checkSource(source, d, (Activity) o, aip);
+						for (VisitReport vr : subReports) {
+						    vr.setProperty("activity", o);
+						    vr.setProperty("sinkPort", pip);
+						}
+						reports.addAll(subReports);
 					}
 				}
 
@@ -112,7 +117,10 @@ public final class WSDLActivityDescriptorChecker implements HealthChecker<InputP
 			Processor sourceProcessor = processorPort.getProcessor();
 			Activity sourceActivity = sourceProcessor.getActivityList().get(0);
 			if (!(sourceActivity instanceof InputPortTypeDescriptorActivity)) {
-				VisitReport newReport = new VisitReport(HealthCheck.getInstance(), o, "Source of " + aip.getName(), HealthCheck.DEFAULT_VALUE, Status.WARNING);
+				VisitReport newReport = new VisitReport(HealthCheck.getInstance(), o, "Source of " + aip.getName(), HealthCheck.DATATYPE_SOURCE, Status.WARNING);
+				newReport.setProperty("sinkPortName", aip.getName());
+				newReport.setProperty("sourceName", sourceProcessor.getLocalName());
+				newReport.setProperty("isProcessorSource", "true");
 				reports.add(newReport);
 			}
 		} else if (source instanceof MergeOutputPort) {
@@ -126,7 +134,10 @@ public final class WSDLActivityDescriptorChecker implements HealthChecker<InputP
 				
 			}
 		} else /* if (source instanceof DataflowInputPort) */  {
-			VisitReport newReport = new VisitReport(HealthCheck.getInstance(), o, "Source of " + aip.getName(), HealthCheck.DEFAULT_VALUE, Status.WARNING);
+			VisitReport newReport = new VisitReport(HealthCheck.getInstance(), o, "Source of " + aip.getName(), HealthCheck.DATATYPE_SOURCE, Status.WARNING);
+			newReport.setProperty("sinkPortName", aip.getName());
+			newReport.setProperty("sourceName", source.getName());
+			newReport.setProperty("isProcessorSource", "false");
 			reports.add(newReport);
 		} 
 		return reports;
