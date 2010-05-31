@@ -47,9 +47,13 @@ public class XMLInputSplitterHealthChecker implements HealthChecker<XMLInputSpli
 		try {
 			element = new SAXBuilder().build(new StringReader(xml)).getRootElement();
 		} catch (JDOMException e) {
-			return new VisitReport(HealthCheck.getInstance(), activity, "Error reading the configuration XML:"+e.getMessage(), HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
+		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "XML Configuration", HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
+		    report.setProperty("exception", e);
+		    return report;
 		} catch (IOException e) {
-			return new VisitReport(HealthCheck.getInstance(), activity, "Error reading the configuration XML:"+e.getMessage(), HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
+		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "XML Configuration", HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
+		    report.setProperty("exception", e);
+		    return report;
 		}
 		TypeDescriptor typeDescriptor = XMLSplitterSerialisationHelper.extensionXMLToTypeDescriptor(element);
 		if (typeDescriptor==null) {
