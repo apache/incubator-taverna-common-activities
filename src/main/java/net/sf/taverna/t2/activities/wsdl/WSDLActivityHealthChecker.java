@@ -63,6 +63,7 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 	public VisitReport visit(Object o, List<Object> ancestors) {
 		List<VisitReport> reports = new ArrayList<VisitReport>();
 		activity = (Activity) o;
+		String endpoint = null;
 		
 		WSDLParser parser;
 		try {
@@ -72,32 +73,38 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 			} else if (activity instanceof DisabledActivity) {
 				configuration = (WSDLActivityConfigurationBean) ((DisabledActivity) activity).getActivityConfiguration();
 			}
-			VisitReport wsdlEndpointReport = RemoteHealthChecker.contactEndpoint(activity, configuration.getWsdl());
+			endpoint = configuration.getWsdl();
+			VisitReport wsdlEndpointReport = RemoteHealthChecker.contactEndpoint(activity, endpoint);
 			reports.add(wsdlEndpointReport);
 			if (!wsdlEndpointReport.getStatus().equals(Status.SEVERE)) {
-			parser = new WSDLParser(configuration.getWsdl());
+			    parser = new WSDLParser(endpoint);
 
-			reports.add(testEndpoint(parser, configuration
-					.getOperation()));
-			reports.add(testStyleAndUse(parser, configuration
-					.getOperation()));
+			    reports.add(testEndpoint(parser, configuration
+						     .getOperation()));
+			    reports.add(testStyleAndUse(endpoint,
+							parser,
+							configuration.getOperation()));
 			}
 
 		} catch (ParserConfigurationException e) {
 			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Bad WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
 			vr.setProperty("exception", e);
+			vr.setProperty("endpoint", endpoint);
 			reports.add(vr);
 		} catch (WSDLException e) {
 			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Bad WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
 			vr.setProperty("exception", e);
+			vr.setProperty("endpoint", endpoint);
 			reports.add(vr);
 		} catch (IOException e) {
-			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "IO problem", HealthCheck.IO_PROBLEM, Status.SEVERE);
+			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "blah problem", HealthCheck.IO_PROBLEM, Status.SEVERE);
 			vr.setProperty("exception", e);
+			vr.setProperty("endpoint", endpoint);
 			reports.add(vr);
 		} catch (SAXException e) {
 			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Bad WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
 			vr.setProperty("exception", e);
+			vr.setProperty("endpoint", endpoint);
 			reports.add(vr);
 		}
 
@@ -108,7 +115,7 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 		return report;
 	}
 
-	private VisitReport testStyleAndUse(WSDLParser parser, String operationName) {
+	private VisitReport testStyleAndUse(String endpoint, WSDLParser parser, String operationName) {
 		VisitReport report;
 		String style = parser.getStyle().toLowerCase();
 		String use = "?";
@@ -120,14 +127,17 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 						Status.SEVERE);
 				report.setProperty("use", use);
 				report.setProperty("style", style);
+				report.setProperty("endpoint", endpoint);
 			} else {
 				report = new VisitReport(HealthCheck.getInstance(), activity, style + "/"
 						+ use + " is OK", HealthCheck.NO_PROBLEM, Status.OK);
 			}
 		} catch (UnknownOperationException e) {
 			report = new VisitReport(HealthCheck.getInstance(), activity,
-					"Unable to find use for operation:" + operationName, HealthCheck.UNKNOWN_OPERATION,
+					"Unknown operation", HealthCheck.UNKNOWN_OPERATION,
 					Status.SEVERE);
+			report.setProperty("operationName", operationName);
+			report.setProperty("endpoint", endpoint);
 		}
 		return report;
 	}
@@ -145,7 +155,9 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 			return reports.get(0);
 		}
 		else if (reports.size()==0) {
-			return new VisitReport(HealthCheck.getInstance(), activity, "No service endpoint could be determined from the WSDL", HealthCheck.NO_ENDPOINTS, Status.SEVERE);
+		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "No service endpoint", HealthCheck.NO_ENDPOINTS, Status.SEVERE);
+		    report.setProperty("operationName", operationName);
+		    return report;
 		}
 		else {
 			return new VisitReport(HealthCheck.getInstance(), activity, "Endpoint tests",  HealthCheck.NO_PROBLEM, status, reports);
