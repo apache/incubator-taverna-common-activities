@@ -95,9 +95,11 @@ public final class WSDLActivityDescriptorChecker implements HealthChecker<InputP
 
 			}
 		} catch (UnknownOperationException e) {
-			logger.error("Problem getting tpe descriptors for activity", e);
+			logger.error("Problem getting type descriptors for activity", e);
 		} catch (IOException e) {
-			logger.error("Problem getting tpe descriptors for activity", e);
+			logger.error("Problem getting type descriptors for activity", e);
+		} catch (NullPointerException e) {
+			logger.error("Problem getting type desciptors for activity", e);
 		}
 		if (reports.isEmpty()) {
 			return null;
