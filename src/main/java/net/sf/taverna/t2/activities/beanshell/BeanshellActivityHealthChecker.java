@@ -49,7 +49,14 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		}
 		List<VisitReport> reports = new ArrayList<VisitReport>();
 		
-		Parser parser = new Parser(new StringReader(activity.getConfiguration().getScript()));
+		String script = activity.getConfiguration().getScript();
+		if (! script.trim().endsWith(";")) {
+			/** Missing ; on last line is not allowed by Parser, 
+			 * but is allowed by Interpreter.eval() used at runtime
+			 */
+			script = script + ";";
+		}
+		Parser parser = new Parser(new StringReader(script));
 		try {
 			while (!parser.Line());
 			reports.add(new VisitReport(HealthCheck.getInstance(), p, "Script OK", HealthCheck.NO_PROBLEM, Status.OK));
