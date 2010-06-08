@@ -23,16 +23,15 @@ package net.sf.taverna.t2.activities.beanshell;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import net.sf.taverna.t2.workflowmodel.Processor;
-import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
-import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
 import net.sf.taverna.t2.activities.dependencyactivity.AbstractAsynchronousDependencyActivity.FileExtFilter;
 import net.sf.taverna.t2.visit.VisitReport;
 import net.sf.taverna.t2.visit.VisitReport.Status;
+import net.sf.taverna.t2.workflowmodel.Processor;
+import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
+import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
 import bsh.ParseException;
 import bsh.Parser;
 
@@ -43,9 +42,10 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 	}
 
 	public VisitReport visit(BeanshellActivity activity, List<Object> ancestors) {
-		Processor p = (Processor) VisitReport.findAncestor(ancestors, Processor.class);
-		if (p == null) {
-			return null;
+		Object subject = (Processor) VisitReport.findAncestor(ancestors, Processor.class);
+		if (subject == null) {
+			// Fall back to using the activity itself as the subject of the reports
+			subject = activity;
 		}
 		List<VisitReport> reports = new ArrayList<VisitReport>();
 		
@@ -59,9 +59,9 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		Parser parser = new Parser(new StringReader(script));
 		try {
 			while (!parser.Line());
-			reports.add(new VisitReport(HealthCheck.getInstance(), p, "Script OK", HealthCheck.NO_PROBLEM, Status.OK));
+			reports.add(new VisitReport(HealthCheck.getInstance(), subject, "Script OK", HealthCheck.NO_PROBLEM, Status.OK));
 		} catch (ParseException e) {
-			reports.add(new VisitReport(HealthCheck.getInstance(), p ,e.getMessage(), HealthCheck.INVALID_SCRIPT, Status.SEVERE));
+			reports.add(new VisitReport(HealthCheck.getInstance(), subject ,e.getMessage(), HealthCheck.INVALID_SCRIPT, Status.SEVERE));
 		}
 		
 		// Check if we can find all the Beanshell's dependencies
@@ -79,10 +79,10 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		    }
 		}
 		if (localDependencies.isEmpty()){ // all dependencies found
-			reports.add(new VisitReport(HealthCheck.getInstance(), p, "Beanshell dependencies found", HealthCheck.NO_PROBLEM, Status.OK));
+			reports.add(new VisitReport(HealthCheck.getInstance(), subject, "Beanshell dependencies found", HealthCheck.NO_PROBLEM, Status.OK));
 		}
 		else{
-			VisitReport vr = new VisitReport(HealthCheck.getInstance(), p, "Beanshell dependencies missing", HealthCheck.MISSING_DEPENDENCY, Status.SEVERE);
+			VisitReport vr = new VisitReport(HealthCheck.getInstance(), subject, "Beanshell dependencies missing", HealthCheck.MISSING_DEPENDENCY, Status.SEVERE);
 			vr.setProperty("dependencies", localDependencies);
 			vr.setProperty("directory", BeanshellActivity.libDir);
 			reports.add(vr);
@@ -90,7 +90,7 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		
 		}
 		Status status = VisitReport.getWorstStatus(reports);
-		VisitReport report = new VisitReport(HealthCheck.getInstance(), p, "Beanshell report", HealthCheck.NO_PROBLEM,
+		VisitReport report = new VisitReport(HealthCheck.getInstance(), subject, "Beanshell report", HealthCheck.NO_PROBLEM,
 				status, reports);
 
 		return report;
