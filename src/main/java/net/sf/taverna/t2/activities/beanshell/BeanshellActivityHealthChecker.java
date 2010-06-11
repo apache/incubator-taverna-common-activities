@@ -61,7 +61,9 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 			while (!parser.Line());
 			reports.add(new VisitReport(HealthCheck.getInstance(), subject, "Script OK", HealthCheck.NO_PROBLEM, Status.OK));
 		} catch (ParseException e) {
-			reports.add(new VisitReport(HealthCheck.getInstance(), subject ,e.getMessage(), HealthCheck.INVALID_SCRIPT, Status.SEVERE));
+		    VisitReport report = new VisitReport(HealthCheck.getInstance(), subject ,e.getMessage(), HealthCheck.INVALID_SCRIPT, Status.SEVERE);
+		    report.setProperty("exception", e);
+		    reports.add(report);
 		}
 		
 		// Check if we can find all the Beanshell's dependencies
