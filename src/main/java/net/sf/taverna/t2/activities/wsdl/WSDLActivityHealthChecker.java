@@ -87,22 +87,22 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 			}
 
 		} catch (ParserConfigurationException e) {
-			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Bad WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
+			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Invalid WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
 			vr.setProperty("exception", e);
 			vr.setProperty("endpoint", endpoint);
 			reports.add(vr);
 		} catch (WSDLException e) {
-			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Bad WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
+			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Invalid WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
 			vr.setProperty("exception", e);
 			vr.setProperty("endpoint", endpoint);
 			reports.add(vr);
 		} catch (IOException e) {
-			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "blah problem", HealthCheck.IO_PROBLEM, Status.SEVERE);
+			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Read problem", HealthCheck.IO_PROBLEM, Status.SEVERE);
 			vr.setProperty("exception", e);
 			vr.setProperty("endpoint", endpoint);
 			reports.add(vr);
 		} catch (SAXException e) {
-			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Bad WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
+			VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity, "Invalid WSDL", HealthCheck.BAD_WSDL, Status.SEVERE);
 			vr.setProperty("exception", e);
 			vr.setProperty("endpoint", endpoint);
 			reports.add(vr);
@@ -134,7 +134,7 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 			}
 		} catch (UnknownOperationException e) {
 			report = new VisitReport(HealthCheck.getInstance(), activity,
-					"Unknown operation", HealthCheck.UNKNOWN_OPERATION,
+					"Operation not found", HealthCheck.UNKNOWN_OPERATION,
 					Status.SEVERE);
 			report.setProperty("operationName", operationName);
 			report.setProperty("endpoint", endpoint);
@@ -155,7 +155,7 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 			return reports.get(0);
 		}
 		else if (reports.size()==0) {
-		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "No service endpoint", HealthCheck.NO_ENDPOINTS, Status.SEVERE);
+		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "Service could not be located.", HealthCheck.NO_ENDPOINTS, Status.SEVERE);
 		    report.setProperty("operationName", operationName);
 		    return report;
 		}
