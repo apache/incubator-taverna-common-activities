@@ -21,6 +21,10 @@
 package net.sf.taverna.t2.activities.wsdl;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +41,7 @@ import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
 import net.sf.taverna.t2.workflowmodel.utils.Tools;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
@@ -188,7 +193,24 @@ public class WSDLActivity extends
 
 	private void parseWSDL() throws ParserConfigurationException,
 			WSDLException, IOException, SAXException, UnknownOperationException {
-		parser = new WSDLParser(configurationBean.getWsdl());
+	    URLConnection connection = null;
+	    try {
+		URL wsdlURL = new URL(configurationBean.getWsdl());
+		connection = wsdlURL.openConnection();
+		connection.setConnectTimeout(RemoteHealthChecker.getTimeoutInSeconds() * 1000);
+		connection.connect();
+	    } catch (MalformedURLException e) {
+		throw new IOException("Malformed URL", e);
+	    } catch (SocketTimeoutException e) {
+		throw new IOException("Timeout", e);
+	    } catch (IOException e) {
+		throw e;
+	    } finally {
+		if ((connection != null) && (connection.getInputStream() != null)) {
+		    connection.getInputStream().close();
+		}
+	    }
+	    parser = new WSDLParser(configurationBean.getWsdl());
 	}
 
 	private void configurePorts() throws UnknownOperationException, IOException {
