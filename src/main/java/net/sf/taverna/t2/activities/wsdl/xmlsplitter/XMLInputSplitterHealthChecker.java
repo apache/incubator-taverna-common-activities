@@ -47,20 +47,20 @@ public class XMLInputSplitterHealthChecker implements HealthChecker<XMLInputSpli
 		try {
 			element = new SAXBuilder().build(new StringReader(xml)).getRootElement();
 		} catch (JDOMException e) {
-		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "XML Configuration", HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
+		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "Invalid XML Splitter configuration", HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
 		    report.setProperty("exception", e);
 		    return report;
 		} catch (IOException e) {
-		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "XML Configuration", HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
+		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "Invalid XML Splitter configuration", HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
 		    report.setProperty("exception", e);
 		    return report;
 		}
 		TypeDescriptor typeDescriptor = XMLSplitterSerialisationHelper.extensionXMLToTypeDescriptor(element);
 		if (typeDescriptor==null) {
-			return new VisitReport(HealthCheck.getInstance(), activity, "The datatype is NULL", HealthCheck.NULL_DATATYPE, Status.SEVERE);
+			return new VisitReport(HealthCheck.getInstance(), activity, "Unknown datatype for port", HealthCheck.NULL_DATATYPE, Status.SEVERE);
 		}
 		else {
-			return new VisitReport(HealthCheck.getInstance(), activity, "The datatype is declared OK", HealthCheck.NO_PROBLEM, Status.OK);
+			return new VisitReport(HealthCheck.getInstance(), activity, "Recognized datatype", HealthCheck.NO_PROBLEM, Status.OK);
 		}
 	}
 
