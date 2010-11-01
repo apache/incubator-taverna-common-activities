@@ -58,6 +58,8 @@ public class BeanshellActivity extends
 
 	private Interpreter interpreter;
 	
+	private static String CLEAR_COMMAND = "clear();";
+
 	public BeanshellActivity() {
 	}
 
@@ -116,6 +118,15 @@ public class BeanshellActivity extends
 		return null;
 	}
 
+	private void clearInterpreter() {
+	    try {
+		interpreter.eval(CLEAR_COMMAND);
+	    }
+            catch (EvalError e) {
+		logger.error("Could not clear the interpreter", e);
+	    }
+	}
+
 	@Override
 	public void executeAsynch(final Map<String, T2Reference> data,
 			final AsynchronousActivityCallback callback) {
@@ -152,6 +163,7 @@ public class BeanshellActivity extends
 	
 					Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 	
+					clearInterpreter();
 					try {
 						// set inputs
 						for (String inputName : data.keySet()) {
@@ -185,6 +197,7 @@ public class BeanshellActivity extends
 						callback.fail(
 								"Error accessing beanshell input/output data for " + this, e);
 					}
+					clearInterpreter();
 				}
 			}
 			
