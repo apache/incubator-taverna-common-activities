@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>net.sf.taverna.t2.ui-activities</groupId>
+		<artifactId>rest</artifactId>
+		<version>0.3.1</version>
+	</parent>
+	<artifactId>rest-activity</artifactId>
+	<name>REST Activity - Core</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>workflowmodel-api</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.activities</groupId>
+			<artifactId>activity-test-utils</artifactId>
+			<version>${t2.activities.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.security</groupId>
+			<artifactId>credential-manager</artifactId>
+			<version>${t2.security.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sf.taverna.t2.ui-api</groupId>
+			<artifactId>report-api</artifactId>
+			<version>${t2.ui.api.version}</version>
+		</dependency>
+		<!-- 
+		   for opening configuration dialog of XPath activity 
+		   from 'Solution' area of 'VisitExplainer'
+		-->
+		<dependency>
+			<groupId>net.sf.taverna.t2.ui-components</groupId>
+			<artifactId>report-view</artifactId>
+			<version>${t2.ui.components.version}</version>
+		</dependency>
+		
+	</dependencies>
+	
+</project>
