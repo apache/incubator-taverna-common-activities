@@ -41,12 +41,12 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.5-FINAL</version>
+			<version>${poi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.5-FINAL</version>
+			<version>${poi.ooxml.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.odftoolkit</groupId>
@@ -56,18 +56,18 @@
 		<dependency>
 			<groupId>net.sourceforge.javacsv</groupId>
 			<artifactId>javacsv</artifactId>
-			<version>2.0</version>
+			<version>${javacsv.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.13</version>
+			<version>${log4j.version}</version>
 		</dependency>
 		<!-- test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.4</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
