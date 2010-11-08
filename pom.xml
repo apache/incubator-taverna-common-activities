@@ -5,7 +5,7 @@
 		<artifactId>activities</artifactId>
 		<version>1.3-SNAPSHOT</version>
 	</parent>
-  <groupId>net.sf.taverna.t2.ui-activities</groupId>
+  <groupId>net.sf.taverna.t2.activities</groupId>
   <artifactId>xpath-activity</artifactId>
   <name>XPath Activity - Core</name>
   
