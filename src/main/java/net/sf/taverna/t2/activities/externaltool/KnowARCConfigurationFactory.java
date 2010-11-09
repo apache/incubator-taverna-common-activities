@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009 Hajo Nils Krabbenhšft, INB, University of Luebeck   
+ * Copyright (C) 2009 Hajo Nils Krabbenhoeft, INB, University of Luebeck   
  * 
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
@@ -28,7 +28,7 @@ import de.uni_luebeck.inb.knowarc.gui.KnowARCConfiguration;
  * This singleton ensures a global KnowARCConfiguration which governs the
  * invocation of all use cases
  * 
- * @author Hajo Nils Krabbenhšft
+ * @author Hajo Nils Krabbenhoeft
  */
 public class KnowARCConfigurationFactory {
 

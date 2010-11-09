@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009 Hajo Nils Krabbenhšft, INB, University of Luebeck   
+ * Copyright (C) 2009 Hajo Nils Krabbenhoeft, INB, University of Luebeck   
  * 
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
@@ -25,7 +25,7 @@ package net.sf.taverna.t2.activities.externaltool;
  * This class stores the repository URL and matching use case id, which identify
  * the use case to invoke.
  * 
- * @author Hajo Nils Krabbenhšft
+ * @author Hajo Nils Krabbenhoeft
  */
 public class ExternalToolActivityConfigurationBean {
 

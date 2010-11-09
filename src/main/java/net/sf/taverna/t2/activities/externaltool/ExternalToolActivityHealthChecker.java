@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2009 Hajo Nils Krabbenhšft, INB, University of Luebeck   
+ * Copyright (C) 2009 Hajo Nils Krabbenhoeft, INB, University of Luebeck   
  * 
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
@@ -35,7 +35,7 @@ import de.uni_luebeck.inb.knowarc.usecases.UseCaseEnumeration;
 /**
  * Investigates if everything is going fine with a job
  * 
- * @author Hajo Nils Krabbenhšft
+ * @author Hajo Nils Krabbenhoeft
  */
 public class ExternalToolActivityHealthChecker implements HealthChecker<ExternalToolActivity> {
 
