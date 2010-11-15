@@ -20,19 +20,17 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.dependencyactivity;
 
-import java.net.URL;
 import java.util.LinkedHashSet;
 
-import net.sf.taverna.raven.repository.BasicArtifact;
 import net.sf.taverna.t2.activities.dependencyactivity.AbstractAsynchronousDependencyActivity.ClassLoaderSharing;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
 
 /**
- * Parent configuration bean for activities that have local JAR or artifact dependencies,
+ * Parent configuration bean for activities that have local JAR,
  * such as API Consumer and Beanshell activity.
  * 
  * @author Alex Nenadic
- *
+ * @author David Withers
  */
 public class DependencyActivityConfigurationBean extends
 		ActivityPortsDefinitionBean {
@@ -48,28 +46,13 @@ public class DependencyActivityConfigurationBean extends
 	 * and the paths should be relative.
 	 */
 	private LinkedHashSet<String> localDependencies ;//= new LinkedHashSet<String>();
-	
-	/**
-	 * Artifact dependencies. These artifacts should be available from
-	 * the centrally known repositories or from one of the listed repositories in
-	 * {@link #repositories}.
-	 */
-	private LinkedHashSet<BasicArtifact> artifactDependencies ;//= new LinkedHashSet<BasicArtifact>();
-	
-	/**
-	 * Repositoryies to use when searching for artifacts. In addition, the system
-	 * repositories will be searched.
-	 */
-	@Deprecated
-	private LinkedHashSet<URL> repositories ;//= new LinkedHashSet<URL>();
-		
+			
 	/**
 	 * Constructor.
 	 */
 	public DependencyActivityConfigurationBean(){
 		classLoaderSharing = ClassLoaderSharing.workflow;
 		localDependencies = new LinkedHashSet<String>();
-		artifactDependencies = new LinkedHashSet<BasicArtifact>();
 	}
 	
 	/**
@@ -83,9 +66,6 @@ public class DependencyActivityConfigurationBean extends
 
 		if (localDependencies == null) 
 			localDependencies = new LinkedHashSet<String>();
-
-		if (artifactDependencies == null)
-			artifactDependencies = new LinkedHashSet<BasicArtifact>();
 
 			return this;
 	}
@@ -133,36 +113,6 @@ public class DependencyActivityConfigurationBean extends
 	public void removeLocalDependency(String dep){
 		localDependencies.remove(dep);
 	}
-	
-	/**
-	 * @return the artifactDependencies
-	 */
-	public LinkedHashSet<BasicArtifact> getArtifactDependencies() {
-		return artifactDependencies;
-	}
-	
-	/**
-	 * @param artifactDependencies the artifactDependencies to set
-	 */
-	public void setArtifactDependencies(LinkedHashSet<BasicArtifact> artifactDependencies) {
-		this.artifactDependencies = artifactDependencies;
-	}
-	
-	/**
-	 * Adds an artifact dependency to the list of local dependencies.
-	 * @param dep
-	 */
-	public void addArtifactDependency(BasicArtifact dep){
-		artifactDependencies.add(dep);
-	}
-
-	/**
-	 * Removes an artifact dependency from the list of local dependencies.
-	 * @param dep
-	 */
-	public void removeArtifacteDependency(BasicArtifact dep){
-		artifactDependencies.remove(dep);
-	}
-	
+		
 }
 
