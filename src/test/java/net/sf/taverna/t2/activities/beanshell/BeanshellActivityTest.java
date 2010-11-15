@@ -31,6 +31,7 @@ import java.util.Map;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.workflowmodel.AbstractPort;
+import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean;
 
@@ -50,6 +51,7 @@ public class BeanshellActivityTest {
 	@Test
 	public void simpleScript() throws Exception {
 		BeanshellActivity activity = new BeanshellActivity();
+		activity.setEdits(new EditsImpl());
 		BeanshellActivityConfigurationBean bean = new BeanshellActivityConfigurationBean();
 		
 		ActivityInputPortDefinitionBean inputPortBean = new ActivityInputPortDefinitionBean();

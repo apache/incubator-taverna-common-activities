@@ -32,7 +32,7 @@ import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import net.sf.taverna.t2.visit.VisitReport;
 import net.sf.taverna.t2.visit.VisitReport.Status;
 import net.sf.taverna.t2.workflowmodel.Edits;
-import net.sf.taverna.t2.workflowmodel.EditsRegistry;
+import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
 
 import org.junit.Test;
 
@@ -43,10 +43,9 @@ import org.junit.Test;
  *
  */
 public class BeanshellActivityHealthCheckerTest {
-	Edits edits = EditsRegistry.getEdits();
 	
+	private Edits edits = new EditsImpl();
 	
-
 	@Test
 	public void oneLinerNoSemicolon() throws Exception {
 		BeanshellActivity activity = new BeanshellActivity();
