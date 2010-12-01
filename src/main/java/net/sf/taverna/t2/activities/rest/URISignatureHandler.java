@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * This class deals with URI signatures - essentially, strings that represent
  * some resource's URI with zero or more placeholders. URI signatures are known
@@ -73,9 +74,9 @@ public class URISignatureHandler {
 					startSymbolIdx = i;
 				} else /* if (nestingLevel > 0) */{
 					throw new URISignatureParsingException(
-							"Malformed URI signature: at least two "
-									+ "placeholder opening symbols follow each other without being closed "
-									+ "appropriately (possibly, the signature contains nested placeholders)");
+							"Malformed URL: at least two parameter placeholder opening\n" +
+							"symbols follow each other without being closed appropriately\n" +
+							"(possibly the signature contains nested placeholders).");
 				}
 				break;
 
@@ -92,12 +93,12 @@ public class URISignatureHandler {
 								placeholderCandidate, startSymbolIdx + 1);
 					} else {
 						throw new URISignatureParsingException(
-								"Malformed URI signature: duplicate placeholder \""
-										+ placeholderCandidate + "\" found");
+								"Malformed URL: duplicate parameter placeholder \""
+										+ placeholderCandidate + "\" found.");
 					}
 				} else /* if (nestingLevel < 0) */{
 					throw new URISignatureParsingException(
-							"Malformed URI signature: placeholder closing symbol found before the opening one");
+							"Malformed URL: parameter placeholder closing symbol found before the opening one.");
 				}
 				break;
 
@@ -113,8 +114,8 @@ public class URISignatureHandler {
 		// that)
 		if (nestingLevel > 0) {
 			throw new URISignatureParsingException(
-					"Malformed URI signature: placeholder opening symbol found, "
-							+ "but the closing one has not been encountered");
+					"Malformed URL: parameter placeholder opening symbol found,\n"
+							+ "but the closing one has not been encountered.");
 		}
 
 		return (foundPlaceholdersWithPositions);
@@ -162,6 +163,59 @@ public class URISignatureHandler {
 		// will terminate quietly
 		extractPlaceholdersWithPositions(uriSignature);
 	}
+	
+	 /**
+	  * Check if the URL string contains "unsafe" characters, i.e. characters 
+	  * that need URL-encoding.
+	  * Form RFC 1738: "...Only alphanumerics [0-9a-zA-Z], the special 
+	  * characters "$-_.+!*'()," (not including the quotes) and reserved 
+	  * characters used for their reserved purposes may be 
+	  * used unencoded within a URL." 
+	  * Reserved characters are: ";/?:@&=" (excluding quotes).
+	  * We do not warn the user if they have not properly enclosed parameter 
+	  * names in curly braces as this check is already being done elsewhere in the code.
+	  * We do not check the characters in parameter names either.
+	 */
+	public static void checkForUnsafeCharacters(String candidateURLSignature) throws URISignatureParsingException{
+		String allowedURLCharactersString = new String("abcdefghijklmnopqrstuvwxyz0123456789$-_.+!*'(),;/?:@&=");
+		char[] allowedURLCharactersArray = allowedURLCharactersString.toCharArray();
+		List<Character> allowedURLCharactersList = new ArrayList<Character>();
+		    for (char value : allowedURLCharactersArray) {
+		    	allowedURLCharactersList.add(new Character(value));
+		    }
+
+		int index=0;
+		String unsafeCharactersDetected = "";
+		while (index < candidateURLSignature.length()){
+			char character = candidateURLSignature.charAt(index);
+			if (character == '{'){ // a start of a parameter
+				// This is a paramater name - ignore until we find the closing '}'
+				index++;
+				while(character != '}' && index < candidateURLSignature.length()){
+					character = candidateURLSignature.charAt(index);
+					index++;
+				}
+			}
+			else if (!allowedURLCharactersList.contains(Character.valueOf(Character.toLowerCase(character)))){
+				// We found an unsafe character in the URL - add to the list of unsafe characters
+				unsafeCharactersDetected+="'" + character + "', ";
+				index++;
+			}
+			else{
+				index++;
+			}
+		}
+		String message = "";
+		unsafeCharactersDetected = unsafeCharactersDetected.trim();
+		if (unsafeCharactersDetected.endsWith(",")){ // remove the last ","
+			unsafeCharactersDetected = unsafeCharactersDetected.substring(0, unsafeCharactersDetected.lastIndexOf(','));
+		}
+		if  (!unsafeCharactersDetected.equals("")){
+			message += "REST service's URL contains unsafe characters that need\nto be URL-encoded or the service will most probably fail:\n"+ unsafeCharactersDetected;	
+			throw new URISignatureParsingException(message);
+		}
+	}
+
 
 	/**
 	 * Tests whether the provided URI signature is valid or not.
