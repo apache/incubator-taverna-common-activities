@@ -61,6 +61,7 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 	}
 
 	private VisitReport checkRepository(ExternalToolActivity activity, ExternalToolActivityConfigurationBean configuration) {
+/*
 		try {
 			// try to parse the use case repository XML file
 			UseCaseEnumeration.enumerateXmlInner(new ProgressDisplayImpl(KnowARCConfigurationFactory.getConfiguration()), configuration.getRepositoryUrl(),
@@ -71,11 +72,14 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 		}
 		return new VisitReport(HealthCheck.getInstance(), activity, "Repository is fine: " + configuration.getRepositoryUrl(), HealthCheck.NO_PROBLEM,
 				Status.OK);
+				*/
+		return null;
 	}
 
 	private UseCaseDescription useCaseDescription;
 
 	private VisitReport checkExternalTool(ExternalToolActivity activity, ExternalToolActivityConfigurationBean configuration) {
+		/*
 		useCaseDescription = null;
 		// get a list of use cases from the repository XML file
 		List<UseCaseDescription> usecases = UseCaseEnumeration.enumerateXmlFile(new ProgressDisplayImpl(KnowARCConfigurationFactory.getConfiguration()),
@@ -92,6 +96,8 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 
 		return new VisitReport(HealthCheck.getInstance(), activity, "Could not find usecase: " + configuration.getExternaltoolid(),
 				HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
+				*/
+		return null;
 	}
 
 	private VisitReport checkQueuePresent(ExternalToolActivity activity, ExternalToolActivityConfigurationBean configuration) {

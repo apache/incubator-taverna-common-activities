@@ -127,18 +127,13 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		this.configurationBean = bean;
 
 		try {
-			// re-parse the use case XML file
-			List<UseCaseDescription> usecases = UseCaseEnumeration.enumerateXmlFile(new ProgressDisplayImpl(KnowARCConfigurationFactory.getConfiguration()),
-					bean.getRepositoryUrl());
-			// retrieve the UseCaseDescription for the given configuration bean
-			// and store it into mydesc
-			for (UseCaseDescription usecase : usecases) {
-				if (!usecase.usecaseid.equalsIgnoreCase(bean.getExternaltoolid()))
-					continue;
-				mydesc = usecase;
-				break;
-			}
-
+			mydesc = bean.getUseCaseDescription();
+			
+			inputPorts.clear();
+			outputPorts.clear();
+			
+			if (mydesc != null) {
+			
 			// loop through all script inputs and add them as taverna activity
 			// input ports
 			for (Map.Entry<String, ScriptInput> cur : mydesc.inputs.entrySet()) {
@@ -153,6 +148,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			// loop through all script outputs and add them to taverna
 			for (Map.Entry<String, ScriptOutput> cur : mydesc.outputs.entrySet()) {
 				addOutputWithMime(cur.getKey(), 0, cur.getValue().mime);
+			}
 			}
 
 			// we always add STDOUT and STDERR output ports, even if these are
