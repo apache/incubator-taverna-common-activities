@@ -177,7 +177,7 @@ public class URISignatureHandler {
 	  * We do not check the characters in parameter names either.
 	 */
 	public static void checkForUnsafeCharacters(String candidateURLSignature) throws URISignatureParsingException{
-		String allowedURLCharactersString = new String("abcdefghijklmnopqrstuvwxyz0123456789$-_.+!*'(),;/?:@&=");
+		String allowedURLCharactersString = new String("abcdefghijklmnopqrstuvwxyz0123456789$-_.+!*'(),;/?:@&=%");
 		char[] allowedURLCharactersArray = allowedURLCharactersString.toCharArray();
 		List<Character> allowedURLCharactersList = new ArrayList<Character>();
 		    for (char value : allowedURLCharactersArray) {
