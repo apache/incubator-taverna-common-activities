@@ -6,7 +6,7 @@ import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.SshNode;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
 
 public class RetrieveLoginFromTaverna implements AskUserForPw {
 	private CredentialManager credentialManager = null;

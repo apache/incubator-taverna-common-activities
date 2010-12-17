@@ -35,7 +35,7 @@ public class KnowARCConfigurationFactory {
 	private static KnowARCConfiguration config = new KnowARCConfiguration(ApplicationRuntime.getInstance().getApplicationHomeDir());
 
 	public static KnowARCConfiguration getConfiguration() {
-		return config;
+		return new KnowARCConfiguration(ApplicationRuntime.getInstance().getApplicationHomeDir());
 	}
 
 }

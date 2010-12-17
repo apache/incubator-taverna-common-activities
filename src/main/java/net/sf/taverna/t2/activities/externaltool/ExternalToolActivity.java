@@ -25,14 +25,17 @@ import java.io.IOException;
 import java.rmi.ServerException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.taverna.t2.annotation.Annotated;
 import net.sf.taverna.t2.annotation.annotationbeans.MimeType;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
+import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.EditException;
 import net.sf.taverna.t2.workflowmodel.EditsRegistry;
@@ -188,13 +191,20 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							// choose a
 							// matching invocation algorithm based on the plugin
 							// configuration and use case description.
-							invoke = UseCaseInvokation.createAppropriateInvokationFor(KnowARCConfigurationFactory.getConfiguration(), mydesc,
-									new RetrieveLoginFromTaverna());
+							invoke = configurationBean.getInvocationBean().getAppropriateInvocation(ExternalToolActivity.this);
 
 							// look at every use dynamic case input
 							for (String cur : invoke.getInputs()) {
 								// retrieve the value from taverna's reference
 								// service
+
+							    Identified identified = referenceService.resolveIdentifier(data.get(cur), null, callback.getContext());
+							    if (identified instanceof ReferenceSet) {
+								ReferenceSet rs = (ReferenceSet) identified;
+								for (ExternalReferenceSPI ers : rs.getExternalReferences()) {
+								    System.err.println(ers.getClass().getCanonicalName());
+								}
+							    }
 								Object value = referenceService.renderIdentifier(data.get(cur), invoke.getType(cur), callback.getContext());
 								// and send it to the UseCaseInvokation
 								invoke.setInput(cur, value);
