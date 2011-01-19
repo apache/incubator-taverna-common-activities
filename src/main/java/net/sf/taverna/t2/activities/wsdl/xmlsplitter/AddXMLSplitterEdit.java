@@ -29,7 +29,6 @@ import net.sf.taverna.t2.workflowmodel.Dataflow;
 import net.sf.taverna.t2.workflowmodel.Edit;
 import net.sf.taverna.t2.workflowmodel.EditException;
 import net.sf.taverna.t2.workflowmodel.Edits;
-import net.sf.taverna.t2.workflowmodel.EditsRegistry;
 import net.sf.taverna.t2.workflowmodel.EventForwardingOutputPort;
 import net.sf.taverna.t2.workflowmodel.EventHandlingInputPort;
 import net.sf.taverna.t2.workflowmodel.InputPort;
@@ -46,7 +45,7 @@ import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
 public class AddXMLSplitterEdit extends AbstractDataflowEdit {
 
-	private final Edits edits = EditsRegistry.getEdits();
+	private final Edits edits;
 	private final Activity<?> activity;
 	private final String portName;
 	private final boolean isInput;
@@ -54,12 +53,12 @@ public class AddXMLSplitterEdit extends AbstractDataflowEdit {
 	private Edit<?> linkUpEdit;
 
 	public AddXMLSplitterEdit(Dataflow dataflow, Activity<?> activity,
-			String portName, boolean isInput) {
+			String portName, boolean isInput, Edits edits) {
 		super(dataflow);
 		this.activity = activity;
 		this.portName = portName;
 		this.isInput = isInput;
-
+		this.edits = edits;
 	}
 
 	@Override
