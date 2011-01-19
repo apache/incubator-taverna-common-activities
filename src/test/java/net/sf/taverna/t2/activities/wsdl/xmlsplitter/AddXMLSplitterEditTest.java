@@ -66,7 +66,7 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	@Ignore("Integration test")
 	@Test
 	public void testAddOutputSplitterToWSDLActivity() throws Exception {
-		AddXMLSplitterEdit edit = new AddXMLSplitterEdit(dataflow,activity,"parameters",false);
+		AddXMLSplitterEdit edit = new AddXMLSplitterEdit(dataflow,activity,"parameters",false, new EditsImpl());
 		edit.doEdit();
 		assertEquals("The workflow should now contain 2 services",2,dataflow.getProcessors().size());
 		Processor processor=null;
@@ -92,7 +92,7 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	@Ignore("Integration test")
 	@Test
 	public void testUndo() throws Exception {
-		AddXMLSplitterEdit edit = new AddXMLSplitterEdit(dataflow,activity,"parameters",false);
+		AddXMLSplitterEdit edit = new AddXMLSplitterEdit(dataflow,activity,"parameters",false, new EditsImpl());
 		edit.doEdit();
 		edit.undo();
 		assertEquals("There should be only 1 processor",1,dataflow.getProcessors().size());
@@ -103,7 +103,7 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	@Ignore("Integration test")
 	@Test
 	public void testAddInputSplitterToWSDLActivity() throws Exception {
-		AddXMLSplitterEdit edit = new AddXMLSplitterEdit(dataflow,activity,"parameters",true);
+		AddXMLSplitterEdit edit = new AddXMLSplitterEdit(dataflow,activity,"parameters",true, new EditsImpl());
 		edit.doEdit();
 		assertEquals("The workflow should now contain 2 services",2,dataflow.getProcessors().size());
 		Processor processor=null;
