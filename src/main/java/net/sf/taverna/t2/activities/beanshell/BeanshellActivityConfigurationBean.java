@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.taverna.t2.activities.dependencyactivity.DependencyActivityConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationProperty;
 
 /**
  * A configuration bean specific to a Beanshell activity; provides details
@@ -33,6 +35,7 @@ import net.sf.taverna.t2.activities.dependencyactivity.DependencyActivityConfigu
  * @author David Withers
  * @author Alex Nenadic
  */
+@ConfigurationBean(uri = BeanshellActivity.URI + "/configuration")
 public class BeanshellActivityConfigurationBean extends DependencyActivityConfigurationBean {
 
 	private String script;
@@ -52,6 +55,7 @@ public class BeanshellActivityConfigurationBean extends DependencyActivityConfig
 	/**
 	 * @param script the Beanshell script
 	 */
+	@ConfigurationProperty(name = "script", label = "Beanshell Script", description = "The beanshell script to be executed")
 	public void setScript(String script) {
 		this.script = script;
 	}

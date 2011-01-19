@@ -52,6 +52,8 @@ import bsh.Interpreter;
 public class BeanshellActivity extends
 	AbstractAsynchronousDependencyActivity<BeanshellActivityConfigurationBean> {
 
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/beanshell";
+
 	protected BeanshellActivityConfigurationBean configurationBean;
 
 	private static Logger logger = Logger.getLogger(BeanshellActivity.class);
