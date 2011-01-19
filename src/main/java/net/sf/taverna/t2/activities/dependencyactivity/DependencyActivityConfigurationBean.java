@@ -24,6 +24,8 @@ import java.util.LinkedHashSet;
 
 import net.sf.taverna.t2.activities.dependencyactivity.AbstractAsynchronousDependencyActivity.ClassLoaderSharing;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationProperty;
 
 /**
  * Parent configuration bean for activities that have local JAR,
@@ -32,6 +34,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDe
  * @author Alex Nenadic
  * @author David Withers
  */
+@ConfigurationBean(uri = "http://ns.taverna.org.uk/2010/activity/dependency/Configuration")
 public class DependencyActivityConfigurationBean extends
 		ActivityPortsDefinitionBean {
 
@@ -73,6 +76,7 @@ public class DependencyActivityConfigurationBean extends
 	/**
 	 * @param classLoaderSharing the classLoaderSharing to set
 	 */
+	@ConfigurationProperty(name = "classLoaderSharing", label = "ClassLoader Sharing Policy", required = false)
 	public void setClassLoaderSharing(ClassLoaderSharing classLoaderSharing) {
 		this.classLoaderSharing = classLoaderSharing;
 	}
@@ -87,6 +91,7 @@ public class DependencyActivityConfigurationBean extends
 	/**
 	 * @param localDependencies the localDependencies to set
 	 */
+	@ConfigurationProperty(name = "localDependency", label = "Local Dependencies", required = false)
 	public void setLocalDependencies(LinkedHashSet<String> localDependencies) {
 		this.localDependencies = localDependencies;
 	}
