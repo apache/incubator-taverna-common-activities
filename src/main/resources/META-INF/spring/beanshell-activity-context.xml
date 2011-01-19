@@ -5,4 +5,6 @@
 
 	<bean id="beanshellActivityHealthChecker" class="net.sf.taverna.t2.activities.beanshell.BeanshellActivityHealthChecker" />
 
+	<bean id="beanshellActivityFactory" class="net.sf.taverna.t2.activities.beanshell.BeanshellActivityFactory" />
+
 </beans>
