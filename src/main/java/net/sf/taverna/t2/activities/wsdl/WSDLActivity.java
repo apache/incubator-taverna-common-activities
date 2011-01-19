@@ -33,15 +33,14 @@ import java.util.Map;
 import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.taverna.t2.activities.wsdl.security.SecurityProfiles;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
+import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
 import net.sf.taverna.t2.workflowmodel.utils.Tools;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
@@ -66,6 +65,9 @@ import org.xml.sax.SAXException;
 public class WSDLActivity extends
 		AbstractAsynchronousActivity<WSDLActivityConfigurationBean> implements
 		InputPortTypeDescriptorActivity, OutputPortTypeDescriptorActivity {
+	
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/wsdl";
+
 	private static final String ENDPOINT_REFERENCE = "EndpointReference";
 	private WSDLActivityConfigurationBean configurationBean;
 	private WSDLParser parser;

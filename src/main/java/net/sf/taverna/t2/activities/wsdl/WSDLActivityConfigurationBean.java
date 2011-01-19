@@ -20,6 +20,9 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.wsdl;
 
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationProperty;
+
 /**
  * A standard Java Bean that provides the details required to configure a WSDLActivity.
  * <p>
@@ -27,6 +30,7 @@ package net.sf.taverna.t2.activities.wsdl;
  * </p>
  * @author Stuart Owen
  */
+@ConfigurationBean(uri = WSDLActivity.URI + "/configuration")
 public class WSDLActivityConfigurationBean {
     private String wsdl;
     private String operation;
@@ -45,6 +49,7 @@ public class WSDLActivityConfigurationBean {
         return wsdl;
     }
 
+	@ConfigurationProperty(name = "wsdl", label = "WSDL URL", description = "The location of the WSDL definition for the web service")
     public void setWsdl(String wsdl) {
         this.wsdl = wsdl;
     }
@@ -53,6 +58,7 @@ public class WSDLActivityConfigurationBean {
         return operation;
     }
 
+	@ConfigurationProperty(name = "operation", label = "Operation Name", description = "The name of the WSDL operation")
     public void setOperation(String operation) {
         this.operation = operation;
     }
@@ -61,6 +67,7 @@ public class WSDLActivityConfigurationBean {
 		return securityProfile;
 	}
 
+	@ConfigurationProperty(name = "securityProfile", label = "Security Profile", description = "WS-Security settings required by the web service", required = false)
 	public void setSecurityProfile(String securityProfile) {
 		this.securityProfile = securityProfile;
 	}
