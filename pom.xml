@@ -11,8 +11,7 @@
 	<groupId>net.sf.taverna</groupId>
 	<artifactId>wsdl-generic</artifactId>
 	<version>1.7-SNAPSHOT</version>
-
-	<packaging>jar</packaging>
+	<packaging>bundle</packaging>
 	<name>wsdl-generic</name>
 	<description>
         WSDL handling classes that are shared between Taverna 1 and 2
@@ -20,6 +19,11 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -68,6 +72,16 @@
 			<name>myGrid Snapshot Repository</name>
 			<url>http://www.mygrid.org.uk/maven/snapshot-repository</url>
 		</repository>
+		<repository>
+			<id>com.springsource.repository.bundles.release</id>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/release</url>
+		</repository>
+		<repository>
+			<id>com.springsource.repository.bundles.external</id>
+			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/external</url>
+		</repository>
 	</repositories>
 	<scm>
 		<connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</connection>
@@ -78,52 +92,83 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.jdom</groupId>
-			<artifactId>jdom</artifactId>
-			<version>1.1</version>
+			<artifactId>com.springsource.org.jdom</artifactId>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
-			<version>1.1</version>
+			<artifactId>com.springsource.javax.activation</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		
+		<!--<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>1.4</version>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.12</version>
+			<groupId>axis</groupId>
+			<artifactId>axis-jaxrpc</artifactId>
+			<version>1.4</version>
 		</dependency>
-		<!--
-			<dependency> <groupId>axis</groupId> <artifactId>axis</artifactId>
-			<version>1.4</version> </dependency> <dependency>
-			<groupId>axis</groupId> <artifactId>axis-jaxrpc</artifactId>
-			<version>1.4</version> </dependency> <dependency>
-			<groupId>axis</groupId> <artifactId>axis-saaj</artifactId>
-			<version>1.4</version> </dependency> <dependency>
-			<groupId>axis</groupId> <artifactId>axis-wsdl4j</artifactId>
-			<version>1.5.1</version> </dependency> to make security work inside
-			Raven, instead use a single dependency that bundles the above
-			together with wss4j:
-		-->
 		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis-saaj</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis-wsdl4j</artifactId>
+			<version>1.5.1</version>
+		</dependency>-->
+		<!-- to make security work inside Raven, instead use a single dependency that bundles the above together 
+			with wss4j: -->
+		<!--<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis-wss4j</artifactId>
 			<version>1.4-1.5.4-2</version>
+		</dependency>-->
+
+		<!-- OSGI versions of above-->
+		<dependency>
+			<groupId>org.apache.axis</groupId>
+			<artifactId>com.springsource.org.apache.axis</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.wsdl</groupId>
+			<artifactId>com.springsource.javax.wsdl</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.rpc</groupId>
+			<artifactId>com.springsource.javax.xml.rpc</artifactId>
+			<version>1.1.0</version>
 		</dependency>
 
-		<dependency>
-			<groupId>uk.org.mygrid.taverna.scufl</groupId>
-			<artifactId>scufl-model</artifactId>
-			<version>1.7.2.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
+		<!-- xerces doesn't seem to be required - need to check -->
+		<!--<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xmlParserAPIs</artifactId>
 			<version>2.2.1</version>
+		</dependency>-->
+
+		<dependency>
+			<groupId>org.apache.log4j</groupId>
+			<artifactId>com.springsource.org.apache.log4j</artifactId>
+			<version>1.2.16</version>
 		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>uk.org.mygrid.taverna</groupId>
+			<artifactId>taverna-core</artifactId>
+			<version>1.7.2.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
