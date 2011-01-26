@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
+ * Copyright (C) 2010 The University of Manchester   
  * 
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
@@ -20,22 +20,30 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 
+import java.net.URI;
 
-import net.sf.taverna.t2.activities.wsdl.WSDLActivity;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationProperty;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
 
-@ConfigurationBean(uri = WSDLActivity.URI + "/xmlsplitter/configuration")
-public class XMLSplitterConfigurationBean extends ActivityPortsDefinitionBean {
-	String wrappedTypeXML;
+/**
+ * An {@link ActivityFactory} for creating <code>XMLOutputSplitterActivity</code>.
+ * 
+ * @author David Withers
+ */
+public class XMLOutputSplitterActivityFactory implements ActivityFactory {
 
-	public String getWrappedTypeXML() {
-		return wrappedTypeXML;
+	@Override
+	public XMLOutputSplitterActivity createActivity() {
+		return new XMLOutputSplitterActivity();
 	}
 
-	@ConfigurationProperty(name = "wrappedTypeXML", label = "Wrapped Type XML")
-	public void setWrappedTypeXML(String wrappedTypeXML) {
-		this.wrappedTypeXML = wrappedTypeXML;
+	@Override
+	public URI getActivityURI() {
+		return URI.create(XMLOutputSplitterActivity.URI);
 	}
+
+	@Override
+	public Object createActivityConfiguration() {
+		return new XMLSplitterConfigurationBean();
+	}
+
 }

@@ -7,7 +7,11 @@
                                  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
 	<service ref="wsdlActivityHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
+	<service ref="xmlInputSplitterHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
+	<service ref="xmlOutputSplitterHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
 
 	<service ref="wsdlActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
+	<service ref="xmlInputSplitterActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
+	<service ref="xmlOutputSplitterActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
 
 </beans:beans>

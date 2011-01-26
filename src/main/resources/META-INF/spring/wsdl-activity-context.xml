@@ -4,7 +4,11 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="wsdlActivityHealthChecker" class="net.sf.taverna.t2.activities.wsdl.WSDLActivityHealthChecker" />
+	<bean id="xmlInputSplitterHealthChecker" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterHealthChecker" />
+	<bean id="xmlOutputSplitterHealthChecker" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterHealthChecker" />
 
 	<bean id="wsdlActivityFactory" class="net.sf.taverna.t2.activities.wsdl.WSDLActivityFactory" />
+	<bean id="xmlInputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterActivity" />
+	<bean id="xmlOutputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterActivity" />
 
 </beans>
