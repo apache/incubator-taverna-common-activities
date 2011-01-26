@@ -1,34 +1,21 @@
 package net.sf.taverna.t2.activities.wsdl.security;
 
-import static org.junit.Assert.*;
-
-import java.util.Hashtable;
+import static org.junit.Assert.assertEquals;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.xml.namespace.QName;
 
-import org.apache.axis.MessageContext;
-import org.apache.axis.SimpleChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.axis.client.Transport;
-import org.apache.axis.configuration.BasicClientConfig;
-import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.configuration.XMLStringProvider;
-import org.apache.axis.encoding.Base64;
-import org.apache.axis.transport.http.HTTPConstants;
-import org.apache.axis.transport.http.HTTPSender;
-import org.apache.axis.transport.http.HTTPTransport;
-import org.apache.ws.axis.security.WSDoAllSender;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SecureServicesInvokerTest {
 
+	@Ignore
 	@Test
 	public void testCreteCallAndInvoke() { 
 		try { 
