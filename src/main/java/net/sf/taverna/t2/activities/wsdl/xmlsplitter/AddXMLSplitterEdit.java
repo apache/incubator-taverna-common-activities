@@ -36,14 +36,12 @@ import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.Processor;
 import net.sf.taverna.t2.workflowmodel.ProcessorInputPort;
 import net.sf.taverna.t2.workflowmodel.ProcessorOutputPort;
-import net.sf.taverna.t2.workflowmodel.impl.AbstractDataflowEdit;
-import net.sf.taverna.t2.workflowmodel.impl.DataflowImpl;
-import net.sf.taverna.t2.workflowmodel.impl.Tools;
 import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
+import net.sf.taverna.t2.workflowmodel.utils.Tools;
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
-public class AddXMLSplitterEdit extends AbstractDataflowEdit {
+public class AddXMLSplitterEdit implements Edit<Dataflow> {
 
 	private final Edits edits;
 	private final Activity<?> activity;
@@ -51,10 +49,12 @@ public class AddXMLSplitterEdit extends AbstractDataflowEdit {
 	private final boolean isInput;
 	private CompoundEdit compoundEdit1 = null;
 	private Edit<?> linkUpEdit;
+	private final Dataflow dataflow;
+	private boolean applied = false;
 
 	public AddXMLSplitterEdit(Dataflow dataflow, Activity<?> activity,
 			String portName, boolean isInput, Edits edits) {
-		super(dataflow);
+		this.dataflow = dataflow;
 		this.activity = activity;
 		this.portName = portName;
 		this.isInput = isInput;
@@ -62,7 +62,8 @@ public class AddXMLSplitterEdit extends AbstractDataflowEdit {
 	}
 
 	@Override
-	protected void doEditAction(DataflowImpl dataflow) throws EditException {
+	public Dataflow doEdit() throws EditException {
+		if (applied) throw new EditException("Edit has already been applied!");
 		List<Edit<?>> editList = new ArrayList<Edit<?>>();
 
 		Activity<XMLSplitterConfigurationBean> splitter = null;
@@ -210,11 +211,12 @@ public class AddXMLSplitterEdit extends AbstractDataflowEdit {
 					"Unable to find the sink port when linking up "
 							+ sourcePortName + " to " + sinkPortName);
 
-		linkUpEditList.add(net.sf.taverna.t2.workflowmodel.utils.Tools.getCreateAndConnectDatalinkEdit(dataflow, source, sink));
+		linkUpEditList.add(net.sf.taverna.t2.workflowmodel.utils.Tools.getCreateAndConnectDatalinkEdit(dataflow, source, sink, edits));
 
 		linkUpEdit = new CompoundEdit(linkUpEditList);
 		linkUpEdit.doEdit();
-
+		applied = true;
+		return dataflow;
 	}
 
 	private EventHandlingInputPort getSinkPort(Processor processor, Activity<?> activity,
@@ -250,11 +252,21 @@ public class AddXMLSplitterEdit extends AbstractDataflowEdit {
 	}
 
 	@Override
-	protected void undoEditAction(DataflowImpl dataflow) {
+	public void undo() {
+		if (!applied) {
+			throw new RuntimeException(
+					"Attempt to undo edit that was never applied");
+		}
 		if (linkUpEdit.isApplied())
 			linkUpEdit.undo();
 		if (compoundEdit1.isApplied())
 			compoundEdit1.undo();
+		applied = false;
+	}
+	
+	@Override
+	public boolean isApplied() {
+		return applied;
 	}
 
 	private Processor findProcessorForActivity(Dataflow dataflow,
@@ -266,6 +278,11 @@ public class AddXMLSplitterEdit extends AbstractDataflowEdit {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public Object getSubject() {
+		return dataflow;
 	}
 
 }
