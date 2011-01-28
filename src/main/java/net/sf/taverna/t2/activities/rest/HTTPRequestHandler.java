@@ -6,8 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
 
 import net.sf.taverna.t2.activities.rest.RESTActivity.DATA_FORMAT;
 
@@ -22,12 +27,17 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.log4j.Logger;
 
 /**
  * This class deals with the actual remote REST service invocation.
@@ -43,6 +53,7 @@ public class HTTPRequestHandler
 {
   private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
   private static final String ACCEPT_HEADER_NAME = "Accept";
+  private static Logger logger = Logger.getLogger(HTTPRequestHandler.class);
   
   
   /**
@@ -66,12 +77,41 @@ public class HTTPRequestHandler
    */
   public static HTTPRequestResponse initiateHTTPRequest(String requestURL,
       RESTActivityConfigurationBean configBean, Object inputMessageBody)
-  {
+  {	  
+	  ClientConnectionManager connectionManager = null;
+		if (requestURL.toLowerCase().startsWith("https")) {
+			// Register a protocol scheme for https that uses Taverna's SSLSocketFactory
+			try {
+				URL url = new URL(requestURL); // the URL object which will
+												// parse the port out for us
+				int port = url.getPort();
+				if (port == -1) { // no port was defined in the URL
+					port = 433; // default HTTPS port
+				}
+				Scheme https = new Scheme("https",
+						new org.apache.http.conn.ssl.SSLSocketFactory(
+								SSLContext.getDefault()), port);
+				SchemeRegistry schemeRegistry = new SchemeRegistry();
+				schemeRegistry.register(https);
+			    connectionManager = new SingleClientConnManager(null, schemeRegistry);
+			} catch (MalformedURLException ex) {
+				logger.error("Failed to extract port from the REST service URL: the URL "
+								+ requestURL + " is malformed.", ex);
+				// This will cause the REST activity to fail but this method
+				// seems not to throw an exception so we'll just log the error and let it go through
+			} catch (NoSuchAlgorithmException ex2) {
+				// This will cause the REST activity to fail but this method
+				// seems not to throw an exception so we'll just log the error and let it go through
+				logger.error("Failed to create SSLContext for invoking the REST service over https.",
+								ex2);
+			}
+		}
+	  
     switch (configBean.getHttpMethod()) {
-      case GET:    return (doGET   (requestURL, configBean));
-      case POST:   return (doPOST  (requestURL, configBean, inputMessageBody));
-      case PUT:    return (doPUT   (requestURL, configBean, inputMessageBody));
-      case DELETE: return (doDELETE(requestURL, configBean));
+      case GET:    return (doGET   (connectionManager, requestURL, configBean));
+      case POST:   return (doPOST  (connectionManager, requestURL, configBean, inputMessageBody));
+      case PUT:    return (doPUT   (connectionManager, requestURL, configBean, inputMessageBody));
+      case DELETE: return (doDELETE(connectionManager, requestURL, configBean));
       default:     return (new HTTPRequestResponse(new Exception("Error: something went wrong; " +
       		                  "no failure has occurred, but but unexpected HTTP method (\"" +
       		                  configBean.getHttpMethod() + "\") encountered.")));
@@ -79,13 +119,13 @@ public class HTTPRequestHandler
   }
   
   
-  private static HTTPRequestResponse doGET(String requestURL, RESTActivityConfigurationBean configBean) {
+  private static HTTPRequestResponse doGET(ClientConnectionManager connectionManager, String requestURL, RESTActivityConfigurationBean configBean) {
     HttpGet httpGet = new HttpGet(requestURL);
-    return (performHTTPRequest(httpGet, configBean));
+    return (performHTTPRequest(connectionManager, httpGet, configBean));
   }
   
   
-  private static HTTPRequestResponse doPOST(String requestURL,
+  private static HTTPRequestResponse doPOST(ClientConnectionManager connectionManager, String requestURL,
       RESTActivityConfigurationBean configBean, Object inputMessageBody)
   {
     HttpPost httpPost = new HttpPost(requestURL);
@@ -115,11 +155,11 @@ public class HTTPRequestHandler
       		"attach a message body to the POST request. See attached cause of this " +
       		"exception for details.")));
     }
-    return(performHTTPRequest(httpPost, configBean));
+    return(performHTTPRequest(connectionManager, httpPost, configBean));
   }
   
   
-  private static HTTPRequestResponse doPUT(String requestURL,
+  private static HTTPRequestResponse doPUT(ClientConnectionManager connectionManager, String requestURL,
       RESTActivityConfigurationBean configBean, Object inputMessageBody)
   {
     HttpPut httpPut = new HttpPut(requestURL);
@@ -142,13 +182,13 @@ public class HTTPRequestHandler
           "attach a message body to the PUT request. See attached cause of this " +
           "exception for details.")));
     }
-    return (performHTTPRequest(httpPut, configBean));
+    return (performHTTPRequest(connectionManager, httpPut, configBean));
   }
   
   
-  private static HTTPRequestResponse doDELETE(String requestURL, RESTActivityConfigurationBean configBean) {
+  private static HTTPRequestResponse doDELETE(ClientConnectionManager connectionManager, String requestURL, RESTActivityConfigurationBean configBean) {
     HttpDelete httpDelete = new HttpDelete(requestURL);
-    return (performHTTPRequest(httpDelete, configBean));
+    return (performHTTPRequest(connectionManager, httpDelete, configBean));
   }
   
   
@@ -159,16 +199,15 @@ public class HTTPRequestHandler
    * @param httpRequest
    * @param acceptHeaderValue 
    */
-  private static HTTPRequestResponse performHTTPRequest(HttpRequestBase httpRequest, RESTActivityConfigurationBean configBean)
+  private static HTTPRequestResponse performHTTPRequest(ClientConnectionManager connectionManager, HttpRequestBase httpRequest, RESTActivityConfigurationBean configBean)
   {
     // headers are set identically for all HTTP methods, therefore can do centrally - here
     httpRequest.setHeader(ACCEPT_HEADER_NAME, configBean.getAcceptsHeaderValue());
     
-    
     HTTPRequestResponse requestResponse = new HTTPRequestResponse();
     
     try {
-      HttpClient httpClient = new DefaultHttpClient();
+      HttpClient httpClient = new DefaultHttpClient(connectionManager, null);
       ((DefaultHttpClient)httpClient).setCredentialsProvider(RESTActivityCredentialsProvider.getInstance());
       HttpContext localContext = new BasicHttpContext();
       
