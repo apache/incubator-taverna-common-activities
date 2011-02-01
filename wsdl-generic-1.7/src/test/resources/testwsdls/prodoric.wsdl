@@ -1,0 +1,360 @@
+<?xml version ='1.0' encoding ='UTF-8' ?> 
+<definitions name='prodoric_ws' 
+  targetNamespace='ws.prodoric' 
+  xmlns:tns='ws.prodoric' 
+  xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' 
+  xmlns:xsd='http://www.w3.org/2001/XMLSchema' 
+  xmlns:soapenc='http://schemas.xmlsoap.org/soap/encoding/' 
+  xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/' 
+  xmlns='http://schemas.xmlsoap.org/wsdl/'> 
+
+<wsdl:types>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:apachesoap="http://xml.apache.org/xml-soap"
+xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+targetNamespace="ws.prodoric">
+
+<xsd:element name="ProteinAccString"  type="xsd:string"/>
+<xsd:element name="HelloStringIn"     type="xsd:string"/>
+<xsd:element name="HelloStringOut"    type="xsd:string"/>
+<xsd:element name="ProfileAcc"        type="xsd:string"/>
+
+<xsd:element name="OperonParams"             type="tns:ParamsType"/>
+<xsd:element name="RegulatorParams"          type="tns:ParamsType"/>
+<xsd:element name="ProfileParameterParams"   type="tns:ParamsType"/>
+<xsd:element name="ExpressionFromGeneParams" type="tns:ParamsType"/>
+<xsd:element name="GenomeParams"             type="tns:ParamsType"/>
+  <xsd:complexType name="ParamsType">
+
+    <xsd:sequence>
+      <xsd:element name="idtype" type="xsd:string"/>
+      <xsd:element name="id"     type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+<xsd:element name="UniprotAccArray" type="tns:StringArrayType"/>
+<xsd:complexType name="StringArrayType">
+  <xsd:sequence>
+   <xsd:element name="str" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="ArrayOfOperonResult" type="tns:OperonResultArrayType"/>
+<xsd:complexType name="OperonResultArrayType">
+  <xsd:sequence>
+   <xsd:element name="OperonResult" type="tns:OperonResultType" minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="OperonResultType">
+  <xsd:sequence>
+    <xsd:element name="gene_acc"    type="xsd:string"/>
+
+    <xsd:element name="short_name"  type="xsd:string"/>
+    <xsd:element name="gene_name"   type="xsd:string"/>
+    <xsd:element name="orf_id"      type="xsd:string"/>
+    <xsd:element name="operon_acc"  type="xsd:string"/>
+    <xsd:element name="operon_name" type="xsd:string"/>
+    <xsd:element name="references"  type="xsd:string"/>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="ArrayOfRegulatorResult" type="tns:RegulatorResultArrayType"/>
+
+<xsd:complexType name="RegulatorResultArrayType">
+  <xsd:sequence>
+   <xsd:element name="RegulatorResult" type="tns:RegulatorResultType" minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="RegulatorResultType">
+  <xsd:sequence>
+    <xsd:element name="protein_acc"    type="xsd:string"/>
+    <xsd:element name="short_name"     type="xsd:string"/>
+    <xsd:element name="protein_name"   type="xsd:string"/>
+
+    <xsd:element name="orf_id"         type="xsd:string"/>
+    <xsd:element name="mode_of_action" type="xsd:string"/>
+    <xsd:element name="promoter_acc"   type="xsd:string"/>
+    <xsd:element name="promoter_name"  type="xsd:string"/>
+    <xsd:element name="site_acc"       type="xsd:string"/>
+    <xsd:element name="site_name"      type="xsd:string"/>
+    <xsd:element name="sequence"       type="xsd:string"/>
+    <xsd:element name="references"     type="xsd:string"/>
+  </xsd:sequence>
+
+</xsd:complexType>
+
+<xsd:element name="ArrayOfProfileParameterResult" type="tns:ProfileParameterResultArrayType"/>
+<xsd:complexType name="ProfileParameterResultArrayType">
+  <xsd:sequence>
+   <xsd:element name="ProfileParameterResult" type="tns:ProfileParameterResultType" minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="ProfileParameterResultType">
+  <xsd:sequence>
+    <xsd:element name="profile_acc" type="xsd:string"/>
+    <xsd:element name="description" type="xsd:string"/>
+
+    <xsd:element name="condition"   type="xsd:string"/>
+    <xsd:element name="details"     type="xsd:string"/>
+    <xsd:element name="genome_acc"  type="xsd:string"/>
+    <xsd:element name="genome"      type="xsd:string"/>
+    <xsd:element name="references"  type="xsd:string"/>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="ArrayOfProfileResult" type="tns:ProfileResultArrayType"/>
+<xsd:complexType name="ProfileResultArrayType">
+  <xsd:sequence>
+
+   <xsd:element name="ProfileResult" type="tns:ProfileResultType" minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="ProfileResultType">
+  <xsd:sequence>
+    <xsd:element name="gene_acc"    type="xsd:string"/>
+    <xsd:element name="orf_id"      type="xsd:string"/>
+    <xsd:element name="short_name"  type="xsd:string"/>
+    <xsd:element name="gene_name"   type="xsd:string"/>
+    <xsd:element name="regulation"  type="xsd:string"/>
+
+    <xsd:element name="fold_change" type="xsd:string"/>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="ArrayOfExpressionFromGene" type="tns:ExpressionFromGeneArrayType"/>
+<xsd:complexType name="ExpressionFromGeneArrayType">
+  <xsd:sequence>
+   <xsd:element name="ExpressionFromGene" type="tns:ExpressionFromGeneType" minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="ExpressionFromGeneType">
+  <xsd:sequence>
+
+    <xsd:element name="profile_acc" type="xsd:string"/>
+    <xsd:element name="description" type="xsd:string"/>
+    <xsd:element name="condition"   type="xsd:string"/>
+    <xsd:element name="regulation"  type="xsd:string"/>
+    <xsd:element name="fold_change" type="xsd:string"/>
+    <xsd:element name="references"  type="xsd:string"/>
+  </xsd:sequence>
+</xsd:complexType>
+
+<xsd:element name="ArrayOfGenomeResult" type="tns:GenomeResultArrayType"/>
+
+<xsd:complexType name="GenomeResultArrayType">
+  <xsd:sequence>
+   <xsd:element name="GenomeResult" type="tns:GenomeResultType" minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="GenomeResultType">
+  <xsd:sequence>
+    <xsd:element name="genome_acc"   type="xsd:string"/>
+    <xsd:element name="genome_name"  type="xsd:string"/>
+  </xsd:sequence>
+
+</xsd:complexType>
+
+</xsd:schema>
+
+</wsdl:types>
+
+<message name='getOperonRequest'>
+  <part name='params' element='tns:OperonParams'/>
+</message>
+<message name='getOperonResponse'> 
+  <part name='return' element='tns:ArrayOfOperonResult'/> 
+</message> 
+
+<message name='getRegulatorsFromGeneRequest'>
+  <part name='params' element='tns:RegulatorParams'/>
+</message>
+
+<message name='getRegulatorsFromGeneResponse'> 
+  <part name='return' element='tns:ArrayOfRegulatorResult'/> 
+</message>
+
+<message name='getProfileParameterRequest'>
+  <part name='params' element='tns:ProfileParameterParams'/>
+</message>
+<message name='getProfileParameterResponse'> 
+  <part name='return' element='tns:ArrayOfProfileParameterResult'/> 
+</message>
+
+<message name='getProfileRequest'>
+  <part name='params' element='tns:ProfileAcc'/>
+</message>
+<message name='getProfileResponse'> 
+  <part name='return' element='tns:ArrayOfProfileResult'/> 
+
+</message>
+
+<message name='getExpressionFromGeneRequest'>
+  <part name='params' element='tns:ExpressionFromGeneParams'/>
+</message>
+<message name='getExpressionFromGeneResponse'> 
+  <part name='return' element='tns:ArrayOfExpressionFromGene'/> 
+</message>
+
+<message name='getGenomeRequest'>
+  <part name='params' element='tns:GenomeParams'/> 
+</message>
+<message name='getGenomeResponse'>
+  <part name='return' element='tns:ArrayOfGenomeResult'/> 
+
+</message> 
+
+<message name='getUniProtAccRequest'> 
+  <part name='protein_acc' element='tns:ProteinAccString'/> 
+</message>
+<message name='getUniProtAccResponse'> 
+  <part name='uniprot_acc' element='tns:UniprotAccArray'/> 
+</message> 
+
+<message name='helloRequest'> 
+  <part name='input'  element='tns:HelloStringIn'/> 
+</message>
+<message name='helloResponse'> 
+  <part name='return' element='tns:HelloStringOut'/> 
+</message>
+
+
+<portType name='prodoricPortType'> 
+
+  <operation name='getOperon'> 
+    <input  message='tns:getOperonRequest'/> 
+    <output message='tns:getOperonResponse'/> 
+  </operation>
+
+  <operation name='getRegulatorsFromGene'> 
+    <input  message='tns:getRegulatorsFromGeneRequest'/> 
+    <output message='tns:getRegulatorsFromGeneResponse'/> 
+  </operation>
+
+  <operation name='getProfileParameter'> 
+    <input  message='tns:getProfileParameterRequest'/> 
+    <output message='tns:getProfileParameterResponse'/> 
+  </operation>
+
+  <operation name='getProfile'> 
+    <input  message='tns:getProfileRequest'/> 
+    <output message='tns:getProfileResponse'/> 
+  </operation>
+
+  <operation name='getExpressionFromGene'> 
+    <input  message='tns:getExpressionFromGeneRequest'/> 
+    <output message='tns:getExpressionFromGeneResponse'/> 
+  </operation>
+
+  <operation name='getGenome'>
+    <input  message='tns:getGenomeRequest'/> 
+    <output message='tns:getGenomeResponse'/> 
+  </operation> 
+
+  <operation name='getUniProtAcc'> 
+    <input  message='tns:getUniProtAccRequest'/> 
+    <output message='tns:getUniProtAccResponse'/> 
+  </operation> 
+
+  <operation name='hello'> 
+    <input  message='tns:helloRequest'/> 
+    <output message='tns:helloResponse'/> 
+  </operation>
+
+</portType> 
+
+
+<binding name='prodoricBinding' type='tns:prodoricPortType'> 
+  <soap:binding style='document' transport='http://schemas.xmlsoap.org/soap/http'/> 
+
+  <operation name='getOperon'> 
+    <soap:operation soapAction='ws.prodoric#getOperon'/> 
+    <input> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </input> 
+    <output> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </output> 
+  </operation>
+
+  <operation name='getRegulatorsFromGene'> 
+    <soap:operation soapAction='ws.prodoric#getRegulatorsFromGene'/> 
+    <input> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </input> 
+    <output> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </output> 
+  </operation>
+
+  <operation name='getProfileParameter'> 
+    <soap:operation soapAction='ws.prodoric#getProfileParameter'/> 
+    <input> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </input> 
+    <output> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </output> 
+  </operation>
+
+  <operation name='getProfile'> 
+    <soap:operation soapAction='ws.prodoric#getProfile'/> 
+    <input> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </input> 
+    <output> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </output> 
+  </operation>
+
+  
+    <operation name='getExpressionFromGene'> 
+    <soap:operation soapAction='ws.prodoric#getExpressionFromGene'/> 
+    <input> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </input> 
+    <output> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </output> 
+  </operation>
+  
+
+  <operation name='getGenome'> 
+    <soap:operation soapAction='ws.prodoric#getGenome'/> 
+    <input> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </input> 
+    <output> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </output> 
+  </operation> 
+
+  <operation name='getUniProtAcc'> 
+    <soap:operation soapAction='ws.prodoric#getUniProtAcc'/> 
+    <input> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </input> 
+    <output> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </output> 
+  </operation>
+
+  <operation name='hello'> 
+    <soap:operation soapAction='ws.prodoric#hello'/> 
+    <input> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </input> 
+    <output> 
+      <soap:body use='literal' namespace='ws.prodoric' /> 
+    </output> 
+  </operation>
+
+</binding> 
+
+
+<service name='prodoric_webservice'> 
+  <port name='prodoricPort' binding='tns:prodoricBinding'> 
+    <soap:address location='http://134.169.104.13/webservice/prodoric_server.php'/> 
+  </port> 
+
+</service>
+</definitions>
