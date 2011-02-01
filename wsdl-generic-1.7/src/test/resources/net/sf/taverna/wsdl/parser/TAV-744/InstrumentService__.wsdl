@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions name="InstrumentService" targetNamespace="http://InstrumentService.uniparthenope.it/InstrumentService/service" xmlns:binding="http://InstrumentService.uniparthenope.it/InstrumentService/bindings" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <wsdl:import location="InstrumentService_bindings.wsdl" namespace="http://InstrumentService.uniparthenope.it/InstrumentService/bindings"/>
-  <wsdl:service name="InstrumentService">
-    <wsdl:port binding="binding:InstrumentServicePortTypeSOAPBinding" name="InstrumentServicePortTypePort">
-      <soap:address location="http://193.205.230.10:8080/wsrf/services/dsa/InstrumentService"/>
-    </wsdl:port>
-  </wsdl:service>
-</wsdl:definitions>
