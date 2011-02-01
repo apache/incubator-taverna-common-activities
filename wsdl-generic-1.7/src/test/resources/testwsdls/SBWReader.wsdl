@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://www.sys-bio.org/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://www.sys-bio.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.sys-bio.org/">
+      <s:element name="doAnalysis">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="var0" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+
+      </s:element>
+      <s:element name="doAnalysisResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="loadSBML">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="var0" type="s:string" />
+          </s:sequence>
+
+        </s:complexType>
+      </s:element>
+      <s:element name="loadSBMLResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="getErrors">
+        <s:complexType />
+      </s:element>
+      <s:element name="getErrorsResponse">
+
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getErrorsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+
+        </s:sequence>
+      </s:complexType>
+      <s:element name="getWarnings">
+        <s:complexType />
+      </s:element>
+      <s:element name="getWarningsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getWarningsResult" type="tns:ArrayOfString" />
+
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getFatals">
+        <s:complexType />
+      </s:element>
+      <s:element name="getFatalsResponse">
+        <s:complexType>
+          <s:sequence>
+
+            <s:element minOccurs="0" maxOccurs="1" name="getFatalsResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getInfo">
+        <s:complexType />
+      </s:element>
+      <s:element name="getInfoResponse">
+        <s:complexType>
+
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getInfoResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="numErrors">
+        <s:complexType />
+      </s:element>
+      <s:element name="numErrorsResponse">
+
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="numErrorsResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ArrayOfString" nillable="true" type="tns:ArrayOfString" />
+      <s:element name="int" type="s:int" />
+    </s:schema>
+
+  </wsdl:types>
+  <wsdl:message name="doAnalysisSoapIn">
+    <wsdl:part name="parameters" element="tns:doAnalysis" />
+  </wsdl:message>
+  <wsdl:message name="doAnalysisSoapOut">
+    <wsdl:part name="parameters" element="tns:doAnalysisResponse" />
+  </wsdl:message>
+  <wsdl:message name="loadSBMLSoapIn">
+    <wsdl:part name="parameters" element="tns:loadSBML" />
+
+  </wsdl:message>
+  <wsdl:message name="loadSBMLSoapOut">
+    <wsdl:part name="parameters" element="tns:loadSBMLResponse" />
+  </wsdl:message>
+  <wsdl:message name="getErrorsSoapIn">
+    <wsdl:part name="parameters" element="tns:getErrors" />
+  </wsdl:message>
+  <wsdl:message name="getErrorsSoapOut">
+    <wsdl:part name="parameters" element="tns:getErrorsResponse" />
+
+  </wsdl:message>
+  <wsdl:message name="getWarningsSoapIn">
+    <wsdl:part name="parameters" element="tns:getWarnings" />
+  </wsdl:message>
+  <wsdl:message name="getWarningsSoapOut">
+    <wsdl:part name="parameters" element="tns:getWarningsResponse" />
+  </wsdl:message>
+  <wsdl:message name="getFatalsSoapIn">
+    <wsdl:part name="parameters" element="tns:getFatals" />
+
+  </wsdl:message>
+  <wsdl:message name="getFatalsSoapOut">
+    <wsdl:part name="parameters" element="tns:getFatalsResponse" />
+  </wsdl:message>
+  <wsdl:message name="getInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:getInfo" />
+  </wsdl:message>
+  <wsdl:message name="getInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:getInfoResponse" />
+
+  </wsdl:message>
+  <wsdl:message name="numErrorsSoapIn">
+    <wsdl:part name="parameters" element="tns:numErrors" />
+  </wsdl:message>
+  <wsdl:message name="numErrorsSoapOut">
+    <wsdl:part name="parameters" element="tns:numErrorsResponse" />
+  </wsdl:message>
+  <wsdl:message name="doAnalysisHttpGetIn">
+    <wsdl:part name="var0" type="s:string" />
+
+  </wsdl:message>
+  <wsdl:message name="doAnalysisHttpGetOut" />
+  <wsdl:message name="loadSBMLHttpGetIn">
+    <wsdl:part name="var0" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="loadSBMLHttpGetOut" />
+  <wsdl:message name="getErrorsHttpGetIn" />
+  <wsdl:message name="getErrorsHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+
+  </wsdl:message>
+  <wsdl:message name="getWarningsHttpGetIn" />
+  <wsdl:message name="getWarningsHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="getFatalsHttpGetIn" />
+  <wsdl:message name="getFatalsHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+
+  <wsdl:message name="getInfoHttpGetIn" />
+  <wsdl:message name="getInfoHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="numErrorsHttpGetIn" />
+  <wsdl:message name="numErrorsHttpGetOut">
+    <wsdl:part name="Body" element="tns:int" />
+  </wsdl:message>
+  <wsdl:message name="doAnalysisHttpPostIn">
+
+    <wsdl:part name="var0" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="doAnalysisHttpPostOut" />
+  <wsdl:message name="loadSBMLHttpPostIn">
+    <wsdl:part name="var0" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="loadSBMLHttpPostOut" />
+  <wsdl:message name="getErrorsHttpPostIn" />
+  <wsdl:message name="getErrorsHttpPostOut">
+
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="getWarningsHttpPostIn" />
+  <wsdl:message name="getWarningsHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="getFatalsHttpPostIn" />
+  <wsdl:message name="getFatalsHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+
+  </wsdl:message>
+  <wsdl:message name="getInfoHttpPostIn" />
+  <wsdl:message name="getInfoHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfString" />
+  </wsdl:message>
+  <wsdl:message name="numErrorsHttpPostIn" />
+  <wsdl:message name="numErrorsHttpPostOut">
+    <wsdl:part name="Body" element="tns:int" />
+  </wsdl:message>
+
+  <wsdl:portType name="validateSoap">
+    <wsdl:operation name="doAnalysis">
+      <wsdl:input message="tns:doAnalysisSoapIn" />
+      <wsdl:output message="tns:doAnalysisSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="loadSBML">
+      <wsdl:input message="tns:loadSBMLSoapIn" />
+      <wsdl:output message="tns:loadSBMLSoapOut" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getErrors">
+      <wsdl:input message="tns:getErrorsSoapIn" />
+      <wsdl:output message="tns:getErrorsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getWarnings">
+      <wsdl:input message="tns:getWarningsSoapIn" />
+      <wsdl:output message="tns:getWarningsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getFatals">
+
+      <wsdl:input message="tns:getFatalsSoapIn" />
+      <wsdl:output message="tns:getFatalsSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getInfo">
+      <wsdl:input message="tns:getInfoSoapIn" />
+      <wsdl:output message="tns:getInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="numErrors">
+      <wsdl:input message="tns:numErrorsSoapIn" />
+
+      <wsdl:output message="tns:numErrorsSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="validateHttpGet">
+    <wsdl:operation name="doAnalysis">
+      <wsdl:input message="tns:doAnalysisHttpGetIn" />
+      <wsdl:output message="tns:doAnalysisHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="loadSBML">
+
+      <wsdl:input message="tns:loadSBMLHttpGetIn" />
+      <wsdl:output message="tns:loadSBMLHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getErrors">
+      <wsdl:input message="tns:getErrorsHttpGetIn" />
+      <wsdl:output message="tns:getErrorsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getWarnings">
+      <wsdl:input message="tns:getWarningsHttpGetIn" />
+
+      <wsdl:output message="tns:getWarningsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getFatals">
+      <wsdl:input message="tns:getFatalsHttpGetIn" />
+      <wsdl:output message="tns:getFatalsHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getInfo">
+      <wsdl:input message="tns:getInfoHttpGetIn" />
+      <wsdl:output message="tns:getInfoHttpGetOut" />
+
+    </wsdl:operation>
+    <wsdl:operation name="numErrors">
+      <wsdl:input message="tns:numErrorsHttpGetIn" />
+      <wsdl:output message="tns:numErrorsHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="validateHttpPost">
+    <wsdl:operation name="doAnalysis">
+      <wsdl:input message="tns:doAnalysisHttpPostIn" />
+
+      <wsdl:output message="tns:doAnalysisHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="loadSBML">
+      <wsdl:input message="tns:loadSBMLHttpPostIn" />
+      <wsdl:output message="tns:loadSBMLHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getErrors">
+      <wsdl:input message="tns:getErrorsHttpPostIn" />
+      <wsdl:output message="tns:getErrorsHttpPostOut" />
+
+    </wsdl:operation>
+    <wsdl:operation name="getWarnings">
+      <wsdl:input message="tns:getWarningsHttpPostIn" />
+      <wsdl:output message="tns:getWarningsHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getFatals">
+      <wsdl:input message="tns:getFatalsHttpPostIn" />
+      <wsdl:output message="tns:getFatalsHttpPostOut" />
+    </wsdl:operation>
+
+    <wsdl:operation name="getInfo">
+      <wsdl:input message="tns:getInfoHttpPostIn" />
+      <wsdl:output message="tns:getInfoHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="numErrors">
+      <wsdl:input message="tns:numErrorsHttpPostIn" />
+      <wsdl:output message="tns:numErrorsHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="validateSoap" type="tns:validateSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="doAnalysis">
+      <soap:operation soapAction="http://www.sys-bio.org/doAnalysis" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadSBML">
+      <soap:operation soapAction="http://www.sys-bio.org/loadSBML" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getErrors">
+      <soap:operation soapAction="http://www.sys-bio.org/getErrors" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWarnings">
+      <soap:operation soapAction="http://www.sys-bio.org/getWarnings" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFatals">
+      <soap:operation soapAction="http://www.sys-bio.org/getFatals" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInfo">
+      <soap:operation soapAction="http://www.sys-bio.org/getInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="numErrors">
+      <soap:operation soapAction="http://www.sys-bio.org/numErrors" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="validateSoap12" type="tns:validateSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="doAnalysis">
+      <soap12:operation soapAction="http://www.sys-bio.org/doAnalysis" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadSBML">
+      <soap12:operation soapAction="http://www.sys-bio.org/loadSBML" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getErrors">
+      <soap12:operation soapAction="http://www.sys-bio.org/getErrors" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWarnings">
+      <soap12:operation soapAction="http://www.sys-bio.org/getWarnings" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFatals">
+      <soap12:operation soapAction="http://www.sys-bio.org/getFatals" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInfo">
+      <soap12:operation soapAction="http://www.sys-bio.org/getInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="numErrors">
+      <soap12:operation soapAction="http://www.sys-bio.org/numErrors" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="validateHttpGet" type="tns:validateHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="doAnalysis">
+
+      <http:operation location="/doAnalysis" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output />
+    </wsdl:operation>
+    <wsdl:operation name="loadSBML">
+      <http:operation location="/loadSBML" />
+      <wsdl:input>
+
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output />
+    </wsdl:operation>
+    <wsdl:operation name="getErrors">
+      <http:operation location="/getErrors" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWarnings">
+      <http:operation location="/getWarnings" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFatals">
+      <http:operation location="/getFatals" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInfo">
+      <http:operation location="/getInfo" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="numErrors">
+      <http:operation location="/numErrors" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="validateHttpPost" type="tns:validateHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="doAnalysis">
+      <http:operation location="/doAnalysis" />
+
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output />
+    </wsdl:operation>
+    <wsdl:operation name="loadSBML">
+      <http:operation location="/loadSBML" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+
+      </wsdl:input>
+      <wsdl:output />
+    </wsdl:operation>
+    <wsdl:operation name="getErrors">
+      <http:operation location="/getErrors" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getWarnings">
+      <http:operation location="/getWarnings" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getFatals">
+      <http:operation location="/getFatals" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInfo">
+      <http:operation location="/getInfo" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="numErrors">
+      <http:operation location="/numErrors" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="validate">
+    <wsdl:port name="validateSoap" binding="tns:validateSoap">
+      <soap:address location="http://128.208.17.26/generate/SBWReader.asmx" />
+    </wsdl:port>
+    <wsdl:port name="validateSoap12" binding="tns:validateSoap12">
+
+      <soap12:address location="http://128.208.17.26/generate/SBWReader.asmx" />
+    </wsdl:port>
+    <wsdl:port name="validateHttpGet" binding="tns:validateHttpGet">
+      <http:address location="http://128.208.17.26/generate/SBWReader.asmx" />
+    </wsdl:port>
+    <wsdl:port name="validateHttpPost" binding="tns:validateHttpPost">
+      <http:address location="http://128.208.17.26/generate/SBWReader.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

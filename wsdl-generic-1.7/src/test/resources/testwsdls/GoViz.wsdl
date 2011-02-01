@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" xmlns:intf="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><wsdl:types><schema targetNamespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" xmlns="http://www.w3.org/2001/XMLSchema"><import namespace="http://schemas.xmlsoap.org/soap/encoding/"/><complexType name="ArrayOf_xsd_string"><complexContent><restriction base="soapenc:Array"><attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]"/></restriction></complexContent></complexType></schema></wsdl:types>
+  <wsdl:message name="clearColoursRequest">
+    <wsdl:part name="sessionID" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="markTermRequest">
+    <wsdl:part name="sessionID" type="xsd:string"/>
+    <wsdl:part name="geneOntologyID" type="xsd:string"/>
+    <wsdl:part name="colour" type="xsd:string"/>
+  </wsdl:message>
+
+  <wsdl:message name="getChildrenResponse">
+    <wsdl:part name="getChildrenReturn" type="impl:ArrayOf_xsd_string"/>
+  </wsdl:message>
+  <wsdl:message name="getDotRequest">
+    <wsdl:part name="sessionID" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="createSessionRequest">
+  </wsdl:message>
+  <wsdl:message name="getParentsRequest">
+
+    <wsdl:part name="geneOntologyID" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="addTermRequest">
+    <wsdl:part name="sessionID" type="xsd:string"/>
+    <wsdl:part name="geneOntologyID" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="clearColoursResponse">
+  </wsdl:message>
+  <wsdl:message name="createSessionResponse">
+
+    <wsdl:part name="createSessionReturn" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="getAncestorsRequest">
+    <wsdl:part name="geneOntologyID" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="destroySessionResponse">
+  </wsdl:message>
+  <wsdl:message name="addTermResponse">
+  </wsdl:message>
+
+  <wsdl:message name="getParentsResponse">
+    <wsdl:part name="getParentsReturn" type="impl:ArrayOf_xsd_string"/>
+  </wsdl:message>
+  <wsdl:message name="markTermResponse">
+  </wsdl:message>
+  <wsdl:message name="getDotResponse">
+    <wsdl:part name="getDotReturn" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="destroySessionRequest">
+
+    <wsdl:part name="sessionID" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="getChildrenRequest">
+    <wsdl:part name="geneOntologyID" type="xsd:string"/>
+  </wsdl:message>
+  <wsdl:message name="getAncestorsResponse">
+    <wsdl:part name="getAncestorsReturn" type="impl:ArrayOf_xsd_string"/>
+  </wsdl:message>
+  <wsdl:portType name="GoViz">
+
+    <wsdl:operation name="createSession">
+      <wsdl:input message="impl:createSessionRequest" name="createSessionRequest"/>
+      <wsdl:output message="impl:createSessionResponse" name="createSessionResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="destroySession" parameterOrder="sessionID">
+      <wsdl:input message="impl:destroySessionRequest" name="destroySessionRequest"/>
+      <wsdl:output message="impl:destroySessionResponse" name="destroySessionResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="getChildren" parameterOrder="geneOntologyID">
+
+      <wsdl:input message="impl:getChildrenRequest" name="getChildrenRequest"/>
+      <wsdl:output message="impl:getChildrenResponse" name="getChildrenResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="addTerm" parameterOrder="sessionID geneOntologyID">
+      <wsdl:input message="impl:addTermRequest" name="addTermRequest"/>
+      <wsdl:output message="impl:addTermResponse" name="addTermResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="clearColours" parameterOrder="sessionID">
+      <wsdl:input message="impl:clearColoursRequest" name="clearColoursRequest"/>
+
+      <wsdl:output message="impl:clearColoursResponse" name="clearColoursResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="getAncestors" parameterOrder="geneOntologyID">
+      <wsdl:input message="impl:getAncestorsRequest" name="getAncestorsRequest"/>
+      <wsdl:output message="impl:getAncestorsResponse" name="getAncestorsResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="getDot" parameterOrder="sessionID">
+      <wsdl:input message="impl:getDotRequest" name="getDotRequest"/>
+      <wsdl:output message="impl:getDotResponse" name="getDotResponse"/>
+
+    </wsdl:operation>
+    <wsdl:operation name="getParents" parameterOrder="geneOntologyID">
+      <wsdl:input message="impl:getParentsRequest" name="getParentsRequest"/>
+      <wsdl:output message="impl:getParentsResponse" name="getParentsResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="markTerm" parameterOrder="sessionID geneOntologyID colour">
+      <wsdl:input message="impl:markTermRequest" name="markTermRequest"/>
+      <wsdl:output message="impl:markTermResponse" name="markTermResponse"/>
+    </wsdl:operation>
+
+  </wsdl:portType>
+  <wsdl:binding name="GoVizSoapBinding" type="impl:GoViz">
+    <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="createSession">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="createSessionRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="createSessionResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="destroySession">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="destroySessionRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="destroySessionResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getChildren">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getChildrenRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="getChildrenResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="addTerm">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="addTermRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="addTermResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="clearColours">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="clearColoursRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="clearColoursResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAncestors">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getAncestorsRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="getAncestorsResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getDot">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getDotRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="getDotResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getParents">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getParentsRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="getParentsResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="markTerm">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="markTermRequest">
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://DefaultNamespace" use="encoded"/>
+      </wsdl:input>
+      <wsdl:output name="markTermResponse">
+
+        <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws" use="encoded"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GoVizService">
+    <wsdl:port binding="impl:GoVizSoapBinding" name="GoViz">
+      <wsdlsoap:address location="http://www.ebi.ac.uk/collab/mygrid/service1/goviz/GoViz.jws"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

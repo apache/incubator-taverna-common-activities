@@ -1,0 +1,76 @@
+
+<getSteadyStateTableReturn>
+    <credits xsi:type="xsd:string" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">Powered by Mathematica, Wolfram Research</credits>
+    <fluxNames soapenc:arrayType="xsd:string[17]" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="soapenc:Array" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <fluxNames xsi:type="xsd:string">v[GLT]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[GLK]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[PGI]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[GLYCO]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[Treha]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[PFK]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[ALD]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[G3PDH]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[GAPDH]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[PGK]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[PGM]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[ENO]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[PYK]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[PDC]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[SUC]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[ADH]</fluxNames>
+        <fluxNames xsi:type="xsd:string">v[ATP]</fluxNames>
+    </fluxNames>
+    <fluxVals soapenc:arrayType="xsd:string[17]" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="soapenc:Array" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <fluxVals xsi:type="xsd:string">88.15049285974906</fluxVals>
+        <fluxVals xsi:type="xsd:string">88.15049285974904</fluxVals>
+        <fluxVals xsi:type="xsd:string">77.35049285974908</fluxVals>
+        <fluxVals xsi:type="xsd:string">6</fluxVals>
+        <fluxVals xsi:type="xsd:string">2.4</fluxVals>
+        <fluxVals xsi:type="xsd:string">77.3504928597491</fluxVals>
+        <fluxVals xsi:type="xsd:string">77.35049285974904</fluxVals>
+        <fluxVals xsi:type="xsd:string">18.202466703480138</fluxVals>
+        <fluxVals xsi:type="xsd:string">136.49851901601804</fluxVals>
+        <fluxVals xsi:type="xsd:string">136.4985190160183</fluxVals>
+        <fluxVals xsi:type="xsd:string">136.498519016018</fluxVals>
+        <fluxVals xsi:type="xsd:string">136.498519016018</fluxVals>
+        <fluxVals xsi:type="xsd:string">136.49851901601804</fluxVals>
+        <fluxVals xsi:type="xsd:string">136.49851901601798</fluxVals>
+        <fluxVals xsi:type="xsd:string">3.640493340696029</fluxVals>
+        <fluxVals xsi:type="xsd:string">129.21753233462553</fluxVals>
+        <fluxVals xsi:type="xsd:string">99.09605231253782</fluxVals>
+    </fluxVals>
+    <isModelMethodSupported xsi:type="xsd:boolean" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">true</isModelMethodSupported>
+    <metabNames soapenc:arrayType="xsd:string[14]" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="soapenc:Array" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <metabNames xsi:type="xsd:string">ACE</metabNames>
+        <metabNames xsi:type="xsd:string">BPG</metabNames>
+        <metabNames xsi:type="xsd:string">F16P</metabNames>
+        <metabNames xsi:type="xsd:string">F6P</metabNames>
+        <metabNames xsi:type="xsd:string">G6P</metabNames>
+        <metabNames xsi:type="xsd:string">GLCi</metabNames>
+        <metabNames xsi:type="xsd:string">NAD</metabNames>
+        <metabNames xsi:type="xsd:string">P2G</metabNames>
+        <metabNames xsi:type="xsd:string">P3G</metabNames>
+        <metabNames xsi:type="xsd:string">PEP</metabNames>
+        <metabNames xsi:type="xsd:string">Prb</metabNames>
+        <metabNames xsi:type="xsd:string">PYR</metabNames>
+        <metabNames xsi:type="xsd:string">TRIO</metabNames>
+        <metabNames xsi:type="xsd:string">NADH</metabNames>
+    </metabNames>
+    <metabVals soapenc:arrayType="xsd:string[14]" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xsi:type="soapenc:Array" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <metabVals xsi:type="xsd:string">0.170116511247478</metabVals>
+        <metabVals xsi:type="xsd:string">0.00032969362849256316</metabVals>
+        <metabVals xsi:type="xsd:string">0.6019547147734713</metabVals>
+        <metabVals xsi:type="xsd:string">0.11284989677951425</metabVals>
+        <metabVals xsi:type="xsd:string">1.0334604569319266</metabVals>
+        <metabVals xsi:type="xsd:string">0.09874371287268408</metabVals>
+        <metabVals xsi:type="xsd:string">1.5455601206148244</metabVals>
+        <metabVals xsi:type="xsd:string">0.04484907064065288</metabVals>
+        <metabVals xsi:type="xsd:string">0.35652004693990313</metabVals>
+        <metabVals xsi:type="xsd:string">0.07363323011128868</metabVals>
+        <metabVals xsi:type="xsd:string">6.309399270731274</metabVals>
+        <metabVals xsi:type="xsd:string">8.523412394422687</metabVals>
+        <metabVals xsi:type="xsd:string">0.7775576104829965</metabVals>
+        <metabVals xsi:type="xsd:string">0.04443987938517546</metabVals>
+    </metabVals>
+    <model xsi:type="xsd:string" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">teusink</model>
+</getSteadyStateTableReturn>
