@@ -35,6 +35,7 @@ import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.soap.WSDLSOAPInvoker;
 
+import org.apache.axis.AxisProperties;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
@@ -252,8 +253,23 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			}
 		}
 
-		Call call = super.getCall(wssEngineConfiguration);
 
+		// This does not work
+//		ClassUtils.setClassLoader("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory",TavernaAxisCustomSSLSocketFactory.class.getClassLoader());
+		
+		// Setting Axis property only works when we also set the Thread's classloader as below 
+		// (we do it from the net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke.requestRun())
+//		Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+		if (!AxisProperties.getProperty("axis.socketSecureFactory").equals("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory")){
+			AxisProperties.setProperty("axis.socketSecureFactory", "net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory");
+			logger.info("Setting axis.socketSecureFactory property to " + AxisProperties.getProperty("axis.socketSecureFactory"));
+		}
+        
+		// This also does not work
+		//AxisProperties.setClassDefault(SecureSocketFactory.class, "net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory");
+        
+		Call call = super.getCall(wssEngineConfiguration);
+		
 		// Now that we have an axis Call object, configure any additional
 		// security properties on it (or its message context or its Transport
 		// handler),

@@ -21,20 +21,14 @@
 
 package net.sf.taverna.t2.activities.wsdl.wss4j;
 
-import java.io.File;
 import java.util.Vector;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-
-import net.sf.taverna.t2.activities.wsdl.WSDLActivity;
 //import net.sf.taverna.t2.security.agents.SAException;
 //import net.sf.taverna.t2.security.agents.WSSecurityAgent;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
+//import org.apache.log4j.Logger;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSEncryptionPart;
@@ -46,8 +40,6 @@ import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.w3c.dom.Document;
 
-import org.apache.axis.MessageContext;
-
 public class T2WSDoAllSender extends WSDoAllSender{
 	
     /**
@@ -58,11 +50,11 @@ public class T2WSDoAllSender extends WSDoAllSender{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static Log log = LogFactory.getLog(T2WSDoAllSender.class.getName());
+	//private static Log log = LogFactory.getLog(T2WSDoAllSender.class.getName());
 
-    private boolean doDebug = log.isDebugEnabled();
+   // private boolean doDebug = log.isDebugEnabled();
     
-    private static Logger logger = Logger.getLogger(T2WSDoAllSender.class);
+   // private static Logger logger = Logger.getLogger(T2WSDoAllSender.class);
     
     /**                                                             
      * Performs all defined security actions to set-up the SOAP request.
