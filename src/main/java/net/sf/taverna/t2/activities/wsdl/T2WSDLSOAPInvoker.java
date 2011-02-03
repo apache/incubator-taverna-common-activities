@@ -260,7 +260,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		// Setting Axis property only works when we also set the Thread's classloader as below 
 		// (we do it from the net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke.requestRun())
 //		Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-		if (!AxisProperties.getProperty("axis.socketSecureFactory").equals("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory")){
+		if (AxisProperties.getProperty("axis.socketSecureFactory")== null || !AxisProperties.getProperty("axis.socketSecureFactory").equals("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory")){
 			AxisProperties.setProperty("axis.socketSecureFactory", "net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory");
 			logger.info("Setting axis.socketSecureFactory property to " + AxisProperties.getProperty("axis.socketSecureFactory"));
 		}
