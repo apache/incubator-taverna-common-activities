@@ -22,9 +22,13 @@ package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.net.URI;
+
 import net.sf.taverna.t2.activities.testutils.LocationConstants;
 import net.sf.taverna.t2.activities.wsdl.WSDLActivity;
 import net.sf.taverna.t2.activities.wsdl.WSDLActivityConfigurationBean;
+import net.sf.taverna.t2.activities.wsdl.WSDLOperationConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.Processor;
 import net.sf.taverna.t2.workflowmodel.impl.DataflowImpl;
@@ -40,6 +44,7 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	private WSDLActivity activity;
 	private DataflowImpl dataflow;
 	private WSDLActivityConfigurationBean configBean;
+	private static WSDLOperationConfigurationBean operationConfigBean;
 	private String wsdlLocation = WSDL_TEST_BASE
 	+ "eutils/eutils_lite.wsdl";
 	private Edits edits;
@@ -49,8 +54,10 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	public void setUp() throws Exception {
 		activity = new WSDLActivity();
 		configBean = new WSDLActivityConfigurationBean();
-		configBean.setOperation("run_eInfo");
-		configBean.setWsdl(wsdlLocation);
+		operationConfigBean = new WSDLOperationConfigurationBean();
+		operationConfigBean.setOperationName("run_eInfo");
+		operationConfigBean.setWsdl(URI.create(wsdlLocation));
+		configBean.setOperation(operationConfigBean);
 		activity.configure(configBean);
 		edits = new EditsImpl();
 		

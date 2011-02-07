@@ -32,8 +32,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationPr
  */
 @ConfigurationBean(uri = WSDLActivity.URI + "/configuration")
 public class WSDLActivityConfigurationBean {
-    private String wsdl;
-    private String operation;
+    private WSDLOperationConfigurationBean operation;
     private String securityProfile;
     
     // In the case service requires username and password for authentication,
@@ -45,21 +44,12 @@ public class WSDLActivityConfigurationBean {
     public WSDLActivityConfigurationBean() {
     }
 
-    public String getWsdl() {
-        return wsdl;
-    }
-
-	@ConfigurationProperty(name = "wsdl", label = "WSDL URL", description = "The location of the WSDL definition for the web service")
-    public void setWsdl(String wsdl) {
-        this.wsdl = wsdl;
-    }
-
-    public String getOperation() {
+    public WSDLOperationConfigurationBean getOperation() {
         return operation;
     }
 
-	@ConfigurationProperty(name = "operation", label = "Operation Name", description = "The name of the WSDL operation")
-    public void setOperation(String operation) {
+	@ConfigurationProperty(name = "operation", label = "WSDL Operation", description = "The WSDL operation")
+    public void setOperation(WSDLOperationConfigurationBean operation) {
         this.operation = operation;
     }
 

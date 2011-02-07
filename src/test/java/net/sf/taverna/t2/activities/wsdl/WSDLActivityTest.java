@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,6 @@ import net.sf.taverna.t2.activities.testutils.LocationConstants;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -44,6 +44,7 @@ public class WSDLActivityTest implements LocationConstants {
 
 	private static WSDLActivity activity;
 	private static WSDLActivityConfigurationBean configBean;
+	private static WSDLOperationConfigurationBean operationConfigBean;
 	private static String wsdlLocation = WSDL_TEST_BASE
 			+ "eutils/eutils_lite.wsdl";
 
@@ -52,8 +53,10 @@ public class WSDLActivityTest implements LocationConstants {
 	public static void setUp() throws Exception {
 		activity = new WSDLActivity();
 		configBean = new WSDLActivityConfigurationBean();
-		configBean.setOperation("run_eInfo");
-		configBean.setWsdl(wsdlLocation);
+		operationConfigBean = new WSDLOperationConfigurationBean();
+		operationConfigBean.setOperationName("run_eInfo");
+		operationConfigBean.setWsdl(URI.create(wsdlLocation));
+		configBean.setOperation(operationConfigBean);
 		activity.configure(configBean);
 	}
 
