@@ -23,11 +23,15 @@ package net.sf.taverna.t2.activities.spreadsheet;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationProperty;
+
 /**
  * Configuration for the SpreadsheetImport activity.
  * 
  * @author David Withers
  */
+@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/configuration")
 public class SpreadsheetImportConfiguration {
 
 	private Range columnRange;
@@ -91,6 +95,7 @@ public class SpreadsheetImportConfiguration {
 	 * @param columnRange
 	 *            the new value for columnRange
 	 */
+	@ConfigurationProperty(name = "columnRange", label = "Column Range", description = "The range of columns to be imported (e.g. columns 2 to 7")
 	public void setColumnRange(Range columnRange) {
 		this.columnRange = columnRange;
 	}
@@ -110,6 +115,7 @@ public class SpreadsheetImportConfiguration {
 	 * @param rowRange
 	 *            the new value for rowRange
 	 */
+	@ConfigurationProperty(name = "rowRange", label = "Row Range", description = "The range of rows to be imported (e.g. rows 1 to 15", required = false)
 	public void setRowRange(Range rowRange) {
 		this.rowRange = rowRange;
 	}
@@ -129,6 +135,7 @@ public class SpreadsheetImportConfiguration {
 	 * @param emptyCellValue
 	 *            the new value for emptyCellValue
 	 */
+	@ConfigurationProperty(name = "emptyCellValue", label = "Empty Cell Value", description = "The value to use for empty cells. The default is \"\"", required = false)
 	public void setEmptyCellValue(String emptyCellValue) {
 		this.emptyCellValue = emptyCellValue;
 	}
@@ -167,6 +174,7 @@ public class SpreadsheetImportConfiguration {
 	 * @param allRows
 	 *            the new value for allRows
 	 */
+	@ConfigurationProperty(name = "allRows", label = "Import All Rows", description = "Imports all the rows containing data", required = false)
 	public void setAllRows(boolean allRows) {
 		this.allRows = allRows;
 	}
@@ -186,6 +194,7 @@ public class SpreadsheetImportConfiguration {
 	 * @param excludeFirstRow
 	 *            the new value for excludeFirstRow
 	 */
+	@ConfigurationProperty(name = "excludeFirstRow", label = "Exclude First Row", description = "Excludes the first row from the import", required = false)
 	public void setExcludeFirstRow(boolean excludeFirstRow) {
 		this.excludeFirstRow = excludeFirstRow;
 	}
@@ -204,6 +213,7 @@ public class SpreadsheetImportConfiguration {
 	 *
 	 * @param ignoreBlankRows the new value for ignoreBlankRows
 	 */
+	@ConfigurationProperty(name = "ignoreBlankRows", label = "Ignore Blank Rows", description = "Excludes blank rows from the import", required = false)
 	public void setIgnoreBlankRows(boolean ignoreBlankRows) {
 		this.ignoreBlankRows = ignoreBlankRows;
 	}
@@ -224,6 +234,7 @@ public class SpreadsheetImportConfiguration {
 	 * @param emptyCellPolicy
 	 *            the new value for emptyCellPolicy
 	 */
+	@ConfigurationProperty(name = "emptyCellPolicy", label = "Empty Cell Policy", description = "Policy for handling empty cells", required = false)
 	public void setEmptyCellPolicy(SpreadsheetEmptyCellPolicy emptyCellPolicy) {
 		this.emptyCellPolicy = emptyCellPolicy;
 	}
@@ -244,6 +255,7 @@ public class SpreadsheetImportConfiguration {
 	 * @param outputFormat
 	 *            the new value for outputFormat
 	 */
+	@ConfigurationProperty(name = "outputFormat", label = "Output Format", description = "How the activity outputs are to be formatted", required = false)
 	public void setOutputFormat(SpreadsheetOutputFormat outputFormat) {
 		this.outputFormat = outputFormat;
 	}
@@ -264,6 +276,7 @@ public class SpreadsheetImportConfiguration {
 	 * @param outputFormat
 	 *            the new delimiter for CSV formatted output
 	 */
+	@ConfigurationProperty(name = "csvDelimiter", label = "CSV Delimiter", description = "The delimiter to use for CSV input files. The default is ','", required = false)
 	public void setCsvDelimiter(String csvDelimiter) {
 		this.csvDelimiter = csvDelimiter;
 	}

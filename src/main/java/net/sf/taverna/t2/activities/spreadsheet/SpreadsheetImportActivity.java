@@ -31,9 +31,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.Map.Entry;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
@@ -62,6 +62,8 @@ import com.csvreader.CsvWriter;
  */
 public class SpreadsheetImportActivity extends
 		AbstractAsynchronousActivity<SpreadsheetImportConfiguration> {
+
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/spreadsheetImport";
 
 	private static final String INPUT_PORT_NAME = "fileurl";
 
