@@ -22,6 +22,7 @@ package net.sf.taverna.t2.activities.beanshell;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 
@@ -59,6 +60,14 @@ public class BeanshellActivityFactoryTest {
 	@Test
 	public void testGetActivityURI() {
 		assertEquals(URI.create(BeanshellActivity.URI), factory.getActivityURI());
+	}
+
+	/**
+	 * Test method for {@link net.sf.taverna.t2.activities.beanshell.BeanshellActivityFactory#createActivityConfiguration()}.
+	 */
+	@Test
+	public void testCreateActivityConfiguration() {
+		assertTrue(factory.createActivityConfiguration() instanceof BeanshellActivityConfigurationBean);
 	}
 
 }
