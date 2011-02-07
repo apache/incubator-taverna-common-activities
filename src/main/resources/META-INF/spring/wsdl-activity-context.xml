@@ -8,7 +8,7 @@
 	<bean id="xmlOutputSplitterHealthChecker" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterHealthChecker" />
 
 	<bean id="wsdlActivityFactory" class="net.sf.taverna.t2.activities.wsdl.WSDLActivityFactory" />
-	<bean id="xmlInputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterActivity" />
-	<bean id="xmlOutputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterActivity" />
+	<bean id="xmlInputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterActivityFactory" />
+	<bean id="xmlOutputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterActivityFactory" />
 
 </beans>
