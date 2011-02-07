@@ -26,8 +26,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
-import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
 import net.sf.taverna.t2.visit.VisitReport.Status;
+import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +49,7 @@ public class SpreadsheetImportHealthCheckerTest {
 		EditsImpl ei = new EditsImpl();
 		healthChecker = new SpreadsheetImportHealthChecker();
 		activity = new SpreadsheetImportActivity();
+		activity.setEdits(new EditsImpl());
 		ancestors = new ArrayList();
 		ancestors.add(ei.createProcessor("fred"));
 	}

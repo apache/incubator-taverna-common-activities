@@ -8,17 +8,35 @@
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>spreadsheet-import-activity</artifactId>
+	<packaging>bundle</packaging>
 	<name>Taverna 2 Spreadsheet Import Activity</name>
 	<description>Activity to import data from spreadsheet files</description>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Export-Package>org.apache.poi.*,org.openxmlformats.schemas.*,schemasMicrosoftCom*,org.odftoolkit.*,com.csvreader.*</Export-Package>
+						<Import-Package>!org.apache.poi.hdgf.extractor,!org.apache.poi.hslf.extractor,!org.apache.poi.hwpf.extractor,!org.apache.poi.sl.*, *</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<repositories>
+		<!--TODO move repository locations to parent -->
 		<repository>
-			<id>mygrid-repository</id>
-			<name>myGrid Repository</name>
-			<url>http://www.mygrid.org.uk/maven/repository</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
+			<id>com.springsource.repository.bundles.release</id>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/release</url>
+		</repository>
+		<repository>
+			<id>com.springsource.repository.bundles.external</id>
+			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/external</url>
 		</repository>
 		<repository>
 			<id>odftoolkit</id>
@@ -59,10 +77,21 @@
 			<version>2.0</version>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.13</version>
+			<groupId>org.apache.log4j</groupId>
+			<artifactId>com.springsource.org.apache.log4j</artifactId>
+			<version>1.2.16</version>
 		</dependency>
+		<!--================================================================================= -->
+		<!-- Work around for java compiler bug : -->
+		<!-- An exception has occurred in the compiler (1.6.0_22) -->
+		<!-- com.sun.tools.javac.code.Symbol$CompletionFailure: -->
+		<!-- class file for org.springframework.transaction.annotation.Propagation not found -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.transaction</artifactId>
+			<version>3.0.5.RELEASE</version>
+		</dependency>
+		<!--================================================================================= -->
 		<!-- test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>

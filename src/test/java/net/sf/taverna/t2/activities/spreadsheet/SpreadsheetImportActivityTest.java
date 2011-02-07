@@ -35,6 +35,7 @@ import java.util.Set;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.Port;
+import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 
 import org.junit.Before;
@@ -53,6 +54,7 @@ public class SpreadsheetImportActivityTest {
 	@Before
 	public void setUp() throws Exception {
 		activity = new SpreadsheetImportActivity();
+		activity.setEdits(new EditsImpl());
 		configuration = new SpreadsheetImportConfiguration();
 	}
 
