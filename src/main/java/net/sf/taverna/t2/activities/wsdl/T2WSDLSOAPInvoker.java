@@ -154,7 +154,6 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		// .getDocumentElement()));
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void configureSecurity(Call call,
 			WSDLActivityConfigurationBean bean) throws Exception {
 
@@ -169,7 +168,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)
 				|| securityProfile
 						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)) {
-
+			
 			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, false);
 			call.setProperty(Call.USERNAME_PROPERTY, usernamePassword.getUsername());
 			call.setProperty(Call.PASSWORD_PROPERTY, usernamePassword.getPasswordAsString());
@@ -231,9 +230,8 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		String securityProfile = bean.getSecurityProfile();
 		EngineConfiguration wssEngineConfiguration = null;
 		if (securityProfile != null) {
-			// If security settings require WS-Security and not just Basic HTTP
-			// AuthN
-			// - configure the axis engine from the appropriate config strings
+			// If security settings require WS-Security and not just e.g. Basic HTTP
+			// AuthN - configure the axis engine from the appropriate config strings
 			if (securityProfile
 					.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)) {
 				wssEngineConfiguration = new XMLStringProvider(
@@ -252,7 +250,6 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 						SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD_CONFIG);
 			}
 		}
-
 
 		// This does not work
 //		ClassUtils.setClassLoader("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory",TavernaAxisCustomSSLSocketFactory.class.getClassLoader());
