@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.taverna.t2.activities.dependencyactivity.DependencyActivityConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ConfigurationProperty;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * A configuration bean specific to a Beanshell activity; provides details
