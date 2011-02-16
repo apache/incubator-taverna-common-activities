@@ -10,15 +10,6 @@
 	<artifactId>dependency-activity</artifactId>
 	<packaging>bundle</packaging>
 	<name>Taverna 2 Activity with Dependencies</name>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-			</plugin>
-		</plugins>
-	</build>
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>
