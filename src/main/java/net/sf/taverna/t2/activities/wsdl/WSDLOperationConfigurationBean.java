@@ -30,7 +30,7 @@ import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
  * 
  * @author David Withers
  */
-@ConfigurationBean(uri = WSDLActivity.URI + "/operation/configuration")
+@ConfigurationBean(uri = WSDLActivity.URI + "/operation#Config")
 public class WSDLOperationConfigurationBean {
 
 	private URI wsdl;
@@ -49,7 +49,7 @@ public class WSDLOperationConfigurationBean {
 		return operationName;
 	}
 
-	@ConfigurationProperty(name = "operationName", label = "Operation Name", description = "The name of the WSDL operation")
+	@ConfigurationProperty(name = "name", label = "Operation Name", description = "The name of the WSDL operation")
 	public void setOperationName(String operationName) {
 		this.operationName = operationName;
 	}

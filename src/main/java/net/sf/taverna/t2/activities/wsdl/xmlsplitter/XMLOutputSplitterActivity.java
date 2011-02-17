@@ -57,7 +57,7 @@ public class XMLOutputSplitterActivity extends
 		AbstractAsynchronousActivity<XMLSplitterConfigurationBean> implements
 		OutputPortTypeDescriptorActivity {
 
-	public static final String URI = "http://ns.taverna.org.uk/2010/activity/xmlOutputSplitter";
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/xml-splitter/out";
 
 	XMLSplitterConfigurationBean configBean;
 	TypeDescriptor typeDescriptor;

@@ -30,7 +30,7 @@ import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
  * </p>
  * @author Stuart Owen
  */
-@ConfigurationBean(uri = WSDLActivity.URI + "/configuration")
+@ConfigurationBean(uri = WSDLActivity.URI + "#Config")
 public class WSDLActivityConfigurationBean {
     private WSDLOperationConfigurationBean operation;
     private String securityProfile;

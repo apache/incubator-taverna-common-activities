@@ -55,7 +55,7 @@ import org.jdom.input.SAXBuilder;
  */
 public class XMLInputSplitterActivity extends AbstractAsynchronousActivity<XMLSplitterConfigurationBean> implements InputPortTypeDescriptorActivity {
 
-	public static final String URI = "http://ns.taverna.org.uk/2010/activity/xmlInputSplitter";
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/xml-splitter/in";
 
 	XMLSplitterConfigurationBean configBean;
 	TypeDescriptor typeDescriptor;

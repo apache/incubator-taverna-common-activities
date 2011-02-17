@@ -26,7 +26,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDe
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 
-@ConfigurationBean(uri = WSDLActivity.URI + "/xmlsplitter/configuration")
+@ConfigurationBean(uri = WSDLActivity.URI + "/xml-splitter#Config")
 public class XMLSplitterConfigurationBean extends ActivityPortsDefinitionBean {
 	String wrappedTypeXML;
 
@@ -34,7 +34,7 @@ public class XMLSplitterConfigurationBean extends ActivityPortsDefinitionBean {
 		return wrappedTypeXML;
 	}
 
-	@ConfigurationProperty(name = "wrappedTypeXML", label = "Wrapped Type XML")
+	@ConfigurationProperty(name = "wrappedType", label = "Wrapped Type XML")
 	public void setWrappedTypeXML(String wrappedTypeXML) {
 		this.wrappedTypeXML = wrappedTypeXML;
 	}
