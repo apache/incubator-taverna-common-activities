@@ -34,7 +34,7 @@ import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
  * @author Alex Nenadic
  * @author David Withers
  */
-@ConfigurationBean(uri = "http://ns.taverna.org.uk/2010/activity/dependency/Configuration")
+@ConfigurationBean(uri = "http://ns.taverna.org.uk/2010/activity/dependency#Configuration")
 public class DependencyActivityConfigurationBean extends
 		ActivityPortsDefinitionBean {
 
