@@ -76,5 +76,12 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+    <repositories>
+        <repository>
+            <id>odftoolkit</id>
+            <name>Odftoolkit Repository</name>
+            <url>http://odftoolkit.org/svn/odfdom~maven2/release/</url>
+        </repository>
+    </repositories>
 
 </project>
