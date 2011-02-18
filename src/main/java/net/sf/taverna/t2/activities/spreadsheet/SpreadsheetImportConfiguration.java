@@ -31,7 +31,7 @@ import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
  * 
  * @author David Withers
  */
-@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/configuration")
+@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "#Config")
 public class SpreadsheetImportConfiguration {
 
 	private Range columnRange;
