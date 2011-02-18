@@ -27,7 +27,7 @@ public class RetrieveLoginFromTaverna implements AskUserForPw {
 
 	private UsernamePassword getUserPass() {
 		try {
-			final String urlStr = "ssh://" + workerNode.host + "/" + workerNode.directory;
+			final String urlStr = "ssh://" + workerNode.getHost() + "/" + workerNode.getDirectory();
 			URI userpassUrl = URI.create(urlStr.replace("//", "/"));
 			final UsernamePassword userAndPass = credentialManager.getUsernameAndPasswordForService(userpassUrl, false, null);
 			return userAndPass;

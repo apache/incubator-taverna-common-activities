@@ -139,18 +139,18 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			
 			// loop through all script inputs and add them as taverna activity
 			// input ports
-			for (Map.Entry<String, ScriptInput> cur : mydesc.inputs.entrySet()) {
+			for (Map.Entry<String, ScriptInput> cur : mydesc.getInputs().entrySet()) {
 				ScriptInputUser scriptInputUser = (ScriptInputUser) cur.getValue();
 				// if the input port is a list, depth is 1 otherwise it is a
 				// single element, therefore depth 0
 				// if the input port is binary, we would like byte arrays,
 				// otherwise we require strings
-				addInputWithMime(cur.getKey(), scriptInputUser.list ? 1 : 0, cur.getValue().binary ? byte[].class : String.class, scriptInputUser.mime);
+				addInputWithMime(cur.getKey(), scriptInputUser.isList() ? 1 : 0, cur.getValue().isBinary() ? byte[].class : String.class, scriptInputUser.getMime());
 
 			}
 			// loop through all script outputs and add them to taverna
-			for (Map.Entry<String, ScriptOutput> cur : mydesc.outputs.entrySet()) {
-				addOutputWithMime(cur.getKey(), 0, cur.getValue().mime);
+			for (Map.Entry<String, ScriptOutput> cur : mydesc.getOutputs().entrySet()) {
+				addOutputWithMime(cur.getKey(), 0, cur.getValue().getMime());
 			}
 			}
 

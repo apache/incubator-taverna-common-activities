@@ -65,7 +65,7 @@ public class RegisteredExternalToolActivityConfigurationBean extends ExternalToo
 		// retrieve the UseCaseDescription for the given configuration bean
 		// and store it into mydesc
 		for (UseCaseDescription usecase : usecases) {
-			if (!usecase.usecaseid.equalsIgnoreCase(this.getExternaltoolid()))
+			if (!usecase.getUsecaseid().equalsIgnoreCase(this.getExternaltoolid()))
 				continue;
 			useCaseDescription = usecase;
 			break;

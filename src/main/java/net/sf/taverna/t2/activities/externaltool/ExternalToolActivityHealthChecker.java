@@ -101,7 +101,7 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 	}
 
 	private VisitReport checkQueuePresent(ExternalToolActivity activity, ExternalToolActivityConfigurationBean configuration) {
-		final ArrayList<String> compatibleQueues = KnowARCConfigurationFactory.getConfiguration().info.getCompatibleQueuesForREs(useCaseDescription.REs);
+		final ArrayList<String> compatibleQueues = KnowARCConfigurationFactory.getConfiguration().info.getCompatibleQueuesForREs(useCaseDescription.getREs());
 
 		final int queueCount = compatibleQueues.size();
 		final boolean ok = queueCount > 0;
