@@ -23,7 +23,6 @@ package net.sf.taverna.t2.activities.externaltool;
 
 import java.util.List;
 
-import de.uni_luebeck.inb.knowarc.gui.ProgressDisplayImpl;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseEnumeration;
 
@@ -60,7 +59,7 @@ public class RegisteredExternalToolActivityConfigurationBean extends ExternalToo
 	@Override
 	public UseCaseDescription getUseCaseDescription() {
 		// re-parse the use case XML file
-		List<UseCaseDescription> usecases = UseCaseEnumeration.enumerateXmlFile(new ProgressDisplayImpl(KnowARCConfigurationFactory.getConfiguration()),
+		List<UseCaseDescription> usecases = UseCaseEnumeration.enumerateXmlFile(
 				this.getRepositoryUrl());
 		// retrieve the UseCaseDescription for the given configuration bean
 		// and store it into mydesc

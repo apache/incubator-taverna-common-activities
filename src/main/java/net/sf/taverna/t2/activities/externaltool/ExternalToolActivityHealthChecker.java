@@ -28,9 +28,7 @@ import net.sf.taverna.t2.visit.VisitReport;
 import net.sf.taverna.t2.visit.VisitReport.Status;
 import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
 import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
-import de.uni_luebeck.inb.knowarc.gui.ProgressDisplayImpl;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseEnumeration;
 
 /**
  * Investigates if everything is going fine with a job
@@ -51,8 +49,8 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 		// contains the needed use case
 		reports.add(checkRepository(activity, configuration));
 		reports.add(checkExternalTool(activity, configuration));
-		reports.add(checkQueuePresent(activity, configuration));
-		reports.add(checkCertificateNotExpired(activity, configuration));
+//		reports.add(checkQueuePresent(activity, configuration));
+//		reports.add(checkCertificateNotExpired(activity, configuration));
 
 		Status status = getWorstStatus(reports);
 		VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "Janitor Use Case Activity", HealthCheck.NO_PROBLEM, status, reports);
@@ -100,7 +98,7 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 		return null;
 	}
 
-	private VisitReport checkQueuePresent(ExternalToolActivity activity, ExternalToolActivityConfigurationBean configuration) {
+/*	private VisitReport checkQueuePresent(ExternalToolActivity activity, ExternalToolActivityConfigurationBean configuration) {
 		final ArrayList<String> compatibleQueues = KnowARCConfigurationFactory.getConfiguration().info.getCompatibleQueuesForREs(useCaseDescription.getREs());
 
 		final int queueCount = compatibleQueues.size();
@@ -115,7 +113,7 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 				: HealthCheck.INVALID_CONFIGURATION, ok ? Status.OK : Status.SEVERE);
 	}
 
-	private Status getWorstStatus(List<VisitReport> reports) {
+*/	private Status getWorstStatus(List<VisitReport> reports) {
 		Status status = Status.OK;
 		for (VisitReport report : reports) {
 			if (report.getStatus().equals(Status.WARNING) && status.equals(Status.OK))

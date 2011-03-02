@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.rmi.ServerException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -48,14 +47,12 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.apache.log4j.Logger;
 import org.globus.ftp.exception.ClientException;
 
-import de.uni_luebeck.inb.knowarc.gui.ProgressDisplayImpl;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseEnumeration;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.OnDemandDownload;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvokation;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 
 /**
  * This is the main class of the use case activity plugin. Here we store the
@@ -177,7 +174,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 
 			public void run() {
 				ReferenceService referenceService = callback.getContext().getReferenceService();
-				UseCaseInvokation invoke = null;
+				UseCaseInvocation invoke = null;
 				try {
 					int retries = 5;
 					// retry the job submission 5 times. this is needed since
@@ -192,6 +189,9 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							// matching invocation algorithm based on the plugin
 							// configuration and use case description.
 							invoke = configurationBean.getInvocationBean().getAppropriateInvocation(ExternalToolActivity.this);
+							if (invoke == null) {
+								System.err.println("Invoke is null");
+							}
 
 							// look at every use dynamic case input
 							for (String cur : invoke.getInputs()) {

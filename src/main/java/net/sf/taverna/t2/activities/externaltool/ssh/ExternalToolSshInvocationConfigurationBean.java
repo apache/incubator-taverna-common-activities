@@ -6,40 +6,46 @@ package net.sf.taverna.t2.activities.externaltool.ssh;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
+import net.sf.taverna.t2.activities.externaltool.ExternalToolInvocationConfigurationBean;
+import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
+
+import org.apache.log4j.Logger;
+
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvokation;
-import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
-import net.sf.taverna.t2.activities.externaltool.ExternalToolInvocationConfigurationBean;
-import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
 /**
  * @author alanrw
  *
  */
 public final class ExternalToolSshInvocationConfigurationBean extends
-		ExternalToolInvocationConfigurationBean<SshUseCaseInvokation> {
+		ExternalToolInvocationConfigurationBean<SshUseCaseInvocation> {
 	
 	private transient int currentWorkerNode = 1;
 	
 	private List<SshNode> sshWorkerNodes = new ArrayList<SshNode>();
+	
+	private static Logger logger = Logger.getLogger(ExternalToolSshInvocationConfigurationBean.class);
 
 	public List<SshNode> getSshWorkerNodes() {
 		return sshWorkerNodes;
 	}
 
 	@Override
-	public SshUseCaseInvokation getAppropriateInvocation(ExternalToolActivity a) {
-		SshUseCaseInvokation result = null;
+	public SshUseCaseInvocation getAppropriateInvocation(ExternalToolActivity a) {
+		SshUseCaseInvocation result = null;
 	
 		try {
-			result = new SshUseCaseInvokation(null, a.getConfiguration().getUseCaseDescription(), getNextWorkerNode(), new RetrieveLoginFromTaverna());
+			SshNode node = getNextWorkerNode();
+			result = new SshUseCaseInvocation(a.getConfiguration().getUseCaseDescription(), node, new RetrieveLoginFromTaverna(SshUseCaseInvocation.createSshUrl(node.getHost(), node.getPort(), node.getDirectory())));
 		} catch (JSchException e) {
-			// TODO Auto-generated catch block
+			logger.error("Null invocation", e);
 		} catch (SftpException e) {
-			// TODO Auto-generated catch block
+			logger.error("Null invocation", e);
 		}
 		return result;
 	}
