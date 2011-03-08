@@ -20,13 +20,11 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 
-
-import net.sf.taverna.t2.activities.wsdl.WSDLActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 
-@ConfigurationBean(uri = WSDLActivity.URI + "/xml-splitter#Config")
+@ConfigurationBean(uri = "http://ns.taverna.org.uk/2010/activity/xml-splitter#Config")
 public class XMLSplitterConfigurationBean extends ActivityPortsDefinitionBean {
 	String wrappedTypeXML;
 
@@ -38,4 +36,5 @@ public class XMLSplitterConfigurationBean extends ActivityPortsDefinitionBean {
 	public void setWrappedTypeXML(String wrappedTypeXML) {
 		this.wrappedTypeXML = wrappedTypeXML;
 	}
+
 }
