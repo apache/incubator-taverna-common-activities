@@ -10,6 +10,13 @@
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>external-tool-activity</artifactId>
 	<name>Taverna 2 ExternalTool Activity</name>
+	<repositories>
+		<repository>
+			<id>commonsvfsgrid</id>
+			<name>commonsvfsgrid</name>
+			<url>http://commonsvfsgrid.sourceforge.net/maven/</url>
+		</repository>
+		</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>
@@ -22,6 +29,11 @@
 			<version>${t2.core.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>reference-impl</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.taverna</groupId>
 			<artifactId>wsdl-generic</artifactId>
 			<version>${wsdl.generic.version}</version>
@@ -31,6 +43,11 @@
 			<groupId>net.sf.taverna.t2.security</groupId>
 			<artifactId>credential-manager</artifactId>
 			<version>${t2.security.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+	<artifactId>reference-core-extensions</artifactId>
+	<version>${t2.reference-core-extensions.version}</version>
 		</dependency>
 
 		<dependency>
@@ -51,13 +68,23 @@
                         <version>${jdom.version}</version>
 		</dependency>
 
-
-		<!-- function dependencies for invocation -->
+	<dependency>
+    	<groupId>com.jcraft</groupId>
+    	<artifactId>jsch</artifactId>
+    	<version>${jsch.version}</version>
+	</dependency>
 		<dependency>
-			<groupId>de.uni_luebeck.inb.krabbenh</groupId>
-			<artifactId>knowarc-usecases</artifactId>
-			<version>${knowarc.usecases.version}</version>
+			<groupId>external.jglobus</groupId>
+			<artifactId>cog-jglobus</artifactId>
+			<version>1.8.0</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io.version}</version>
+		</dependency>
+		
 
 	</dependencies>
 </project>
