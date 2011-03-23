@@ -7,12 +7,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
 
 /**
@@ -20,6 +23,9 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
  *
  */
 public class SshPool {
+	
+	private static Logger logger = Logger.getLogger(SshPool.class);
+
 	
 	private static JSch jsch = new JSch();
 	
@@ -37,20 +43,20 @@ public class SshPool {
 
 		Session s = sessionMap.get(sshNode);
 		if ((s != null) && s.isConnected()) {
-			System.err.println("Reusing session");
+			logger.info("Reusing session");
 			return s;
 		}
 		if (s != null) {
-			System.err.println("Session was not connected");
+			logger.info("Session was not connected");
 		}
 		if (s == null) {
-			System.err.println("No session found for " + sshNode.toString());
+			logger.info("No session found for " + sshNode.toString());
 		}
 
 		if (askUserForPw.getKeyfile().length() > 0) {
 			jsch.addIdentity(askUserForPw.getKeyfile());
 		}
-		System.err.println("Using host is " + sshNode.getHost() + " and port " + sshNode.getPort());
+		logger.info("Using host is " + sshNode.getHost() + " and port " + sshNode.getPort());
 		Session sshSession = jsch.getSession(askUserForPw.getUsername(), sshNode.getHost(), sshNode.getPort());
 		sshSession.setUserInfo(new SshAutoLoginTrustEveryone(askUserForPw));
 		sshSession.connect(CONNECT_TIMEOUT);
@@ -58,7 +64,7 @@ public class SshPool {
 		askUserForPw.authenticationSucceeded();
 		sessionMap.put(sshNode, sshSession);
 		if (sshSession == null) {
-			System.err.println("Returning a null session");
+			logger.error("Returning a null session");
 		}
 		return sshSession;
 	}
@@ -70,21 +76,21 @@ public class SshPool {
 	private static synchronized ChannelSftp getSftpGetChannel(Session session) throws JSchException {
 		ChannelSftp result = sftpGetMap.get(session);
 		if (!session.isConnected()) {
-			System.err.println("Session is not connected");
+			logger.warn("Session is not connected");
 		}
 		if (result == null) {
-			System.err.println("Creating new sftp channel");
+			logger.info("Creating new sftp channel");
 			result = (ChannelSftp) session.openChannel("sftp");
 			sftpGetMap.put(session, result);
 		}
 		else {
-			System.err.println("Reusing sftp channel");			
+			logger.info("Reusing sftp channel");			
 		}
 		if (!result.isConnected()) {
-			System.err.println("Connecting");
+			logger.info("Connecting");
 			result.connect();
 		} else {
-			System.err.println("Already connected");
+			logger.info("Already connected");
 		}
 		return result;
 	}
@@ -98,22 +104,22 @@ public class SshPool {
 	    synchronized(sftpPutMap) {
 		result = sftpPutMap.get(session);
 		if (!session.isConnected()) {
-			System.err.println("Session is not connected");
+			logger.info("Session is not connected");
 		}
 		if (result == null) {
-			System.err.println("Creating new sftp channel");
+			logger.info("Creating new sftp channel");
 			result = (ChannelSftp) session.openChannel("sftp");
 			sftpPutMap.put(session, result);
 		}
 		else {
-			System.err.println("Reusing sftp channel");			
+			logger.info("Reusing sftp channel");			
 		}
 	    }
 	    if (!result.isConnected()) {
-		System.err.println("Connecting");
+		logger.info("Connecting");
 		result.connect(CONNECT_TIMEOUT);
 	    } else {
-		System.err.println("Already connected");
+		logger.info("Already connected");
 	    }
 	    return result;
 	}

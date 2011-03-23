@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * Representation of information about a single runtime environment. It is used
  * to decide if one runtime environment is possibly compatible with another one
@@ -41,6 +43,9 @@ import java.util.List;
  */
 @SuppressWarnings("unchecked")
 public class RuntimeEnvironment implements Comparable {
+	
+	private static Logger logger = Logger.getLogger(RuntimeEnvironment.class);
+
 
 	/**
 	 * Unique identification of the runtime environment - the full name
@@ -235,13 +240,13 @@ public class RuntimeEnvironment implements Comparable {
 		if ("compare".equals(argv[0])) {
 			RuntimeEnvironment r1 = new RuntimeEnvironment(argv[1]);
 			RuntimeEnvironment r2 = new RuntimeEnvironment(argv[2]);
-			System.out.println("r1.getName(): " + r1.getName());
-			System.out.println("r1.getVersion(): " + r1.getVersion());
-			System.out.println("r2.getName(): " + r2.getName());
-			System.out.println("r2.getVersion(): " + r2.getVersion());
-			System.out.println("r1.atLeastAsCapableAs(r2): " + String.valueOf(r1.atLeastAsCapableAs(r2)));
+			logger.info("r1.getName(): " + r1.getName());
+			logger.info("r1.getVersion(): " + r1.getVersion());
+			logger.info("r2.getName(): " + r2.getName());
+			logger.info("r2.getVersion(): " + r2.getVersion());
+			logger.info("r1.atLeastAsCapableAs(r2): " + String.valueOf(r1.atLeastAsCapableAs(r2)));
 		} else {
-			System.err.println("Don't know how to '" + argv[0] + "'");
+			logger.info("Don't know how to '" + argv[0] + "'");
 		}
 	}
 

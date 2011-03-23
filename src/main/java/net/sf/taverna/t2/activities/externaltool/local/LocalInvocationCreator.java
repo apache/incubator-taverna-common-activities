@@ -5,7 +5,10 @@ package net.sf.taverna.t2.activities.externaltool.local;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 import net.sf.taverna.t2.activities.externaltool.InvocationCreator;
+import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocation;
@@ -17,6 +20,8 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocati
 public final class LocalInvocationCreator implements
 		InvocationCreator {
 	
+	private static Logger logger = Logger.getLogger(LocalInvocationCreator.class);
+
 	public boolean equals(Object o) {
 		return (o instanceof LocalInvocationCreator);
 	}
@@ -32,7 +37,7 @@ public final class LocalInvocationCreator implements
 		try {
 			result = new LocalUseCaseInvocation(description);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return result;
 	}

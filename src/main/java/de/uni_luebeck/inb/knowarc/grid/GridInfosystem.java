@@ -47,6 +47,7 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+import org.apache.log4j.Logger;
 import org.globus.ftp.exception.FTPException;
 import org.globus.ftp.exception.ServerException;
 import org.globus.gsi.GlobusCredential;
@@ -67,6 +68,9 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
  * @author Steffen Moeller
  */
 public class GridInfosystem {
+	
+	private static Logger logger = Logger.getLogger(GridInfosystem.class);
+	
 
 	private final String configurationPath;
 	private final ProgressDisplay progressDisplay;
@@ -191,7 +195,7 @@ public class GridInfosystem {
 			} catch (NamingException ex) {
 				progressDisplay.log(0, "Problem with site " + giisUrl + ".");
 				progressDisplay.logTrace(0, ex);
-				ex.printStackTrace();
+				logger.error(ex);
 			} catch (NullPointerException ex) {
 				progressDisplay.log(0, "Programming error that manifested itself with site " + giisUrl + ".");
 				progressDisplay.logTrace(0, ex);
@@ -282,10 +286,10 @@ public class GridInfosystem {
 	}
 	
 	private void logFtpConnectionException(Exception e, StringBuilder log) {
-		e.printStackTrace();
+		logger.error(e);
 		if (log != null) {
 			StringWriter wr = new StringWriter();
-			e.printStackTrace(new PrintWriter(wr));
+			logger.error(new PrintWriter(wr));
 			log.append(wr.toString());
 		}
 		

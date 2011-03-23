@@ -20,11 +20,8 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation.local;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -36,7 +33,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +43,7 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.globus.ftp.exception.NotImplementedException;
 
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
@@ -59,6 +56,8 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
  * @author Hajo Krabbenhoeft
  */
 public class LocalUseCaseInvocation extends UseCaseInvocation {
+
+	private static Logger logger = Logger.getLogger(LocalUseCaseInvocation.class);
 
 	private final File tempDir;
 	
@@ -95,7 +94,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		} else if (input.isTempFile()) {
 			target = tempDir.getAbsolutePath() + "/" + "tempfile." + (nTempFiles++) + ".tmp";
 		}
-		System.err.println("Target is " + target);
+		logger.info("Target is " + target);
 		if (input.isFile() || input.isTempFile()) {
 			// Try to get it as a file
 			Reader r;
@@ -175,7 +174,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		ProcessBuilder builder = new ProcessBuilder(cmds);
 		builder.directory(tempDir);
 		builder.environment();
-		System.err.println("Command is " + command + " in directory " + tempDir);
+		logger.info("Command is " + command + " in directory " + tempDir);
 		running = builder.start();
 	}
 

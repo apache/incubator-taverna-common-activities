@@ -23,6 +23,8 @@ package de.uni_luebeck.inb.knowarc.grid.re;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 /**
  * When use cases present a runtime environment, then they don't want to express
  * that these would provide such, but that these request such, i.e. they constrain
@@ -31,6 +33,9 @@ import java.util.Iterator;
  * @since 2008
  */
 public class RuntimeEnvironmentConstraint extends RuntimeEnvironment {
+	
+	private static Logger logger = Logger.getLogger(RuntimeEnvironmentConstraint.class);
+
 	
 	
 	/**
@@ -78,7 +83,7 @@ public class RuntimeEnvironmentConstraint extends RuntimeEnvironment {
 			relation="<=";
 		}
 		else if (!RuntimeEnvironmentConstraint.acceptedRelation(relation)) {
-			System.err.println("Unknown relation '"+relation+"', presuming '"+RuntimeEnvironmentConstraint.DefaultRelation+"'");
+			logger.warn("Unknown relation '"+relation+"', presuming '"+RuntimeEnvironmentConstraint.DefaultRelation+"'");
 			relation=RuntimeEnvironmentConstraint.DefaultRelation;
 		}
 		this.relation=relation;
@@ -90,17 +95,17 @@ public class RuntimeEnvironmentConstraint extends RuntimeEnvironment {
 	 * @return true iff the RE fulfills this REconstraint.
 	 */
 	public boolean isFulfilledBy(RuntimeEnvironment re) {
-		//System.err.println(re.getID()+" " + this.getRelation() + " "+this.getID() + " ?");
+		logger.info(re.getID()+" " + this.getRelation() + " "+this.getID() + " ?");
 		if (this.getRelation().equals("=")) {
-			//System.err.println("=");
+			logger.info("=");
 			return re.getID().equals(this.getID());
 		}
 		if (!re.getName().equals(this.getName())) {
-			//System.err.println("Name match failed");
+			logger.warn("Name match failed");
 			return false;
 		}
 		int c = RuntimeEnvironment.compareVersions(re.getVersion(),this.getVersion());
-		//System.err.println("c="+c);
+		logger.info("c="+c);
 		if (this.getRelation().equals(">")) return c>0;
 		if (this.getRelation().equals(">=")) return c>=0;
 		if (this.getRelation().equals("<=")) return c<=0;
@@ -128,21 +133,21 @@ public class RuntimeEnvironmentConstraint extends RuntimeEnvironment {
 	public static void main(String argv[]) {
 		try {
 			if (argv[0].equals("--help") || argv.length != 3) {
-				System.err.println("Expecting arguments (<|>|=|<=|>=) runtime1-version runtime2-version");
+				logger.error("Expecting arguments (<|>|=|<=|>=) runtime1-version runtime2-version");
 			}
 			else {
 				RuntimeEnvironmentConstraint r1 = new RuntimeEnvironmentConstraint(argv[1], argv[0]);
 				RuntimeEnvironment r2 = new RuntimeEnvironment(argv[2]);
-				System.out.println("r1.getName(): "+r1.getName());
-				System.out.println("r1.getVersion(): "+r1.getVersion());
-				System.out.println("r1.getRelation(): "+r1.getRelation());
-				System.out.println("r2.getName(): "+r2.getName());
-				System.out.println("r2.getVersion(): "+r2.getVersion());
-				System.out.println("r1.isFulfilledBy(r2): "+String.valueOf(r1.isFulfilledBy(r2)));
+				logger.info("r1.getName(): "+r1.getName());
+				logger.info("r1.getVersion(): "+r1.getVersion());
+				logger.info("r1.getRelation(): "+r1.getRelation());
+				logger.info("r2.getName(): "+r2.getName());
+				logger.info("r2.getVersion(): "+r2.getVersion());
+				logger.info("r1.isFulfilledBy(r2): "+String.valueOf(r1.isFulfilledBy(r2)));
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 }

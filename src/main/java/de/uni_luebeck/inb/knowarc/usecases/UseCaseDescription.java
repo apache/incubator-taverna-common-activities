@@ -31,11 +31,11 @@ import java.util.Map;
 
 import javax.swing.ImageIcon;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 
-import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironment;
 import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 
 
@@ -44,6 +44,8 @@ import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
  */
 public class UseCaseDescription {
 
+	private static Logger logger = Logger.getLogger(UseCaseDescription.class);
+	
 	/**
 	 * Identifier for the retrieval of this UseCase in the sharedRepository
 	 * database, respectively its XML export.
@@ -280,7 +282,7 @@ public class UseCaseDescription {
 			URL u = new URL(icon_url);
 			return new ImageIcon(u, getUsecaseid());
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 			return null;
 		}
 	}
@@ -327,7 +329,7 @@ public class UseCaseDescription {
 	 */
 	public static void main(String[] argv) throws MalformedURLException, IOException, Exception {
 		UseCaseDescription d = new UseCaseDescription(new URL(argv[0]).openStream());
-		System.err.println(d.getCommand());
+		logger.info(d.getCommand());
 	}
 
 	/**

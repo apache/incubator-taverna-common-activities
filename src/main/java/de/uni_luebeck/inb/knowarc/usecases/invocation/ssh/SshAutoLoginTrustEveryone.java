@@ -20,12 +20,17 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
+import org.apache.log4j.Logger;
+
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
 
 import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
 
 final class SshAutoLoginTrustEveryone implements UserInfo, UIKeyboardInteractive {
+	
+	private static Logger logger = Logger.getLogger(SshAutoLoginTrustEveryone.class);
+
 	private final AskUserForPw askUserForPw;
 
 	public SshAutoLoginTrustEveryone(AskUserForPw askUserForPw) {
@@ -34,7 +39,7 @@ final class SshAutoLoginTrustEveryone implements UserInfo, UIKeyboardInteractive
 	}
 
 	public void showMessage(String arg0) {
-		System.out.println(arg0);
+		logger.info(arg0);
 	}
 
 	public boolean promptYesNo(String arg0) {

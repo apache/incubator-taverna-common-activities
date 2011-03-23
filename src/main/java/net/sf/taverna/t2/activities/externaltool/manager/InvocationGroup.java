@@ -3,14 +3,18 @@
  */
 package net.sf.taverna.t2.activities.externaltool.manager;
 
-import net.sf.taverna.t2.activities.externaltool.InvocationCreator;
 import net.sf.taverna.t2.spi.SPIRegistry;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author alanrw
  *
  */
 public class InvocationGroup {
+
+	private static Logger logger = Logger.getLogger(InvocationGroup.class);
+
 	private String invocationGroupName;
 	
 	private String mechanismType;
@@ -99,7 +103,7 @@ public class InvocationGroup {
 	 */
 	public void setMechanism(InvocationMechanism mechanism) {
 		
-		System.err.println("InvocationGroup " + this.hashCode() + " called " + getInvocationGroupName() + " set to " + mechanism.getName());
+		logger.info("InvocationGroup " + this.hashCode() + " called " + getInvocationGroupName() + " set to " + mechanism.getName());
 		
 		this.mechanism = mechanism;
 		this.setMechanismXML(mechanism.getXML());

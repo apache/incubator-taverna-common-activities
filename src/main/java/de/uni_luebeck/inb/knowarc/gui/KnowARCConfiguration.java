@@ -32,8 +32,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 
+import org.apache.log4j.Logger;
+
 import de.uni_luebeck.inb.knowarc.grid.GridInfosystem;
 import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironment;
+import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
@@ -41,6 +44,8 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
  * Collector of parameters
  */
 public class KnowARCConfiguration {
+
+	private static Logger logger = Logger.getLogger(KnowARCConfiguration.class);
 
 	public KnowARCConfiguration(File configurationPath) {
 		this.configurationPath = configurationPath;
@@ -50,7 +55,7 @@ public class KnowARCConfiguration {
 			icon_knowarc = new ImageIcon(classLoader.getResource("de/uni_luebeck/usecase/knowarc.png"));
 			icon_server = new ImageIcon(classLoader.getResource("de/uni_luebeck/usecase/knowarc.png"));
 		} catch (NullPointerException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		readSshConfiguration();
 		readInvocationMethod();
@@ -88,7 +93,7 @@ public class KnowARCConfiguration {
 
 	public void debug(byte debugThreshold, String message) {
 		if (debugThreshold <= debug) {
-			System.err.println(message);
+			logger.error(message);
 		}
 	}
 

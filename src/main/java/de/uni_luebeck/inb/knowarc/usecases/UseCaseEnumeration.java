@@ -28,28 +28,32 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 public class UseCaseEnumeration {
+
+	private static Logger logger = Logger.getLogger(UseCaseEnumeration.class);
+
 	public static List<UseCaseDescription> enumerateXmlFile(String xmlFileUrl) {
 
 		ArrayList<UseCaseDescription> ret = new ArrayList<UseCaseDescription>();
 		try {
 			enumerateXmlInner(xmlFileUrl, ret);
 		} catch (IOException ioe) {
-			System.err.println("Problem retrieving from " + xmlFileUrl);
-			ioe.printStackTrace();
+			logger.error("Problem retrieving from " + xmlFileUrl);
+			logger.error(ioe);
 			return ret;
 		} catch (JDOMException jdome) {
-			System.err.println("Problem with document retrieved from " + xmlFileUrl);
-			jdome.printStackTrace();
+			logger.error("Problem with document retrieved from " + xmlFileUrl);
+			logger.error(jdome);
 			return ret;
 		} catch (Exception e) {
-			System.err.println("Got this error for URL '" + xmlFileUrl + "'");
-			e.printStackTrace();
+			logger.error("Got this error for URL '" + xmlFileUrl + "'");
+			logger.error(e);
 		}
 
 		return ret;

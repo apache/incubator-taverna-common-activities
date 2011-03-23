@@ -25,9 +25,15 @@ import java.io.StringWriter;
 
 import javax.swing.JOptionPane;
 
+import org.apache.log4j.Logger;
+
+import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.gui.PleaseWaitDialog.WaitMessage;
 
 public class ProgressDisplayImpl implements de.uni_luebeck.inb.knowarc.grid.ProgressDisplay{
+	
+	private static Logger logger = Logger.getLogger(ProgressDisplayImpl.class);
+	
 	private KnowARCConfiguration configuration;
 	public ProgressDisplayImpl(KnowARCConfiguration configuration) {
 		this.configuration = configuration;

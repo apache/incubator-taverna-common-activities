@@ -50,6 +50,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.apache.log4j.Logger;
 import org.globus.ftp.exception.ClientException;
 
+import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
@@ -65,6 +66,9 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
  * @author Hajo Nils Krabbenhoeft
  */
 public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalToolActivityConfigurationBean> {
+	
+	private static Logger logger = Logger.getLogger(ExternalToolActivity.class);
+	
 	private ExternalToolActivityConfigurationBean configurationBean;
 	private UseCaseDescription mydesc;
 
@@ -194,14 +198,14 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							// matching invocation algorithm based on the plugin
 							// configuration and use case description.
 							InvocationGroup group = configurationBean.getInvocationGroup();
-							System.err.println("Invoking using invocationGroup " + group.hashCode() + " called " + group.getInvocationGroupName());
-							System.err.println("InvocationMechanism name is " + group.getMechanism().getName());
-							System.err.println("Group thinks mechanism name is " + group.getMechanismName());
-							System.err.println("Mechanism XML is " + group.getMechanismXML());
+							logger.info("Invoking using invocationGroup " + group.hashCode() + " called " + group.getInvocationGroupName());
+							logger.info("InvocationMechanism name is " + group.getMechanism().getName());
+							logger.info("Group thinks mechanism name is " + group.getMechanismName());
+							logger.info("Mechanism XML is " + group.getMechanismXML());
 							invoke = getInvocation(group.getMechanismType(),
 									group.getMechanismXML(), configurationBean.getUseCaseDescription());
 							if (invoke == null) {
-								System.err.println("Invoke is null");
+								logger.error("Invoke is null");
 								callback.fail("No invocation mechanism found");
 							}
 
@@ -214,7 +218,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							    if (identified instanceof ReferenceSet) {
 								ReferenceSet rs = (ReferenceSet) identified;
 								for (ExternalReferenceSPI ers : rs.getExternalReferences()) {
-								    System.err.println(ers.getClass().getCanonicalName());
+								    logger.info(ers.getClass().getCanonicalName());
 								}
 							    }
 								// and send it to the UseCaseInvokation

@@ -20,45 +20,32 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
 import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.ReferencedDataNature;
 import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.globus.ftp.exception.NotImplementedException;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
+import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
@@ -72,6 +59,9 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
  * @author Hajo Krabbenhoeft
  */
 public class SshUseCaseInvocation extends UseCaseInvocation {
+	
+	private static Logger logger = Logger.getLogger(RuntimeEnvironmentConstraint.class);
+	
 	
 	public static final String SSH_USE_CASE_INVOCATION_TYPE = "D0A4CDEB-DD10-4A8E-A49C-8871003083D8";
 	private String tmpname;
@@ -110,7 +100,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
 		synchronized(getNodeLock(workerNode)) {
 
-			System.err.println("Changing remote directory to " + workerNode.getDirectory());
+			logger.info("Changing remote directory to " + workerNode.getDirectory());
 			sftp.cd(workerNode.getDirectory());
 			Random rnd = new Random();
 			while (true) {
@@ -137,18 +127,19 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		    try {
 			sftp.cd(workerNode.getDirectory() + tmpname);
 		    } catch (SftpException e1) {
-			System.err.println("Unable to change directory" + e1);
+			logger.error("Unable to change directory" + e1);
 		    }
 		    try {
 			sftp.put(new ByteArrayInputStream(contents), name);
 		    } catch (Exception e) {
-			System.err.println("Error in putFile" + e);
+		    	// TODO
+			logger.error("Error in putFile" + e);
 		    }
 		    //				sftp.disconnect();
 		}
 	    } catch (JSchException e2) {
 		// TODO Auto-generated catch block
-		e2.printStackTrace();
+		logger.error(e2);
 	    }
 	}
 
@@ -276,7 +267,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 		if (input.isFile() || input.isTempFile()) {
 		target = workerNode.getDirectory() + tmpname + "/" + remoteName;
-		System.err.println("Target is " + target);
+		logger.info("Target is " + target);
 				try {
 				    ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
 				    synchronized (getNodeLock(workerNode)) {

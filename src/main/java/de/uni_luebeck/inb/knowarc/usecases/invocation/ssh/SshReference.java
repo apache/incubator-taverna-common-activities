@@ -5,15 +5,17 @@ package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
 import java.io.InputStream;
 
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
-
 import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
 import net.sf.taverna.t2.reference.AbstractExternalReference;
 import net.sf.taverna.t2.reference.DereferenceException;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.ReferenceContext;
+
+import org.apache.log4j.Logger;
+
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 
 /**
  * @author alanrw
@@ -21,6 +23,9 @@ import net.sf.taverna.t2.reference.ReferenceContext;
  */
 public class SshReference extends AbstractExternalReference implements
 	ExternalReferenceSPI {
+	
+	private static Logger logger = Logger.getLogger(SshReference.class);
+
 	
 	private String host = "127.0.0.1";
 	private int port = 22;
@@ -66,14 +71,14 @@ public class SshReference extends AbstractExternalReference implements
 			node.setDirectory(this.getDirectory());
 			String fullPath = getDirectory() +  getSubDirectory() + "/" + getFileName();
 			ChannelSftp channel = SshPool.getSftpGetChannel(node, new RetrieveLoginFromTaverna(new SshUrl(node).toString()));
-			System.err.println("Opening stream on " + fullPath);
+			logger.info("Opening stream on " + fullPath);
 			return (channel.get(fullPath));
 		} catch (JSchException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//TODO
+			logger.error(e);
 		} catch (SftpException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 		}
 		return null;
 	}
