@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroup;
+import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager;
 import net.sf.taverna.t2.annotation.Annotated;
 import net.sf.taverna.t2.annotation.annotationbeans.MimeType;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
@@ -36,6 +38,7 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.taverna.t2.workflowmodel.EditException;
 import net.sf.taverna.t2.workflowmodel.EditsRegistry;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
@@ -129,6 +132,8 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		try {
 			mydesc = bean.getUseCaseDescription();
 			
+			bean.setInvocationGroup(InvocationGroupManager.getInstance().checkGroup(bean.getInvocationGroup()));
+			
 			inputPorts.clear();
 			outputPorts.clear();
 			
@@ -176,7 +181,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 				ReferenceService referenceService = callback.getContext().getReferenceService();
 				UseCaseInvocation invoke = null;
 				try {
-					int retries = 5;
+					int retries = 0;
 					// retry the job submission 5 times. this is needed since
 					// sadly not every grid job queue listed in the information
 					// systems is still online. we only retry job submission,
@@ -188,9 +193,16 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							// choose a
 							// matching invocation algorithm based on the plugin
 							// configuration and use case description.
-							invoke = configurationBean.getInvocationBean().getAppropriateInvocation(ExternalToolActivity.this);
+							InvocationGroup group = configurationBean.getInvocationGroup();
+							System.err.println("Invoking using invocationGroup " + group.hashCode() + " called " + group.getInvocationGroupName());
+							System.err.println("InvocationMechanism name is " + group.getMechanism().getName());
+							System.err.println("Group thinks mechanism name is " + group.getMechanismName());
+							System.err.println("Mechanism XML is " + group.getMechanismXML());
+							invoke = getInvocation(group.getMechanismType(),
+									group.getMechanismXML(), configurationBean.getUseCaseDescription());
 							if (invoke == null) {
 								System.err.println("Invoke is null");
+								callback.fail("No invocation mechanism found");
 							}
 
 							// look at every use dynamic case input
@@ -205,13 +217,12 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 								    System.err.println(ers.getClass().getCanonicalName());
 								}
 							    }
-								Object value = referenceService.renderIdentifier(data.get(cur), invoke.getType(cur), callback.getContext());
 								// and send it to the UseCaseInvokation
-								invoke.setInput(cur, value);
+								invoke.setInput(cur, referenceService, data.get(cur));
 							}
 
 							// submit the use case to its invocation mechanism
-							invoke.submit_generate_job();
+							invoke.submit_generate_job(referenceService);
 
 							// do not retry, we succeeded :)
 							break;
@@ -259,6 +270,23 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 
 		});
 
+	}
+	
+	private static SPIRegistry<InvocationCreator> invocationCreatorRegistry = new SPIRegistry(InvocationCreator.class);
+	
+	private UseCaseInvocation getInvocation(String mechanismType, String xml, UseCaseDescription description) {
+		UseCaseInvocation result = null;
+		InvocationCreator creator = null;
+		for (InvocationCreator c : invocationCreatorRegistry.getInstances()) {
+			if (c.canHandle(mechanismType)) {
+				creator = c;
+				break;
+			}
+		}
+		if (creator != null) {
+			result = creator.convert(xml, description);
+		}
+		return result;
 	}
 
 }

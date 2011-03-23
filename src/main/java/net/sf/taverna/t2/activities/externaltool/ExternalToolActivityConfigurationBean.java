@@ -1,25 +1,69 @@
 package net.sf.taverna.t2.activities.externaltool;
 
-import net.sf.taverna.t2.activities.externaltool.local.ExternalToolLocalInvocationConfigurationBean;
+import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroup;
+import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 
-public abstract class ExternalToolActivityConfigurationBean {
+public final class ExternalToolActivityConfigurationBean {
 	
-	public abstract UseCaseDescription getUseCaseDescription();
+	private InvocationGroup group;
+	protected String repositoryUrl;
+	protected String externaltoolid;
+	protected UseCaseDescription useCaseDescription = null;
 	
-	private ExternalToolInvocationConfigurationBean<?> invocationBean;
-	
-	protected ExternalToolActivityConfigurationBean() {
-		invocationBean = new ExternalToolLocalInvocationConfigurationBean();
+	public ExternalToolActivityConfigurationBean() {
+		group = InvocationGroupManager.getInstance().getDefaultGroup();
 	}
 
-	public ExternalToolInvocationConfigurationBean<?> getInvocationBean() {
-		return invocationBean;
+	public InvocationGroup getInvocationGroup() {
+		return group;
 	}
 
-	public void setInvocationBean(
-			ExternalToolInvocationConfigurationBean<?> invocationBean) {
-		this.invocationBean = invocationBean;
+	public void setInvocationGroup(
+			InvocationGroup group) {
+		this.group = group;
+	}
+
+	/**
+	 * @return the repositoryUrl
+	 */
+	public String getRepositoryUrl() {
+		return repositoryUrl;
+	}
+
+	/**
+	 * @param repositoryUrl the repositoryUrl to set
+	 */
+	public void setRepositoryUrl(String repositoryUrl) {
+		this.repositoryUrl = repositoryUrl;
+	}
+
+	/**
+	 * @return the externaltoolid
+	 */
+	public String getExternaltoolid() {
+		return externaltoolid;
+	}
+
+	/**
+	 * @param externaltoolid the externaltoolid to set
+	 */
+	public void setExternaltoolid(String externaltoolid) {
+		this.externaltoolid = externaltoolid;
+	}
+
+	/**
+	 * @return the useCaseDescription
+	 */
+	public UseCaseDescription getUseCaseDescription() {
+		return useCaseDescription;
+	}
+
+	/**
+	 * @param useCaseDescription the useCaseDescription to set
+	 */
+	public void setUseCaseDescription(UseCaseDescription useCaseDescription) {
+		this.useCaseDescription = useCaseDescription;
 	}
 
 }
