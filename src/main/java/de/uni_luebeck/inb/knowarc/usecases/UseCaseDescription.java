@@ -159,14 +159,21 @@ public class UseCaseDescription {
 			String name = cur.getAttributeValue("name");
 			String type = cur.getName();
 			boolean binary = false;
-			if (null != cur.getAttributeValue("binary") && cur.getAttributeValue("binary").equalsIgnoreCase("true"))
+			if (null != cur.getAttributeValue("binary") && cur.getAttributeValue("binary").equalsIgnoreCase("true")) {
 				binary = true;
+			}
 			boolean list = false;
-			if (null != cur.getAttributeValue("list") && cur.getAttributeValue("list").equalsIgnoreCase("true"))
+			if (null != cur.getAttributeValue("list") && cur.getAttributeValue("list").equalsIgnoreCase("true")) {
 				list = true;
+			}
 			boolean concatenate = false;
-			if (null != cur.getAttributeValue("concatenate") && cur.getAttributeValue("concatenate").equalsIgnoreCase("true"))
+			if (null != cur.getAttributeValue("concatenate") && cur.getAttributeValue("concatenate").equalsIgnoreCase("true")) {
 				concatenate = true;
+			}
+			boolean forceCopy = false;
+			if (null != cur.getAttributeValue("forceCopy") && cur.getAttributeValue("forceCopy").equalsIgnoreCase("true")) {
+				forceCopy = true;
+			}
 
 			Element inner = null;
 			String innerType = null, tag = null, path = null;
@@ -192,14 +199,14 @@ public class UseCaseDescription {
 				si.setUrl(content.getAttributeValue("url"));
 				if (si.getUrl() == null)
 					si.setContent(content.getText());
-				fillInputDescription(si, binary, innerType, tag, path);
+				fillInputDescription(si, binary, forceCopy, innerType, tag, path);
 				getStatic_inputs().add(si);
 			} else if (type.equalsIgnoreCase("input")) {
 				ScriptInputUser indesc = new ScriptInputUser();
 				indesc.setList(list);
 				indesc.setMime(mime);
 				indesc.setConcatenate(concatenate);
-				fillInputDescription(indesc, binary, innerType, tag, path);
+				fillInputDescription(indesc, binary, forceCopy, innerType, tag, path);
 				getInputs().put(name, indesc);
 			} else if (type.equalsIgnoreCase("output")) {
 				ScriptOutput outdesc = new ScriptOutput();
@@ -249,8 +256,9 @@ public class UseCaseDescription {
 		}
 	}
 
-	private void fillInputDescription(ScriptInput fillMe, boolean binary, String innerType, String tag, String path) throws Exception {
+	private void fillInputDescription(ScriptInput fillMe, boolean binary, boolean forceCopy, String innerType, String tag, String path) throws Exception {
 		fillMe.setBinary(binary);
+		fillMe.setForceCopy(forceCopy);
 		if (null == innerType) {
 			// don't know what to do
 			throw new Exception("FIXME: Found null == innerType for input, is this the bug?");

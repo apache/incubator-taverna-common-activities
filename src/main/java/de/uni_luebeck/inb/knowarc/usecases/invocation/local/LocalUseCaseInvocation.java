@@ -63,13 +63,24 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	
 	public static String LOCAL_USE_CASE_INVOCATION_TYPE = "789663B8-DA91-428A-9F7D-B3F3DA185FD4";
 	
-	public LocalUseCaseInvocation(UseCaseDescription desc) throws IOException {
+	private Process running;
+
+	public LocalUseCaseInvocation(UseCaseDescription desc, String mainTempDirectory) throws IOException {
 
 		usecase = desc;
+		
+		if (mainTempDirectory != null) {
+		
+			File mainTempDir = new File(mainTempDirectory);
 
-		tempDir = File.createTempFile("usecase", "dir");
+			tempDir = File.createTempFile("usecase", "dir", mainTempDir);
+		} else {
+			tempDir = File.createTempFile("usecase", "dir");
+		}
 		tempDir.delete();
 		tempDir.mkdir();
+		System.err.println("mainTempDirectory is " + mainTempDirectory);
+		System.err.println("Using tempDir " + tempDir.getAbsolutePath());
 
 	}
 
@@ -153,8 +164,6 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 //		tempFile.delete();
 	}
 
-	private Process running;
-
 	@Override
 	protected void submit_generate_job_inner() throws Exception {
 		tags.put("uniqueID", "" + getSubmissionID());
@@ -174,7 +183,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		ProcessBuilder builder = new ProcessBuilder(cmds);
 		builder.directory(tempDir);
 		builder.environment();
-		logger.info("Command is " + command + " in directory " + tempDir);
+		logger.error("Command is " + command + " in directory " + tempDir);
 		running = builder.start();
 	}
 

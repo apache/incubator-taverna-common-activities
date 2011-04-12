@@ -51,6 +51,7 @@ public abstract class ScriptInput {
 	private boolean binary = false;
 	
 	private String charsetName = Charset.defaultCharset().name();
+	private boolean forceCopy = false;
 	
 	/**
 	 * @return the tag
@@ -109,5 +110,16 @@ public abstract class ScriptInput {
 	 */
 	public void setCharsetName(String charsetName) {
 		this.charsetName = charsetName;
+	}
+	
+	public final void setForceCopy(boolean forceCopy) {
+		this.forceCopy = forceCopy;
+		
+	}
+	/**
+	 * @return the forceCopy
+	 */
+	public boolean isForceCopy() {
+		return forceCopy;
 	}
 }

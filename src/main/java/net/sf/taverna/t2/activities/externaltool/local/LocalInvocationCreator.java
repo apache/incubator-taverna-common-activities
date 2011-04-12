@@ -4,8 +4,13 @@
 package net.sf.taverna.t2.activities.externaltool.local;
 
 import java.io.IOException;
+import java.io.StringReader;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 import net.sf.taverna.t2.activities.externaltool.InvocationCreator;
 import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
@@ -22,6 +27,8 @@ public final class LocalInvocationCreator implements
 	
 	private static Logger logger = Logger.getLogger(LocalInvocationCreator.class);
 
+	private static SAXBuilder builder = new SAXBuilder();
+
 	public boolean equals(Object o) {
 		return (o instanceof LocalInvocationCreator);
 	}
@@ -33,9 +40,25 @@ public final class LocalInvocationCreator implements
 
 	@Override
 	public UseCaseInvocation convert(String xml, UseCaseDescription description) {
-		UseCaseInvocation result = null;
+		LocalUseCaseInvocation result = null;
 		try {
-			result = new LocalUseCaseInvocation(description);
+			Document document;
+			try {
+				document = builder.build(new StringReader(xml));
+			} catch (JDOMException e1) {
+				logger.error("Null invocation", e1);
+				return null;
+			} catch (IOException e1) {
+				logger.error("Null invocation", e1);
+				return null;
+			}
+			Element top = document.getRootElement();
+			Element directoryElement = top.getChild("directory");
+			String tempDir = null;
+			if (directoryElement != null) {
+				tempDir = directoryElement.getText();
+			}
+			result = new LocalUseCaseInvocation(description, tempDir);
 		} catch (IOException e) {
 			logger.error(e);
 		}

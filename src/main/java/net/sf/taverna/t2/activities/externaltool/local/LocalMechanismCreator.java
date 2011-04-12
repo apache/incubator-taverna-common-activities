@@ -27,6 +27,10 @@ public class LocalMechanismCreator extends MechanismCreator {
 			String mechanismName) {
 		ExternalToolLocalInvocationMechanism result = new ExternalToolLocalInvocationMechanism();
 		result.setName(mechanismName);
+		Element directoryElement = detailsElement.getChild("directory");
+		if (directoryElement != null) {
+			result.setDirectory(directoryElement.getText());
+		}
 		return result;
 	}
 

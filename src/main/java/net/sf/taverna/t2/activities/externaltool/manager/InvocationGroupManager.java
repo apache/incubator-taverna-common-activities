@@ -160,6 +160,14 @@ public class InvocationGroupManager {
 		}
 		return null;
 	}
+	
+	public void mechanismChanged(InvocationMechanism im) {
+		for (InvocationGroup g : groups) {
+			if (g.getMechanism().equals(im)) {
+				g.setMechanism(im);
+			}
+		}
+	}
 
 	
 	private void createDefaultMechanism() {

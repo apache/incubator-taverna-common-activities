@@ -31,10 +31,12 @@ public class SshNode {
 	 * @param directory the directory to set
 	 */
 	public void setDirectory(String directory) {
-		if (!directory.endsWith("/")) {
-			directory = directory + "/";
+		if ((directory != null) && !directory.isEmpty()) {
+			if (!directory.endsWith("/")) {
+				directory = directory + "/";
+			}
+			this.directory = directory;
 		}
-		this.directory = directory;
 	}
 
 	/**
