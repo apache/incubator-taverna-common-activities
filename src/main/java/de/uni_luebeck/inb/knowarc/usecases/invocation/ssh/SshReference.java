@@ -65,10 +65,7 @@ public class SshReference extends AbstractExternalReference implements
 	public InputStream openStream(ReferenceContext context)
 			throws DereferenceException {
 		try {
-			SshNode node = new SshNode();
-			node.setHost(this.getHost());
-			node.setPort(this.getPort());
-			node.setDirectory(this.getDirectory());
+			SshNode node = SshNodeFactory.getInstance().getSshNode(this.getHost(), this.getPort(), this.getDirectory());
 			String fullPath = getDirectory() +  getSubDirectory() + "/" + getFileName();
 			ChannelSftp channel = SshPool.getSftpGetChannel(node, new RetrieveLoginFromTaverna(new SshUrl(node).toString()));
 			logger.info("Opening stream on " + fullPath);
@@ -151,6 +148,10 @@ public class SshReference extends AbstractExternalReference implements
 	 */
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+	
+	public String getFullPath() {
+		return getDirectory() + "/" + getSubDirectory() + "/" + getFileName();
 	}
 
 }

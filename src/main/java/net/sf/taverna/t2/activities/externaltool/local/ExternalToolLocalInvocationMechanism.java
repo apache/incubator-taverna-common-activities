@@ -18,6 +18,22 @@ public class ExternalToolLocalInvocationMechanism extends
 		InvocationMechanism {
 	
 	private String directory;
+	
+	private String shellPrefix;
+	
+	private String linkCommand;
+	
+	/**
+	 * 
+	 */
+	public ExternalToolLocalInvocationMechanism() {
+		super();
+		String os = System.getProperty("os.name");
+		if (!os.startsWith("Windows")) {
+			setShellPrefix(UNIX_SHELL);
+			setLinkCommand(UNIX_LINK);
+		}
+	}
 
 	@Override
 	public String getType() {
@@ -27,13 +43,24 @@ public class ExternalToolLocalInvocationMechanism extends
 	@Override
 	public Element getXMLElement() {
 		Element result = new Element("localInvocation");
-		if (directory != null) {
+		if ((directory != null) && !directory.isEmpty()){
 			Element directoryElement = new Element("directory");
 			directoryElement.addContent(new Text(directory));
 			result.addContent(directoryElement);
 		}
+		if ((shellPrefix != null) && !shellPrefix.isEmpty()) {
+			Element shellPrefixElement = new Element("shellPrefix");
+			shellPrefixElement.addContent(new Text(shellPrefix));
+			result.addContent(shellPrefixElement);
+		}
+		if ((linkCommand != null) && !linkCommand.isEmpty()) {
+			Element linkCommandElement = new Element("linkCommand");
+			linkCommandElement.addContent(new Text(linkCommand));
+			result.addContent(linkCommandElement);
+		}
 		return result;
 	}
+
 
 	/**
 	 * @return the directory
@@ -47,6 +74,38 @@ public class ExternalToolLocalInvocationMechanism extends
 	 */
 	public void setDirectory(String directory) {
 		this.directory = directory;
+	}
+
+	/**
+	 * @return the shellPrefix
+	 */
+	public String getShellPrefix() {
+		return shellPrefix;
+	}
+
+	/**
+	 * @param shellPrefix the shellPrefix to set
+	 */
+	public void setShellPrefix(String shellPrefix) {
+		this.shellPrefix = shellPrefix;
+	}
+
+	/**
+	 * @return the linkCommand
+	 */
+	public String getLinkCommand() {
+		return linkCommand;
+	}
+
+	/**
+	 * @param linkCommand the linkCommand to set
+	 */
+	public void setLinkCommand(String linkCommand) {
+		if (linkCommand.isEmpty()) {
+			this.linkCommand = null;
+		} else {
+			this.linkCommand = linkCommand;
+		}
 	}
 
 }

@@ -22,6 +22,7 @@ package de.uni_luebeck.inb.knowarc.usecases.invocation.local;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -34,10 +35,17 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
+import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.ReferencedDataNature;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
@@ -49,6 +57,7 @@ import org.globus.ftp.exception.NotImplementedException;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 
 /**
@@ -65,9 +74,15 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	
 	private Process running;
 
-	public LocalUseCaseInvocation(UseCaseDescription desc, String mainTempDirectory) throws IOException {
+	private final String shellPrefix;
+
+	private final String linkCommand;
+
+	public LocalUseCaseInvocation(UseCaseDescription desc, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
 
 		usecase = desc;
+		this.shellPrefix = shellPrefix;
+		this.linkCommand = linkCommand;
 		
 		if (mainTempDirectory != null) {
 		
@@ -94,46 +109,99 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	}
 	
 	@Override
-	public String setOneInput(ReferenceService referenceService, T2Reference t2Reference, ScriptInput input) throws UnsupportedEncodingException, IOException {
+	public String setOneInput(ReferenceService referenceService, T2Reference t2Reference, ScriptInput input) throws InvocationException {
 		
 		if (input.getCharsetName() == null) {
 			input.setCharsetName(Charset.defaultCharset().name());
 		}
 		String target = null;
+		String targetSuffix = null;
 		if (input.isFile()) {
-			target = tempDir.getAbsolutePath() + "/" + input.getTag();
+			targetSuffix = input.getTag();
 		} else if (input.isTempFile()) {
-			target = tempDir.getAbsolutePath() + "/" + "tempfile." + (nTempFiles++) + ".tmp";
+			targetSuffix = "tempfile." + (nTempFiles++) + ".tmp";
 		}
 		logger.info("Target is " + target);
 		if (input.isFile() || input.isTempFile()) {
+			target = tempDir.getAbsolutePath() + "/" + targetSuffix;
 			// Try to get it as a file
 			Reader r;
 			Writer w;
 			FileReference fileRef = getAsFileReference(referenceService, t2Reference);
 			if (fileRef != null) {
 				
+				if (!input.isForceCopy()) {
+					if (linkCommand != null) {
+						String source = fileRef.getFile().getAbsolutePath();
+						String actualLinkCommand = getActualOsCommand(linkCommand, source, targetSuffix, target);
+						logger.error("Link command is " + actualLinkCommand);
+						String[] splitCmds = actualLinkCommand.split(" ");
+						ProcessBuilder builder = new ProcessBuilder(splitCmds);
+						builder.directory(tempDir);
+						try {
+							int code = builder.start().waitFor();
+							if (code == 0) {
+								return target;
+							} else {
+								logger.error("Link command gave errorcode: " + code);
+							}
+								
+						} catch (InterruptedException e) {
+							// go through
+						} catch (IOException e) {
+							// go through
+						}
+
+					}
+				}
+				
 				if (input.isBinary()) {
-						r = new FileReader(fileRef.getFile());
+						try {
+							r = new FileReader(fileRef.getFile());
+						} catch (FileNotFoundException e) {
+							throw new InvocationException(e);
+						}
 						
 				} else {
 					if (fileRef.getDataNature().equals(ReferencedDataNature.TEXT)) {
 						r = new InputStreamReader(fileRef.openStream(dummyContext), Charset.forName(fileRef.getCharset()));
 					} else {
-						r = new FileReader(fileRef.getFile());
+						try {
+							r = new FileReader(fileRef.getFile());
+						} catch (FileNotFoundException e) {
+							throw new InvocationException(e);
+						}
 					}
 				}
 			} else {
 					r = new InputStreamReader(getAsStream(referenceService, t2Reference));
 			}
 			if (input.isBinary()) {
-				w = new FileWriter(target);				
+				try {
+					w = new FileWriter(target);
+				} catch (IOException e) {
+					throw new InvocationException(e);
+				}				
 			} else {
-				w = new OutputStreamWriter(new FileOutputStream(target), input.getCharsetName());				
+				try {
+					w = new OutputStreamWriter(new FileOutputStream(target), input.getCharsetName());
+				} catch (UnsupportedEncodingException e) {
+					throw new InvocationException(e);
+				} catch (FileNotFoundException e) {
+					throw new InvocationException(e);
+				}				
 			}
-			IOUtils.copyLarge(r, w);
-			r.close();
-			w.close();
+			try {
+				IOUtils.copyLarge(r, w);
+			} catch (IOException e) {
+				throw new InvocationException(e);
+			}
+			try {
+				r.close();
+				w.close();
+			} catch (IOException e) {
+				throw new InvocationException(e);
+			}
 			return target;
 		}
 		else {
@@ -163,28 +231,41 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 //		recDel(tempDir);
 //		tempFile.delete();
 	}
-
+	
 	@Override
-	protected void submit_generate_job_inner() throws Exception {
+	protected void submit_generate_job_inner() throws InvocationException {
 		tags.put("uniqueID", "" + getSubmissionID());
 		String command = usecase.getCommand();
 		for (String cur : tags.keySet()) {
 			command = command.replaceAll("\\Q%%" + cur + "%%\\E", tags.get(cur));
 		}
-		
-//		String[] cmds = new String[3];
-//		cmds[0] = "C:\\\\Windows\\System32\\cmd.exe";
-//		cmds[1] = "/c";
-//		cmds[2] = command;
-//		String[] cmds = new String[2];
-//		cmds[0] = "/bin/sh";
-//		cmds[1] = command;
-		String[] cmds = command.split(" ");
+
+		List<String> cmds = new ArrayList<String>();
+		if ((shellPrefix != null) && !shellPrefix.isEmpty()) {
+			String[] prefixCmds = shellPrefix.split(" ");
+			for (int i = 0; i < prefixCmds.length; i++) {
+				cmds.add(prefixCmds[i]);
+			}
+			cmds.add(command);
+		} else {
+			String[] splitCmds = command.split(" ");
+			for (int i = 0; i < splitCmds.length; i++) {
+				cmds.add(splitCmds[i]);
+			}
+		}
+	
 		ProcessBuilder builder = new ProcessBuilder(cmds);
 		builder.directory(tempDir);
-		builder.environment();
+
+		for (int i = 0; i < cmds.size(); i++) {
+			logger.error("cmds[" + i + "] = " + cmds.get(i));
+		}
 		logger.error("Command is " + command + " in directory " + tempDir);
-		running = builder.start();
+		try {
+			running = builder.start();
+		} catch (IOException e) {
+			throw new InvocationException(e);
+		}
 	}
 
 	private void copy_stream(InputStream read, OutputStream write) throws IOException {
@@ -197,16 +278,20 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	}
 
 	@Override
-	public HashMap<String, Object> submit_wait_fetch_results() throws Exception {
+	public HashMap<String, Object> submit_wait_fetch_results() throws InvocationException {
 		ByteArrayOutputStream stdout_buf = new ByteArrayOutputStream();
 		ByteArrayOutputStream stderr_buf = new ByteArrayOutputStream();
 		while (true) {
-			copy_stream(running.getInputStream(), stdout_buf);
-			copy_stream(running.getErrorStream(), stderr_buf);
+			try {
+				copy_stream(running.getInputStream(), stdout_buf);
+				copy_stream(running.getErrorStream(), stderr_buf);
+			} catch (IOException e1) {
+				throw new InvocationException(e1);
+			}
 			try {
 				int errorCode = running.exitValue();
 				if (errorCode != 0)
-					throw new Exception("Exit code: " + errorCode + stderr_buf.toString("US-ASCII"));
+					throw new InvocationException("Exit code: " + errorCode + stderr_buf.toString("US-ASCII"));
 				else
 					break;
 			} catch (IllegalThreadStateException e) {
@@ -214,12 +299,18 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 					Thread.sleep(100);
 				} catch (Exception e2) {
 				}
+			} catch (UnsupportedEncodingException e) {
+				throw new InvocationException(e);
 			}
 		}
 
 		HashMap<String, Object> results = new HashMap<String, Object>();
-		results.put("STDOUT", stdout_buf.toString("US-ASCII"));
-		results.put("STDERR", stderr_buf.toString("US-ASCII"));
+		try {
+			results.put("STDOUT", stdout_buf.toString("US-ASCII"));
+			results.put("STDERR", stderr_buf.toString("US-ASCII"));
+		} catch (UnsupportedEncodingException e) {
+			throw new InvocationException(e);
+		}
 
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
 			FileReference ref = new FileReference(new File(tempDir.getAbsoluteFile() + "/" + cur.getValue().getPath()));
@@ -229,6 +320,18 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		}
 
 		return results;
+	}
+
+	private FileReference getAsFileReference(ReferenceService referenceService, T2Reference t2Reference) {
+		Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
+		if (identified instanceof ReferenceSet) {
+			for (ExternalReferenceSPI ref : ((ReferenceSet) identified).getExternalReferences()) {
+				if (ref instanceof FileReference) {
+					return (FileReference) ref;
+				}
+			}
+		}
+		return null;
 	}
 
 }

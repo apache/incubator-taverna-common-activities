@@ -23,7 +23,6 @@ package de.uni_luebeck.inb.knowarc.grid;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -56,8 +55,6 @@ import org.ietf.jgss.GSSException;
 
 import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironment;
 import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
-import de.uni_luebeck.inb.knowarc.gui.KnowARCConfiguration;
-import de.uni_luebeck.inb.knowarc.gui.KnowARCConfigurationDialog;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 
 /**
@@ -560,8 +557,8 @@ public class GridInfosystem {
 		progressDisplay.logTrace(1, e);		
 	}
 
-	public static void main(String[] args) {
-		KnowARCConfiguration conf = new KnowARCConfiguration(new File("/Volumes/Important/fxtentacle/Library/Application Support/taverna-2.1.2/"));
-		new KnowARCConfigurationDialog(null, true, conf).setVisible(true);
-	}
+//	public static void main(String[] args) {
+//		KnowARCConfiguration conf = new KnowARCConfiguration(new File("/Volumes/Important/fxtentacle/Library/Application Support/taverna-2.1.2/"));
+//		new KnowARCConfigurationDialog(null, true, conf).setVisible(true);
+//	}
 }

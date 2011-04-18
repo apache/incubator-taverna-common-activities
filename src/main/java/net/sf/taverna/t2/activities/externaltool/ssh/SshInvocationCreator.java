@@ -23,6 +23,7 @@ import com.jcraft.jsch.SftpException;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrl;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
@@ -57,18 +58,36 @@ public final class SshInvocationCreator implements InvocationCreator {
 		}
 		Element top = document.getRootElement();
 		for (Object nodeObject : top.getChildren("sshNode")) {
-			SshNode node = new SshNode();
 			Element nodeElement = (Element) nodeObject;
 			Element hostElement = nodeElement.getChild("host");
-			if (hostElement != null) {
-				node.setHost(hostElement.getText());
-			}
-			Element directoryElement = nodeElement.getChild("directory");
-			if (directoryElement != null) {
-				node.setDirectory(directoryElement.getText());
-			}
+			String host = hostElement.getText();
+			
 			Element portElement = nodeElement.getChild("port");
-			node.setPort(Integer.parseInt(portElement.getText()));
+			int port = Integer.parseInt(portElement.getText());
+
+			Element directoryElement = nodeElement.getChild("directory");
+			String directory = directoryElement.getText();
+			
+			boolean newNode = !SshNodeFactory.getInstance().containsSshNode(host, port, directory);
+			
+			SshNode node = SshNodeFactory.getInstance().getSshNode(host, port, directory);
+
+			if (newNode) {
+			Element linkCommandElement = nodeElement.getChild("linkCommand");
+			if (linkCommandElement != null) {
+				node.setLinkCommand(linkCommandElement.getText());
+			} else {
+				node.setLinkCommand(null);
+			}
+
+			Element copyCommandElement = nodeElement.getChild("copyCommand");
+			if (copyCommandElement != null) {
+				node.setCopyCommand(copyCommandElement.getText());
+			} else {
+				node.setCopyCommand(null);
+			}
+			}
+
 			sshWorkerNodes.add(node);
 		}
 		SshNode chosenNode = sshWorkerNodes.get(0);

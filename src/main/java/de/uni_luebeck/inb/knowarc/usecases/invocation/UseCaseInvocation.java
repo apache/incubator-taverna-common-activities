@@ -23,6 +23,7 @@ package de.uni_luebeck.inb.knowarc.usecases.invocation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -32,10 +33,10 @@ import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceContext;
 import net.sf.taverna.t2.reference.ReferenceService;
+import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.impl.EmptyReferenceContext;
-import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 
 import org.globus.ftp.exception.NotImplementedException;
 
@@ -52,6 +53,17 @@ import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
  * @author Steffen Moeller
  */
 public abstract class UseCaseInvocation {
+	
+	
+	protected static String getActualOsCommand(String osCommand, String pathToOriginal,
+			String targetName, String pathTarget) {
+				String actualOsCommand = osCommand;
+				actualOsCommand = actualOsCommand.replace("%%PATH_TO_ORIGINAL%%", pathToOriginal);
+				actualOsCommand = actualOsCommand.replace("%%TARGET_NAME%%", targetName);
+				actualOsCommand = actualOsCommand.replace("%%PATH_TO_TARGET%%", pathTarget);
+				return actualOsCommand;
+			}
+
 	protected UseCaseDescription usecase;
 	protected final HashMap<String, String> tags = new HashMap<String, String>();
 	protected int nTempFiles = 0;
@@ -99,7 +111,7 @@ public abstract class UseCaseInvocation {
 	 * set the data for the input port with given name
 	 */
 	@SuppressWarnings("unchecked")
-	public void setInput(String inputName, ReferenceService referenceService, T2Reference t2Reference) throws IOException {
+	public void setInput(String inputName, ReferenceService referenceService, T2Reference t2Reference) throws InvocationException {
 		ScriptInputUser input = (ScriptInputUser) usecase.getInputs().get(inputName);
 //		if (input.isList()) {
 //			List data = null;
@@ -199,7 +211,7 @@ public abstract class UseCaseInvocation {
 	 * submit a grid job and wait for it to finish, then get the result as
 	 * on-demand downloads or directly as data (in case of local execution)
 	 */
-	public HashMap<String, Object> Submit(ReferenceService referenceService) throws Exception {
+	public HashMap<String, Object> Submit(ReferenceService referenceService) throws InvocationException {
 		submit_generate_job(referenceService);
 		return submit_wait_fetch_results();
 	}
@@ -209,47 +221,41 @@ public abstract class UseCaseInvocation {
 	 * 
 	 * Can the statics be made more static?
 	 */
-	public void submit_generate_job(ReferenceService referenceService) throws Exception {
+	public void submit_generate_job(ReferenceService referenceService) throws InvocationException {
 		for (ScriptInputStatic input : usecase.getStatic_inputs()) {
 			T2Reference ref;
 			if (input.getUrl() != null) {
 				// Does this work OK with binary
-				ref = referenceService.register(new URL(input.getUrl()), 0, true, null);
+				try {
+					ref = referenceService.register(new URL(input.getUrl()), 0, true, null);
+				} catch (ReferenceServiceException e) {
+					throw new InvocationException(e);
+				} catch (MalformedURLException e) {
+					throw new InvocationException(e);
+				}
 			} else {
 				ref = referenceService.register((String) input.getContent(), 0, true, null);
 			}
-			tags.put(input.getTag(), setOneInput(referenceService, ref, input));
+				tags.put(input.getTag(), setOneInput(referenceService, ref, input));
+			
 		}
 		submit_generate_job_inner();
 	}
 
-	protected abstract void submit_generate_job_inner() throws Exception;
+	protected abstract void submit_generate_job_inner() throws InvocationException;
 
 	/*
 	 * wait for a submitted job to finish and fetch the results
 	 */
-	public abstract HashMap<String, Object> submit_wait_fetch_results() throws Exception;
+	public abstract HashMap<String, Object> submit_wait_fetch_results() throws InvocationException;
 
-	public abstract String setOneInput(ReferenceService referenceService, T2Reference t2Reference, ScriptInput input)
-			throws UnsupportedEncodingException, IOException;
+	public abstract String setOneInput(ReferenceService referenceService, T2Reference t2Reference, ScriptInput input) throws InvocationException;
 
 	protected InputStream getAsStream(ReferenceService referenceService, T2Reference t2Reference) {
 		Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
 		if (identified instanceof ReferenceSet) {
 			ExternalReferenceSPI ref = ((ReferenceSet) identified).getExternalReferences().iterator().next();
 			return ref.openStream(dummyContext);
-		}
-		return null;
-	}
-
-	protected FileReference getAsFileReference(ReferenceService referenceService, T2Reference t2Reference) {
-		Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
-		if (identified instanceof ReferenceSet) {
-			for (ExternalReferenceSPI ref : ((ReferenceSet) identified).getExternalReferences()) {
-				if (ref instanceof FileReference) {
-					return (FileReference) ref;
-				}
-			}
 		}
 		return null;
 	}

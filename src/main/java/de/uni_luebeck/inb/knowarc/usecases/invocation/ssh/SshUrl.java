@@ -80,7 +80,7 @@ public class SshUrl {
 	}
 	
 	public String toString() {
-		String result = "ssh://" + getHost() + ":" + getPort() + getDirectory();
+		String result = SshNodeFactory.makeUrl(getHost(), getPort(), getDirectory());
 		if (getSubDirectory() != null) {
 			result += "/" + getSubDirectory();
 		}

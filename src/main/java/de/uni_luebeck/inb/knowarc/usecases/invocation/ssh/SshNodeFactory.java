@@ -1,0 +1,49 @@
+/**
+ * 
+ */
+package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author alanrw
+ *
+ */
+public class SshNodeFactory {
+	
+	private Map<String, SshNode> nodeMap = new HashMap<String, SshNode> ();
+	
+	private static SshNodeFactory INSTANCE = new SshNodeFactory();
+	
+	private SshNodeFactory() {
+		// nothing
+	}
+
+	public static SshNodeFactory getInstance() {
+		return INSTANCE;
+	}
+	
+	public SshNode getSshNode(String host, int port, String directory) {
+		String url = makeUrl(host, port, directory);
+		if (nodeMap.containsKey(url)) {
+			return nodeMap.get(url);
+		}
+		else {
+			SshNode newNode = new SshNode();
+			newNode.setHost(host);
+			newNode.setPort(port);
+			newNode.setDirectory(directory);
+			nodeMap.put(url, newNode);
+			return newNode;
+		}
+	}
+	
+	public boolean containsSshNode(String host, int port, String directory) {
+		return nodeMap.containsKey(makeUrl(host, port, directory));
+	}
+	
+	public static String makeUrl(String host, int port, String directory) {
+		return ("ssh://" + host + ":" + port + directory);
+	}
+}

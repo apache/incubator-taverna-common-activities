@@ -32,12 +32,17 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
+import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 
 import org.globus.ftp.exception.ClientException;
 import org.globus.ftp.exception.NotImplementedException;
 import org.globus.ftp.exception.ServerException;
+import org.ietf.jgss.GSSException;
 
 import de.uni_luebeck.inb.knowarc.grid.GridFtpConnection;
 import de.uni_luebeck.inb.knowarc.grid.GridInfosystem;
@@ -48,6 +53,7 @@ import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironment;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.OnDemandDownloadGridftp;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 
@@ -169,7 +175,7 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 	private GridJob jobhandle = null;
 
 	@Override
-	protected void submit_generate_job_inner() throws UnsupportedEncodingException, ServerException, IOException, ClientException {
+	protected void submit_generate_job_inner() throws InvocationException {
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
 			String nopath = cur.getValue().getPath().replaceAll("/", "_");
 			gridjob.mOutput2Url.put(cur.getValue().getPath(), nopath);
@@ -192,7 +198,11 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 		progressDisplay.log(2, cmd);
 
 		String cmdName = "usecase-startup-script";
-		putFile(cmdName, cmd.getBytes("US-ASCII"));
+		try {
+			putFile(cmdName, cmd.getBytes("US-ASCII"));
+		} catch (UnsupportedEncodingException e) {
+			throw new InvocationException(e);
+		}
 		gridjob.executable = cmdName;
 		gridjob.maximumWalltimeInSeconds = usecase.getExecutionTimeoutInSeconds();
 		gridjob.queue = conn.getQueueToSubmitTo();
@@ -204,18 +214,42 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 		}
 		progressDisplay.log(2, "xRSL: \n" + jobhandle.xrsl);
 		progressDisplay.log(1, "target queue: " + conn.getUrl());
-		jobhandle.Submit();
+		try {
+			jobhandle.Submit();
+		} catch (ServerException e) {
+			throw new InvocationException(e);
+		} catch (ClientException e) {
+			throw new InvocationException(e);
+		} catch (IOException e) {
+			throw new InvocationException(e);
+		}
 		String gridjobUrl = conn.getUrl() + "/" + jobhandle.jobid;
 		progressDisplay.log(0, "jobid: " + gridjobUrl);
 		infosystem.addHistory(gridjobUrl);
 
 		for (String upload : uploads.keySet()) {
 			byte[] str = (byte[]) uploads.get(upload);
-			jobhandle.Input(upload, new ByteArrayInputStream(str));
+			try {
+				jobhandle.Input(upload, new ByteArrayInputStream(str));
+			} catch (ServerException e) {
+				throw new InvocationException(e);
+			} catch (ClientException e) {
+				throw new InvocationException(e);
+			} catch (IOException e) {
+				throw new InvocationException(e);
+			}
 		}
 
 		for (String upload : fileUploads.keySet()) {
-			jobhandle.InputLocal(upload, fileUploads.get(upload));
+			try {
+				jobhandle.InputLocal(upload, fileUploads.get(upload));
+			} catch (ServerException e) {
+				throw new InvocationException(e);
+			} catch (ClientException e) {
+				throw new InvocationException(e);
+			} catch (IOException e) {
+				throw new InvocationException(e);
+			}
 		}
 
 		progressDisplay.log(1, "All uploads are finished for job " + jobhandle.jobid);
@@ -229,7 +263,7 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 	}
 
 	@Override
-	public HashMap<String, Object> submit_wait_fetch_results() throws Exception, ClientException, IOException {
+	public HashMap<String, Object> submit_wait_fetch_results() throws InvocationException {
 		boolean weArePreparing = true;
 		boolean weAreRunning = false;
 
@@ -268,13 +302,22 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 				}
 			} catch (Exception e) {
 				numberOfExceptionsToSwallow--;
-				if (numberOfExceptionsToSwallow < 0)
-					throw new Exception("error polling status", e);
+				if (numberOfExceptionsToSwallow < 0) {
+					throw new InvocationException(e);
+				}
 				else {
 					// since polling the job result failed,
 					// which cannot be due to the job failing,
 					// maybe we had a connection timout
-					jobhandle.reconnect(infosystem.getCertificateData());
+					try {
+						jobhandle.reconnect(infosystem.getCertificateData());
+					} catch (ServerException e1) {
+						throw new InvocationException(e1);
+					} catch (GSSException e1) {
+						throw new InvocationException(e1);
+					} catch (IOException e1) {
+						throw new InvocationException(e1);
+					}
 				}
 			}
 			if (++numberOfPolls > 3) {
@@ -287,14 +330,20 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 					timeout = true;
 				if (timeout) {
 					// we have reached a timeout
-					try {
+//					try {
 						// kill grid job
-						jobhandle.Kill();
-					} catch (Exception e) {
-						progressDisplay.log(2, "Error killing grid job which has reached timeout: " + jobhandle.jobid);
-						progressDisplay.logTrace(3, e);
-					}
-					throw new Exception("Grid job has reached timeout of " + usecase.getExecutionTimeoutInSeconds() + "s");
+						try {
+							jobhandle.Kill();
+						} catch (ServerException e) {
+							throw new InvocationException(e);
+						} catch (IOException e) {
+							throw new InvocationException(e);
+						}
+//					} catch (Exception e) {
+//						progressDisplay.log(2, "Error killing grid job which has reached timeout: " + jobhandle.jobid);
+//						progressDisplay.logTrace(3, e);
+//					}
+					throw new InvocationException("Grid job has reached timeout of " + usecase.getExecutionTimeoutInSeconds() + "s");
 				}
 			}
 			if (firstRetry) {
@@ -317,7 +366,14 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 		OnDemandDownloadGridftp dlStdErr = new OnDemandDownloadGridftp(infosystem.getProgressDisplay(), infosystem.getCertificateData(), conn.getUrl(),
 				jobhandle.jobid + "/stderr", false);
 
-		String failed = jobhandle.Failed();
+		String failed;
+		try {
+			failed = jobhandle.Failed();
+		} catch (ClientException e1) {
+			throw new InvocationException(e1);
+		} catch (IOException e1) {
+			throw new InvocationException(e1);
+		}
 
 		if (failed != null) {
 			progressDisplay.log(0, "GridJob failed. " + jobhandle.jobid);
@@ -325,18 +381,18 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 			String stdOut = "";
 			String stdErr = "";
 
-			try {
+//			try {
 				stdOut += dlStdOut.download();
-			} catch (Throwable e) {
-				stdOut += "Error downloading STDOUT: " + e.getMessage();
-			}
+//			} catch (Throwable e) {
+//				stdOut += "Error downloading STDOUT: " + e.getMessage();
+//			}
 			try {
 				stdErr += dlStdErr.download();
 			} catch (Throwable e) {
 				stdErr += "Error downloading STDOUT: " + e.getMessage();
 			}
 
-			throw new Exception("Grid job failed with: " + failed + "\n STDOUT: \n" + stdOut + "\n STDERR: \n" + stdErr);
+			throw new InvocationException("Grid job failed with: " + failed + "\n STDOUT: \n" + stdOut + "\n STDERR: \n" + stdErr);
 		}
 
 		progressDisplay.log(0, "JOB FINISHED! " + jobhandle.jobid + "\n");
@@ -367,9 +423,20 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 
 	@Override
 	public String setOneInput(ReferenceService referenceService,
-			T2Reference t2Reference, ScriptInput input)
-			throws UnsupportedEncodingException, IOException {
+			T2Reference t2Reference, ScriptInput input) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	protected FileReference getAsFileReference(ReferenceService referenceService, T2Reference t2Reference) {
+		Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
+		if (identified instanceof ReferenceSet) {
+			for (ExternalReferenceSPI ref : ((ReferenceSet) identified).getExternalReferences()) {
+				if (ref instanceof FileReference) {
+					return (FileReference) ref;
+				}
+			}
+		}
 		return null;
 	}
 }

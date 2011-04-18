@@ -27,13 +27,19 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
+import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 
 import org.apache.log4j.Logger;
 import org.globus.ftp.exception.NotImplementedException;
@@ -50,6 +56,7 @@ import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 
 /**
@@ -69,6 +76,9 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	private final AskUserForPw askUserForPw;
 	
 	private ChannelExec running;
+	
+	private List<String> precedingCommands = new ArrayList<String>();
+	
 	private final ByteArrayOutputStream stdout_buf = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream stderr_buf = new ByteArrayOutputStream();
 
@@ -210,33 +220,46 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	}
 
 	@Override
-	protected void submit_generate_job_inner() throws Exception {
+	protected void submit_generate_job_inner() throws InvocationException {
 		tags.put("uniqueID", "" + getSubmissionID());
 		String command = usecase.getCommand();
 		for (String cur : tags.keySet()) {
 			command = command.replaceAll("\\Q%%" + cur + "%%\\E", tags.get(cur));
 		}
-		command = "cd " + workerNode.getDirectory() + tmpname + " && " + command;
+		String fullCommand = "cd " + workerNode.getDirectory() + tmpname;
+		for (String preceding : precedingCommands) {
+			fullCommand += " && " + preceding;
+		}
+		fullCommand += " && " + command;
 		
-		running = SshPool.openExecChannel(workerNode, askUserForPw);
-		running.setCommand(command);
-		running.setOutputStream(stdout_buf);
-		running.setErrStream(stderr_buf);
-		running.connect();
+		logger.error("Full command is " + fullCommand);
+		
+		try {
+			running = SshPool.openExecChannel(workerNode, askUserForPw);
+			running.setCommand(fullCommand);
+			running.setOutputStream(stdout_buf);
+			running.setErrStream(stderr_buf);
+			running.connect();
+		} catch (JSchException e) {
+			throw new InvocationException(e);
+		}
+
 	}
 
 	@Override
-	public HashMap<String, Object> submit_wait_fetch_results() throws Exception {
+	public HashMap<String, Object> submit_wait_fetch_results() throws InvocationException {
 		while (!running.isClosed()) {
-			try {
-				Thread.sleep(1000);
-			} catch (Exception e) {
-			}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					throw new InvocationException("Invocation interrupted:" + e.getMessage());
+				}
 		}
 
 		int exitcode = running.getExitStatus();
-		if (exitcode != 0)
-			throw new Exception("nonzero exit code");
+		if (exitcode != 0) {
+			throw new InvocationException("nonzero exit code " + exitcode + ":" + Charset.forName("US-ASCII").decode(ByteBuffer.wrap(stderr_buf.toByteArray())).toString());
+		}
 
 		HashMap<String, Object> results = new HashMap<String, Object>();
 		results.put("STDOUT", Charset.forName("US-ASCII").decode(ByteBuffer.wrap(stdout_buf.toByteArray())).toString());
@@ -252,11 +275,12 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
        		running.disconnect();
 		return results;
 	}
+	
 
 	@Override
 	public String setOneInput(ReferenceService referenceService,
 			T2Reference t2Reference, ScriptInput input)
-			throws UnsupportedEncodingException, IOException {
+			throws InvocationException {
 		String target = null;
 		String remoteName = null;
 		if (input.isFile()) {
@@ -266,29 +290,67 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 
 		}
 		if (input.isFile() || input.isTempFile()) {
-		target = workerNode.getDirectory() + tmpname + "/" + remoteName;
-		logger.info("Target is " + target);
-				try {
-				    ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
-				    synchronized (getNodeLock(workerNode)) {
-					    InputStream r = getAsStream(referenceService, t2Reference);
-					    sftp.put(r, target);
-					    r.close();
+			SshReference sshRef = getAsSshReference(referenceService, t2Reference, workerNode);
+			target = workerNode.getDirectory() + tmpname + "/" + remoteName;
+			logger.info("Target is " + target);
+			if (sshRef != null) {
+				if (!input.isForceCopy()) {
+					String linkCommand = workerNode.getLinkCommand();
+					if (linkCommand != null) {
+						String actualLinkCommand = getActualOsCommand(linkCommand, sshRef.getFullPath(), remoteName, target);
+						precedingCommands.add(actualLinkCommand);
+						return target;
+						
 					}
-				} catch (SftpException e) {
-					throw new IOException(e);
-				} catch (JSchException e) {
-					throw new IOException(e);
-					}
+				}
+				String copyCommand = workerNode.getCopyCommand();
+				if (copyCommand != null) {
+					String actualCopyCommand = getActualOsCommand(copyCommand, sshRef.getFullPath(), remoteName, target);
+					precedingCommands.add(actualCopyCommand);
+					return target;
+				}
+			}
+			try {
+				ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode,
+						askUserForPw);
+				synchronized (getNodeLock(workerNode)) {
+					InputStream r = getAsStream(referenceService, t2Reference);
+					sftp.put(r, target);
+					r.close();
+				}
+			} catch (SftpException e) {
+				throw new InvocationException(e);
+			} catch (JSchException e) {
+				throw new InvocationException(e);
+			} catch (IOException e) {
+				throw new InvocationException(e);
+			}
 			return target;
 		} else {
-			String value = (String) referenceService.renderIdentifier(t2Reference, String.class, dummyContext);
+			String value = (String) referenceService.renderIdentifier(
+					t2Reference, String.class, dummyContext);
 			return value;
-			
+
 		}
 	}
 
-    private static Object getNodeLock(final SshNode node) {
+    private SshReference getAsSshReference(ReferenceService referenceService,
+			T2Reference t2Reference, SshNode workerNode2) {
+    	Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
+		if (identified instanceof ReferenceSet) {
+			for (ExternalReferenceSPI ref : ((ReferenceSet) identified).getExternalReferences()) {
+				if (ref instanceof SshReference) {
+					SshReference sshRef = (SshReference) ref;
+					if (sshRef.getHost().equals(workerNode.getHost())) {
+						return sshRef;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private static Object getNodeLock(final SshNode node) {
 	return getNodeLock(node.getHost());
     }
 

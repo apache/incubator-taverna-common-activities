@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
 /**
@@ -39,19 +40,39 @@ public class SshMechanismCreator extends MechanismCreator {
 		result.setName(mechanismName);
 		ArrayList<SshNode> nodeList = new ArrayList<SshNode>();
 		for (Object nodeObject : detailsElement.getChildren("sshNode")) {
-			SshNode node = new SshNode();
 			Element nodeElement = (Element) nodeObject;
 			Element hostElement = nodeElement.getChild("host");
-			if (hostElement != null) {
-				node.setHost(hostElement.getText());
-			}
-			Element directoryElement = nodeElement.getChild("directory");
-			if (directoryElement != null) {
-				node.setDirectory(directoryElement.getText());
-			}
+			String host;
+			int port;
+			String directory;
+
+				host = hostElement.getText();
+
 			Element portElement = nodeElement.getChild("port");
-			node.setPort(Integer.parseInt(portElement.getText()));
+			port = Integer.parseInt(portElement.getText());
+			
+			Element directoryElement = nodeElement.getChild("directory");
+
+				directory = directoryElement.getText();
+
+				boolean newNode = !SshNodeFactory.getInstance().containsSshNode(host, port, directory);
+			
+			SshNode node = SshNodeFactory.getInstance().getSshNode(host, port, directory);
+			
+			if (newNode) {
+
+			Element linkCommandElement = nodeElement.getChild("linkCommand");
+			if (linkCommandElement != null) {
+				node.setLinkCommand(linkCommandElement.getText());
+			}
+
+			Element copyCommandElement = nodeElement.getChild("copyCommand");
+			if (copyCommandElement != null) {
+				node.setCopyCommand(copyCommandElement.getText());
+			}
+			}
 			nodeList.add(node);
+
 		}
 		result.setNodes(nodeList);		
 		return result;

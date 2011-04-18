@@ -20,13 +20,30 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
+import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
+
 public class SshNode {
+	
+	
+
 	private String host = "127.0.0.1";
 	private int port = 22;
 	private String directory = "/tmp/";
 	
 	private SshUrl url;
+	
+	private String linkCommand = null;
+	private String copyCommand = null;
 
+	/**
+	 * 
+	 */
+	SshNode() {
+		super();
+		linkCommand = InvocationMechanism.UNIX_LINK;
+		copyCommand = InvocationMechanism.UNIX_COPY;
+		
+	}
 	/**
 	 * @param directory the directory to set
 	 */
@@ -91,5 +108,35 @@ public class SshNode {
 		}
 		return (this.hashCode() == obj.hashCode());
 	}
+	/**
+	 * @return the linkCommand
+	 */
+	public String getLinkCommand() {
+		return linkCommand;
+	}
+	/**
+	 * @param linkCommand the linkCommand to set
+	 */
+	public void setLinkCommand(String linkCommand) {
+		if ((linkCommand != null) && linkCommand.isEmpty()) {
+			this.linkCommand = null;
+		} else {
+			this.linkCommand = linkCommand;
+		}	}
+	/**
+	 * @return the copyCommand
+	 */
+	public String getCopyCommand() {
+		return copyCommand;
+	}
+	/**
+	 * @param copyCommand the copyCommand to set
+	 */
+	public void setCopyCommand(String copyCommand) {
+		if ((copyCommand != null) && copyCommand.isEmpty()) {
+			this.copyCommand = null;
+		} else {
+			this.copyCommand = copyCommand;
+		}	}
 	
 }

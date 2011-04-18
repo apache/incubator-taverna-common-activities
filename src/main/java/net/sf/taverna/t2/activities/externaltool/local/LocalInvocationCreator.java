@@ -40,7 +40,7 @@ public final class LocalInvocationCreator implements
 
 	@Override
 	public UseCaseInvocation convert(String xml, UseCaseDescription description) {
-		LocalUseCaseInvocation result = null;
+		UseCaseInvocation result = null;
 		try {
 			Document document;
 			try {
@@ -58,7 +58,17 @@ public final class LocalInvocationCreator implements
 			if (directoryElement != null) {
 				tempDir = directoryElement.getText();
 			}
-			result = new LocalUseCaseInvocation(description, tempDir);
+			String shellPrefix = null;
+			Element shellPrefixElement = top.getChild("shellPrefix");
+			if (shellPrefixElement != null) {
+				shellPrefix = shellPrefixElement.getText();
+			}
+			String linkCommand = null;
+			Element linkCommandElement = top.getChild("linkCommand");
+			if (linkCommandElement != null) {
+				linkCommand = linkCommandElement.getText();
+			}
+			result = new LocalUseCaseInvocation(description, tempDir, shellPrefix, linkCommand);
 		} catch (IOException e) {
 			logger.error(e);
 		}

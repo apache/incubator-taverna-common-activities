@@ -54,16 +54,31 @@ public class ExternalToolSshInvocationMechanism extends InvocationMechanism {
 				hostElement.addContent(new Text(host));
 				nodeElement.addContent(hostElement);
 			}
+			int port = node.getPort();
+			Element portElement = new Element("port");
+			portElement.addContent(new Text(Integer.toString(port)));
+			nodeElement.addContent(portElement);
+
 			String directory = node.getDirectory();
 			if (directory != null) {
 				Element directoryElement = new Element("directory");
 				directoryElement.addContent(new Text(directory));
 				nodeElement.addContent(directoryElement);
 			}
-			int port = node.getPort();
-			Element portElement = new Element("port");
-			portElement.addContent(new Text(Integer.toString(port)));
-			nodeElement.addContent(portElement);
+			
+			String linkCommand = node.getLinkCommand();
+			if (linkCommand != null) {
+				Element linkCommandElement = new Element("linkCommand");
+				linkCommandElement.addContent(new Text(linkCommand));
+				nodeElement.addContent(linkCommandElement);
+			}
+			
+			String copyCommand = node.getCopyCommand();
+			if (copyCommand != null) {
+				Element copyCommandElement = new Element("copyCommand");
+				copyCommandElement.addContent(new Text(copyCommand));
+				nodeElement.addContent(copyCommandElement);
+			}
 			
 			top.addContent(nodeElement);
 		}

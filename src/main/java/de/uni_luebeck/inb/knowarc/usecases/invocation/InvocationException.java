@@ -17,5 +17,9 @@ public class InvocationException extends Exception {
 	public InvocationException(String string) {
 		super(string);
 	}
+	
+	public InvocationException(Exception e) {
+		super(e);
+	}
 
 }

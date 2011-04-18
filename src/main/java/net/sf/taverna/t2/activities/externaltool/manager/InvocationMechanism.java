@@ -15,6 +15,13 @@ import org.jdom.output.XMLOutputter;
 public abstract class InvocationMechanism {
 	
 	protected static XMLOutputter outputter = new XMLOutputter();
+
+
+	public static String UNIX_SHELL = "/bin/sh -c";
+
+	public static String UNIX_LINK = "/bin/ln -s %%PATH_TO_ORIGINAL%% %%TARGET_NAME%%";
+	
+	public static String UNIX_COPY = "/bin/cp %%PATH_TO_ORIGINAL%% %%TARGET_NAME%%";
 	
 	
 	private String name;

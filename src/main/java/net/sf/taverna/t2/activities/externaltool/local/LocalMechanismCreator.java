@@ -31,6 +31,14 @@ public class LocalMechanismCreator extends MechanismCreator {
 		if (directoryElement != null) {
 			result.setDirectory(directoryElement.getText());
 		}
+		Element shellPrefixElement = detailsElement.getChild("shellPrefix");
+		if (shellPrefixElement != null) {
+			result.setShellPrefix(shellPrefixElement.getText());
+		}
+		Element linkCommandElement = detailsElement.getChild("linkCommand");
+		if (linkCommandElement != null) {
+			result.setLinkCommand(linkCommandElement.getText());
+		}
 		return result;
 	}
 
