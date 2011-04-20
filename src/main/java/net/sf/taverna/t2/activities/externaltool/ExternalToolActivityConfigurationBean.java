@@ -11,17 +11,19 @@ public final class ExternalToolActivityConfigurationBean {
 	protected String externaltoolid;
 	protected UseCaseDescription useCaseDescription = null;
 	
+    private static InvocationGroupManager manager = InvocationGroupManager.getInstance();
+
 	public ExternalToolActivityConfigurationBean() {
-		group = InvocationGroupManager.getInstance().getDefaultGroup();
+		group = manager.getDefaultGroup();
 	}
 
 	public InvocationGroup getInvocationGroup() {
-		return group;
+	    return group;
 	}
 
 	public void setInvocationGroup(
 			InvocationGroup group) {
-		this.group = group;
+		this.group = manager.checkGroup(group);
 	}
 
 	/**

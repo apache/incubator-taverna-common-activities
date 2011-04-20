@@ -12,10 +12,6 @@ import net.sf.taverna.t2.activities.externaltool.InvocationCreator;
 import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
@@ -27,15 +23,17 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrl;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
+import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
+
 /**
  * @author alanrw
  *
  */
 public final class SshInvocationCreator implements InvocationCreator {
 	
-	private static SAXBuilder builder = new SAXBuilder();
-	
 	private static Logger logger = Logger.getLogger(SshInvocationCreator.class);
+
+    private static List<SshNode> knownNodes = new ArrayList<SshNode>();
 
 	@Override
 	public boolean canHandle(String mechanismType) {
@@ -43,57 +41,12 @@ public final class SshInvocationCreator implements InvocationCreator {
 	}
 
 	@Override
-	public UseCaseInvocation convert(String xml, UseCaseDescription description) {
-		List<SshNode> sshWorkerNodes = new ArrayList<SshNode>();
-		
-		Document document;
-		try {
-			document = builder.build(new StringReader(xml));
-		} catch (JDOMException e1) {
-			logger.error("Null invocation", e1);
-			return null;
-		} catch (IOException e1) {
-			logger.error("Null invocation", e1);
-			return null;
-		}
-		Element top = document.getRootElement();
-		for (Object nodeObject : top.getChildren("sshNode")) {
-			Element nodeElement = (Element) nodeObject;
-			Element hostElement = nodeElement.getChild("host");
-			String host = hostElement.getText();
-			
-			Element portElement = nodeElement.getChild("port");
-			int port = Integer.parseInt(portElement.getText());
-
-			Element directoryElement = nodeElement.getChild("directory");
-			String directory = directoryElement.getText();
-			
-			boolean newNode = !SshNodeFactory.getInstance().containsSshNode(host, port, directory);
-			
-			SshNode node = SshNodeFactory.getInstance().getSshNode(host, port, directory);
-
-			if (newNode) {
-			Element linkCommandElement = nodeElement.getChild("linkCommand");
-			if (linkCommandElement != null) {
-				node.setLinkCommand(linkCommandElement.getText());
-			} else {
-				node.setLinkCommand(null);
-			}
-
-			Element copyCommandElement = nodeElement.getChild("copyCommand");
-			if (copyCommandElement != null) {
-				node.setCopyCommand(copyCommandElement.getText());
-			} else {
-				node.setCopyCommand(null);
-			}
-			}
-
-			sshWorkerNodes.add(node);
-		}
-		SshNode chosenNode = sshWorkerNodes.get(0);
+	public UseCaseInvocation convert(InvocationMechanism m, UseCaseDescription description) {
+	    ExternalToolSshInvocationMechanism mechanism = (ExternalToolSshInvocationMechanism) m;
 		SshUseCaseInvocation result = null;
 		try {
-			result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString()));
+		    SshNode chosenNode = chooseNode(mechanism.getNodes());
+		    result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString()));
 		} catch (JSchException e) {
 			logger.error("Null invocation", e);
 		} catch (SftpException e) {
@@ -102,4 +55,26 @@ public final class SshInvocationCreator implements InvocationCreator {
 		return result;
 	}
 
+    private static SshNode chooseNode(List<SshNode> possibleNodes) {
+	SshNode result = null;
+	synchronized(knownNodes) {
+	    int chosenIndex = Integer.MAX_VALUE;
+	    for (SshNode p : possibleNodes) {
+		if (!knownNodes.contains(p)) {
+		    knownNodes.add(p);
+		}
+		int index = knownNodes.indexOf(p);
+		if (index < chosenIndex) {
+		    chosenIndex = index;
+		}
+	    }
+	    if (chosenIndex != Integer.MAX_VALUE) {
+		result = knownNodes.get(chosenIndex);
+		// Move node to end of list
+		knownNodes.remove(result);
+		knownNodes.add(result);
+	    }
+	}
+	return result;
+    }
 }

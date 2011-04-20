@@ -202,8 +202,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							logger.info("InvocationMechanism name is " + group.getMechanism().getName());
 							logger.info("Group thinks mechanism name is " + group.getMechanismName());
 							logger.info("Mechanism XML is " + group.getMechanismXML());
-							invoke = getInvocation(group.getMechanismType(),
-									group.getMechanismXML(), configurationBean.getUseCaseDescription());
+							invoke = getInvocation(group, configurationBean.getUseCaseDescription());
 							if (invoke == null) {
 								logger.error("Invoke is null");
 								callback.fail("No invocation mechanism found");
@@ -278,17 +277,17 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	
 	private static SPIRegistry<InvocationCreator> invocationCreatorRegistry = new SPIRegistry(InvocationCreator.class);
 	
-	private UseCaseInvocation getInvocation(String mechanismType, String xml, UseCaseDescription description) {
+	private UseCaseInvocation getInvocation(InvocationGroup group, UseCaseDescription description) {
 		UseCaseInvocation result = null;
 		InvocationCreator creator = null;
 		for (InvocationCreator c : invocationCreatorRegistry.getInstances()) {
-			if (c.canHandle(mechanismType)) {
+			if (c.canHandle(group.getMechanismType())) {
 				creator = c;
 				break;
 			}
 		}
 		if (creator != null) {
-			result = creator.convert(xml, description);
+			result = creator.convert(group.getMechanism(), description);
 		}
 		return result;
 	}
