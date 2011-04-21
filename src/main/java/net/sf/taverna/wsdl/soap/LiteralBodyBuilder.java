@@ -200,7 +200,7 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 					tag = elementType.getName();
 				}
 				Element item = el.getOwnerDocument().createElement(tag);
-				populateElementWithObjectData(mimeType, item, dataValue);
+				populateElementWithObjectData(mimeType, item, dataValue, descriptor);
 				el.appendChild(item);
 			}
 
