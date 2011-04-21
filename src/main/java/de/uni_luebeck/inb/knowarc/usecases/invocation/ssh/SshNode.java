@@ -24,11 +24,13 @@ import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
 
 public class SshNode {
 	
-	
+    public static String DEFAULT_HOST = "127.0.0.1";
+    public static int DEFAULT_PORT = 22;
+    public static String DEFAULT_DIRECTORY = "/tmp/";
 
-	private String host = "127.0.0.1";
-	private int port = 22;
-	private String directory = "/tmp/";
+    private String host = DEFAULT_HOST;
+    private int port = DEFAULT_PORT;
+    private String directory = DEFAULT_DIRECTORY;
 	
 	private SshUrl url;
 	
