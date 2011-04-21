@@ -11,7 +11,8 @@ import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
-import org.apache.http.client.CredentialsProvider;
+//import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,8 +23,9 @@ import org.apache.log4j.Logger;
  * when they are required for HTTP authentication.
  * 
  * @author Sergejs Aleksejevs
+ * @author Alex Nenadic
  */
-public class RESTActivityCredentialsProvider implements CredentialsProvider
+public class RESTActivityCredentialsProvider extends BasicCredentialsProvider
 {
   private static Logger logger = Logger.getLogger(RESTActivityCredentialsProvider.class);
   
@@ -57,7 +59,7 @@ public class RESTActivityCredentialsProvider implements CredentialsProvider
     return (credentialsProvider);
   }
   
-  
+  @Override
   public Credentials getCredentials(AuthScope authscope)
   {
     logger.info("Looking for credentials for: Host - " + authscope.getHost() + ";" +
@@ -65,6 +67,15 @@ public class RESTActivityCredentialsProvider implements CredentialsProvider
         "Realm - " + authscope.getRealm() + ";" +
         "Authentication scheme - " + authscope.getScheme());
     
+	// Ask the superclass first
+    Credentials creds = super.getCredentials(authscope);
+    if (creds != null){ 
+    	// We have used setCredentials() on this class (for proxy host, port, username,password) 
+    	// just before we invoked the http request, which will then pick the proxy credentials up from here.
+    	return creds; 
+    }
+    
+    // Otherwise, ask Credential Manager if is can provide the credential
     
     String AUTHENTICATION_REQUEST_MSG = "This REST service requires authentication in " + authscope.getRealm();
     
@@ -141,11 +152,6 @@ public class RESTActivityCredentialsProvider implements CredentialsProvider
     logger.info("Credentials not found - the user must have refused to enter them.");
     return null;
   }
-  
-  
-  public void setCredentials(AuthScope authscope, Credentials credentials) { /* do nothing */ }
-  public void clear() { /* do nothing */ }
-  
   
   /**
    * This class encapsulates user's credentials that this CredentialsProvider can

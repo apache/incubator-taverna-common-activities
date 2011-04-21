@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.ProxySelector;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -20,7 +21,9 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+//import org.apache.http.client.HttpClient;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -33,6 +36,7 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
@@ -48,6 +52,7 @@ import org.apache.log4j.Logger;
  * REST activity - encapsulated in a configuration bean.
  * 
  * @author Sergejs Aleksejevs
+ * @author Alex Nenadic
  */
 public class HTTPRequestHandler
 {
@@ -55,6 +60,11 @@ public class HTTPRequestHandler
   private static final String ACCEPT_HEADER_NAME = "Accept";
   private static Logger logger = Logger.getLogger(HTTPRequestHandler.class);
   
+	public static String PROXY_HOST = "http.proxyHost";
+	public static String PROXY_PORT = "http.proxyPort";
+	public static String PROXY_USERNAME = "http.proxyUser";
+	public static String PROXY_PASSWORD = "http.proxyPassword";
+	
   
   /**
    * This method is the entry point to the invocation of a remote REST
@@ -78,12 +88,13 @@ public class HTTPRequestHandler
   public static HTTPRequestResponse initiateHTTPRequest(String requestURL,
       RESTActivityConfigurationBean configBean, Object inputMessageBody)
   {	  
-	  ClientConnectionManager connectionManager = null;
+		ClientConnectionManager connectionManager = null;
 		if (requestURL.toLowerCase().startsWith("https")) {
-			// Register a protocol scheme for https that uses Taverna's SSLSocketFactory
+			// Register a protocol scheme for https that uses Taverna's
+			// SSLSocketFactory
 			try {
 				URL url = new URL(requestURL); // the URL object which will
-												// parse the port out for us
+				// parse the port out for us
 				int port = url.getPort();
 				if (port == -1) { // no port was defined in the URL
 					port = 433; // default HTTPS port
@@ -93,16 +104,22 @@ public class HTTPRequestHandler
 								SSLContext.getDefault()), port);
 				SchemeRegistry schemeRegistry = new SchemeRegistry();
 				schemeRegistry.register(https);
-			    connectionManager = new SingleClientConnManager(null, schemeRegistry);
+				connectionManager = new SingleClientConnManager(null,
+						schemeRegistry);
 			} catch (MalformedURLException ex) {
-				logger.error("Failed to extract port from the REST service URL: the URL "
+				logger.error(
+						"Failed to extract port from the REST service URL: the URL "
 								+ requestURL + " is malformed.", ex);
 				// This will cause the REST activity to fail but this method
-				// seems not to throw an exception so we'll just log the error and let it go through
+				// seems not to throw an exception so we'll just log the error
+				// and let it go through
 			} catch (NoSuchAlgorithmException ex2) {
 				// This will cause the REST activity to fail but this method
-				// seems not to throw an exception so we'll just log the error and let it go through
-				logger.error("Failed to create SSLContext for invoking the REST service over https.",
+				// seems not to throw an exception so we'll just log the error
+				// and let it go through
+				logger
+						.error(
+								"Failed to create SSLContext for invoking the REST service over https.",
 								ex2);
 			}
 		}
@@ -192,60 +209,95 @@ public class HTTPRequestHandler
   }
   
   
-  /**
-   * TODO - may need to set PROXY from Taverna's / Java's settings...
-   * TODO - REDIRECTION output:: if there was no redirection, should just show the actual initial URL?
-   * 
-   * @param httpRequest
-   * @param acceptHeaderValue 
-   */
-  private static HTTPRequestResponse performHTTPRequest(ClientConnectionManager connectionManager, HttpRequestBase httpRequest, RESTActivityConfigurationBean configBean)
-  {
-    // headers are set identically for all HTTP methods, therefore can do centrally - here
-    httpRequest.setHeader(ACCEPT_HEADER_NAME, configBean.getAcceptsHeaderValue());
-    
-    HTTPRequestResponse requestResponse = new HTTPRequestResponse();
-    
-    try {
-      HttpClient httpClient = new DefaultHttpClient(connectionManager, null);
-      ((DefaultHttpClient)httpClient).setCredentialsProvider(RESTActivityCredentialsProvider.getInstance());
-      HttpContext localContext = new BasicHttpContext();
-      
-      // execute the request
-      HttpResponse response = httpClient.execute(httpRequest, localContext);
-      
-      // record response code
-      requestResponse.setStatusCode(response.getStatusLine().getStatusCode());
-      requestResponse.setReasonPhrase(response.getStatusLine().getReasonPhrase());
-      
-      // record header values for Content-Type of the response 
-      requestResponse.setResponseContentTypes(response.getHeaders(CONTENT_TYPE_HEADER_NAME));
-      
-      
-      // track where did the final redirect go to (if there was any)
-      HttpHost targetHost = (HttpHost) localContext.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
-      HttpUriRequest targetRequest = (HttpUriRequest) localContext.getAttribute(ExecutionContext.HTTP_REQUEST);
-      requestResponse.setRedirectionURL("" + targetHost + targetRequest.getURI());
-      requestResponse.setRedirectionHTTPMethod(targetRequest.getMethod());
-      
-      // read and store response body
-      // (check there is some content - negative length of content means unknown length;
-      //  zero definitely means no content...)
-      // TODO - make sure that this test is sufficient to determine if there is no response entity
-      if (response.getEntity() != null && response.getEntity().getContentLength() != 0) {
-        requestResponse.setResponseBody(readResponseBody(response.getEntity()));
-      }
-      
-      // release resources (e.g. connection pool, etc)
-      httpClient.getConnectionManager().shutdown();
-     
-    }
-    catch (Exception ex) {
-      requestResponse = new HTTPRequestResponse(ex);
-    }
-    
-    return (requestResponse);
-  }
+	/**
+	 * TODO - REDIRECTION output:: if there was no redirection, should just show the
+	 * actual initial URL?
+	 * 
+	 * @param httpRequest
+	 * @param acceptHeaderValue
+	 */
+	private static HTTPRequestResponse performHTTPRequest(
+			ClientConnectionManager connectionManager,
+			HttpRequestBase httpRequest,
+			RESTActivityConfigurationBean configBean) {
+		// headers are set identically for all HTTP methods, therefore can do
+		// centrally - here
+		httpRequest.setHeader(ACCEPT_HEADER_NAME, configBean
+				.getAcceptsHeaderValue());
+
+		HTTPRequestResponse requestResponse = new HTTPRequestResponse();
+
+		try {
+			DefaultHttpClient httpClient = new DefaultHttpClient(connectionManager,
+					null);
+			((DefaultHttpClient) httpClient)
+					.setCredentialsProvider(RESTActivityCredentialsProvider
+							.getInstance());
+			HttpContext localContext = new BasicHttpContext();
+
+			// Set the proxy settings, if any
+			if (System.getProperty(PROXY_HOST) != null
+					&& !System.getProperty(PROXY_HOST).equals("")) {
+				// Instruct HttpClient to use the standard
+				// JRE proxy selector to obtain proxy information
+				ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(
+						httpClient.getConnectionManager().getSchemeRegistry(), ProxySelector
+								.getDefault());
+				httpClient.setRoutePlanner(routePlanner);
+				// Do we need to authenticate the user to the proxy?
+				if (System.getProperty(PROXY_USERNAME) != null
+						&& !System.getProperty(PROXY_USERNAME).equals("")) {
+					// Add the proxy username and password to the list of credentials
+					httpClient.getCredentialsProvider().setCredentials(
+							new AuthScope(System.getProperty(PROXY_HOST),Integer.parseInt(System.getProperty(PROXY_PORT))),
+							new UsernamePasswordCredentials(System.getProperty(PROXY_USERNAME), System.getProperty(PROXY_PASSWORD)));
+				}
+			}
+
+			// execute the request
+			HttpResponse response = httpClient.execute(httpRequest,
+					localContext);
+
+			// record response code
+			requestResponse.setStatusCode(response.getStatusLine()
+					.getStatusCode());
+			requestResponse.setReasonPhrase(response.getStatusLine()
+					.getReasonPhrase());
+
+			// record header values for Content-Type of the response
+			requestResponse.setResponseContentTypes(response
+					.getHeaders(CONTENT_TYPE_HEADER_NAME));
+
+			// track where did the final redirect go to (if there was any)
+			HttpHost targetHost = (HttpHost) localContext
+					.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+			HttpUriRequest targetRequest = (HttpUriRequest) localContext
+					.getAttribute(ExecutionContext.HTTP_REQUEST);
+			requestResponse.setRedirectionURL("" + targetHost
+					+ targetRequest.getURI());
+			requestResponse.setRedirectionHTTPMethod(targetRequest.getMethod());
+
+			// read and store response body
+			// (check there is some content - negative length of content means
+			// unknown length;
+			// zero definitely means no content...)
+			// TODO - make sure that this test is sufficient to determine if
+			// there is no response entity
+			if (response.getEntity() != null
+					&& response.getEntity().getContentLength() != 0) {
+				requestResponse.setResponseBody(readResponseBody(response
+						.getEntity()));
+			}
+
+			// release resources (e.g. connection pool, etc)
+			httpClient.getConnectionManager().shutdown();
+
+		} catch (Exception ex) {
+			requestResponse = new HTTPRequestResponse(ex);
+		}
+
+		return (requestResponse);
+	}
   
   
   /**
