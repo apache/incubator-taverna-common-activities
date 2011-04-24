@@ -22,6 +22,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 public class RESTActivity extends
 		AbstractAsynchronousActivity<RESTActivityConfigurationBean> implements
 		AsynchronousActivity<RESTActivityConfigurationBean> {
+	
 	// This generic activity can deal with any of the four HTTP methods
 	public static enum HTTP_METHOD {
 		GET, POST, PUT, DELETE
@@ -44,7 +45,7 @@ public class RESTActivity extends
 
 	// Pre-defined MIME types that this activity "knows" about -
 	// these will be available for configuration of the activity
-	public static String[] MIME_TYPES = { "text/css", "text/csv", "text/html",
+	public static String[] MIME_TYPES = { "", "text/css", "text/csv", "text/html",
 			"text/plain", "text/xml", "application/xml", "application/json",
 			"application/msword", "application/octet-stream",
 			"application/pdf", "application/zip", "image/bmp", "image/gif",

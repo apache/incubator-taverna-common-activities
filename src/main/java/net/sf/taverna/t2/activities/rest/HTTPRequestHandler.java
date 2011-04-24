@@ -153,7 +153,10 @@ public class HTTPRequestHandler
       httpPost.getParams().setBooleanParameter("http.protocol.expect-continue", false );
     }
     
-    httpPost.setHeader(CONTENT_TYPE_HEADER_NAME, configBean.getContentTypeForUpdates());
+	// If the user wants to set MIME type for the 'Content-Type' header
+    if (!configBean.getContentTypeForUpdates().equals("")){
+    	httpPost.setHeader(CONTENT_TYPE_HEADER_NAME, configBean.getContentTypeForUpdates());
+    }
     try {
       HttpEntity entity = null;
       if (inputMessageBody == null) {
@@ -180,7 +183,9 @@ public class HTTPRequestHandler
       RESTActivityConfigurationBean configBean, Object inputMessageBody)
   {
     HttpPut httpPut = new HttpPut(requestURL);
-    httpPut.setHeader(CONTENT_TYPE_HEADER_NAME, configBean.getContentTypeForUpdates());
+    if (!configBean.getContentTypeForUpdates().equals("")){
+    	httpPut.setHeader(CONTENT_TYPE_HEADER_NAME, configBean.getContentTypeForUpdates());
+    }
     try {
       HttpEntity entity = null;
       if (inputMessageBody == null) {
@@ -222,9 +227,14 @@ public class HTTPRequestHandler
 			RESTActivityConfigurationBean configBean) {
 		// headers are set identically for all HTTP methods, therefore can do
 		// centrally - here
-		httpRequest.setHeader(ACCEPT_HEADER_NAME, configBean
-				.getAcceptsHeaderValue());
-
+		
+		// If the user wants to set MIME type for the 'Accepts' header
+		if (!configBean
+				.getAcceptsHeaderValue().equals("")){
+			httpRequest.setHeader(ACCEPT_HEADER_NAME, configBean
+					.getAcceptsHeaderValue());			
+		}
+		
 		HTTPRequestResponse requestResponse = new HTTPRequestResponse();
 
 		try {
