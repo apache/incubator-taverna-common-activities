@@ -164,11 +164,7 @@ public abstract class UseCaseInvocation {
 	}
 
 
-	public abstract void Cleanup();
-
-	public abstract void putFile(String name, byte[] contents);
-
-	public abstract void putReference(String name, String source) throws NotImplementedException;
+	public abstract void cleanup() throws InvocationException;
 
 	/*
 	 * submit a grid job and wait for it to finish, then get the result as
