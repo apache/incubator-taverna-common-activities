@@ -29,8 +29,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
+import net.sf.taverna.t2.reference.IdentifiedList;
 import net.sf.taverna.t2.reference.ReferenceContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
@@ -67,7 +69,8 @@ public abstract class UseCaseInvocation {
 	protected UseCaseDescription usecase;
 	protected final HashMap<String, String> tags = new HashMap<String, String>();
 	protected int nTempFiles = 0;
-	public final ReferenceContext dummyContext = new EmptyReferenceContext();
+	private static int submissionID = 0;
+	private InvocationContext invocationContext;
 	
 	/*
 	 * get the class of the data we expect for a given input
@@ -97,7 +100,6 @@ public abstract class UseCaseInvocation {
 		return usecase.getInputs().keySet();
 	}
 
-	private static int submissionID = 0;
 
 	/*
 	 * get a id, incremented with each job. thus, this should be thread-wide
@@ -113,91 +115,52 @@ public abstract class UseCaseInvocation {
 	@SuppressWarnings("unchecked")
 	public void setInput(String inputName, ReferenceService referenceService, T2Reference t2Reference) throws InvocationException {
 		ScriptInputUser input = (ScriptInputUser) usecase.getInputs().get(inputName);
-//		if (input.isList()) {
-//			List data = null;
-//			if (value instanceof OnDemandDownload) {
-//				data = (List) ((OnDemandDownload) value).download();
-//			} else {
-//				data = (List) value;
-//			}
+		if (input.isList()) {
+			IdentifiedList<T2Reference> listOfReferences = (IdentifiedList<T2Reference>) referenceService.getListService().getList(t2Reference);
 
-//			if (!input.isConcatenate()) {
-//				// this is a list input (not concatenated)
-//				// so write every element to its own temporary file
-//				// and create a filelist file
-//
-//				// we need to write the list elements to temporary files
-//				ScriptInputUser listElements = new ScriptInputUser();
-//				listElements.setBinary(input.isBinary());
-//				listElements.setTempFile(true);
-//
-//				String lineEndChar = "\n";
-//				if (!input.isFile() && !input.isTempFile())
-//					lineEndChar = " ";
-//
-//				String list = "";
-//				// create a list of all temp file names
-//				for (Object cur : data) {
-//					String tmp = setOneInput(cur, listElements);
-//					list += tmp + lineEndChar;
-//				}
-//
-//				String filenames = "";
-//				// create a list of the original file names, works only in url
-//				// mode
-//				for (Object cur : data) {
-//					String tmp = "NO_URL_MODE_ERROR";
-//					if (cur instanceof OnDemandDownload) {
-//						tmp = ((OnDemandDownload) cur).getReferenceURL();
-//						int ind = tmp.lastIndexOf('/');
-//						if (ind == -1)
-//							ind = tmp.lastIndexOf('\\');
-//						if (ind != -1)
-//							tmp = tmp.substring(ind);
-//					}
-//					filenames += tmp + lineEndChar;
-//				}
-//
-//				// how do we want the listfile to be stored?
-//				ScriptInputUser listFile = new ScriptInputUser();
-//				listFile.setBinary(false); // since its a list file
-//				listFile.setFile(input.isFile());
-//				listFile.setTempFile(input.isTempFile());
-//				listFile.setTag(input.getTag());
-//
-//				tags.put(listFile.getTag(), setOneInput(list, listFile));
-//
-//				listFile.setTag(input.getTag() + "_NAMES");
-//				tags.put(listFile.getTag(), setOneInput(filenames, listFile));
-//			} else {
-//				Object concat = null;
-//				// first, concatenate all data
-//				if (input.isBinary()) {
-//					int size = 0;
-//					for (Object cur : data) {
-//						size += ((byte[]) cur).length;
-//					}
-//					byte[] concatb = new byte[size];
-//					int pos = 0;
-//					for (Object cur : data) {
-//						byte[] curb = (byte[]) cur;
-//						System.arraycopy(curb, 0, concatb, pos, curb.length);
-//						pos += curb.length;
-//					}
-//					concat = concatb;
-//				} else {
-//					String concata = "";
-//					for (Object cur : data) {
-//						concata += (String) cur;
-//					}
-//					concat = concata;
-//				}
-//				// then set as normal input
-//				tags.put(input.getTag(), setOneInput(concat, input));
-//			}
-//		} else {
+				// this is a list input (not concatenated)
+				// so write every element to its own temporary file
+				// and create a filelist file
+
+				// we need to write the list elements to temporary files
+				ScriptInputUser listElementTemp = new ScriptInputUser();
+				listElementTemp.setBinary(input.isBinary());
+				listElementTemp.setTempFile(true);
+
+				String lineEndChar = "\n";
+
+				String listFileContent = "";
+				String filenamesFileContent = "";
+				// create a list of all temp file names
+				for (T2Reference cur : listOfReferences) {
+					String tmp = setOneInput(referenceService, cur, listElementTemp);
+					listFileContent += tmp + lineEndChar;
+					int ind = tmp.lastIndexOf('/');
+					if (ind == -1) {
+						ind = tmp.lastIndexOf('\\');
+					}
+					if (ind != -1) {
+						tmp = tmp.substring(ind + 1);
+					}
+					filenamesFileContent += tmp + lineEndChar;
+				}
+
+				// how do we want the listfile to be stored?
+				ScriptInputUser listFile = new ScriptInputUser();
+				listFile.setBinary(false); // since its a list file
+				listFile.setFile(input.isFile());
+				listFile.setTempFile(input.isTempFile());
+				listFile.setTag(input.getTag());
+				T2Reference listFileContentReference = referenceService.register(listFileContent, 0, true, invocationContext);
+
+				tags.put(listFile.getTag(), setOneInput(referenceService, listFileContentReference, listFile));
+
+				listFile.setTag(input.getTag() + "_NAMES");
+				T2Reference filenamesFileContentReference = referenceService.register(filenamesFileContent, 0, true, null);
+				tags.put(listFile.getTag(), setOneInput(referenceService, filenamesFileContentReference, listFile));
+			}  else {
 			tags.put(input.getTag(), setOneInput(referenceService, t2Reference, input));
-//		}
+		}
 	}
 
 
@@ -255,8 +218,18 @@ public abstract class UseCaseInvocation {
 		Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
 		if (identified instanceof ReferenceSet) {
 			ExternalReferenceSPI ref = ((ReferenceSet) identified).getExternalReferences().iterator().next();
-			return ref.openStream(dummyContext);
+			return ref.openStream(invocationContext);
 		}
 		return null;
 	}
+
+	public void setContext(InvocationContext context) {
+		this.invocationContext = context;
+		
+	}
+	
+	public InvocationContext getContext() {
+		return this.invocationContext;
+	}
+
 }
