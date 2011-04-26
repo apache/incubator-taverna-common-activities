@@ -328,7 +328,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 			return target;
 		} else {
 			String value = (String) referenceService.renderIdentifier(
-					t2Reference, String.class, dummyContext);
+					t2Reference, String.class, this.getContext());
 			return value;
 
 		}
