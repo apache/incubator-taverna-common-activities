@@ -130,7 +130,6 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 
 	}
 
-	@Override
 	/*
 	 * Some data is transferred to the remote site.
 	 * 
@@ -151,7 +150,6 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 	 * @param source
 	 *            - URL at which it is available now
 	 */
-	@Override
 	public void putReference(String file, String source) {
 		if (source.startsWith("file")) {
 			try {
@@ -416,7 +414,7 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 	 * @see de.uni_luebeck.janitor.usecase.UseCaseInvokation#Cleanup()
 	 */
 	@Override
-	public void Cleanup() {
+	public void cleanup() {
 		if (conn != null)
 			conn.Disconnect();
 	}
