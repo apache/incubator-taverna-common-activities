@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
+import net.sf.taverna.t2.reference.ReferenceContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.ReferencedDataNature;
@@ -164,7 +165,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 						
 				} else {
 					if (fileRef.getDataNature().equals(ReferencedDataNature.TEXT)) {
-						r = new InputStreamReader(fileRef.openStream(dummyContext), Charset.forName(fileRef.getCharset()));
+						r = new InputStreamReader(fileRef.openStream(this.getContext()), Charset.forName(fileRef.getCharset()));
 					} else {
 						try {
 							r = new FileReader(fileRef.getFile());
@@ -205,11 +206,12 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 			return target;
 		}
 		else {
-			String value = (String) referenceService.renderIdentifier(t2Reference, String.class, dummyContext);
+			String value = (String) referenceService.renderIdentifier(t2Reference, String.class, this.getContext());
 			return value;
 		}
 	}
 	
+
 	@Override
 	public void putFile(String name, byte[] contents) {
 		try {
