@@ -39,21 +39,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
-import net.sf.taverna.t2.reference.ReferenceContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.ReferencedDataNature;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.globus.ftp.exception.NotImplementedException;
 
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
@@ -213,25 +210,13 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	
 
 	@Override
-	public void putFile(String name, byte[] contents) {
+	public void cleanup() {
+		logger.error("Clearing " + tempDir);
 		try {
-			FileOutputStream out = new FileOutputStream(tempDir.getAbsolutePath() + "/" + name, false);
-			out.write(contents);
-			out.close();
-		} catch (Exception e) {
-		    // TODO
+			FileUtils.deleteDirectory(tempDir);
+		} catch (IOException e) {
+			logger.error("Unable to delete" + tempDir, e);
 		}
-	}
-
-	@Override
-	public void putReference(String name, String source) throws NotImplementedException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public void Cleanup() {
-//		recDel(tempDir);
-//		tempFile.delete();
 	}
 	
 	@Override
