@@ -38,6 +38,7 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
 import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.taverna.t2.workflowmodel.EditException;
 import net.sf.taverna.t2.workflowmodel.EditsRegistry;
@@ -50,7 +51,6 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.apache.log4j.Logger;
 import org.globus.ftp.exception.ClientException;
 
-import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
@@ -203,6 +203,9 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							logger.info("Group thinks mechanism name is " + group.getMechanismName());
 							logger.info("Mechanism XML is " + group.getMechanismXML());
 							invoke = getInvocation(group, configurationBean.getUseCaseDescription());
+							String runId = callback.getContext().getEntities(WorkflowRunIdEntity.class).get(0).getWorkflowRunId();
+							logger.error("Run id is " + runId);
+							ExternalToolRunDeletionListener.rememberInvocation(runId, invoke);
 							invoke.setContext(callback.getContext());
 							if (invoke == null) {
 								logger.error("Invoke is null");
@@ -264,11 +267,6 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 					callback.fail("Problem submitting job: IOException: ", e);
 				} catch (Exception e) {
 					callback.fail(e.getMessage(), e);
-				} finally {
-					// clean up temporary invocation files, terminate network
-					// connections
-					if (invoke != null)
-						invoke.Cleanup();
 				}
 			}
 
