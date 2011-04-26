@@ -203,6 +203,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							logger.info("Group thinks mechanism name is " + group.getMechanismName());
 							logger.info("Mechanism XML is " + group.getMechanismXML());
 							invoke = getInvocation(group, configurationBean.getUseCaseDescription());
+							invoke.setContext(callback.getContext());
 							if (invoke == null) {
 								logger.error("Invoke is null");
 								callback.fail("No invocation mechanism found");
