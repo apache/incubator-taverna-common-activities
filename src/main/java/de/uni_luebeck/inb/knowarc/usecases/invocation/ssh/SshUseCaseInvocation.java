@@ -20,11 +20,9 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -39,10 +37,8 @@ import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.reference.impl.external.file.FileReference;
 
 import org.apache.log4j.Logger;
-import org.globus.ftp.exception.NotImplementedException;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
@@ -51,7 +47,6 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
-import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
@@ -67,7 +62,7 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
  */
 public class SshUseCaseInvocation extends UseCaseInvocation {
 	
-	private static Logger logger = Logger.getLogger(RuntimeEnvironmentConstraint.class);
+	private static Logger logger = Logger.getLogger(SshUseCaseInvocation.class);
 	
 	
 	public static final String SSH_USE_CASE_INVOCATION_TYPE = "D0A4CDEB-DD10-4A8E-A49C-8871003083D8";
@@ -128,95 +123,45 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 	}
 
-	@Override
-	public void putFile(String name, byte[] contents) {
-	    ChannelSftp sftp;
-	    try {
-		sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
-		synchronized(getNodeLock(workerNode)) {
-		    try {
-			sftp.cd(workerNode.getDirectory() + tmpname);
-		    } catch (SftpException e1) {
-			logger.error("Unable to change directory" + e1);
-		    }
-		    try {
-			sftp.put(new ByteArrayInputStream(contents), name);
-		    } catch (Exception e) {
-		    	// TODO
-			logger.error("Error in putFile" + e);
-		    }
-		    //				sftp.disconnect();
-		}
-	    } catch (JSchException e2) {
-		// TODO Auto-generated catch block
-		logger.error(e2);
-	    }
-	}
-
-	@Override
-	public void putReference(String name, String source) throws NotImplementedException {
-		throw new NotImplementedException();
-	}
-
-	private void recursiveDelete(String path) throws SftpException, JSchException {
-		if (!path.startsWith(workerNode.getDirectory() + tmpname))
+	private void recursiveDelete(ChannelSftp sftp, String path) throws SftpException, JSchException {
+		if (!path.startsWith(workerNode.getDirectory() + tmpname)) {
 			return;
-		ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
-		synchronized(getNodeLock(workerNode)) {
-		    Vector<?> entries = sftp.ls(path);
-		    for (Object object : entries) {
+		}
+		Vector<?> entries = sftp.ls(path);
+		for (Object object : entries) {
 			LsEntry entry = (LsEntry) object;
-			if (entry.getFilename().equals(".") || entry.getFilename().equals(".."))
+			if (entry.getFilename().equals(".")
+					|| entry.getFilename().equals("..")) {
 				continue;
-			if (entry.getAttrs().isDir())
-				recursiveDelete(path + entry.getFilename() + "/");
-			else
+			}
+			if (entry.getAttrs().isDir()) {
+				recursiveDelete(sftp, path + entry.getFilename() + "/");
+			}
+			else {
 				sftp.rm(path + entry.getFilename());
+			}
 		}
 		sftp.rmdir(path);
-		}
 	}
 
 	@Override
-	public void Cleanup() {
-		try {
-//			sftp.cd(workerNode.getDirectory());
-//			recursiveDelete(workerNode.getDirectory() + tmpname + "/");
-		} catch (Exception e) {
-		    // TODO
-		}
-		try {
-			if (running != null) {
-			    running.disconnect();
+	public void cleanup() throws InvocationException {
+			ChannelSftp sftp;
+			try {
+				sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
+			} catch (JSchException e) {
+				throw new InvocationException(e);
 			}
-//			sftp.disconnect();
-//			sshSession.disconnect();
-		} catch (Exception e) {
-		}
-	}
-
-	/**
-	 * Transforms an input stream towards an entity that Taverna can work with.
-	 * 
-	 * @param read
-	 * @param binary
-	 * @return
-	 * @throws IOException
-	 */
-	private Object file2data(InputStream read, boolean binary) throws IOException {
-		byte[] data = new byte[0];
-		byte[] buf = new byte[1024];
-		int r;
-		while (-1 != (r = read.read(buf))) {
-			byte[] d2 = new byte[data.length + r];
-			System.arraycopy(data, 0, d2, 0, data.length);
-			System.arraycopy(buf, 0, d2, data.length, r);
-			data = d2;
-		}
-		if (binary)
-			return data;
-		else
-			return Charset.forName("US-ASCII").decode(ByteBuffer.wrap(data)).toString();
+			synchronized(getNodeLock(workerNode)) {
+			try {
+				sftp.cd(workerNode.getDirectory());
+				recursiveDelete(sftp, workerNode.getDirectory() + tmpname + "/");
+			} catch (SftpException e) {
+				throw new InvocationException(e);
+			} catch (JSchException e) {
+				throw new InvocationException(e);
+			}
+			}
 	}
 
 	@Override
@@ -271,8 +216,9 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		    results.put(cur.getKey(), url);
 		}
 
-		//		sftp.disconnect();
-       		running.disconnect();
+		if (running != null) {
+		    running.disconnect();
+		}
 		return results;
 	}
 	
