@@ -33,13 +33,14 @@ public class ExternalToolRunDeletionListener implements RunDeletionListener {
 	@Override
 	public void deleteRun(String runToDelete) {
 		Set<UseCaseInvocation> invocations = runToInvocationsMap.get(runToDelete);
-		runToInvocationsMap.remove(runToDelete);
-		for (UseCaseInvocation uci : invocations) {
-			try {
-				uci.cleanup();
-			}
-			catch (InvocationException e) {
-				logger.error(e);
+		if (invocations != null) {
+			runToInvocationsMap.remove(runToDelete);
+			for (UseCaseInvocation uci : invocations) {
+				try {
+					uci.cleanup();
+				} catch (InvocationException e) {
+					logger.error(e);
+				}
 			}
 		}
 	}
