@@ -152,7 +152,7 @@ public class InvocationGroupManager {
 		return null;
 	}
 	
-	private InvocationGroup getInvocationGroup(String defaultGroupName) {
+	InvocationGroup getInvocationGroup(String defaultGroupName) {
 		for (InvocationGroup g : groups) {
 			if (g.getInvocationGroupName().equals(defaultGroupName)) {
 				return g;

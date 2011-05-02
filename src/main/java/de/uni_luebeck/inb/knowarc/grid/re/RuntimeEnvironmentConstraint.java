@@ -36,8 +36,20 @@ public class RuntimeEnvironmentConstraint extends RuntimeEnvironment {
 	
 	private static Logger logger = Logger.getLogger(RuntimeEnvironmentConstraint.class);
 
+	private static String[] ACCEPTED_RELATIONS = new String[] {"=", ">=", "<=", ">", "<"};
+	/**
+	 * If there is no relation specified, presume >=
+	 */
+	private static String DEFAULT_RELATION = ">=";
 	
-	
+	public static String[] getAcceptedRelations() {
+		return ACCEPTED_RELATIONS;
+	}
+
+	public static String getDefaultRelation() {
+		return DEFAULT_RELATION;
+	}
+
 	/**
 	 *  Identifies the relation between runtime environments to be tested
 	 */
@@ -63,10 +75,6 @@ public class RuntimeEnvironmentConstraint extends RuntimeEnvironment {
 	}
 	
 	/**
-	 * If there is no relation specified, presume >=
-	 */
-	public static String DefaultRelation=new String(">=");
-	/**
 	 * Constructor
 	 * @param id - expects the name of the runtime environment together with the version to which the
 	 * @param relation - relates to (">","<","=",">=","<=")
@@ -74,7 +82,7 @@ public class RuntimeEnvironmentConstraint extends RuntimeEnvironment {
 	public RuntimeEnvironmentConstraint(String id, String relation) {
 		super(id);
 		if (null == relation || relation.equals("")) {
-			relation=RuntimeEnvironmentConstraint.DefaultRelation;
+			relation=RuntimeEnvironmentConstraint.getDefaultRelation();
 		}
 		if (relation.equals("==")) {
 			relation="=";
@@ -83,8 +91,8 @@ public class RuntimeEnvironmentConstraint extends RuntimeEnvironment {
 			relation="<=";
 		}
 		else if (!RuntimeEnvironmentConstraint.acceptedRelation(relation)) {
-			logger.warn("Unknown relation '"+relation+"', presuming '"+RuntimeEnvironmentConstraint.DefaultRelation+"'");
-			relation=RuntimeEnvironmentConstraint.DefaultRelation;
+			logger.warn("Unknown relation '"+relation+"', presuming '"+RuntimeEnvironmentConstraint.getDefaultRelation()+"'");
+			relation=RuntimeEnvironmentConstraint.getDefaultRelation();
 		}
 		this.relation=relation;
 	}

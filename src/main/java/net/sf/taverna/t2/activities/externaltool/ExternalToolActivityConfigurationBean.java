@@ -10,8 +10,13 @@ public final class ExternalToolActivityConfigurationBean {
 	protected String repositoryUrl;
 	protected String externaltoolid;
 	protected UseCaseDescription useCaseDescription = null;
+	private boolean edited = false;
 	
-    private static InvocationGroupManager manager = InvocationGroupManager.getInstance();
+    public boolean isEdited() {
+		return edited;
+	}
+
+	private static InvocationGroupManager manager = InvocationGroupManager.getInstance();
 
 	public ExternalToolActivityConfigurationBean() {
 		group = manager.getDefaultGroup();
@@ -66,6 +71,10 @@ public final class ExternalToolActivityConfigurationBean {
 	 */
 	public void setUseCaseDescription(UseCaseDescription useCaseDescription) {
 		this.useCaseDescription = useCaseDescription;
+	}
+
+	public void setEdited(boolean b) {
+		this.edited  = b;
 	}
 
 }
