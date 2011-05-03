@@ -301,8 +301,6 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
 			FileReference ref = new FileReference(new File(tempDir.getAbsoluteFile() + "/" + cur.getValue().getPath()));
-			ref.setReferencingDeletableData(true);
-			ref.setReferencingMutableData(true);
 			results.put(cur.getKey(), ref);
 		}
 

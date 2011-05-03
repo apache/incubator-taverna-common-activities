@@ -35,14 +35,10 @@ public class SshReference extends AbstractExternalReference implements
 	
 	public SshReference() {
 		super();
-		this.setReferencingMutableData(true);
-		this.setReferencingDeletableData(true);
 	}
 	
 	public SshReference(SshUrl url) {
 		super();
-		this.setReferencingMutableData(true);
-		this.setReferencingDeletableData(true);
 		this.host = url.getSshNode().getHost();
 		this.port = url.getSshNode().getPort();
 		this.directory = url.getSshNode().getDirectory();
