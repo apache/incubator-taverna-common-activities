@@ -1,6 +1,7 @@
 package net.sf.taverna.t2.activities.rest;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -34,6 +35,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 	private Boolean escapeParameters; // whether to perform URL escaping of
 										// passed parameters, true by default
 
+	private ArrayList<ArrayList<String>> otherHTTPHeaders; // list of HTTP headers (other than Accept and Content-Type) and their values
 	// only need to store the configuration of inputs, as all of them are
 	// dynamic;
 	// only inputs that constitute components of URL signature are to be stored
@@ -66,6 +68,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 															// processor look
 															// simpler
 		defaultBean.setEscapeParameters(true);
+		defaultBean.setOtherHTTPHeaders(new ArrayList<ArrayList<String>>());
 		return (defaultBean);
 	}
 
@@ -78,6 +81,9 @@ public class RESTActivityConfigurationBean implements Serializable {
 	private Object readResolve() {
 		if (escapeParameters == null){ // if this value is not set in the bean read from XML then set it to true
 			escapeParameters = Boolean.TRUE;
+		}
+		if (otherHTTPHeaders == null){
+			otherHTTPHeaders = new ArrayList<ArrayList<String>>();
 		}
 		return this;
 	}
@@ -186,5 +192,13 @@ public class RESTActivityConfigurationBean implements Serializable {
 	
 	public boolean getEscapeParameters() {
 		return this.escapeParameters.booleanValue();
+	}
+
+	public void setOtherHTTPHeaders(ArrayList<ArrayList<String>> otherHTTPHeaders) {
+		this.otherHTTPHeaders = otherHTTPHeaders;
+	}
+
+	public ArrayList<ArrayList<String>> getOtherHTTPHeaders() {
+		return otherHTTPHeaders;
 	}
 }

@@ -235,6 +235,16 @@ public class HTTPRequestHandler
 					.getAcceptsHeaderValue());			
 		}
 		
+		// See if user wanted to set any other HTTP headers
+		ArrayList<ArrayList<String>> otherHTTPHeaders = configBean.getOtherHTTPHeaders();
+		if (!otherHTTPHeaders.isEmpty()){
+			for (ArrayList<String> httpHeaderNameValuePair : otherHTTPHeaders){
+				if (httpHeaderNameValuePair.get(0)!= null && !httpHeaderNameValuePair.get(0).equals("")){
+					httpRequest.setHeader(httpHeaderNameValuePair.get(0), httpHeaderNameValuePair.get(1));	
+				}	
+			}		
+		}
+		
 		HTTPRequestResponse requestResponse = new HTTPRequestResponse();
 
 		try {
