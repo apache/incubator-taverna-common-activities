@@ -329,29 +329,34 @@ public class HTTPRequestHandler
    * @return
    * @throws IOException
    */
-  private static Object readResponseBody(HttpEntity entity) throws IOException
-  {
-    if (entity != null)
-    {
-      // test whether the data is binary or textual -
-      // for binary data will read just as it is, for textual data
-      // will attempt to perform charset conversion from the original
-      // one into UTF-8
-      
-      String contentType = entity.getContentType().getValue().toLowerCase();
-      if (contentType.startsWith("text") && contentType.contains("charset=")) {
-        // read as text
-        return (readResponseBodyAsString(entity));
-      }
-      else {
-        // read as binary - enough to pass the input stream, not the whole entity
-        return (readFromInputStreamAsBinary(entity.getContent()));
-      }
-    }
-    else {
-      // HTTP message did not contain body...
-      return (null);
-    }
+	private static Object readResponseBody(HttpEntity entity)
+			throws IOException {
+		
+		if (entity != null) {
+			// test whether the data is binary or textual -
+			// for binary data will read just as it is, for textual data
+			// will attempt to perform charset conversion from the original
+			// one into UTF-8
+
+			if (entity.getContentType() == null) {
+				// HTTP message contains a body but content type is null??? - we have seen services like this
+				return (readFromInputStreamAsBinary(entity.getContent()));
+			}
+
+			String contentType = entity.getContentType().getValue()
+					.toLowerCase();
+			if (contentType.startsWith("text") || contentType.contains("charset=")) {
+				// read as text
+				return (readResponseBodyAsString(entity));
+			} else {
+				// read as binary - enough to pass the input stream, not the
+				// whole entity
+				return (readFromInputStreamAsBinary(entity.getContent()));
+			}
+		} else {
+			// HTTP message did not contain body...
+			return (null);
+		}
   }
   
   
@@ -365,32 +370,45 @@ public class HTTPRequestHandler
    * @return
    * @throws IOException
    */
-  private static String readResponseBodyAsString(HttpEntity entity) throws IOException
-  {
-    // get charset name
-    String charset = null;
-    String contentType = entity.getContentType().getValue().toLowerCase();
-    
-    String[] contentTypeParts = contentType.split(";");
-    for (String contentTypePart : contentTypeParts)
-    {
-      contentTypePart = contentTypePart.trim();
-      if (contentTypePart.startsWith("charset=")) {
-        charset = contentTypePart.substring("charset=".length());
-      }
-    }
-    
-    // read the data line by line
-    StringBuilder responseBodyString = new StringBuilder();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(), charset));
-    
-    String str;
-    while ((str = reader.readLine()) != null) {
-      responseBodyString.append(str + "\n");
-    }
-    
-    return (responseBodyString.toString());
-  }
+	private static String readResponseBodyAsString(HttpEntity entity)
+			throws IOException {
+
+		// From RFC2616
+		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+		// Content-Type = "Content-Type" ":" media-type,
+		// where media-type = type "/" subtype *( ";" parameter )
+		// can have 0 or more parameters such as
+		// "charset", etc.
+		// Linear white space (LWS) MUST NOT be used
+		// between the type and subtype,
+		// nor between an attribute and its value.
+		// e.g. Content-Type: text/html;
+		// charset=ISO-8859-4
+
+		// get charset name
+		String charset = null;
+		String contentType = entity.getContentType().getValue().toLowerCase();
+
+		String[] contentTypeParts = contentType.split(";");
+		for (String contentTypePart : contentTypeParts) {
+			contentTypePart = contentTypePart.trim();
+			if (contentTypePart.startsWith("charset=")) {
+				charset = contentTypePart.substring("charset=".length());
+			}
+		}
+
+		// read the data line by line
+		StringBuilder responseBodyString = new StringBuilder();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(entity
+				.getContent(), charset != null ? charset : "UTF-8"));
+
+		String str;
+		while ((str = reader.readLine()) != null) {
+			responseBodyString.append(str + "\n");
+		}
+
+		return (responseBodyString.toString());
+	}
   
   
   /**

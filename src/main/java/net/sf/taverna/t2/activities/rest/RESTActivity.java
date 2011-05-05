@@ -346,51 +346,41 @@ public class RESTActivity extends
 					
 					// Check if error returned is a string - sometimes services return byte[]
 					ErrorDocument errorDocument  = null;
-					if (requestResponse.getResponseBody() instanceof String){
+					if (requestResponse.getResponseBody() == null){
+						// No response body - register empty string
 						errorDocument = referenceService
-							.getErrorDocumentService().registerError(
-									(String)requestResponse.getResponseBody(), 0, context);
-					}
-					else if (requestResponse.getResponseBody() instanceof byte[]){
-						// Do the only thing we can - try to convert to UTF-8 encoded string
-						// and hope we'll get back something intelligible
-						String str = null;
-						// Try to see if the server has set the character encoding of the response
-						String charEncoding = null;
-						if (requestResponse.getResponseContentTypes()!= null && requestResponse.getResponseContentTypes().length > 0){
-							// From RFC2616 http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-							// Content-Type = "Content-Type" ":" media-type, where 
-							// media-type = type "/" subtype *( ";" parameter )
-							// can have 0 or more parameters such as "charset", etc.
-							// Linear white space (LWS) MUST NOT be used between the type and subtype, 
-							// nor between an attribute and its value. 
-							// e.g. Content-Type: text/html; charset=ISO-8859-4
-							if (requestResponse.getResponseContentTypes()[0].getValue().contains("charset=")){
-								// Get rid of the first part of the string until "charset="
-								String str2 = requestResponse.getResponseContentTypes()[0].getValue().substring(requestResponse.getResponseContentTypes()[0].getValue().indexOf("charset"));
-								if (str2.indexOf(";") < 0){ // no ";" character
-									charEncoding = str2.substring("charset=".length()).trim(); // till the end of the string
-								}
-								else{
-									charEncoding = str2.substring("charset=".length(), str2.indexOf(";")).trim(); // till the first occurrence of ";"
-								}
-							}
-						}
-						try {
-							str = new String(((byte[])requestResponse.getResponseBody()), charEncoding != null ? charEncoding : "UTF-8");
-						} catch (UnsupportedEncodingException e) {
-							logger.error("Failed to construct the response body string using the Content-Type charset encoding " + requestResponse.getResponseContentTypes()[0].getValue(), e);
-							str = new String(((byte[])requestResponse.getResponseBody()));  // try with no encoding, probably will fail
-						}
-						errorDocument = referenceService
-						.getErrorDocumentService().registerError(
-								str, 0, context);
+						.getErrorDocumentService().registerError("", 0, context);
 					}
 					else{
-						// Do what we can - call toString() method and hope for the best
-						errorDocument = referenceService
-						.getErrorDocumentService().registerError(
-								requestResponse.getResponseBody().toString(), 0, context);
+						if (requestResponse.getResponseBody() instanceof String) {
+							errorDocument = referenceService
+									.getErrorDocumentService().registerError(
+											(String) requestResponse
+													.getResponseBody(), 0,
+											context);
+						} else if (requestResponse.getResponseBody() instanceof byte[]) {
+							// Do the only thing we can - try to convert to
+							// UTF-8 encoded string
+							// and hope we'll get back something intelligible
+							String str = null;
+							try {
+								str = new String(((byte[]) requestResponse
+										.getResponseBody()),"UTF-8");
+							} catch (UnsupportedEncodingException e) {
+								logger.error("Failed to reconstruct the response body byte[] into string using UTF-8 encoding", e);
+								str = new String(((byte[]) requestResponse.getResponseBody())); // try with no encoding, probably will get garbage
+							}
+							errorDocument = referenceService
+									.getErrorDocumentService().registerError(
+											str, 0, context);
+						} else {
+							// Do what we can - call toString() method and hope
+							// for the best
+							errorDocument = referenceService
+									.getErrorDocumentService().registerError(
+											requestResponse.getResponseBody()
+													.toString(), 0, context);
+						}
 					}
 					responseBodyRef = referenceService.register(errorDocument,
 							0, true, context);
