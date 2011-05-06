@@ -822,6 +822,11 @@ public class WSDLParser {
 				result.getElements().addAll(
 						constructElements(containedElements));
 			}
+			List containedAttributes = type.getContainedAttributes();
+			if (containedAttributes != null) {
+				result.getAttributes().addAll(
+						constructAttributes(containedAttributes));				
+			}
 			result.setQname(type.getQName());
 		}
 		return result;
@@ -849,11 +854,12 @@ public class WSDLParser {
 
 		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
 			ContainedAttribute attribute = (ContainedAttribute) iterator.next();
-			TypeDescriptor elType = constructType(attribute.getType());
-			elType.setOptional(attribute.getOptional());
-			elType.setName(attribute.getQName().getLocalPart());
-			elType.setQname(attribute.getQName());
-			result.add(elType);
+			AttributeTypeDescriptor attributeType = new AttributeTypeDescriptor();
+			attributeType.setType(attribute.getQName().getLocalPart());
+			attributeType.setOptional(attribute.getOptional());
+			attributeType.setName(attribute.getQName().getLocalPart());
+			attributeType.setQname(attribute.getQName());
+			result.add(attributeType);
 		}
 
 		return result;

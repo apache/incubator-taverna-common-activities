@@ -47,6 +47,7 @@ import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
 import org.apache.axis.encoding.Base64;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -85,7 +86,7 @@ public class XMLOutputSplitter {
 							"Unexpected, multiple output names for ArrayType");
 				executeForArrayType(result, children);
 			} else {
-				executeForComplexType(result, outputNameList, children);
+				executeForComplexType(result, outputNameList, children, doc.getRootElement().getAttributes());
 			}
 
 			// populate missing outputs with empty strings for basic types,
@@ -133,7 +134,7 @@ public class XMLOutputSplitter {
 
 	@SuppressWarnings({ "unchecked" })
 	private void executeForComplexType(Map<String, Object> result,
-			List<String> outputNameList, List<Element> children)
+			List<String> outputNameList, List<Element> children, List<Attribute> list)
 			throws IOException {               
 
 		XMLOutputter outputter = new XMLOutputter();
@@ -175,6 +176,13 @@ public class XMLOutputSplitter {
 						result.put(child.getName(), child.getText());
 					}
 				}
+			}
+		}
+		for (Attribute attribute : list) {
+			if (outputNameList.contains("1" + attribute.getName())) {
+				result.put("1" + attribute.getName(), attribute.getValue());
+			} else if (outputNameList.contains(attribute.getName())) {
+				result.put(attribute.getName(), attribute.getValue());
 			}
 		}
 	}
