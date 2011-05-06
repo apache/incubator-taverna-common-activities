@@ -437,4 +437,11 @@ public class GridUseCaseInvocation extends UseCaseInvocation {
 		}
 		return null;
 	}
+
+	@Override
+	public void setStdIn(ReferenceService referenceService,
+			T2Reference t2Reference) {
+		// TODO Auto-generated method stub
+		
+	}
 }

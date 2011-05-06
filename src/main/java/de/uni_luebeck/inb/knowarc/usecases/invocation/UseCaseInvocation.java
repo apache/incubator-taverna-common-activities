@@ -228,4 +228,7 @@ public abstract class UseCaseInvocation {
 		return this.invocationContext;
 	}
 
+	public abstract void setStdIn(ReferenceService referenceService,
+			T2Reference t2Reference);
+
 }

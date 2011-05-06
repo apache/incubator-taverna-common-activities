@@ -20,9 +20,11 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -63,6 +65,8 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 public class SshUseCaseInvocation extends UseCaseInvocation {
 	
 	private static Logger logger = Logger.getLogger(SshUseCaseInvocation.class);
+	
+	private InputStream stdInputStream = null;
 	
 	
 	public static final String SSH_USE_CASE_INVOCATION_TYPE = "D0A4CDEB-DD10-4A8E-A49C-8871003083D8";
@@ -184,6 +188,9 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 			running.setCommand(fullCommand);
 			running.setOutputStream(stdout_buf);
 			running.setErrStream(stderr_buf);
+			if (stdInputStream != null) {
+				running.setInputStream(stdInputStream);
+			}
 			running.connect();
 		} catch (JSchException e) {
 			throw new InvocationException(e);
@@ -203,12 +210,20 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 
 		int exitcode = running.getExitStatus();
 		if (exitcode != 0) {
-			throw new InvocationException("nonzero exit code " + exitcode + ":" + Charset.forName("US-ASCII").decode(ByteBuffer.wrap(stderr_buf.toByteArray())).toString());
+			try {
+				throw new InvocationException("nonzero exit code " + exitcode + ":" + stderr_buf.toString("US-ASCII"));
+			} catch (UnsupportedEncodingException e) {
+				throw new InvocationException("nonzero exit code " + exitcode + ":" + stderr_buf.toString());
+			}
 		}
 
 		HashMap<String, Object> results = new HashMap<String, Object>();
-		results.put("STDOUT", Charset.forName("US-ASCII").decode(ByteBuffer.wrap(stdout_buf.toByteArray())).toString());
-		results.put("STDERR", Charset.forName("US-ASCII").decode(ByteBuffer.wrap(stderr_buf.toByteArray())).toString());
+		try {
+			results.put("STDOUT", stdout_buf.toString("US-ASCII"));
+			results.put("STDERR", stderr_buf.toString("US-ASCII"));
+		} catch (UnsupportedEncodingException e) {
+			throw new InvocationException ("Unable to decode stream");
+		}
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
 		    SshUrl url = new SshUrl(workerNode);
 		    url.setSubDirectory(tmpname);
@@ -218,6 +233,13 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 
 		if (running != null) {
 		    running.disconnect();
+		}
+		if (stdInputStream != null) {
+			try {
+				stdInputStream.close();
+			} catch (IOException e) {
+				throw new InvocationException(e);
+			}
 		}
 		return results;
 	}
@@ -306,4 +328,10 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	}
 	return nodeLock.get(hostName);
     }
+
+	@Override
+	public void setStdIn(ReferenceService referenceService,
+			T2Reference t2Reference) {
+		stdInputStream = new BufferedInputStream(getAsStream(referenceService, t2Reference));
+	}
 }

@@ -20,6 +20,8 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation.local;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -75,6 +77,8 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	private final String shellPrefix;
 
 	private final String linkCommand;
+
+	private Reader stdInReader = null;
 
 	public LocalUseCaseInvocation(UseCaseDescription desc, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
 
@@ -250,6 +254,11 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		logger.error("Command is " + command + " in directory " + tempDir);
 		try {
 			running = builder.start();
+			if (stdInReader != null) {
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(running.getOutputStream()));
+				IOUtils.copyLarge(stdInReader, writer);
+				writer.close();
+			}
 		} catch (IOException e) {
 			throw new InvocationException(e);
 		}
@@ -292,12 +301,8 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		}
 
 		HashMap<String, Object> results = new HashMap<String, Object>();
-		try {
-			results.put("STDOUT", stdout_buf.toString("US-ASCII"));
-			results.put("STDERR", stderr_buf.toString("US-ASCII"));
-		} catch (UnsupportedEncodingException e) {
-			throw new InvocationException(e);
-		}
+			results.put("STDOUT", stdout_buf.toString());
+			results.put("STDERR", stderr_buf.toString());
 
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
 			FileReference ref = new FileReference(new File(tempDir.getAbsoluteFile() + "/" + cur.getValue().getPath()));
@@ -317,6 +322,12 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void setStdIn(ReferenceService referenceService,
+			T2Reference t2Reference) {
+		stdInReader = new BufferedReader(new InputStreamReader(getAsStream(referenceService, t2Reference)));
 	}
 
 }
