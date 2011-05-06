@@ -67,6 +67,12 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
  */
 public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalToolActivityConfigurationBean> {
 	
+	private static final String STDERR = "STDERR";
+
+	private static final String STDOUT = "STDOUT";
+
+	private static final String STDIN = "STDIN";
+
 	private static Logger logger = Logger.getLogger(ExternalToolActivity.class);
 	
 	private ExternalToolActivityConfigurationBean configurationBean;
@@ -110,7 +116,9 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		ActivityInputPort inputPort = EditsRegistry.getEdits().createActivityInputPort(portName, portDepth, true, handledReferenceSchemes,
 				translatedElementClass);
 		inputPorts.add(inputPort);
-		addMimeTypes(inputPort, mimeTypes);
+		if (mimeTypes != null) {
+			addMimeTypes(inputPort, mimeTypes);
+		}
 	}
 
 	/**
@@ -164,8 +172,9 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			// not given in the use case description. This makes sence since we
 			// always invoke command line programs, thus always get STDOUT and
 			// STDERR.
-			addOutput("STDOUT", 0);
-			addOutput("STDERR", 0);
+			addInputWithMime(STDIN, 0, byte[].class, null);
+			addOutput(STDOUT, 0);
+			addOutput(STDERR, 0);
 		} catch (Exception e) {
 			throw new ActivityConfigurationException("Couldn't create ExternalTool Activity", e);
 		}
@@ -214,18 +223,13 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 
 							// look at every use dynamic case input
 							for (String cur : invoke.getInputs()) {
-								// retrieve the value from taverna's reference
-								// service
-
-							    Identified identified = referenceService.resolveIdentifier(data.get(cur), null, callback.getContext());
-							    if (identified instanceof ReferenceSet) {
-								ReferenceSet rs = (ReferenceSet) identified;
-								for (ExternalReferenceSPI ers : rs.getExternalReferences()) {
-								    logger.info(ers.getClass().getCanonicalName());
+								if (!cur.equals(STDIN)) {
+									invoke.setInput(cur, referenceService, data.get(cur));
 								}
-							    }
-								// and send it to the UseCaseInvokation
-								invoke.setInput(cur, referenceService, data.get(cur));
+							}
+							
+							if (data.containsKey(STDIN)) {
+								invoke.setStdIn(referenceService, data.get(STDIN));
 							}
 
 							// submit the use case to its invocation mechanism
