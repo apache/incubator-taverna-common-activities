@@ -11,6 +11,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Text;
 
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
 
@@ -40,6 +41,9 @@ public class ExternalToolSshInvocationMechanism extends InvocationMechanism {
 	}
 
 	public List<SshNode> getNodes() {
+		if (this.nodes.isEmpty()) {
+			this.nodes.add(SshNodeFactory.getInstance().getDefaultNode());
+		}
 		return this.nodes;
 	}
 

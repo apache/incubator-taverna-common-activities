@@ -18,12 +18,13 @@
  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-package de.uni_luebeck.inb.knowarc.grid.re;
+package de.uni_luebeck.inb.knowarc.usecases;
  
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+
 
 /**
  * When use cases present a runtime environment, then they don't want to express

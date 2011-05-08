@@ -11,6 +11,8 @@ public final class ExternalToolActivityConfigurationBean {
 	protected String externaltoolid;
 	protected UseCaseDescription useCaseDescription = null;
 	private boolean edited = false;
+	private boolean includesStdIn;
+	private boolean includesStdOut;
 	
     public boolean isEdited() {
 		return edited;
@@ -22,7 +24,9 @@ public final class ExternalToolActivityConfigurationBean {
 		group = manager.getDefaultGroup();
 	}
 
+	// You need to do setInvocationGroup because when you clone the bean you get a copy of the group
 	public InvocationGroup getInvocationGroup() {
+		setInvocationGroup(this.group);
 	    return group;
 	}
 

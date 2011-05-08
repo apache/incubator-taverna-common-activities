@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -96,8 +97,8 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		}
 		tempDir.delete();
 		tempDir.mkdir();
-		System.err.println("mainTempDirectory is " + mainTempDirectory);
-		System.err.println("Using tempDir " + tempDir.getAbsolutePath());
+		logger.info("mainTempDirectory is " + mainTempDirectory);
+		logger.info("Using tempDir " + tempDir.getAbsolutePath());
 
 	}
 
@@ -274,7 +275,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	}
 
 	@Override
-	public HashMap<String, Object> submit_wait_fetch_results() throws InvocationException {
+	public HashMap<String, Object> submit_wait_fetch_results(ReferenceService referenceService) throws InvocationException {
 		ByteArrayOutputStream stdout_buf = new ByteArrayOutputStream();
 		ByteArrayOutputStream stderr_buf = new ByteArrayOutputStream();
 		while (true) {
@@ -305,8 +306,14 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 			results.put("STDERR", stderr_buf.toString());
 
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
-			FileReference ref = new FileReference(new File(tempDir.getAbsoluteFile() + "/" + cur.getValue().getPath()));
-			results.put(cur.getKey(), ref);
+			File result = new File(tempDir.getAbsoluteFile() + "/" + cur.getValue().getPath());
+			if (result.exists()) {
+				FileReference ref = new FileReference();
+				results.put(cur.getKey(), ref);
+			} else {
+				ErrorDocument ed = referenceService.getErrorDocumentService().registerError("No result for " + cur.getKey(), 0, getContext());
+				results.put(cur.getKey(), ed);
+			}
 		}
 
 		return results;

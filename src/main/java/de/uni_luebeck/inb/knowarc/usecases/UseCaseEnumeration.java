@@ -51,9 +51,6 @@ public class UseCaseEnumeration {
 			logger.error("Problem with document retrieved from " + xmlFileUrl);
 			logger.error(jdome);
 			return ret;
-		} catch (Exception e) {
-			logger.error("Got this error for URL '" + xmlFileUrl + "'");
-			logger.error(e);
 		}
 
 		return ret;

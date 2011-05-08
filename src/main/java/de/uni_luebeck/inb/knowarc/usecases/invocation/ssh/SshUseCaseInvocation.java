@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
+import net.sf.taverna.t2.reference.ErrorDocument;
+import net.sf.taverna.t2.reference.ErrorDocumentServiceException;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -199,7 +201,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	}
 
 	@Override
-	public HashMap<String, Object> submit_wait_fetch_results() throws InvocationException {
+	public HashMap<String, Object> submit_wait_fetch_results(ReferenceService referenceService) throws InvocationException {
 		while (!running.isClosed()) {
 				try {
 					Thread.sleep(1000);
@@ -224,11 +226,32 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		} catch (UnsupportedEncodingException e) {
 			throw new InvocationException ("Unable to decode stream");
 		}
+		try {
+			ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
+		synchronized(getNodeLock(workerNode)) {
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
-		    SshUrl url = new SshUrl(workerNode);
-		    url.setSubDirectory(tmpname);
-		    url.setFileName(cur.getValue().getPath());
-		    results.put(cur.getKey(), url);
+			String fullPath = workerNode.getDirectory() + tmpname + "/" + cur.getValue().getPath();
+			try {
+				if (sftp.stat(fullPath) != null) {
+					SshUrl url = new SshUrl(workerNode);
+					url.setSubDirectory(tmpname);
+					url.setFileName(cur.getValue().getPath());
+					results.put(cur.getKey(), url);
+				} else {
+					ErrorDocument ed = referenceService.getErrorDocumentService().registerError("No result for " + cur.getKey(), 0, getContext());
+					results.put(cur.getKey(), ed);
+				}
+			} catch (SftpException e) {
+				ErrorDocument ed = referenceService.getErrorDocumentService().registerError("No result for " + cur.getKey(), 0, getContext());
+				results.put(cur.getKey(), ed);
+			
+			}
+		}
+		}
+		} catch (JSchException e1) {
+			throw new InvocationException(e1);
+		} catch (ErrorDocumentServiceException e) {
+			throw new InvocationException(e);			
 		}
 
 		if (running != null) {
@@ -302,8 +325,8 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 	}
 
-    private SshReference getAsSshReference(ReferenceService referenceService,
-			T2Reference t2Reference, SshNode workerNode2) {
+    public SshReference getAsSshReference(ReferenceService referenceService,
+			T2Reference t2Reference, SshNode workerNode) {
     	Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
 		if (identified instanceof ReferenceSet) {
 			for (ExternalReferenceSPI ref : ((ReferenceSet) identified).getExternalReferences()) {
@@ -317,6 +340,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 		return null;
 	}
+
 
 	private static Object getNodeLock(final SshNode node) {
 	return getNodeLock(node.getHost());

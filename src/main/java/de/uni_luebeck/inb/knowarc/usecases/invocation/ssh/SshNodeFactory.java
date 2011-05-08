@@ -16,8 +16,14 @@ public class SshNodeFactory {
 	
 	private static SshNodeFactory INSTANCE = new SshNodeFactory();
 	
+	private SshNode defaultNode;
+	
 	private SshNodeFactory() {
-		// nothing
+		defaultNode = getSshNode(SshNode.DEFAULT_HOST, SshNode.DEFAULT_PORT, SshNode.DEFAULT_DIRECTORY);
+	}
+
+	public SshNode getDefaultNode() {
+		return defaultNode;
 	}
 
 	public static SshNodeFactory getInstance() {

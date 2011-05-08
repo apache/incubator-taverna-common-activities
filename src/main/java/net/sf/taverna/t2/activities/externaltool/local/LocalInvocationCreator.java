@@ -5,16 +5,19 @@ package net.sf.taverna.t2.activities.externaltool.local;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import net.sf.taverna.t2.activities.externaltool.InvocationCreator;
-import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
+import de.uni_luebeck.inb.knowarc.usecases.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocation;
 
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
+import net.sf.taverna.t2.reference.ReferenceService;
+import net.sf.taverna.t2.reference.T2Reference;
 
 /**
  * @author alanrw
@@ -35,7 +38,7 @@ public final class LocalInvocationCreator implements
 	}
 
 	@Override
-	public UseCaseInvocation convert(InvocationMechanism m, UseCaseDescription description) {
+	public UseCaseInvocation convert(InvocationMechanism m, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 	    ExternalToolLocalInvocationMechanism mechanism = (ExternalToolLocalInvocationMechanism) m;
 		UseCaseInvocation result = null;
 		try {

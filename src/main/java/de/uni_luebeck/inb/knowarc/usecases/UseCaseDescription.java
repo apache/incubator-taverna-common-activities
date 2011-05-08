@@ -28,15 +28,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.ImageIcon;
+
+import net.sf.taverna.t2.workflowmodel.serialization.DeserializationException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
 
 
 /**
@@ -103,6 +106,10 @@ public class UseCaseDescription {
 	private List<ScriptInputStatic> static_inputs = new ArrayList<ScriptInputStatic>();
 	private Map<String, ScriptInput> inputs = new HashMap<String, ScriptInput>();
 	private Map<String, ScriptOutput> outputs = new HashMap<String, ScriptOutput>();
+	
+	private boolean includeStdIn = false;
+	private boolean includeStdOut = true;
+	private boolean includeStdErr = true;
 
 	/**
 	 * Constructor, for special purpose usecases.
@@ -118,30 +125,176 @@ public class UseCaseDescription {
 	 * getClass().getClassLoader().getResourceAsStream("..") to load a usecase
 	 * from your program jar
 	 */
-	public UseCaseDescription(InputStream programAsStream) throws Exception {
+	public UseCaseDescription(InputStream programAsStream) throws DeserializationException {
 		SAXBuilder builder = new SAXBuilder();
-		Document doc = builder.build(programAsStream);
-		programAsStream.close();
+		Document doc;
+		try {
+			doc = builder.build(programAsStream);
+			programAsStream.close();
+		} catch (JDOMException e) {
+			throw new DeserializationException("Error deserializing usecase", e);
+		} catch (IOException e) {
+			throw new DeserializationException("Error deserializing usecase", e);
+		}
 		readFromXmlElement(doc.getRootElement());
 	}
 
 	/**
 	 * Constructor, expects an XML-root to dissect.
 	 */
-	public UseCaseDescription(Element programNode) throws Exception {
+	public UseCaseDescription(Element programNode) throws DeserializationException {
 		readFromXmlElement(programNode);
 	}
 
+/**
+ * Produce an XML description of the UseCaseDescription
+ */
+	public Element writeToXMLElement() {
+		Element programNode = new Element("program");
+		programNode.setAttribute("name", getUsecaseid());
+		programNode.setAttribute("description", getDescription());
+		// Always use element version of command
+//		programNode.setAttribute("command", getCommand());
+		Element commandNode = new Element("command");
+		commandNode.addContent(getCommand());
+		programNode.addContent(commandNode);
+		programNode.setAttribute("timeout", Integer.toString(getExecutionTimeoutInSeconds()));
+		programNode.setAttribute("preparing_timeout", Integer.toString(getPreparingTimeoutInSeconds()));
+		programNode.setAttribute("includeStdIn", Boolean.toString(isIncludeStdIn()));
+		programNode.setAttribute("includeStdOut", Boolean.toString(isIncludeStdOut()));
+		programNode.setAttribute("includeStdErr", Boolean.toString(isIncludeStdErr()));
+		for (ScriptInputStatic si : getStatic_inputs()) {
+			Element staticNode = new Element("static");
+			if (si.isBinary()) {
+				staticNode.setAttribute("binary", "true");
+			}
+			if (si.isForceCopy()) {
+				staticNode.setAttribute("forceCopy", "true");
+			}
+			if (si.isFile()) {
+				Element fileNode = new Element("file");
+				fileNode.setAttribute("path", si.getTag());
+				staticNode.addContent(fileNode);
+			} else if (si.isTempFile()) {
+				Element tempfileNode = new Element("tempfile");
+				tempfileNode.setAttribute("tag", si.getTag());
+				staticNode.addContent(tempfileNode);
+			} else {
+				Element replaceNode = new Element("replace");
+				replaceNode.setAttribute("tag", si.getTag());
+				staticNode.addContent(replaceNode);
+			}
+			if (si.getUrl() != null) {
+				staticNode.setAttribute("url", si.getUrl());
+			} else {
+				Element contentNode = new Element("content");
+				contentNode.addContent((String) si.getContent());
+				staticNode.addContent(contentNode);
+			}
+			programNode.addContent(staticNode);
+		}
+		for (Entry<String, ScriptInput> entry : getInputs().entrySet()) {
+			String name = entry.getKey();
+			ScriptInputUser si = (ScriptInputUser) entry.getValue();
+			Element inputNode = new Element("input");
+			inputNode.setAttribute("name", name);
+			if (si.isBinary()) {
+				inputNode.setAttribute("binary", "true");
+			}
+			if (si.isForceCopy()) {
+				inputNode.setAttribute("forceCopy", "true");
+			}
+			if (si.isConcatenate()) {
+				inputNode.setAttribute("concatenate", "true");
+			}
+			if (si.isList()) {
+				inputNode.setAttribute("list", "true");
+			}
+			if (si.isFile()) {
+				Element fileNode = new Element("file");
+				fileNode.setAttribute("path", si.getTag());
+				inputNode.addContent(fileNode);
+			} else if (si.isTempFile()) {
+				Element tempfileNode = new Element("tempfile");
+				tempfileNode.setAttribute("tag", si.getTag());
+				inputNode.addContent(tempfileNode);
+			} else {
+				Element replaceNode = new Element("replace");
+				replaceNode.setAttribute("tag", si.getTag());
+				inputNode.addContent(replaceNode);
+			}
+			for (String mime : si.getMime()) {
+				Element mimeNode = new Element("mime");
+				mimeNode.setAttribute("type", mime);
+				inputNode.addContent(mimeNode);
+			}
+			programNode.addContent(inputNode);
+		}
+		for (Entry<String, ScriptOutput> entry : getOutputs().entrySet()) {
+			String name = entry.getKey();
+			ScriptOutput so = entry.getValue();
+			Element outputNode = new Element("output");
+			outputNode.setAttribute("name", name);
+			if (so.isBinary()) {
+				outputNode.setAttribute("binary", "true");
+			}
+			Element fromfileNode = new Element("fromfile");
+			fromfileNode.setAttribute("path", so.getPath());
+			outputNode.addContent(fromfileNode);
+			for (String mime : so.getMime()) {
+				Element mimeNode = new Element("mime");
+				mimeNode.setAttribute("type", mime);
+				outputNode.addContent(mimeNode);
+			}
+			programNode.addContent(outputNode);
+		}
+		for (RuntimeEnvironmentConstraint rec : getREs()) {
+			Element rteNode = new Element("rte");
+			rteNode.setAttribute("name", rec.getID());
+			rteNode.setAttribute("relation", rec.getRelation());
+			programNode.addContent(rteNode);
+		}
+		if ((group != null) && !group.isEmpty()) {
+			Element groupNode = new Element("group");
+			groupNode.setAttribute("name", group);
+			programNode.addContent(groupNode);
+		}
+		if ((test_local != null) && !test_local.isEmpty()) {
+			Element testNode = new Element("test");
+			testNode.setAttribute("local", test_local);
+			programNode.addContent(testNode);
+		}
+		if ((icon_url != null) && !icon_url.isEmpty()) {
+			Element iconNode = new Element("icon");
+			iconNode.setAttribute("url", icon_url);
+			programNode.addContent(iconNode);
+		}
+		if (!getQueue_preferred().isEmpty() || !getQueue_deny().isEmpty()) {
+			Element queueNode = new Element("queue");
+			for (String url : getQueue_preferred()) {
+				Element preferredNode = new Element("prefer");
+				preferredNode.setAttribute("url", url);
+				queueNode.addContent(preferredNode);
+			}
+			for (String url : getQueue_deny()) {
+				Element denyNode = new Element("deny");
+				denyNode.setAttribute("url", url);
+				queueNode.addContent(denyNode);
+			}
+			programNode.addContent(queueNode);
+		}
+		return programNode;
+	}
 	/**
 	 * Specifies the UseCaseDescription from the root of an XML description
 	 * which is accessible online.
 	 * 
 	 * @param programNode
-	 * @throws Exception
+	 * @throws DeserializationException
 	 */
-	private void readFromXmlElement(Element programNode) throws Exception {
+	private void readFromXmlElement(Element programNode) throws DeserializationException {
 		if (programNode.getName().compareToIgnoreCase("program") != 0)
-			throw new Exception("Expected <program>, read '" + programNode.getName() + "'");
+			throw new DeserializationException("Expected <program>, read '" + programNode.getName() + "'");
 
 		setUsecaseid(programNode.getAttributeValue("name"));
 		setDescription(programNode.getAttributeValue("description"));
@@ -152,11 +305,27 @@ public class UseCaseDescription {
 		timeoutStr = programNode.getAttributeValue("preparing_timeout");
 		if (timeoutStr != null)
 			setPreparingTimeoutInSeconds(Integer.parseInt(timeoutStr));
+		
+		String includeStdInStr = programNode.getAttributeValue("includeStdIn");
+		if (includeStdInStr != null && !includeStdInStr.isEmpty()) {
+			setIncludeStdIn(includeStdInStr.equals("true"));
+		}
+
+		String includeStdOutStr = programNode.getAttributeValue("includeStdOut");
+		if (includeStdOutStr != null && !includeStdOutStr.isEmpty()) {
+			setIncludeStdOut(includeStdOutStr.equals("true"));
+		}
+
+		String includeStdErrStr = programNode.getAttributeValue("includeStdErr");
+		if (includeStdErrStr != null && !includeStdErrStr.isEmpty()) {
+			setIncludeStdErr(includeStdErrStr.equals("true"));
+		}
 
 		for (Object cur_ob : programNode.getChildren()) {
 			Element cur = (Element) cur_ob;
 
 			String name = cur.getAttributeValue("name");
+
 			String type = cur.getName();
 			boolean binary = false;
 			if (null != cur.getAttributeValue("binary") && cur.getAttributeValue("binary").equalsIgnoreCase("true")) {
@@ -195,7 +364,7 @@ public class UseCaseDescription {
 				ScriptInputStatic si = new ScriptInputStatic();
 				Element content = cur.getChild("content");
 				if (content == null)
-					throw new Exception("FIXME: script tag without embedded content tag");
+					throw new DeserializationException("FIXME: script tag without embedded content tag");
 				si.setUrl(content.getAttributeValue("url"));
 				if (si.getUrl() == null)
 					si.setContent(content.getText());
@@ -207,7 +376,7 @@ public class UseCaseDescription {
 				indesc.setMime(mime);
 				indesc.setConcatenate(concatenate);
 				fillInputDescription(indesc, binary, forceCopy, innerType, tag, path);
-				getInputs().put(name, indesc);
+				getInputs().put(name.replace(" ", "_"), indesc);
 			} else if (type.equalsIgnoreCase("output")) {
 				ScriptOutput outdesc = new ScriptOutput();
 				outdesc.setMime(mime);
@@ -215,15 +384,15 @@ public class UseCaseDescription {
 				boolean ok = true;
 				if (null == innerType) {
 					// don't know what to do
-					throw new Exception("FIXME: Found null == innerType for output, is this the bug?");
+					throw new DeserializationException("FIXME: Found null == innerType for output, is this the bug?");
 				} else if (innerType.equalsIgnoreCase("fromfile")) {
 					outdesc.setPath(path);
 					outdesc.setBinary(binary);
 				} else {
-					throw new Exception("Problem reading output port: unknown innerType '" + innerType + "'");
+					throw new DeserializationException("Problem reading output port: unknown innerType '" + innerType + "'");
 				}
 				if (ok) {
-					getOutputs().put(name, outdesc);
+					getOutputs().put(name.replace(" ", "_"), outdesc);
 				}
 			} else if (type.equalsIgnoreCase("rte") || type.equalsIgnoreCase("re")) {
 				getREs().add(new RuntimeEnvironmentConstraint(name, cur.getAttributeValue("relation")));
@@ -241,27 +410,28 @@ public class UseCaseDescription {
 					else if (child.getName().equalsIgnoreCase("deny"))
 						getQueue_deny().add(child.getAttributeValue("url"));
 					else
-						throw new Exception("Error while reading usecase " + this.getUsecaseid() + ": invalid queue entry");
+						throw new DeserializationException("Error while reading usecase " + this.getUsecaseid() + ": invalid queue entry");
 				}
 			} else if (type.equalsIgnoreCase("command")) {
 				// i like to have the ability to inject complete shell script
 				// fragments into the use case,
 				// so this should be replace and should allow multiple lines
-				if (getCommand() != null)
-					throw new Exception("You have specified both command attribute and command tag.");
+				if ((getCommand() != null) && !getCommand().isEmpty()) {
+					throw new DeserializationException("You have specified both command attribute and command tag.");
+				}
 				setCommand(cur.getText());
 			} else {
-				throw new Exception("Unexpected and uninterpreted attribute " + type);
+				throw new DeserializationException("Unexpected and uninterpreted attribute " + type);
 			}
 		}
 	}
 
-	private void fillInputDescription(ScriptInput fillMe, boolean binary, boolean forceCopy, String innerType, String tag, String path) throws Exception {
+	private void fillInputDescription(ScriptInput fillMe, boolean binary, boolean forceCopy, String innerType, String tag, String path) throws DeserializationException {
 		fillMe.setBinary(binary);
 		fillMe.setForceCopy(forceCopy);
 		if (null == innerType) {
 			// don't know what to do
-			throw new Exception("FIXME: Found null == innerType for input, is this the bug?");
+			throw new DeserializationException("FIXME: Found null == innerType for input, is this the bug?");
 		} else if (innerType.equalsIgnoreCase("replace")) {
 			fillMe.setTag(tag);
 			fillMe.setTempFile(false);
@@ -277,7 +447,7 @@ public class UseCaseDescription {
 			fillMe.setTempFile(false);
 			fillMe.setFile(true);
 		} else {
-			throw new Exception("Problem reading input port: unknown innerType '" + innerType + "'");
+			throw new DeserializationException("Problem reading input port: unknown innerType '" + innerType + "'");
 		}
 	}
 
@@ -331,11 +501,11 @@ public class UseCaseDescription {
 	/**
 	 * hajo's test just pass an url or file url to an xml file
 	 * 
-	 * @throws Exception
 	 * @throws IOException
 	 * @throws MalformedURLException
+	 * @throws DeserializationException 
 	 */
-	public static void main(String[] argv) throws MalformedURLException, IOException, Exception {
+	public static void main(String[] argv) throws MalformedURLException, IOException, DeserializationException {
 		UseCaseDescription d = new UseCaseDescription(new URL(argv[0]).openStream());
 		logger.info(d.getCommand());
 	}
@@ -499,5 +669,29 @@ public class UseCaseDescription {
 	 */
 	public String getUsecaseid() {
 		return usecaseid;
+	}
+
+	public boolean isIncludeStdIn() {
+		return includeStdIn;
+	}
+
+	public void setIncludeStdIn(boolean includeStdIn) {
+		this.includeStdIn = includeStdIn;
+	}
+
+	public boolean isIncludeStdOut() {
+		return includeStdOut;
+	}
+
+	public void setIncludeStdOut(boolean includeStdOut) {
+		this.includeStdOut = includeStdOut;
+	}
+
+	public boolean isIncludeStdErr() {
+		return includeStdErr;
+	}
+
+	public void setIncludeStdErr(boolean includeStdErr) {
+		this.includeStdErr = includeStdErr;
 	}
 }

@@ -18,7 +18,7 @@
  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
  */
 
-package de.uni_luebeck.inb.knowarc.grid.re;
+package de.uni_luebeck.inb.knowarc.usecases;
 
 import java.util.Arrays;
 import java.util.Iterator;

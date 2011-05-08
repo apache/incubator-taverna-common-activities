@@ -15,7 +15,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
-import de.uni_luebeck.inb.knowarc.grid.re.RuntimeEnvironmentConstraint;
+import de.uni_luebeck.inb.knowarc.usecases.RuntimeEnvironmentConstraint;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
 
 /**

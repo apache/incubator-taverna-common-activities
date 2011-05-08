@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.taverna.t2.activities.externaltool.InvocationCreator;
 import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
@@ -20,10 +21,16 @@ import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshReference;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrl;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
+import net.sf.taverna.t2.reference.ExternalReferenceSPI;
+import net.sf.taverna.t2.reference.Identified;
+import net.sf.taverna.t2.reference.ReferenceService;
+import net.sf.taverna.t2.reference.ReferenceSet;
+import net.sf.taverna.t2.reference.T2Reference;
 
 /**
  * @author alanrw
@@ -41,11 +48,11 @@ public final class SshInvocationCreator implements InvocationCreator {
 	}
 
 	@Override
-	public UseCaseInvocation convert(InvocationMechanism m, UseCaseDescription description) {
+	public UseCaseInvocation convert(InvocationMechanism m, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 	    ExternalToolSshInvocationMechanism mechanism = (ExternalToolSshInvocationMechanism) m;
 		SshUseCaseInvocation result = null;
 		try {
-		    SshNode chosenNode = chooseNode(mechanism.getNodes());
+		    SshNode chosenNode = chooseNode(mechanism.getNodes(), data, referenceService);
 		    result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString()));
 		} catch (JSchException e) {
 			logger.error("Null invocation", e);
@@ -55,8 +62,18 @@ public final class SshInvocationCreator implements InvocationCreator {
 		return result;
 	}
 
-    private static SshNode chooseNode(List<SshNode> possibleNodes) {
+    private static SshNode chooseNode(List<SshNode> possibleNodes, Map<String, T2Reference> data, ReferenceService referenceService) {
 	SshNode result = null;
+	for (T2Reference ref : data.values()) {
+		SshReference r = getAsSshReference(referenceService, ref);
+		if (r != null) {
+			SshNode dataNode = SshNodeFactory.getInstance().getSshNode(r.getHost(), r.getPort(), r.getDirectory());
+			if (possibleNodes.contains(dataNode)) {
+				logger.info("Running with data at " + r.getHost());
+				return dataNode;
+			}
+		}
+	}
 	synchronized(knownNodes) {
 	    int chosenIndex = Integer.MAX_VALUE;
 	    for (SshNode p : possibleNodes) {
@@ -77,4 +94,19 @@ public final class SshInvocationCreator implements InvocationCreator {
 	}
 	return result;
     }
+    
+    private static SshReference getAsSshReference(ReferenceService referenceService,
+			T2Reference t2Reference) {
+    	Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
+		if (identified instanceof ReferenceSet) {
+			for (ExternalReferenceSPI ref : ((ReferenceSet) identified).getExternalReferences()) {
+				if (ref instanceof SshReference) {
+					SshReference sshRef = (SshReference) ref;
+					return sshRef;
+				}
+			}
+		}
+		return null;
+	}
+
 }

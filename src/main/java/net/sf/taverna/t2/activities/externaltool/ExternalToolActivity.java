@@ -21,8 +21,6 @@
 
 package net.sf.taverna.t2.activities.externaltool;
 
-import java.io.IOException;
-import java.rmi.ServerException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,10 +31,7 @@ import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager;
 import net.sf.taverna.t2.annotation.Annotated;
 import net.sf.taverna.t2.annotation.annotationbeans.MimeType;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.ReferenceServiceException;
-import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
 import net.sf.taverna.t2.spi.SPIRegistry;
@@ -49,13 +44,12 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.log4j.Logger;
-import org.globus.ftp.exception.ClientException;
 
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.OnDemandDownload;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 
 /**
@@ -168,13 +162,15 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			}
 			}
 
-			// we always add STDOUT and STDERR output ports, even if these are
-			// not given in the use case description. This makes sence since we
-			// always invoke command line programs, thus always get STDOUT and
-			// STDERR.
-			addInputWithMime(STDIN, 0, byte[].class, null);
-			addOutput(STDOUT, 0);
-			addOutput(STDERR, 0);
+			if (mydesc.isIncludeStdIn()) {
+				addInputWithMime(STDIN, 0, byte[].class, null);
+			}
+			if (mydesc.isIncludeStdOut()) {
+				addOutput(STDOUT, 0);
+			}
+			if (mydesc.isIncludeStdErr()) {
+				addOutput(STDERR, 0);
+			}
 		} catch (Exception e) {
 			throw new ActivityConfigurationException("Couldn't create ExternalTool Activity", e);
 		}
@@ -193,83 +189,70 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			public void run() {
 				ReferenceService referenceService = callback.getContext().getReferenceService();
 				UseCaseInvocation invoke = null;
+				
+				/**
+				 * Note that retrying needs to be either done via Taverna's retry mechanism or as part of the specific invocation
+				 */
 				try {
-					int retries = 0;
-					// retry the job submission 5 times. this is needed since
-					// sadly not every grid job queue listed in the information
-					// systems is still online. we only retry job submission,
-					// not result fetching.
-					while (true) {
-						retries--;
-						try {
-							// we ask the UseCaseInvokation implementation to
-							// choose a
-							// matching invocation algorithm based on the plugin
-							// configuration and use case description.
-							InvocationGroup group = configurationBean.getInvocationGroup();
-							logger.info("Invoking using invocationGroup " + group.hashCode() + " called " + group.getInvocationGroupName());
-							logger.info("InvocationMechanism name is " + group.getMechanism().getName());
-							logger.info("Group thinks mechanism name is " + group.getMechanismName());
-							logger.info("Mechanism XML is " + group.getMechanismXML());
-							invoke = getInvocation(group, configurationBean.getUseCaseDescription());
-							String runId = callback.getContext().getEntities(WorkflowRunIdEntity.class).get(0).getWorkflowRunId();
-							logger.error("Run id is " + runId);
-							ExternalToolRunDeletionListener.rememberInvocation(runId, invoke);
-							invoke.setContext(callback.getContext());
-							if (invoke == null) {
-								logger.error("Invoke is null");
-								callback.fail("No invocation mechanism found");
-							}
+					// we ask the UseCaseInvokation implementation to
+					// choose a
+					// matching invocation algorithm based on the plugin
+					// configuration and use case description.
+					InvocationGroup group = configurationBean
+							.getInvocationGroup();
+					logger.info("Invoking using invocationGroup "
+							+ group.hashCode() + " called "
+							+ group.getInvocationGroupName());
+					logger.info("InvocationMechanism name is "
+							+ group.getMechanism().getName());
+					logger.info("Group thinks mechanism name is "
+							+ group.getMechanismName());
+					logger.info("Mechanism XML is " + group.getMechanismXML());
+					invoke = getInvocation(group,
+							configurationBean.getUseCaseDescription(), data, referenceService);
+					if (invoke == null) {
+						logger.error("Invoke is null");
+						callback.fail("No invocation mechanism found");
+					}
+					String runId = callback.getContext()
+							.getEntities(WorkflowRunIdEntity.class).get(0)
+							.getWorkflowRunId();
+					logger.info("Run id is " + runId);
+					ExternalToolRunDeletionListener.rememberInvocation(runId,
+							invoke);
+					invoke.setContext(callback.getContext());
 
-							// look at every use dynamic case input
-							for (String cur : invoke.getInputs()) {
-								if (!cur.equals(STDIN)) {
-									invoke.setInput(cur, referenceService, data.get(cur));
-								}
-							}
-							
-							if (data.containsKey(STDIN)) {
-								invoke.setStdIn(referenceService, data.get(STDIN));
-							}
-
-							// submit the use case to its invocation mechanism
-							invoke.submit_generate_job(referenceService);
-
-							// do not retry, we succeeded :)
-							break;
-						} catch (Exception e) {
-							// for the last retry, throw the exception
-							if (retries <= 0)
-								throw e;
+					// look at every use dynamic case input
+					for (String cur : invoke.getInputs()) {
+						if (!cur.equals(STDIN)) {
+							invoke.setInput(cur, referenceService,
+									data.get(cur));
 						}
 					}
 
+					if (mydesc.isIncludeStdIn() && (data.get(STDIN) != null)) {
+						invoke.setStdIn(referenceService, data.get(STDIN));
+					}
+
+					// submit the use case to its invocation mechanism
+					invoke.submit_generate_job(referenceService);
+
 					// retrieve the result.
-					Map<String, Object> downloads = invoke.submit_wait_fetch_results();
+					Map<String, Object> downloads = invoke
+							.submit_wait_fetch_results(referenceService);
 					Map<String, T2Reference> result = new HashMap<String, T2Reference>();
 					for (Map.Entry<String, Object> cur : downloads.entrySet()) {
 						Object value = cur.getValue();
 
-						// if the value is a reference, dereference it
-						if (value instanceof OnDemandDownload)
-							value = ((OnDemandDownload) value).download();
-
 						// register the result value with taverna
-						T2Reference reference = referenceService.register(value, 0, true, callback.getContext());
+						T2Reference reference = referenceService.register(
+								value, 0, true, callback.getContext());
 						// store the reference into the activity result
 						// set
 						result.put(cur.getKey(), reference);
 					}
 					callback.receiveResult(result, new int[0]);
-				} catch (ServerException e) {
-					callback.fail("Problem submitting job: ServerException: ", e);
-				} catch (ReferenceServiceException e) {
-					callback.fail("Problem with job input / output port: ", e);
-				} catch (ClientException e) {
-					callback.fail("Problem submitting job: ClientException: ", e);
-				} catch (IOException e) {
-					callback.fail("Problem submitting job: IOException: ", e);
-				} catch (Exception e) {
+				} catch (InvocationException e) {
 					callback.fail(e.getMessage(), e);
 				}
 			}
@@ -280,7 +263,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	
 	private static SPIRegistry<InvocationCreator> invocationCreatorRegistry = new SPIRegistry(InvocationCreator.class);
 	
-	private UseCaseInvocation getInvocation(InvocationGroup group, UseCaseDescription description) {
+	private UseCaseInvocation getInvocation(InvocationGroup group, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 		UseCaseInvocation result = null;
 		InvocationCreator creator = null;
 		for (InvocationCreator c : invocationCreatorRegistry.getInstances()) {
@@ -290,7 +273,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			}
 		}
 		if (creator != null) {
-			result = creator.convert(group.getMechanism(), description);
+			result = creator.convert(group.getMechanism(), description, data, referenceService);
 		}
 		return result;
 	}

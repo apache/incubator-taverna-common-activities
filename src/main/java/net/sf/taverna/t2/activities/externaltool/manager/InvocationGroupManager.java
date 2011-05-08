@@ -79,6 +79,16 @@ public class InvocationGroupManager {
 		notifyListeners();
 	}
 	
+	public void removeMechanism(InvocationMechanism mechanism) {
+		for (InvocationGroup g : groups) {
+			if (g.getMechanism().equals(mechanism)) {
+				return;
+			}
+		}
+		mechanisms.remove(mechanism);
+		notifyListeners();
+	}
+	
 	public HashSet<InvocationGroup> getInvocationGroups() {
 		return groups;
 	}

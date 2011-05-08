@@ -114,6 +114,9 @@ public abstract class UseCaseInvocation {
 	 */
 	@SuppressWarnings("unchecked")
 	public void setInput(String inputName, ReferenceService referenceService, T2Reference t2Reference) throws InvocationException {
+		if (t2Reference == null) {
+			throw new InvocationException("No input specified for " + inputName);
+		}
 		ScriptInputUser input = (ScriptInputUser) usecase.getInputs().get(inputName);
 		if (input.isList()) {
 			IdentifiedList<T2Reference> listOfReferences = (IdentifiedList<T2Reference>) referenceService.getListService().getList(t2Reference);
@@ -172,7 +175,7 @@ public abstract class UseCaseInvocation {
 	 */
 	public HashMap<String, Object> Submit(ReferenceService referenceService) throws InvocationException {
 		submit_generate_job(referenceService);
-		return submit_wait_fetch_results();
+		return submit_wait_fetch_results(referenceService);
 	}
 
 	/*
@@ -206,7 +209,7 @@ public abstract class UseCaseInvocation {
 	/*
 	 * wait for a submitted job to finish and fetch the results
 	 */
-	public abstract HashMap<String, Object> submit_wait_fetch_results() throws InvocationException;
+	public abstract HashMap<String, Object> submit_wait_fetch_results(ReferenceService referenceService) throws InvocationException;
 
 	public abstract String setOneInput(ReferenceService referenceService, T2Reference t2Reference, ScriptInput input) throws InvocationException;
 
