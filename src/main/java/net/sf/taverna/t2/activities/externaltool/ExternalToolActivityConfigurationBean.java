@@ -11,8 +11,6 @@ public final class ExternalToolActivityConfigurationBean {
 	protected String externaltoolid;
 	protected UseCaseDescription useCaseDescription = null;
 	private boolean edited = false;
-	private boolean includesStdIn;
-	private boolean includesStdOut;
 	
     public boolean isEdited() {
 		return edited;
