@@ -10,13 +10,7 @@
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>external-tool-activity</artifactId>
 	<name>Taverna 2 ExternalTool Activity</name>
-	<repositories>
-		<repository>
-			<id>commonsvfsgrid</id>
-			<name>commonsvfsgrid</name>
-			<url>http://commonsvfsgrid.sourceforge.net/maven/</url>
-		</repository>
-		</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>
@@ -40,14 +34,13 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>
-	<artifactId>reference-core-extensions</artifactId>
-	<version>${t2.reference-core-extensions.version}</version>
+			<artifactId>reference-core-extensions</artifactId>
+			<version>${t2.reference-core-extensions.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-                        <version>${junit.version}</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -59,26 +52,19 @@
 		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom</artifactId>
-                        <version>${jdom.version}</version>
+			<version>${jdom.version}</version>
 		</dependency>
-
-	<dependency>
-    	<groupId>com.jcraft</groupId>
-    	<artifactId>jsch</artifactId>
-    	<version>${jsch.version}</version>
-	</dependency>
-<!-- 		<dependency>
-			<groupId>external.jglobus</groupId>
-			<artifactId>cog-jglobus</artifactId>
-			<version>1.8.0</version>
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>${jsch.version}</version>
 		</dependency>
--->	
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons.io.version}</version>
 		</dependency>
-		
-
 	</dependencies>
+
+	
 </project>
