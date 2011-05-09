@@ -9,6 +9,6 @@ package net.sf.taverna.t2.activities.externaltool.manager;
  */
 public interface InvocationGroupManagerListener {
 
-	void change();
+	void invocationManagerChange(InvocationManagerEvent event);
 
 }

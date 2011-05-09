@@ -62,7 +62,6 @@ public class InvocationGroupManager {
 		}
 		
 		saveConfiguration();
-		notifyListeners();
 	}
 
 	public static InvocationGroupManager getInstance() {
@@ -71,22 +70,22 @@ public class InvocationGroupManager {
 
 	public void addInvocationGroup(InvocationGroup group) {
 		groups.add(group);
-		notifyListeners();
+		notifyListeners(new InvocationGroupAddedEvent(group));
 	}
 	
 	public void removeInvocationGroup(InvocationGroup group) {
 		groups.remove(group);
-		notifyListeners();
+		notifyListeners(new InvocationGroupRemovedEvent(group));
 	}
 	
 	public void removeMechanism(InvocationMechanism mechanism) {
 		for (InvocationGroup g : groups) {
 			if (g.getMechanism().equals(mechanism)) {
-				return;
+				g.setMechanism(getDefaultMechanism());
 			}
 		}
 		mechanisms.remove(mechanism);
-		notifyListeners();
+		notifyListeners(new InvocationMechanismRemovedEvent(mechanism));
 	}
 	
 	public HashSet<InvocationGroup> getInvocationGroups() {
@@ -128,12 +127,12 @@ public class InvocationGroupManager {
 
 	public void addMechanism(InvocationMechanism mechanism) {
 		mechanisms.add(mechanism);
-		notifyListeners();
+		notifyListeners(new InvocationMechanismAddedEvent(mechanism));
 	}
 
-	private void notifyListeners() {
+	private void notifyListeners(InvocationManagerEvent event) {
 		for (InvocationGroupManagerListener igml : listeners) {
-			igml.change();
+			igml.invocationManagerChange(event);
 		}
 	}
 	
