@@ -308,7 +308,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
 			File result = new File(tempDir.getAbsoluteFile() + "/" + cur.getValue().getPath());
 			if (result.exists()) {
-				FileReference ref = new FileReference();
+				FileReference ref = new FileReference(result);
 				results.put(cur.getKey(), ref);
 			} else {
 				ErrorDocument ed = referenceService.getErrorDocumentService().registerError("No result for " + cur.getKey(), 0, getContext());
