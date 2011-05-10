@@ -137,7 +137,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 					if (linkCommand != null) {
 						String source = fileRef.getFile().getAbsolutePath();
 						String actualLinkCommand = getActualOsCommand(linkCommand, source, targetSuffix, target);
-						logger.error("Link command is " + actualLinkCommand);
+						logger.info("Link command is " + actualLinkCommand);
 						String[] splitCmds = actualLinkCommand.split(" ");
 						ProcessBuilder builder = new ProcessBuilder(splitCmds);
 						builder.directory(tempDir);
@@ -216,7 +216,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 
 	@Override
 	public void cleanup() {
-		logger.error("Clearing " + tempDir);
+		logger.info("Clearing " + tempDir);
 		try {
 			FileUtils.deleteDirectory(tempDir);
 		} catch (IOException e) {
@@ -250,9 +250,9 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		builder.directory(tempDir);
 
 		for (int i = 0; i < cmds.size(); i++) {
-			logger.error("cmds[" + i + "] = " + cmds.get(i));
+			logger.info("cmds[" + i + "] = " + cmds.get(i));
 		}
-		logger.error("Command is " + command + " in directory " + tempDir);
+		logger.info("Command is " + command + " in directory " + tempDir);
 		try {
 			running = builder.start();
 			if (stdInReader != null) {

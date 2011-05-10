@@ -183,7 +183,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 		fullCommand += " && " + command;
 		
-		logger.error("Full command is " + fullCommand);
+		logger.info("Full command is " + fullCommand);
 		
 		try {
 			running = SshPool.openExecChannel(workerNode, askUserForPw);
