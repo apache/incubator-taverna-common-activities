@@ -20,12 +20,19 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation;
 
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.io.IOUtils;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
@@ -112,8 +119,10 @@ public abstract class UseCaseInvocation {
 		}
 		ScriptInputUser input = (ScriptInputUser) usecase.getInputs().get(inputName);
 		if (input.isList()) {
-			IdentifiedList<T2Reference> listOfReferences = (IdentifiedList<T2Reference>) referenceService.getListService().getList(t2Reference);
+			IdentifiedList<T2Reference> listOfReferences = (IdentifiedList<T2Reference>) referenceService
+					.getListService().getList(t2Reference);
 
+			if (!input.isConcatenate()) {
 				// this is a list input (not concatenated)
 				// so write every element to its own temporary file
 				// and create a filelist file
@@ -124,12 +133,16 @@ public abstract class UseCaseInvocation {
 				listElementTemp.setTempFile(true);
 
 				String lineEndChar = "\n";
+				if (!input.isFile() && !input.isTempFile()) {
+					lineEndChar = " ";
+				}
 
 				String listFileContent = "";
 				String filenamesFileContent = "";
 				// create a list of all temp file names
 				for (T2Reference cur : listOfReferences) {
-					String tmp = setOneInput(referenceService, cur, listElementTemp);
+					String tmp = setOneInput(referenceService, cur,
+							listElementTemp);
 					listFileContent += tmp + lineEndChar;
 					int ind = tmp.lastIndexOf('/');
 					if (ind == -1) {
@@ -147,15 +160,61 @@ public abstract class UseCaseInvocation {
 				listFile.setFile(input.isFile());
 				listFile.setTempFile(input.isTempFile());
 				listFile.setTag(input.getTag());
-				T2Reference listFileContentReference = referenceService.register(listFileContent, 0, true, invocationContext);
+				T2Reference listFileContentReference = referenceService
+						.register(listFileContent, 0, true, invocationContext);
 
-				tags.put(listFile.getTag(), setOneInput(referenceService, listFileContentReference, listFile));
+				tags.put(listFile.getTag(), setOneInput(referenceService,
+						listFileContentReference, listFile));
 
 				listFile.setTag(input.getTag() + "_NAMES");
-				T2Reference filenamesFileContentReference = referenceService.register(filenamesFileContent, 0, true, null);
-				tags.put(listFile.getTag(), setOneInput(referenceService, filenamesFileContentReference, listFile));
-			}  else {
-			tags.put(input.getTag(), setOneInput(referenceService, t2Reference, input));
+				T2Reference filenamesFileContentReference = referenceService
+						.register(filenamesFileContent, 0, true, null);
+				tags.put(listFile.getTag(), setOneInput(referenceService,
+						filenamesFileContentReference, listFile));
+			} else {
+				try {
+					// first, concatenate all data
+					if (input.isBinary()) {
+						ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+						BufferedWriter outputWriter = new BufferedWriter(
+								new OutputStreamWriter(outputStream));
+						for (T2Reference cur : listOfReferences) {
+							InputStreamReader inputReader = new InputStreamReader(
+									getAsStream(referenceService, cur));
+							IOUtils.copyLarge(inputReader, outputWriter);
+							inputReader.close();
+						}
+						outputWriter.close();
+						T2Reference binaryReference = referenceService
+								.register(outputStream.toByteArray(), 0, true,
+										invocationContext);
+						tags.put(input.getTag(), setOneInput(referenceService,
+								binaryReference, input));
+					} else {
+						ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+						BufferedWriter outputWriter = new BufferedWriter(
+								new OutputStreamWriter(outputStream));
+						for (T2Reference cur : listOfReferences) {
+							InputStreamReader inputReader = new InputStreamReader(
+									getAsStream(referenceService, cur));
+							IOUtils.copyLarge(inputReader, outputWriter);
+							outputWriter.write(" ");
+							inputReader.close();
+						}
+						outputWriter.close();
+						T2Reference binaryReference = referenceService
+								.register(outputStream.toByteArray(), 0, true,
+										invocationContext);
+						tags.put(input.getTag(), setOneInput(referenceService,
+								binaryReference, input));
+					}
+				} catch (IOException e) {
+					throw new InvocationException(e);
+				}
+			}
+		} else {
+			tags.put(input.getTag(), setOneInput(referenceService, t2Reference,
+					input));
 		}
 	}
 
