@@ -287,23 +287,29 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 			}
 			try {
 				int errorCode = running.exitValue();
-				if (errorCode != 0)
-					throw new InvocationException("Exit code: " + errorCode + stderr_buf.toString("US-ASCII"));
+				if (errorCode != 0) {
+					try {
+						throw new InvocationException("Nonzero exit code " + errorCode + ":" + stderr_buf.toString("US-ASCII"));
+					} catch (UnsupportedEncodingException e) {
+						throw new InvocationException("Nonzero exit code " + errorCode + ":" + stderr_buf.toString());
+					}
+				}
 				else
 					break;
 			} catch (IllegalThreadStateException e) {
+
 				try {
 					Thread.sleep(100);
-				} catch (Exception e2) {
+				} catch (InterruptedException e1) {
+					throw new InvocationException(e);
 				}
-			} catch (UnsupportedEncodingException e) {
-				throw new InvocationException(e);
+
 			}
 		}
 
 		HashMap<String, Object> results = new HashMap<String, Object>();
-			results.put("STDOUT", stdout_buf.toString());
-			results.put("STDERR", stderr_buf.toString());
+			results.put("STDOUT", stdout_buf.toByteArray());
+			results.put("STDERR", stderr_buf.toByteArray());
 
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
 			File result = new File(tempDir.getAbsoluteFile() + "/" + cur.getValue().getPath());
