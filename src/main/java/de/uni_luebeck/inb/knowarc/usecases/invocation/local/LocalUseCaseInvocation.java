@@ -287,7 +287,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 			}
 			try {
 				int errorCode = running.exitValue();
-				if (errorCode != 0) {
+				if (errorCode < 0) {
 					try {
 						throw new InvocationException("Nonzero exit code " + errorCode + ":" + stderr_buf.toString("US-ASCII"));
 					} catch (UnsupportedEncodingException e) {

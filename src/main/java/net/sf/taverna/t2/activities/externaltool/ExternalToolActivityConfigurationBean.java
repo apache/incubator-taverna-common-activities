@@ -2,11 +2,23 @@ package net.sf.taverna.t2.activities.externaltool;
 
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroup;
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager;
+import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
+import net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator;
+import net.sf.taverna.t2.spi.SPIRegistry;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 
 public final class ExternalToolActivityConfigurationBean {
 	
 	private InvocationGroup group;
+	
+	private String mechanismType;
+	
+	private String mechanismName;
+	
+	private String mechanismXML;
+	
+	private transient InvocationMechanism mechanism;
+
 	protected String repositoryUrl;
 	protected String externaltoolid;
 	protected UseCaseDescription useCaseDescription = null;
@@ -16,21 +28,24 @@ public final class ExternalToolActivityConfigurationBean {
 		return edited;
 	}
 
-	private static InvocationGroupManager manager = InvocationGroupManager.getInstance();
-
 	public ExternalToolActivityConfigurationBean() {
-		group = manager.getDefaultGroup();
 	}
 
-	// You need to do setInvocationGroup because when you clone the bean you get a copy of the group
 	public InvocationGroup getInvocationGroup() {
-		setInvocationGroup(this.group);
 	    return group;
 	}
 
 	public void setInvocationGroup(
 			InvocationGroup group) {
-		this.group = manager.checkGroup(group);
+		this.group = group;
+		clearMechanismInformation();
+	}
+
+	private void clearMechanismInformation() {
+		this.mechanismType = null;
+		this.mechanismName = null;
+		this.mechanismXML = null;
+		this.mechanism = null;
 	}
 
 	/**
@@ -77,6 +92,85 @@ public final class ExternalToolActivityConfigurationBean {
 
 	public void setEdited(boolean b) {
 		this.edited  = b;
+	}
+
+	/**
+	 * @param mechanism the mechanism to set
+	 */
+	public void setMechanism(InvocationMechanism mechanism) {
+		this.mechanism = mechanism;
+		this.group = null;
+	}
+	
+	public void convertMechanismToDetails() {
+		if (mechanism != null) {
+			this.setMechanismXML(mechanism.getXML());
+			this.setMechanismName(mechanism.getName());
+			this.setMechanismType(mechanism.getType());			
+		}
+	}
+
+	/**
+	 * @param mechanismType the mechanismType to set
+	 */
+	public void setMechanismType(String mechanismType) {
+		this.mechanismType = mechanismType;
+	}
+
+	/**
+	 * @param mechanismName the mechanismName to set
+	 */
+	public void setMechanismName(String mechanismName) {
+		this.mechanismName = mechanismName;
+	}
+
+	/**
+	 * @param mechanismXML the mechanismXML to set
+	 */
+	public void setMechanismXML(String mechanismXML) {
+		this.mechanismXML = mechanismXML;
+	}
+	
+	private static SPIRegistry<MechanismCreator> mechanismCreatorRegistry = new SPIRegistry(MechanismCreator.class);
+	
+	public void convertDetailsToMechanism() {
+		if (mechanismXML != null) {
+			for (MechanismCreator mc : mechanismCreatorRegistry.getInstances()) {
+				if (mc.canHandle(getMechanismType())) {
+					mechanism = mc.convert(getMechanismXML(), getMechanismName());
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @return the mechanism
+	 */
+	public InvocationMechanism getMechanism() {
+		
+		return mechanism;
+	}
+
+	/**
+	 * @return the mechanismType
+	 */
+	public String getMechanismType() {
+		return mechanismType;
+	}
+
+	/**
+	 * @return the mechanismName
+	 */
+	public String getMechanismName() {
+		return mechanismName;
+	}
+
+	/**
+	 * @return the mechanismXML
+	 */
+	public String getMechanismXML() {
+		return mechanismXML;
 	}
 
 }

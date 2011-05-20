@@ -28,6 +28,7 @@ import java.util.Map;
 
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroup;
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager;
+import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
 import net.sf.taverna.t2.annotation.Annotated;
 import net.sf.taverna.t2.annotation.annotationbeans.MimeType;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
@@ -136,9 +137,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		this.configurationBean = bean;
 
 		try {
-			mydesc = bean.getUseCaseDescription();
-			
-			bean.setInvocationGroup(InvocationGroupManager.getInstance().checkGroup(bean.getInvocationGroup()));
+			mydesc = bean.getUseCaseDescription();		
 			
 			inputPorts.clear();
 			outputPorts.clear();
@@ -178,7 +177,28 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 
 	@Override
 	public ExternalToolActivityConfigurationBean getConfiguration() {
+		if (configurationBean != null) {
+			if (configurationBean.getInvocationGroup() == null) {
+				configurationBean.convertMechanismToDetails();
+			} else {
+				configurationBean.getInvocationGroup().convertMechanismToDetails();
+			}
+		}
 		return configurationBean;
+	}
+	
+	public InvocationMechanism recreateMechanism() {
+		if (configurationBean.getInvocationGroup() != null) {
+			if (configurationBean.getInvocationGroup().getMechanism() == null) {
+				configurationBean.getInvocationGroup().convertDetailsToMechanism();			
+			}
+			return configurationBean.getInvocationGroup().getMechanism();
+		} else {
+			if (configurationBean.getMechanism() == null) {
+				configurationBean.convertDetailsToMechanism();
+			}
+			return configurationBean.getMechanism();
+		}
 	}
 
 	@Override
@@ -194,21 +214,8 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 				 * Note that retrying needs to be either done via Taverna's retry mechanism or as part of the specific invocation
 				 */
 				try {
-					// we ask the UseCaseInvokation implementation to
-					// choose a
-					// matching invocation algorithm based on the plugin
-					// configuration and use case description.
-					InvocationGroup group = configurationBean
-							.getInvocationGroup();
-					logger.info("Invoking using invocationGroup "
-							+ group.hashCode() + " called "
-							+ group.getInvocationGroupName());
-					logger.info("InvocationMechanism name is "
-							+ group.getMechanism().getName());
-					logger.info("Group thinks mechanism name is "
-							+ group.getMechanismName());
-					logger.info("Mechanism XML is " + group.getMechanismXML());
-					invoke = getInvocation(group,
+
+					invoke = getInvocation(recreateMechanism(),
 							configurationBean.getUseCaseDescription(), data, referenceService);
 					if (invoke == null) {
 						logger.error("Invoke is null");
@@ -263,17 +270,17 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	
 	private static SPIRegistry<InvocationCreator> invocationCreatorRegistry = new SPIRegistry(InvocationCreator.class);
 	
-	private UseCaseInvocation getInvocation(InvocationGroup group, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
+	private UseCaseInvocation getInvocation(InvocationMechanism mechanism, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 		UseCaseInvocation result = null;
 		InvocationCreator creator = null;
 		for (InvocationCreator c : invocationCreatorRegistry.getInstances()) {
-			if (c.canHandle(group.getMechanismType())) {
+			if (c.canHandle(mechanism.getType())) {
 				creator = c;
 				break;
 			}
 		}
 		if (creator != null) {
-			result = creator.convert(group.getMechanism(), description, data, referenceService);
+			result = creator.convert(mechanism, description, data, referenceService);
 		}
 		return result;
 	}

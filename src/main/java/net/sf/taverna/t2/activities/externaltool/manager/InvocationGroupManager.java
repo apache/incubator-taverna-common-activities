@@ -6,12 +6,21 @@ package net.sf.taverna.t2.activities.externaltool.manager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.lang.ref.WeakReference;
 
 import net.sf.taverna.raven.appconfig.ApplicationRuntime;
 import net.sf.taverna.t2.activities.externaltool.local.ExternalToolLocalInvocationMechanism;
+import net.sf.taverna.t2.lang.observer.MultiCaster;
+import net.sf.taverna.t2.lang.observer.Observable;
+import net.sf.taverna.t2.lang.observer.Observer;
 import net.sf.taverna.t2.spi.SPIRegistry;
+
+import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -26,7 +35,7 @@ import org.jdom.output.XMLOutputter;
  * @author alanrw
  *
  */
-public class InvocationGroupManager {
+public class InvocationGroupManager implements Observable<InvocationManagerEvent>{
 	
 	private static final String DEFAULT_MECHANISM_NAME = "default local";
 	private static final String DEFAULT_GROUP_NAME = "default";
@@ -47,8 +56,10 @@ public class InvocationGroupManager {
 		private static InvocationGroupManager instance = new InvocationGroupManager();		
 	}
 	
-	private HashSet<InvocationGroupManagerListener> listeners = new HashSet<InvocationGroupManagerListener>();
-	private InvocationMechanism defaultMechanism;
+	protected MultiCaster<InvocationManagerEvent> observers = new MultiCaster<InvocationManagerEvent>(
+			this);
+	
+	private InvocationMechanism defaultMechanism = null;
 	
 	private InvocationGroupManager() {
 		readConfiguration();
@@ -70,12 +81,12 @@ public class InvocationGroupManager {
 
 	public void addInvocationGroup(InvocationGroup group) {
 		groups.add(group);
-		notifyListeners(new InvocationGroupAddedEvent(group));
+		observers.notify(new InvocationGroupAddedEvent(group));
 	}
 	
 	public void removeInvocationGroup(InvocationGroup group) {
 		groups.remove(group);
-		notifyListeners(new InvocationGroupRemovedEvent(group));
+		observers.notify(new InvocationGroupRemovedEvent(group));
 	}
 	
 	public void removeMechanism(InvocationMechanism mechanism) {
@@ -85,7 +96,7 @@ public class InvocationGroupManager {
 			}
 		}
 		mechanisms.remove(mechanism);
-		notifyListeners(new InvocationMechanismRemovedEvent(mechanism));
+		observers.notify(new InvocationMechanismRemovedEvent(mechanism));
 	}
 	
 	public HashSet<InvocationGroup> getInvocationGroups() {
@@ -99,45 +110,13 @@ public class InvocationGroupManager {
 		return defaultGroup;
 	}
 
-	public InvocationGroup checkGroup(InvocationGroup invocationGroup) {
-		checkMechanismOfGroup(invocationGroup);
-		for (InvocationGroup ig : getInvocationGroups()) {
-			if (ig.getInvocationGroupName().equals(invocationGroup.getInvocationGroupName())) {
-				return ig;
-			}
-		}
-		addInvocationGroup(invocationGroup);
-		return invocationGroup;
-	}
-
-	private void checkMechanismOfGroup(InvocationGroup group) {
-		for (InvocationMechanism im : mechanisms) {
-			if (im.getName().equals(group.getMechanismName())) {
-				group.setMechanism(im);
-				return;
-			}
-		}
-		addMechanism(group.getMechanism());
-		
-	}
-
 	public Set<InvocationMechanism> getMechanisms() {
 		return mechanisms;
 	}
 
 	public void addMechanism(InvocationMechanism mechanism) {
 		mechanisms.add(mechanism);
-		notifyListeners(new InvocationMechanismAddedEvent(mechanism));
-	}
-
-	private void notifyListeners(InvocationManagerEvent event) {
-		for (InvocationGroupManagerListener igml : listeners) {
-			igml.invocationManagerChange(event);
-		}
-	}
-	
-	public void addListener(InvocationGroupManagerListener listener) {
-		listeners.add(listener);
+		observers.notify(new InvocationMechanismAddedEvent(mechanism));
 	}
 
 	public InvocationMechanism getDefaultMechanism() {
@@ -151,7 +130,7 @@ public class InvocationGroupManager {
 		return groups.contains(group);
 	}
 	
-	private InvocationMechanism getInvocationMechanism(
+	public InvocationMechanism getInvocationMechanism(
 			String defaultMechanismName) {
 		for (InvocationMechanism m : mechanisms) {
 			if (m.getName().equals(defaultMechanismName)) {
@@ -161,9 +140,9 @@ public class InvocationGroupManager {
 		return null;
 	}
 	
-	InvocationGroup getInvocationGroup(String defaultGroupName) {
+	InvocationGroup getInvocationGroup(String groupName) {
 		for (InvocationGroup g : groups) {
-			if (g.getInvocationGroupName().equals(defaultGroupName)) {
+			if (g.getInvocationGroupName().equals(groupName)) {
 				return g;
 			}
 		}
@@ -171,11 +150,7 @@ public class InvocationGroupManager {
 	}
 	
 	public void mechanismChanged(InvocationMechanism im) {
-		for (InvocationGroup g : groups) {
-			if (g.getMechanism().equals(im)) {
-				g.setMechanism(im);
-			}
-		}
+		observers.notify(new InvocationMechanismChangedEvent(im));
 	}
 
 	
@@ -304,6 +279,25 @@ public class InvocationGroupManager {
 		} catch (IOException e) {
 			logger.error("Unable to save invocation manager", e);
 		}
+	}
+
+	public void groupChanged(InvocationGroup group) {
+		observers.notify(new InvocationGroupChangedEvent(group));
+	}
+
+	@Override
+	public void addObserver(Observer<InvocationManagerEvent> observer) {
+		observers.addObserver(observer);
+	}
+
+	@Override
+	public List<Observer<InvocationManagerEvent>> getObservers() {
+		return observers.getObservers();
+	}
+
+	@Override
+	public void removeObserver(Observer<InvocationManagerEvent> observer) {
+		observers.removeObserver(observer);
 	}
 
 }

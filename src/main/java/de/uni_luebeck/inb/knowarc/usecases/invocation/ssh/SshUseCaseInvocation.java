@@ -211,7 +211,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 
 		int exitcode = running.getExitStatus();
-		if (exitcode != 0) {
+		if (exitcode < 0) {
 			try {
 				throw new InvocationException("Nonzero exit code " + exitcode + ":" + stderr_buf.toString("US-ASCII"));
 			} catch (UnsupportedEncodingException e) {
@@ -221,8 +221,15 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 
 		HashMap<String, Object> results = new HashMap<String, Object>();
 
+		
 			results.put("STDOUT", stdout_buf.toByteArray());
 			results.put("STDERR", stderr_buf.toByteArray());
+			try {
+				stdout_buf.close();
+				stderr_buf.close();
+			} catch (IOException e2) {
+				throw new InvocationException(e2);
+			}
 
 		try {
 			ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);

@@ -87,14 +87,6 @@ public class InvocationGroup {
 	 * @return the mechanism
 	 */
 	public InvocationMechanism getMechanism() {
-		if ((mechanism == null) && (mechanismXML != null)) {
-			for (MechanismCreator mc : mechanismCreatorRegistry.getInstances()) {
-				if (mc.canHandle(getMechanismType())) {
-					mechanism = mc.convert(getMechanismXML(), getMechanismName());
-					break;
-				}
-			}
-		}
 		return mechanism;
 	}
 
@@ -106,12 +98,26 @@ public class InvocationGroup {
 		logger.info("InvocationGroup " + this.hashCode() + " called " + getInvocationGroupName() + " set to " + mechanism.getName());
 		
 		this.mechanism = mechanism;
-		this.setMechanismXML(mechanism.getXML());
-		this.setMechanismName(mechanism.getName());
-		this.setMechanismType(mechanism.getType());
 	}
 	
 	public String toString() {
 		return getInvocationGroupName();
+	}
+
+	public void convertMechanismToDetails() {
+		this.setMechanismXML(mechanism.getXML());
+		this.setMechanismName(mechanism.getName());
+		this.setMechanismType(mechanism.getType());	
+	}
+
+	public void convertDetailsToMechanism() {
+		if (mechanismXML != null) {
+			for (MechanismCreator mc : mechanismCreatorRegistry.getInstances()) {
+				if (mc.canHandle(getMechanismType())) {
+					mechanism = mc.convert(getMechanismXML(), getMechanismName());
+					break;
+				}
+			}
+		}
 	}
 }
