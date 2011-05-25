@@ -218,9 +218,6 @@ public abstract class UseCaseInvocation {
 		}
 	}
 
-
-	public abstract void cleanup() throws InvocationException;
-
 	/*
 	 * submit a grid job and wait for it to finish, then get the result as
 	 * on-demand downloads or directly as data (in case of local execution)
@@ -285,5 +282,8 @@ public abstract class UseCaseInvocation {
 
 	public abstract void setStdIn(ReferenceService referenceService,
 			T2Reference t2Reference);
+
+	public abstract void rememberRun(String runId);
+	
 
 }

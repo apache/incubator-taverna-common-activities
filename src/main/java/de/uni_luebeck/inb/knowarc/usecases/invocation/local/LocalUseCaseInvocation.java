@@ -36,11 +36,16 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
@@ -60,6 +65,9 @@ import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrl;
 
 /**
  * The job is executed locally, i.e. not via the grid.
@@ -80,6 +88,10 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	private final String linkCommand;
 
 	private Reader stdInReader = null;
+	
+	private static Map<String, Set<String>> runIdToTempDir = new HashMap<String, Set<String>> ();
+	
+	private static String LOCAL_INVOCATION_FILE = "localInvocations";
 
 	public LocalUseCaseInvocation(UseCaseDescription desc, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
 
@@ -214,13 +226,17 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	}
 	
 
-	@Override
-	public void cleanup() {
-		logger.info("Clearing " + tempDir);
-		try {
-			FileUtils.deleteDirectory(tempDir);
-		} catch (IOException e) {
-			logger.error("Unable to delete" + tempDir, e);
+	public static void cleanup(String runId) {
+		Set<String> tempDirectories = runIdToTempDir.get(runId);
+		if (tempDirectories != null) {
+			for (String tempDir : tempDirectories) {
+				try {
+					FileUtils.deleteDirectory(new File(tempDir));
+				} catch (IOException e) {
+					logger.error("Problem deleting " + tempDir, e);
+				}
+			}
+			runIdToTempDir.remove(runId);
 		}
 	}
 	
@@ -341,6 +357,85 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	public void setStdIn(ReferenceService referenceService,
 			T2Reference t2Reference) {
 		stdInReader = new BufferedReader(new InputStreamReader(getAsStream(referenceService, t2Reference)));
+	}
+
+	@Override
+	public void rememberRun(String runId) {
+		Set<String> directories = runIdToTempDir.get(runId);
+		if (directories == null) {
+			directories = Collections.synchronizedSet(new HashSet<String> ());
+			runIdToTempDir.put(runId, directories);
+		}
+		try {
+			directories.add(tempDir.getCanonicalPath());
+		} catch (IOException e) {
+			logger.error("Unable to record temporary directory: " + tempDir, e);
+		}
+	}
+
+	public static void load(File directory) {
+		File invocationsFile = new File(directory, LOCAL_INVOCATION_FILE);
+		if (!invocationsFile.exists()) {
+			return;
+		}
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(invocationsFile));
+			String line = reader.readLine();
+			while (line != null) {
+				String[] parts = line.split(" ");
+				if (parts.length != 2) {
+					break;
+				}
+				String runId = parts[0];
+				String tempDirString = parts[1];
+				Set<String> tempDirs = runIdToTempDir.get(runId);
+				if (tempDirs == null) {
+					tempDirs = new HashSet<String>();
+					runIdToTempDir.put(runId, tempDirs);
+				}
+				tempDirs.add(tempDirString);
+				line = reader.readLine();
+			}
+		} catch (FileNotFoundException e) {
+			logger.error(e);
+		} catch (IOException e) {
+			logger.error(e);
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			}
+		}
+	}
+
+	public static void persist(File directory) {
+		File invocationsFile = new File(directory, LOCAL_INVOCATION_FILE);
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(invocationsFile));
+			for (String runId : runIdToTempDir.keySet()) {
+				for (String tempDir : runIdToTempDir.get(runId)) {
+					writer.write(runId);
+					writer.write(" ");
+					writer.write(tempDir);
+					writer.newLine();
+				}
+			}
+		} catch (IOException e) {
+			logger.error(e);
+		} finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			}
+		}
 	}
 
 }

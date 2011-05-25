@@ -178,12 +178,21 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	@Override
 	public ExternalToolActivityConfigurationBean getConfiguration() {
 		if (configurationBean != null) {
-			if (configurationBean.getInvocationGroup() == null) {
-				configurationBean.convertMechanismToDetails();
+			InvocationGroup invocationGroup = configurationBean.getInvocationGroup();
+			if (invocationGroup == null) {
+				if (configurationBean.getMechanism() != null) {
+					configurationBean.convertMechanismToDetails();
+				}
 			} else {
-				configurationBean.getInvocationGroup().convertMechanismToDetails();
+				if (invocationGroup.getMechanism() != null) {
+					invocationGroup.convertMechanismToDetails();
+				}
 			}
 		}
+		return configurationBean;
+	}
+	
+	public ExternalToolActivityConfigurationBean getConfigurationNoConversion() {
 		return configurationBean;
 	}
 	
@@ -225,8 +234,8 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 							.getEntities(WorkflowRunIdEntity.class).get(0)
 							.getWorkflowRunId();
 					logger.info("Run id is " + runId);
-					ExternalToolRunDeletionListener.rememberInvocation(runId,
-							invoke);
+					invoke.rememberRun(runId);
+
 					invoke.setContext(callback.getContext());
 
 					// look at every use dynamic case input

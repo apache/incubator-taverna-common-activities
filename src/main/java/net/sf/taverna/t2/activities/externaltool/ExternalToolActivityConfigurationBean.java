@@ -95,10 +95,13 @@ public final class ExternalToolActivityConfigurationBean {
 	}
 
 	/**
+	 * Note this also sets the details
+	 * 
 	 * @param mechanism the mechanism to set
 	 */
 	public void setMechanism(InvocationMechanism mechanism) {
 		this.mechanism = mechanism;
+		convertMechanismToDetails();
 		this.group = null;
 	}
 	

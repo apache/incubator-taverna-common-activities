@@ -28,14 +28,14 @@ public class InvocationGroup {
 	/**
 	 * @return the invocationGroupName
 	 */
-	public String getInvocationGroupName() {
+	public String getName() {
 		return invocationGroupName;
 	}
 
 	/**
 	 * @param invocationGroupName the invocationGroupName to set
 	 */
-	public void setInvocationGroupName(String invocationGroupName) {
+	public void setName(String invocationGroupName) {
 		this.invocationGroupName = invocationGroupName;
 	}
 
@@ -91,17 +91,17 @@ public class InvocationGroup {
 	}
 
 	/**
+	 * Note this also sets the corresponding details
+	 * 
 	 * @param mechanism the mechanism to set
 	 */
 	public void setMechanism(InvocationMechanism mechanism) {
-		
-		logger.info("InvocationGroup " + this.hashCode() + " called " + getInvocationGroupName() + " set to " + mechanism.getName());
-		
 		this.mechanism = mechanism;
+		convertMechanismToDetails();
 	}
 	
 	public String toString() {
-		return getInvocationGroupName();
+		return getName();
 	}
 
 	public void convertMechanismToDetails() {

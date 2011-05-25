@@ -6,12 +6,9 @@ package net.sf.taverna.t2.activities.externaltool.manager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.lang.ref.WeakReference;
 
 import net.sf.taverna.raven.appconfig.ApplicationRuntime;
 import net.sf.taverna.t2.activities.externaltool.local.ExternalToolLocalInvocationMechanism;
@@ -19,8 +16,6 @@ import net.sf.taverna.t2.lang.observer.MultiCaster;
 import net.sf.taverna.t2.lang.observer.Observable;
 import net.sf.taverna.t2.lang.observer.Observer;
 import net.sf.taverna.t2.spi.SPIRegistry;
-
-import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -48,6 +43,8 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	private static SAXBuilder builder = new SAXBuilder();
 	
 	private static SPIRegistry<MechanismCreator> mechanismCreatorRegistry = new SPIRegistry(MechanismCreator.class);
+
+	private static SPIRegistry<InvocationPersister> invocationPersisterRegistry = new SPIRegistry(InvocationPersister.class);
 
 	private static Logger logger = Logger.getLogger(InvocationGroupManager.class);
     
@@ -142,7 +139,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	
 	InvocationGroup getInvocationGroup(String groupName) {
 		for (InvocationGroup g : groups) {
-			if (g.getInvocationGroupName().equals(groupName)) {
+			if (g.getName().equals(groupName)) {
 				return g;
 			}
 		}
@@ -162,7 +159,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	
 	private void createDefaultGroup() {
 		defaultGroup = new InvocationGroup();
-		defaultGroup.setInvocationGroupName(DEFAULT_GROUP_NAME);
+		defaultGroup.setName(DEFAULT_GROUP_NAME);
 		defaultGroup.setMechanism(defaultMechanism);
 		groups.add(defaultGroup);
 	}
@@ -208,8 +205,9 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 					mechanism = getDefaultMechanism();
 				}
 				InvocationGroup group = new InvocationGroup();
-				group.setInvocationGroupName(groupName);
+				group.setName(groupName);
 				group.setMechanism(mechanism);
+				group.convertMechanismToDetails();
 				this.addInvocationGroup(group);
 			}
 		} catch (JDOMException e) {
@@ -260,10 +258,10 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		for (InvocationGroup g : groups) {
 			Element groupElement = new Element("invocationGroup");
 			Element nameElement = new Element("invocationGroupName");
-			nameElement.setText(g.getInvocationGroupName());
+			nameElement.setText(g.getName());
 			groupElement.addContent(nameElement);
 			Element mechanismNameElement = new Element("mechanismName");
-			mechanismNameElement.setText(g.getMechanismName());
+			mechanismNameElement.setText(g.getMechanism().getName());
 			groupElement.addContent(mechanismNameElement);
 			groupsElement.addContent(groupElement);
 		}
@@ -298,6 +296,24 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	@Override
 	public void removeObserver(Observer<InvocationManagerEvent> observer) {
 		observers.removeObserver(observer);
+	}
+	
+	public void deleteRun(String runId) {
+		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+			persister.deleteRun(runId);
+		}
+	}
+	
+	public void persistInvocations() {
+		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+			persister.persist(getInvocationManagerDirectory());
+		}
+	}
+	
+	public void loadInvocations() {
+		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+			persister.load(getInvocationManagerDirectory());
+		}
 	}
 
 }

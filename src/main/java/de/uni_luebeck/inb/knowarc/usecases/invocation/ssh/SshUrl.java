@@ -82,7 +82,7 @@ public class SshUrl {
 	public String toString() {
 		String result = SshNodeFactory.makeUrl(getHost(), getPort(), getDirectory());
 		if (getSubDirectory() != null) {
-			result += "/" + getSubDirectory();
+			result += getSubDirectory();
 		}
 		if (getFileName() != null) {
 			result += "/" + getFileName();
@@ -123,8 +123,4 @@ public class SshUrl {
 		this.sshNode = sshNode;
 	}
 	
-	public String getFullPath() {
-		return getDirectory() + "/" + getSubDirectory() + "/" + getFileName();
-	}
-
 }

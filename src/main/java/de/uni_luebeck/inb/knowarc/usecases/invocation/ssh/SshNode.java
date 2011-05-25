@@ -93,7 +93,7 @@ public class SshNode {
 		return port;
 	}
 	
-	private SshUrl getUrl() {
+	SshUrl getUrl() {
 		if (url == null) {
 			url = new SshUrl(this);
 		}

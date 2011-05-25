@@ -21,19 +21,31 @@
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Vector;
 
+import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
 import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ErrorDocumentServiceException;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
@@ -42,6 +54,7 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.jcraft.jsch.ChannelExec;
@@ -84,6 +97,10 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	private final ByteArrayOutputStream stderr_buf = new ByteArrayOutputStream();
 
     private static HashMap<String, Object> nodeLock = new HashMap<String,Object>();
+    
+	private static Map<String, Set<SshUrl>> runIdToTempDir = new HashMap<String, Set<SshUrl>> ();
+	
+	private static String SSH_INVOCATION_FILE = "sshInvocations";
 
 	public static String test(final SshNode workerNode, final AskUserForPw askUserForPw) {
 		try {
@@ -129,10 +146,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 	}
 
-	private void recursiveDelete(ChannelSftp sftp, String path) throws SftpException, JSchException {
-		if (!path.startsWith(workerNode.getDirectory() + tmpname)) {
-			return;
-		}
+	private static void recursiveDelete(ChannelSftp sftp, String path) throws SftpException, JSchException {
 		Vector<?> entries = sftp.ls(path);
 		for (Object object : entries) {
 			LsEntry entry = (LsEntry) object;
@@ -150,24 +164,43 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		sftp.rmdir(path);
 	}
 
-	@Override
-	public void cleanup() throws InvocationException {
-			ChannelSftp sftp;
-			try {
-				sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
-			} catch (JSchException e) {
-				throw new InvocationException(e);
+	public static void cleanup(String runId) throws InvocationException {
+		Set<SshUrl> tempDirectories = runIdToTempDir.get(runId);
+		if (tempDirectories != null) {
+			for (SshUrl tempUrl : tempDirectories) {
+				URI uri;
+				try {
+					uri = new URI(tempUrl.toString());
+				
+				
+				ChannelSftp sftp;
+				SshNode workerNode;
+				String fullPath = uri.getPath();
+				String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
+				String tempDir = fullPath.substring(fullPath.lastIndexOf("/"));
+				try {
+					workerNode = SshNodeFactory.getInstance().getSshNode(uri.getHost(), uri.getPort(), path);
+					
+					sftp = SshPool.getSftpPutChannel(workerNode, new RetrieveLoginFromTaverna(workerNode.getUrl().toString()));
+				} catch (JSchException e) {
+					throw new InvocationException(e);
+				}
+				synchronized(getNodeLock(workerNode)) {
+				try {
+					sftp.cd(path);
+					recursiveDelete(sftp, path + "/" + tempDir + "/");
+				} catch (SftpException e) {
+					throw new InvocationException(e);
+				} catch (JSchException e) {
+					throw new InvocationException(e);
+				}
+				}
+				} catch (URISyntaxException e1) {
+					throw new InvocationException(e1);
+				}
 			}
-			synchronized(getNodeLock(workerNode)) {
-			try {
-				sftp.cd(workerNode.getDirectory());
-				recursiveDelete(sftp, workerNode.getDirectory() + tmpname + "/");
-			} catch (SftpException e) {
-				throw new InvocationException(e);
-			} catch (JSchException e) {
-				throw new InvocationException(e);
-			}
-			}
+			runIdToTempDir.remove(runId);
+		}
 	}
 
 	@Override
@@ -362,5 +395,93 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	public void setStdIn(ReferenceService referenceService,
 			T2Reference t2Reference) {
 		stdInputStream = new BufferedInputStream(getAsStream(referenceService, t2Reference));
+	}
+
+	@Override
+	public void rememberRun(String runId) {
+		Set<SshUrl> directories = runIdToTempDir.get(runId);
+		if (directories == null) {
+			directories = Collections.synchronizedSet(new HashSet<SshUrl> ());
+			runIdToTempDir.put(runId, directories);
+		}
+		SshUrl url;
+			url = new SshUrl(workerNode);
+			url.setSubDirectory(tmpname);
+			directories.add(url);
+	}
+
+	public static void load(File directory) {
+		File invocationsFile = new File(directory, SSH_INVOCATION_FILE);
+		if (!invocationsFile.exists()) {
+			return;
+		}
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(invocationsFile));
+			String line = reader.readLine();
+			while (line != null) {
+				String[] parts = line.split(" ");
+				if (parts.length != 2) {
+					break;
+				}
+				String runId = parts[0];
+				String urlString = parts[1];
+				Set<SshUrl> urls = runIdToTempDir.get(runId);
+				if (urls == null) {
+					urls = new HashSet<SshUrl>();
+					runIdToTempDir.put(runId, urls);
+				}
+				URI uri = new URI(urlString);
+				String fullPath = uri.getPath();
+				String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
+				String tempDir = fullPath.substring(fullPath.lastIndexOf("/"));
+				SshNode node = SshNodeFactory.getInstance().getSshNode(
+						uri.getHost(), uri.getPort(), path);
+				SshUrl newUrl = new SshUrl(node);
+				newUrl.setSubDirectory(tempDir);
+				urls.add(newUrl);
+				line = reader.readLine();
+			}
+		} catch (FileNotFoundException e) {
+			logger.error(e);
+		} catch (URISyntaxException e) {
+			logger.error(e);
+		} catch (IOException e) {
+			logger.error(e);
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			}
+		}
+	}
+
+	public static void persist(File directory) {
+		File invocationsFile = new File(directory, SSH_INVOCATION_FILE);
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(invocationsFile));
+			for (String runId : runIdToTempDir.keySet()) {
+				for (SshUrl url : runIdToTempDir.get(runId)) {
+					writer.write(runId);
+					writer.write(" ");
+					writer.write(url.toString());
+					writer.newLine();
+				}
+			}
+		} catch (IOException e) {
+			logger.error(e);
+		} finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			}
+		}
 	}
 }
