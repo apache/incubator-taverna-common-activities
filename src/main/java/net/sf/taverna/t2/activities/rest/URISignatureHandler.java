@@ -1,7 +1,11 @@
 package net.sf.taverna.t2.activities.rest;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -364,20 +368,16 @@ public class URISignatureHandler {
 	 * @return URL encoded string that can be inserted into the request URL.
 	 */
 	public static String urlEncodeQuery(String query) {
-		// "fast exit" - if null supplied, just return an empty string;
-		// this is because in the URLs we have "q=", rather than "q=null" - this
-		// will cater for such cases
-		if (query == null)
-			return ("");
-
-		// encode the query
-		String strRes = "";
-		try {
-			strRes = URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// do nothing - UTF-8 must be supported...
+		StringBuilder result = new StringBuilder();
+		StringCharacterIterator i = new StringCharacterIterator(query);
+		for (char c = i.first(); c != CharacterIterator.DONE; c = i.next()) {
+			if (Character.isLetterOrDigit(c)  && (c < 128)) {
+				result.append(c);
+			} else {
+				result.append("%");
+				result.append(Integer.toHexString(c));
+			}
 		}
-
-		return (strRes);
+		return (result.toString());
 	}
 }
