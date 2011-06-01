@@ -396,8 +396,9 @@ public class URISignatureHandlerTest {
 
 		String completeURI = URISignatureHandler.generateCompleteURI(
 				uriSignature, parameters, true);
+		System.err.println(completeURI);
 		assertEquals(
-				"http://sysmo-db.org/sops/1+11/experimental_conditions/2%2F2%242%262%3A?condition_unit=3%3B3",
+				"http://sysmo-db.org/sops/1%2011/experimental_conditions/2%2F2%242%262%3A?condition_unit=3%3B3",
 				completeURI);
 	}
 

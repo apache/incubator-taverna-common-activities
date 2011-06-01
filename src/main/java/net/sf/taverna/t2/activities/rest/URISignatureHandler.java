@@ -375,7 +375,7 @@ public class URISignatureHandler {
 				result.append(c);
 			} else {
 				result.append("%");
-				result.append(Integer.toHexString(c));
+				result.append(Integer.toHexString(c).toUpperCase());
 			}
 		}
 		return (result.toString());
