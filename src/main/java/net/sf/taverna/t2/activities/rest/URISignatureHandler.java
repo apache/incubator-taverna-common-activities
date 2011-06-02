@@ -1,11 +1,7 @@
 package net.sf.taverna.t2.activities.rest;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -13,6 +9,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -34,6 +32,10 @@ import java.util.Map;
  * @author Sergejs Aleksejevs
  */
 public class URISignatureHandler {
+	
+	private static Logger logger = Logger.getLogger(URISignatureHandler.class);
+	
+
 	public static final char PLACEHOLDER_START_SYMBOL = '{';
 	public static final char PLACEHOLDER_END_SYMBOL = '}';
 
@@ -368,16 +370,28 @@ public class URISignatureHandler {
 	 * @return URL encoded string that can be inserted into the request URL.
 	 */
 	public static String urlEncodeQuery(String query) {
-		StringBuilder result = new StringBuilder();
-		StringCharacterIterator i = new StringCharacterIterator(query);
-		for (char c = i.first(); c != CharacterIterator.DONE; c = i.next()) {
-			if (Character.isLetterOrDigit(c)  && (c < 128)) {
-				result.append(c);
-			} else {
-				result.append("%");
-				result.append(Integer.toHexString(c).toUpperCase());
-			}
+		String ns = Normalizer.normalize(query, Normalizer.Form.NFC);
+		byte[] bb = null;
+		try {
+			bb = ns.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error(e);
+			return query;
 		}
-		return (result.toString());
+		
+		StringBuffer sb = new StringBuffer();
+		
+		for (int i = 0; i < bb.length; i++) {
+		    int b = bb[i] & 0xff;
+		    if (!Character.isLetterOrDigit(b) || (b >= 0x80)) {
+		    	sb.append("%");
+		    	sb.append(Integer.toHexString(b).toUpperCase());
+		    }
+		    else {
+		    	sb.append((char)b);
+		    }
+		}
+		return sb.toString();
 	}
+
 }
