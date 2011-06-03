@@ -53,7 +53,7 @@ public class UseCaseDescription {
 	 * Identifier for the retrieval of this UseCase in the sharedRepository
 	 * database, respectively its XML export.
 	 */
-	private String usecaseid;
+	private String usecaseid = "";
 	/**
 	 * Workflow Elements now can get a group identifier. There may be subgroups
 	 * divided by :
@@ -64,11 +64,11 @@ public class UseCaseDescription {
 	 * short to fit on the single line that is prepared for such descriptions in
 	 * the Taverna workflow element list.
 	 */
-	private String description;
+	private String description = "";
 	/**
 	 * What is actually executed on the shell.
 	 */
-	private String command;
+	private String command = "";
 
 	/**
 	 * Accessor function of command
@@ -88,12 +88,12 @@ public class UseCaseDescription {
 	 * Routine that may be executed as a first check if the program is indeed
 	 * installed.
 	 */
-	private String test_local;
+	private String test_local = null;
 	
 	/**
 	 * URL of an icon that would help users to recognise the use case
 	 */
-	private String icon_url;
+	private String icon_url = null;
 
 	private int preparingTimeoutInSeconds = 20 * 60; // 20 minutes
 	private int executionTimeoutInSeconds = 30 * 60; // 30 minutes

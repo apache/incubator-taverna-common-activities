@@ -28,6 +28,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.taverna.t2.workflowmodel.serialization.DeserializationException;
+
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -38,48 +40,63 @@ public class UseCaseEnumeration {
 
 	private static Logger logger = Logger.getLogger(UseCaseEnumeration.class);
 
-	public static List<UseCaseDescription> enumerateXmlFile(String xmlFileUrl) {
+	public static List<UseCaseDescription> readDescriptionsFromUrl(String xmlFileUrl) {
 
-		ArrayList<UseCaseDescription> ret = new ArrayList<UseCaseDescription>();
+		List<UseCaseDescription> ret = new ArrayList<UseCaseDescription>();
+		URLConnection con = null;
 		try {
-			enumerateXmlInner(xmlFileUrl, ret);
+			URL url = new URL(xmlFileUrl);
+
+			con = url.openConnection();
+			con.setConnectTimeout(4000);
+			ret = readDescriptionsFromStream(con.getInputStream());
+			
 		} catch (IOException ioe) {
 			logger.error("Problem retrieving from " + xmlFileUrl);
 			logger.error(ioe);
-			return ret;
-		} catch (JDOMException jdome) {
-			logger.error("Problem with document retrieved from " + xmlFileUrl);
-			logger.error(jdome);
-			return ret;
+		}
+		finally {
+
 		}
 
 		return ret;
 
 	}
-
-	public static void enumerateXmlInner(String xmlFileUrl, ArrayList<UseCaseDescription> ret) throws MalformedURLException,
-			IOException, JDOMException {
-		URL url = new URL(xmlFileUrl);
-
-		URLConnection con = url.openConnection();
-		con.setConnectTimeout(4000);
-		InputStream is = con.getInputStream();
+	
+	public static List<UseCaseDescription> readDescriptionsFromStream(InputStream is) {
+		
+		List<UseCaseDescription> ret = new ArrayList<UseCaseDescription>();
 
 		SAXBuilder builder = new SAXBuilder();
-		Document doc = builder.build(is);
-		is.close();
+		Document doc = null;
+		try {
+			doc = builder.build(is);
+			is.close();
+		} catch (JDOMException e1) {
+			logger.error(e1);
+			return ret;
+		} catch (IOException e1) {
+			logger.error(e1);
+			return ret;
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				logger.error(e);
+			}
+		}
 
 		Element usecases = doc.getRootElement();
 		for (Object ochild : usecases.getChildren()) {
 			Element child = (Element) ochild;
 			if (child.getName().equalsIgnoreCase("program")) {
-				try {
-					ret.add(new UseCaseDescription(child));
-				} catch (Exception e) {
-					String name = child.getAttributeValue("name");
-					// TODO
-				}
+					try {
+						ret.add(new UseCaseDescription(child));
+					} catch (DeserializationException e) {
+						logger.error(e);
+					}
 			}
 		}
+		return ret;
 	}
 }
