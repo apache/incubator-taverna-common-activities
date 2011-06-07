@@ -22,6 +22,7 @@
 package net.sf.taverna.t2.activities.externaltool;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroup;
@@ -31,12 +32,8 @@ import net.sf.taverna.t2.visit.VisitReport;
 import net.sf.taverna.t2.visit.VisitReport.Status;
 import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
 import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
+import net.sf.taverna.t2.workflowmodel.utils.Tools;
 
-/**
- * Investigates if everything is going fine with a job
- * 
- * @author Hajo Nils Krabbenhoeft
- */
 public class ExternalToolActivityHealthChecker implements HealthChecker<ExternalToolActivity> {
 	
 	private static InvocationGroupManager manager = InvocationGroupManager.getInstance();
@@ -75,32 +72,88 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 	public static boolean updateLocation(ExternalToolActivityConfigurationBean configuration) {
 		InvocationGroup invocationGroup = configuration.getInvocationGroup();
 		if (invocationGroup != null) {
-			String invocationGroupName = invocationGroup.getName();
-			String mechanismXML = invocationGroup.getMechanismXML();
-			for (InvocationGroup group : manager.getInvocationGroups()) {
-				if (group.getName().equals(invocationGroupName) &&
-						group.getMechanismXML().equals(mechanismXML)) {
-					if (configuration.getInvocationGroup() != group) {
-						configuration.setInvocationGroup(group);
-					}
-					return true;
-				}
+			if (manager.containsGroup(invocationGroup)) {
+				return true;
 			}
-			return false;
+		}
+		InvocationMechanism invocationMechanism = configuration.getMechanism();
+		if (invocationMechanism != null) {
+			if (manager.containsMechanism(invocationMechanism)) {
+				return true;
+			}
+		}
+		String mechanismXML = null;
+		String mechanismName = null;
+
+		if (invocationGroup != null) {
+			mechanismXML = invocationGroup.getMechanismXML();
+			mechanismName = invocationGroup.getMechanismName();
 		} else {
-			String mechanismXML = configuration.getMechanismXML();
-			String mechanismName = configuration.getMechanismName();
-			for (InvocationMechanism mechanism : manager.getMechanisms()) {
-				if (mechanism.getName().equals(mechanismName) && (mechanism.getXML().equals(mechanismXML))) {
-					if (configuration.getMechanism() != mechanism) {
-						configuration.setMechanism(mechanism);
-					}
-					return true;
-				}
-			}
-			return false;
+			mechanismXML = configuration.getMechanismXML();
+			mechanismName = configuration.getMechanismName();
 		}
 		
+		InvocationMechanism foundMechanism = null;
+		HashSet<String> mechanismNames = new HashSet<String>();
+		for (InvocationMechanism mechanism : manager.getMechanisms()) {
+			mechanismNames.add(mechanism.getName());
+			if (mechanism.getName().equals(mechanismName) && (mechanism.getXML().equals(mechanismXML))) {
+				if (invocationMechanism != mechanism) {
+					foundMechanism = mechanism;
+				}
+			}
+		}
+
+		if (foundMechanism != null) {
+			if (invocationGroup != null) {
+				invocationGroup.setMechanism(foundMechanism);
+				// Cannot return because invocationGroup is still unknown
+			} else {
+				configuration.setMechanism(foundMechanism);
+				return true;
+			}
+		}
+		
+		if (foundMechanism == null) {
+			InvocationMechanism createdMechanism;
+			if (invocationGroup != null) {
+				invocationGroup.convertDetailsToMechanism();
+				createdMechanism = invocationGroup.getMechanism();
+			} else {
+				configuration.convertDetailsToMechanism();
+				createdMechanism = configuration.getMechanism();
+			}
+
+			String chosenMechanismName = Tools.uniqueObjectName(mechanismName,
+					mechanismNames);
+			createdMechanism.setName(chosenMechanismName);
+			if (invocationGroup != null) {
+				invocationGroup.setMechanism(createdMechanism);
+			} else {
+				configuration.setMechanism(createdMechanism);
+			}
+			manager.addMechanism(createdMechanism);
+
+			if (invocationGroup == null) {
+				return true;
+			}
+		}
+		
+		InvocationGroup foundGroup = null;
+		HashSet<String> groupNames = new HashSet<String>();
+		for (InvocationGroup group : manager.getInvocationGroups()) {
+			groupNames.add(group.getName());
+			if (group.getName().equals(invocationGroup.getName()) && (group.getMechanism() == invocationGroup.getMechanism())) {
+				foundGroup = group;
+			}
+		}
+		if (foundGroup != null) {
+			configuration.setInvocationGroup(foundGroup);
+			return true;
+		}
+		invocationGroup.setName(Tools.uniqueObjectName(invocationGroup.getName(), groupNames));
+		manager.addInvocationGroup(invocationGroup);
+		return true;
 	}
 	
 	public boolean isTimeConsuming() {
