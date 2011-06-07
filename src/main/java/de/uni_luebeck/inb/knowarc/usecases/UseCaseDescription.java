@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import javax.swing.ImageIcon;
 
 import net.sf.taverna.t2.workflowmodel.serialization.DeserializationException;
+import net.sf.taverna.t2.workflowmodel.utils.Tools;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -376,7 +377,7 @@ public class UseCaseDescription {
 				indesc.setMime(mime);
 				indesc.setConcatenate(concatenate);
 				fillInputDescription(indesc, binary, forceCopy, innerType, tag, path);
-				getInputs().put(name.replace(" ", "_"), indesc);
+				getInputs().put(Tools.sanitiseName(name), indesc);
 			} else if (type.equalsIgnoreCase("output")) {
 				ScriptOutput outdesc = new ScriptOutput();
 				outdesc.setMime(mime);
@@ -392,7 +393,7 @@ public class UseCaseDescription {
 					throw new DeserializationException("Problem reading output port: unknown innerType '" + innerType + "'");
 				}
 				if (ok) {
-					getOutputs().put(name.replace(" ", "_"), outdesc);
+					getOutputs().put(Tools.sanitiseName(name), outdesc);
 				}
 			} else if (type.equalsIgnoreCase("rte") || type.equalsIgnoreCase("re")) {
 				getREs().add(new RuntimeEnvironmentConstraint(name, cur.getAttributeValue("relation")));
