@@ -316,4 +316,8 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		}
 	}
 
+	public boolean containsMechanism(InvocationMechanism invocationMechanism) {
+		return mechanisms.contains(invocationMechanism);
+	}
+
 }
