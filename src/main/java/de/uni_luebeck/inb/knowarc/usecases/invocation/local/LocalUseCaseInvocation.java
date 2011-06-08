@@ -302,12 +302,12 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 				throw new InvocationException(e1);
 			}
 			try {
-				int errorCode = running.exitValue();
-				if (errorCode < 0) {
+				int exitcode = running.exitValue();
+				if (!usecase.getValidReturnCodes().contains(exitcode)) {
 					try {
-						throw new InvocationException("Nonzero exit code " + errorCode + ":" + stderr_buf.toString("US-ASCII"));
+						throw new InvocationException("Invalid exit code " + exitcode + ":" + stderr_buf.toString("US-ASCII"));
 					} catch (UnsupportedEncodingException e) {
-						throw new InvocationException("Nonzero exit code " + errorCode + ":" + stderr_buf.toString());
+						throw new InvocationException("Invalid exit code " + exitcode + ":" + stderr_buf.toString());
 					}
 				}
 				else

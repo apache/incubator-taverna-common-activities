@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Class representation of XML-description of UseCases
@@ -111,6 +112,8 @@ public class UseCaseDescription {
 	private boolean includeStdIn = false;
 	private boolean includeStdOut = true;
 	private boolean includeStdErr = true;
+	
+	private List<Integer> validReturnCodes = new ArrayList<Integer>();
 
 	/**
 	 * Constructor, for special purpose usecases.
@@ -119,6 +122,7 @@ public class UseCaseDescription {
 	 */
 	public UseCaseDescription(String usecaseid) {
 		this.setUsecaseid(usecaseid);
+		validReturnCodes.add(0);
 	}
 
 	/**
@@ -138,6 +142,7 @@ public class UseCaseDescription {
 			throw new DeserializationException("Error deserializing usecase", e);
 		}
 		readFromXmlElement(doc.getRootElement());
+		validReturnCodes.add(0);
 	}
 
 	/**
@@ -145,6 +150,7 @@ public class UseCaseDescription {
 	 */
 	public UseCaseDescription(Element programNode) throws DeserializationException {
 		readFromXmlElement(programNode);
+		validReturnCodes.add(0);
 	}
 
 /**
@@ -284,6 +290,11 @@ public class UseCaseDescription {
 			}
 			programNode.addContent(queueNode);
 		}
+		if (!getValidReturnCodes().isEmpty()) {
+			Element validReturnCodesNode = new Element("validReturnCodes");
+			validReturnCodesNode.setAttribute("codes", getReturnCodesAsText());
+			programNode.addContent(validReturnCodesNode);
+		}
 		return programNode;
 	}
 	/**
@@ -421,7 +432,13 @@ public class UseCaseDescription {
 					throw new DeserializationException("You have specified both command attribute and command tag.");
 				}
 				setCommand(cur.getText());
-			} else {
+			} else if (type.equalsIgnoreCase("validReturnCodes")) {
+					String codeString = cur.getAttributeValue("codes");
+					if (codeString != null) {
+						setReturnCodesAsText(codeString);
+					}
+			}
+			else {
 				throw new DeserializationException("Unexpected and uninterpreted attribute " + type);
 			}
 		}
@@ -694,5 +711,46 @@ public class UseCaseDescription {
 
 	public void setIncludeStdErr(boolean includeStdErr) {
 		this.includeStdErr = includeStdErr;
+	}
+
+	/**
+	 * @return the validReturnCodes
+	 */
+	public List<Integer> getValidReturnCodes() {
+		return validReturnCodes;
+	}
+
+	/**
+	 * @param validReturnCodes the validReturnCodes to set
+	 */
+	public void setValidReturnCodes(List<Integer> validReturnCodes) {
+		this.validReturnCodes = validReturnCodes;
+	}
+
+	public String getReturnCodesAsText() {
+		return StringUtils.join(getValidReturnCodes(), ",");
+	}
+
+	public void setReturnCodesAsText(String text) {
+		if (getValidReturnCodes() == null) {
+			validReturnCodes = new ArrayList<Integer>();
+		}
+		validReturnCodes.clear();
+		String[] codes = text.split(",");
+		for (String code : codes) {
+			try {
+				Integer codeInt = new Integer(code);
+				if (!validReturnCodes.contains(codeInt)) {
+					validReturnCodes.add(codeInt);
+				}
+			}
+			catch (NumberFormatException e) {
+				logger.error(e);
+			}
+		}
+		if (validReturnCodes.isEmpty()) {
+			validReturnCodes.add(0);
+		}
+		Collections.sort(validReturnCodes);
 	}
 }

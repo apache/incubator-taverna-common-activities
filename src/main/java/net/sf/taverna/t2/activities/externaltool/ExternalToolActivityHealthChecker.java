@@ -71,11 +71,25 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 	
 	public static boolean updateLocation(ExternalToolActivityConfigurationBean configuration) {
 		InvocationGroup invocationGroup = configuration.getInvocationGroup();
+		String invocationGroupSpecification = null;
+		String invocationMechanismSpecification = null;
 		if (invocationGroup != null) {
 			if (manager.containsGroup(invocationGroup)) {
 				return true;
 			}
+			InvocationGroup replacementGroup = manager.getGroupReplacement(invocationGroup);
+			if (replacementGroup != null) {
+				configuration.setInvocationGroup(replacementGroup);
+				return true;
+			}
+			invocationGroupSpecification = invocationGroup.getName() + ":" + invocationGroup.getMechanismXML();
+			InvocationGroup importedGroup = manager.getImportedGroup(invocationGroupSpecification);
+			if (importedGroup != null) {
+				configuration.setInvocationGroup(importedGroup);
+				return true;
+			}
 		}
+		
 		InvocationMechanism invocationMechanism = configuration.getMechanism();
 		if (invocationMechanism != null) {
 			if (manager.containsMechanism(invocationMechanism)) {
@@ -92,6 +106,7 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 			mechanismXML = configuration.getMechanismXML();
 			mechanismName = configuration.getMechanismName();
 		}
+		invocationMechanismSpecification = mechanismName + ":" + mechanismXML;
 		
 		InvocationMechanism foundMechanism = null;
 		HashSet<String> mechanismNames = new HashSet<String>();
@@ -101,6 +116,13 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 				if (invocationMechanism != mechanism) {
 					foundMechanism = mechanism;
 				}
+			}
+		}
+		
+		if (foundMechanism == null) {
+			foundMechanism = manager.getMechanismReplacement(invocationMechanismSpecification);
+			if (foundMechanism == null) {
+				foundMechanism = manager.getImportedMechanism(invocationMechanismSpecification);
 			}
 		}
 
@@ -132,7 +154,8 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 			} else {
 				configuration.setMechanism(createdMechanism);
 			}
-			manager.addMechanism(createdMechanism);
+			manager.importMechanism(invocationMechanismSpecification, createdMechanism);
+			
 
 			if (invocationGroup == null) {
 				return true;
@@ -152,7 +175,7 @@ public class ExternalToolActivityHealthChecker implements HealthChecker<External
 			return true;
 		}
 		invocationGroup.setName(Tools.uniqueObjectName(invocationGroup.getName(), groupNames));
-		manager.addInvocationGroup(invocationGroup);
+		manager.importInvocationGroup(invocationGroupSpecification, invocationGroup);
 		return true;
 	}
 	

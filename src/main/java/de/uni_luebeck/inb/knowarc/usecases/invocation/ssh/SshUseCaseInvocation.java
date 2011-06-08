@@ -244,11 +244,11 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 
 		int exitcode = running.getExitStatus();
-		if (exitcode < 0) {
+		if (!usecase.getValidReturnCodes().contains(exitcode)) {
 			try {
-				throw new InvocationException("Nonzero exit code " + exitcode + ":" + stderr_buf.toString("US-ASCII"));
+				throw new InvocationException("Invalid exit code " + exitcode + ":" + stderr_buf.toString("US-ASCII"));
 			} catch (UnsupportedEncodingException e) {
-				throw new InvocationException("Nonzero exit code " + exitcode + ":" + stderr_buf.toString());
+				throw new InvocationException("Invalid exit code " + exitcode + ":" + stderr_buf.toString());
 			}
 		}
 
