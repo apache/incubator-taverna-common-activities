@@ -99,4 +99,15 @@ public class UseCaseEnumeration {
 		}
 		return ret;
 	}
+
+	public static UseCaseDescription readDescriptionFromUrl(
+			String repositoryUrl, String id) {
+		List<UseCaseDescription> descriptions = readDescriptionsFromUrl(repositoryUrl);
+		for (UseCaseDescription usecase : descriptions) {
+			if (usecase.getUsecaseid().equals(id)) {
+				return usecase;
+			}
+		}
+		return null;
+	}
 }
