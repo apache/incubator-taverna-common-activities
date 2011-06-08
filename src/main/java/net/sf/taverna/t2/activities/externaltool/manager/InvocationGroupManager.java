@@ -6,9 +6,11 @@ package net.sf.taverna.t2.activities.externaltool.manager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import net.sf.taverna.raven.appconfig.ApplicationRuntime;
 import net.sf.taverna.t2.activities.externaltool.local.ExternalToolLocalInvocationMechanism;
@@ -47,6 +49,14 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	private static SPIRegistry<InvocationPersister> invocationPersisterRegistry = new SPIRegistry(InvocationPersister.class);
 
 	private static Logger logger = Logger.getLogger(InvocationGroupManager.class);
+	
+	private HashMap<InvocationGroup, InvocationGroup> groupReplacements = new HashMap<InvocationGroup, InvocationGroup>();
+    
+	private HashMap<String, InvocationMechanism> mechanismReplacements = new HashMap<String, InvocationMechanism>();
+	
+	private HashMap<String, InvocationGroup> groupImports = new HashMap<String, InvocationGroup> ();
+	
+	private HashMap<String, InvocationMechanism> mechanismImports = new HashMap<String, InvocationMechanism> ();
     
 	
 	private static class Singleton {
@@ -81,19 +91,63 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		observers.notify(new InvocationGroupAddedEvent(group));
 	}
 	
+	public void replaceInvocationGroup(InvocationGroup originalGroup, InvocationGroup replacementGroup) {
+		Set<String> toReplaceImports = new HashSet<String>();
+		for (Entry<String, InvocationGroup> entry : groupImports.entrySet()) {
+			if (entry.getValue() == originalGroup) {
+				toReplaceImports.add(entry.getKey());
+			}
+		}
+		for (String spec : toReplaceImports) {
+			if (replacementGroup == null) {
+				groupImports.remove(spec);
+			} else {
+				groupImports.put(spec, replacementGroup);
+			}
+		}
+		if (replacementGroup != null) {
+			groupReplacements.put(originalGroup, replacementGroup);
+		}
+		observers.notify(new InvocationGroupRemovedEvent(originalGroup, (replacementGroup == null? getDefaultGroup(): replacementGroup)));
+	}
+	
 	public void removeInvocationGroup(InvocationGroup group) {
 		groups.remove(group);
-		observers.notify(new InvocationGroupRemovedEvent(group));
+		replaceInvocationGroup(group, getDefaultGroup());
+	}
+	
+	public void replaceInvocationMechanism(InvocationMechanism originalMechanism, InvocationMechanism replacementMechanism) {
+		for (InvocationGroup g : groups) {
+			if (g.getMechanism().equals(originalMechanism)) {
+				if (replacementMechanism == null) {
+					g.setMechanism(getDefaultMechanism());
+				} else {
+					g.setMechanism(replacementMechanism);					
+				}
+			}
+		}
+		Set<String> toRemoveImports = new HashSet<String>();
+		for (Entry<String, InvocationMechanism> entry : mechanismImports.entrySet()) {
+			if (entry.getValue() == originalMechanism) {
+				toRemoveImports.add(entry.getKey());
+			}
+		}
+		for (String spec : toRemoveImports) {
+			if (replacementMechanism == null) {
+				mechanismImports.remove(spec);
+			} else {
+				mechanismImports.put(spec, replacementMechanism);
+			}
+		}
+		if (replacementMechanism != null) {
+			mechanismReplacements.put(originalMechanism.getName() + ":" + originalMechanism.getXML(), replacementMechanism);
+		}
+		observers.notify(new InvocationMechanismRemovedEvent(originalMechanism, (replacementMechanism == null? getDefaultMechanism(): replacementMechanism)));
 	}
 	
 	public void removeMechanism(InvocationMechanism mechanism) {
-		for (InvocationGroup g : groups) {
-			if (g.getMechanism().equals(mechanism)) {
-				g.setMechanism(getDefaultMechanism());
-			}
-		}
 		mechanisms.remove(mechanism);
-		observers.notify(new InvocationMechanismRemovedEvent(mechanism));
+		replaceInvocationMechanism(mechanism, getDefaultMechanism());
 	}
 	
 	public HashSet<InvocationGroup> getInvocationGroups() {
@@ -318,6 +372,34 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 
 	public boolean containsMechanism(InvocationMechanism invocationMechanism) {
 		return mechanisms.contains(invocationMechanism);
+	}
+	
+	public InvocationGroup getGroupReplacement(InvocationGroup group) {
+		return groupReplacements.get(group);
+	}
+	
+	public InvocationMechanism getMechanismReplacement(String invocationMechanismSpecification) {
+		return mechanismReplacements.get(invocationMechanismSpecification);
+	}
+	
+	public InvocationGroup getImportedGroup(String groupSpecification) {
+		return groupImports.get(groupSpecification);
+	}
+
+	public InvocationMechanism getImportedMechanism(String mechanismSpecification) {
+		return mechanismImports.get(mechanismSpecification);
+	}
+
+	public void importMechanism(String invocationMechanismSpecification,
+			InvocationMechanism createdMechanism) {
+		addMechanism(createdMechanism);
+		mechanismImports.put(invocationMechanismSpecification, createdMechanism);
+	}
+
+	public void importInvocationGroup(String invocationGroupSpecification,
+			InvocationGroup invocationGroup) {
+		addInvocationGroup(invocationGroup);
+		groupImports.put(invocationGroupSpecification, invocationGroup);
 	}
 
 }
