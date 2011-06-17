@@ -52,10 +52,10 @@ public class RESTActivityConfigurationBean implements Serializable {
 		// TODO - set sensible default values here
 		RESTActivityConfigurationBean defaultBean = new RESTActivityConfigurationBean();
 		defaultBean.setHttpMethod(RESTActivity.HTTP_METHOD.GET);
-		defaultBean.setAcceptsHeaderValue("text/plain");
+		defaultBean.setAcceptsHeaderValue("application/xml");
 		defaultBean.setContentTypeForUpdates("application/xml");
 		defaultBean
-				.setUrlSignature("http://www.uniprot.org/uniprot/{id}");
+				.setUrlSignature("http://www.uniprot.org/uniprot/{id}.xml");
 		defaultBean.setOutgoingDataFormat(RESTActivity.DATA_FORMAT.String);
 		defaultBean.setSendHTTPExpectRequestHeader(false); // not ticked by
 															// default to allow
