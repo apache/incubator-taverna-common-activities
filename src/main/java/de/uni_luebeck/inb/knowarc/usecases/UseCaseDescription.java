@@ -753,4 +753,25 @@ public class UseCaseDescription {
 		}
 		Collections.sort(validReturnCodes);
 	}
+
+	/**
+	 * @return the group
+	 */
+	public String getGroup() {
+		return group;
+	}
+
+	/**
+	 * @param group the group to set
+	 */
+	public void setGroup(String group) {
+		this.group = group;
+	}
+
+	/**
+	 * @return the icon_url
+	 */
+	public String getIcon_url() {
+		return icon_url;
+	}
 }
