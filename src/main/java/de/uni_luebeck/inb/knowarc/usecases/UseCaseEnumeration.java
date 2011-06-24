@@ -40,7 +40,7 @@ public class UseCaseEnumeration {
 
 	private static Logger logger = Logger.getLogger(UseCaseEnumeration.class);
 
-	public static List<UseCaseDescription> readDescriptionsFromUrl(String xmlFileUrl) {
+	public static List<UseCaseDescription> readDescriptionsFromUrl(String xmlFileUrl) throws IOException {
 
 		List<UseCaseDescription> ret = new ArrayList<UseCaseDescription>();
 		URLConnection con = null;
@@ -54,6 +54,7 @@ public class UseCaseEnumeration {
 		} catch (IOException ioe) {
 			logger.error("Problem retrieving from " + xmlFileUrl);
 			logger.error(ioe);
+			throw ioe;
 		}
 		finally {
 
@@ -101,7 +102,7 @@ public class UseCaseEnumeration {
 	}
 
 	public static UseCaseDescription readDescriptionFromUrl(
-			String repositoryUrl, String id) {
+			String repositoryUrl, String id) throws IOException {
 		List<UseCaseDescription> descriptions = readDescriptionsFromUrl(repositoryUrl);
 		for (UseCaseDescription usecase : descriptions) {
 			if (usecase.getUsecaseid().equals(id)) {
