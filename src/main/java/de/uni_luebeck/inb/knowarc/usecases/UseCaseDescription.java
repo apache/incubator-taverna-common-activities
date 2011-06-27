@@ -290,7 +290,7 @@ public class UseCaseDescription {
 			}
 			programNode.addContent(queueNode);
 		}
-		if (!getValidReturnCodes().isEmpty()) {
+		if ((getValidReturnCodes() != null) && !getValidReturnCodes().isEmpty()) {
 			Element validReturnCodesNode = new Element("validReturnCodes");
 			validReturnCodesNode.setAttribute("codes", getReturnCodesAsText());
 			programNode.addContent(validReturnCodesNode);
