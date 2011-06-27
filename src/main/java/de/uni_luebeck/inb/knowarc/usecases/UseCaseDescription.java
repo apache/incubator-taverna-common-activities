@@ -122,7 +122,6 @@ public class UseCaseDescription {
 	 */
 	public UseCaseDescription(String usecaseid) {
 		this.setUsecaseid(usecaseid);
-		validReturnCodes.add(0);
 	}
 
 	/**
@@ -142,7 +141,6 @@ public class UseCaseDescription {
 			throw new DeserializationException("Error deserializing usecase", e);
 		}
 		readFromXmlElement(doc.getRootElement());
-		validReturnCodes.add(0);
 	}
 
 	/**
@@ -150,7 +148,6 @@ public class UseCaseDescription {
 	 */
 	public UseCaseDescription(Element programNode) throws DeserializationException {
 		readFromXmlElement(programNode);
-		validReturnCodes.add(0);
 	}
 
 /**
@@ -290,11 +287,10 @@ public class UseCaseDescription {
 			}
 			programNode.addContent(queueNode);
 		}
-		if ((getValidReturnCodes() != null) && !getValidReturnCodes().isEmpty()) {
 			Element validReturnCodesNode = new Element("validReturnCodes");
 			validReturnCodesNode.setAttribute("codes", getReturnCodesAsText());
 			programNode.addContent(validReturnCodesNode);
-		}
+
 		return programNode;
 	}
 	/**
@@ -717,6 +713,12 @@ public class UseCaseDescription {
 	 * @return the validReturnCodes
 	 */
 	public List<Integer> getValidReturnCodes() {
+		if (validReturnCodes == null) {
+			validReturnCodes = new ArrayList<Integer>();
+		}
+		if (validReturnCodes.isEmpty()) {
+			validReturnCodes.add(0);
+		}
 		return validReturnCodes;
 	}
 
