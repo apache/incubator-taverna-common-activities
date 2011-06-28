@@ -112,8 +112,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 	public boolean isValid() {
 		return (urlSignature != null
 				&& URISignatureHandler.isValid(urlSignature)
-				&& acceptsHeaderValue != null
-				&& acceptsHeaderValue.length() > 0 && ((RESTActivity
+				&& ((RESTActivity
 				.hasMessageBodyInputPort(httpMethod)
 				&& contentTypeForUpdates != null
 				&& contentTypeForUpdates.length() > 0 && outgoingDataFormat != null) || !RESTActivity

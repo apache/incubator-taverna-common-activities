@@ -229,10 +229,10 @@ public class HTTPRequestHandler
 		// centrally - here
 		
 		// If the user wants to set MIME type for the 'Accepts' header
-		if (!configBean
-				.getAcceptsHeaderValue().equals("")){
-			httpRequest.setHeader(ACCEPT_HEADER_NAME, configBean
-					.getAcceptsHeaderValue());			
+		String acceptsHeaderValue = configBean
+						.getAcceptsHeaderValue();
+		if ((acceptsHeaderValue != null) && !acceptsHeaderValue.isEmpty()) {
+			httpRequest.setHeader(ACCEPT_HEADER_NAME, acceptsHeaderValue);			
 		}
 		
 		// See if user wanted to set any other HTTP headers
