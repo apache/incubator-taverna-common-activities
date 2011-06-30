@@ -78,6 +78,9 @@ public class ScriptInputUser extends ScriptInput {
 	 * @return the mime
 	 */
 	public final ArrayList<String> getMime() {
+		if (mime == null) {
+			mime = new ArrayList<String>();
+		}
 		return mime;
 	}
 
