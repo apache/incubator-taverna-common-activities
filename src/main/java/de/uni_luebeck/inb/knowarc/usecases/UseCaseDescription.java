@@ -570,6 +570,9 @@ public class UseCaseDescription {
 	 * @return the inputs
 	 */
 	public Map<String, ScriptInput> getInputs() {
+		if (inputs == null) {
+			inputs = new HashMap<String, ScriptInput>();
+		}
 		return inputs;
 	}
 
@@ -584,6 +587,9 @@ public class UseCaseDescription {
 	 * @return the outputs
 	 */
 	public Map<String, ScriptOutput> getOutputs() {
+		if (outputs == null) {
+			outputs = new HashMap<String, ScriptOutput>();
+		}
 		return outputs;
 	}
 
@@ -612,6 +618,9 @@ public class UseCaseDescription {
 	 * @return the queue_deny
 	 */
 	public ArrayList<String> getQueue_deny() {
+		if (queue_deny == null) {
+			queue_deny = new ArrayList<String>();
+		}
 		return queue_deny;
 	}
 
@@ -626,6 +635,9 @@ public class UseCaseDescription {
 	 * @return the queue_preferred
 	 */
 	public ArrayList<String> getQueue_preferred() {
+		if (queue_preferred == null) {
+			queue_preferred = new ArrayList<String>();
+		}
 		return queue_preferred;
 	}
 
@@ -640,6 +652,9 @@ public class UseCaseDescription {
 	 * @return the rEs
 	 */
 	public List<RuntimeEnvironmentConstraint> getREs() {
+		if (REs == null) {
+			REs = new ArrayList<RuntimeEnvironmentConstraint>();
+		}
 		return REs;
 	}
 
@@ -654,6 +669,9 @@ public class UseCaseDescription {
 	 * @return the static_inputs
 	 */
 	public List<ScriptInputStatic> getStatic_inputs() {
+		if (static_inputs == null) {
+			static_inputs = new ArrayList<ScriptInputStatic>();
+		}
 		return static_inputs;
 	}
 
@@ -668,6 +686,9 @@ public class UseCaseDescription {
 	 * @return the tags
 	 */
 	public List<String> getTags() {
+		if (tags == null) {
+			tags = new ArrayList<String>();
+		}
 		return tags;
 	}
 

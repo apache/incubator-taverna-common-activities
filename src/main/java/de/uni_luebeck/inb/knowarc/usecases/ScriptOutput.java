@@ -67,6 +67,9 @@ public class ScriptOutput {
 	 * @return the mime
 	 */
 	public final ArrayList<String> getMime() {
+		if (mime == null) {
+			mime = new ArrayList<String>();
+		}
 		return mime;
 	}
 
