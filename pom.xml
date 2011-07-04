@@ -4,11 +4,12 @@
     <parent>
         <groupId>net.sf.taverna</groupId>
         <artifactId>parent</artifactId>
-        <version>0.2.2011-01-24</version>
+        <version>0.2.2011-02-17</version>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <groupId>net.sf.taverna</groupId>
     <artifactId>wsdl-generic</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8</version>
 
     <packaging>jar</packaging>
     <name>wsdl-generic</name>
