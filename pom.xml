@@ -12,7 +12,7 @@
     <version>1.8</version>
 
     <packaging>jar</packaging>
-    <name>wsdl-generic</name>
+    <name>WSDL generic client</name>
     <description>
         WSDL handling classes that are shared between Taverna 1 and 2
     </description>
