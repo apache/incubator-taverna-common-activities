@@ -101,7 +101,7 @@ public class ExternalToolLocalInvocationMechanism extends
 	 * @param linkCommand the linkCommand to set
 	 */
 	public void setLinkCommand(String linkCommand) {
-		if (linkCommand.isEmpty()) {
+	    if ((linkCommand == null) || linkCommand.isEmpty()) {
 			this.linkCommand = null;
 		} else {
 			this.linkCommand = linkCommand;
