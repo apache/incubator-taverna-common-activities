@@ -23,11 +23,15 @@ package net.sf.taverna.t2.activities.spreadsheet;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+
 /**
  * A range of integer values.
  * 
  * @author David Withers
  */
+@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/range#Config")
 public class Range {
 
 	/**
@@ -168,6 +172,7 @@ public class Range {
 	 * @param start
 	 *            the new value for start of the <code>Range</code>
 	 */
+	@ConfigurationProperty(name = "start", label = "Start", description = "The start of the range")
 	public void setStart(int start) {
 		this.start = start;
 	}
@@ -187,6 +192,7 @@ public class Range {
 	 * @param end
 	 *            the new value for end of the <code>Range</code>
 	 */
+	@ConfigurationProperty(name = "end", label = "End", description = "The end of the range")
 	public void setEnd(int end) {
 		this.end = end;
 	}
@@ -211,6 +217,26 @@ public class Range {
 		excludes.remove(exclude);
 	}
 
+	/**
+	 * Returns the exclusions for this range.
+	 * 
+	 * @return the exclusions for this range
+	 */
+	public List<Range> getExcludes() {
+		return excludes;
+	}
+
+	/**
+	 * Sets the exclusions for this range.
+	 * 
+	 * @param excludes
+	 *            the exclusions for this range
+	 */
+	@ConfigurationProperty(name = "excludes", label = "Excludes Ranges", description = "The ranges the exclude from this range")
+	public void setExcludes(List<Range> excludes) {
+		this.excludes = excludes;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
@@ -224,6 +250,7 @@ public class Range {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -238,6 +265,7 @@ public class Range {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

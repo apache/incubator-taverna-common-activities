@@ -22,6 +22,7 @@ package net.sf.taverna.t2.activities.spreadsheet;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
@@ -157,6 +158,21 @@ public class SpreadsheetImportConfiguration {
 	 */
 	public void setColumnNames(Map<String, String> columnNames) {
 		this.columnNames = columnNames;
+	}
+
+	/**
+	 * Sets the columnNames.
+	 * 
+	 * @param columnNames
+	 *            the new value for columnNames
+	 */
+	@ConfigurationProperty(name = "columnNames", label = "Column Name Mapping", description = "Mapping from column to port names", required = false)
+	public void setColumnNames(Set<Mapping> columnNames) {
+		Map<String, String> columnNamesMap = new HashMap<String, String>();
+		for (Mapping mapping : columnNames) {
+			columnNamesMap.put(mapping.column, mapping.port);
+		}
+		this.columnNames = columnNamesMap;
 	}
 
 	/**
@@ -371,4 +387,32 @@ public class SpreadsheetImportConfiguration {
 		return true;
 	}
 
+	@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/mapping#Config")
+	class Mapping {
+		private String column, port;
+
+		public Mapping(String column, String name) {
+			this.column = column;
+			this.port = name;
+		}
+
+		public String getColumn() {
+			return column;
+		}
+
+		@ConfigurationProperty(name = "column", label = "Column", description = "The name of the column")
+		public void setColumn(String column) {
+			this.column = column;
+		}
+
+		public String getPort() {
+			return port;
+		}
+
+		@ConfigurationProperty(name = "port", label = "Port", description = "The name of the port")
+		public void setPort(String port) {
+			this.port = port;
+		}		
+	}
+	
 }
