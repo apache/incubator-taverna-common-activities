@@ -23,6 +23,7 @@ package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -91,6 +92,26 @@ public class XMLSplitterConfigurationBeanBuilder {
 				TypeDescriptor desc=elements.get(i);
 				portBean.setDepth(depthForDescriptor(desc));
 			}
+			
+			List<TypeDescriptor> attributes = ((ComplexTypeDescriptor) descriptor).getAttributes();
+			String[] elementNames = Arrays.copyOf(names, names.length);
+			Arrays.sort(elementNames);
+			String[] attributeNames = new String[attributes.size()];
+			Class<?>[] attributeTypes = new Class<?>[attributes.size()];
+			TypeDescriptor.retrieveSignature(attributes, attributeNames, attributeTypes);
+			for (int i = 0; i < attributeNames.length; i++) {
+				ActivityInputPortDefinitionBean portBean = new ActivityInputPortDefinitionBean();
+				if (Arrays.binarySearch(elementNames, attributeNames[i]) < 0) {
+					portBean.setName(attributeNames[i]);
+				} else {
+					portBean.setName("1" + attributeNames[i]);
+				}
+				portBean.setMimeTypes(Collections.singletonList(TypeDescriptor
+						.translateJavaType(attributeTypes[i])));
+				inputDefinitions.add(portBean);
+				TypeDescriptor desc=attributes.get(i);
+				portBean.setDepth(depthForDescriptor(desc));
+			}
 		} else if (descriptor instanceof ArrayTypeDescriptor) {
 			ActivityInputPortDefinitionBean portBean = new ActivityInputPortDefinitionBean();
 			portBean.setName(descriptor.getName());
@@ -155,6 +176,29 @@ public class XMLSplitterConfigurationBeanBuilder {
 				portBean.setMimeTypes(Collections.singletonList(TypeDescriptor
 						.translateJavaType(types[i])));
 				TypeDescriptor desc=elements.get(i);
+				int depth = depthForDescriptor(desc);
+				portBean.setDepth(depth);
+				portBean.setGranularDepth(depth);
+				
+				outputDefinitions.add(portBean);
+			}
+			
+			List<TypeDescriptor> attributes = ((ComplexTypeDescriptor) descriptor).getAttributes();
+			String[] elementNames = Arrays.copyOf(names, names.length);
+			Arrays.sort(elementNames);
+			String[] attributeNames = new String[attributes.size()];
+			Class<?>[] attributeTypes = new Class<?>[attributes.size()];
+			TypeDescriptor.retrieveSignature(attributes, attributeNames, attributeTypes);
+			for (int i = 0; i < attributeNames.length; i++) {
+				ActivityOutputPortDefinitionBean portBean = new ActivityOutputPortDefinitionBean();
+				if (Arrays.binarySearch(elementNames, attributeNames[i]) < 0) {
+					portBean.setName(attributeNames[i]);
+				} else {
+					portBean.setName("1" + attributeNames[i]);
+				}
+				portBean.setMimeTypes(Collections.singletonList(TypeDescriptor
+						.translateJavaType(attributeTypes[i])));
+				TypeDescriptor desc=attributes.get(i);
 				int depth = depthForDescriptor(desc);
 				portBean.setDepth(depth);
 				portBean.setGranularDepth(depth);

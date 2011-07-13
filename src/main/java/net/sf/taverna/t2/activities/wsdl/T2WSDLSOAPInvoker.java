@@ -23,15 +23,24 @@ package net.sf.taverna.t2.activities.wsdl;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+
 import net.sf.taverna.t2.activities.wsdl.security.SecurityProfiles;
+import net.sf.taverna.t2.security.credentialmanager.CMException;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.soap.WSDLSOAPInvoker;
 
+import org.apache.axis.AxisProperties;
 import org.apache.axis.EngineConfiguration;
+import org.apache.axis.MessageContext;
 import org.apache.axis.client.Call;
 import org.apache.axis.configuration.XMLStringProvider;
 import org.apache.axis.message.SOAPHeaderElement;
@@ -148,60 +157,59 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		// .getDocumentElement()));
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void configureSecurity(Call call,
 			WSDLActivityConfigurationBean bean) throws Exception {
 
 		// If security settings require WS-Security - configure the axis call
 		// with appropriate properties
 		String securityProfile = bean.getSecurityProfile();
-//		if (securityProfile
-//				.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)
-//				|| securityProfile
-//						.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD)
-//				|| securityProfile
-//						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)
-//				|| securityProfile
-//						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)) {
-//
-//			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, false);
-//			call.setProperty(Call.USERNAME_PROPERTY, usernamePassword.getUsername());
-//			call.setProperty(Call.PASSWORD_PROPERTY, usernamePassword.getPasswordAsString());
-//			usernamePassword.resetPassword();
-//		} else if (securityProfile.equals(SecurityProfiles.HTTP_BASIC_AUTHN)){
-//			// Basic HTTP AuthN - set HTTP headers
-//			// pathrecursion allowed
-//			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, true);
-//			MessageContext context = call.getMessageContext();
-//			context.setUsername(usernamePassword.getUsername());
-//			context.setPassword(usernamePassword.getPasswordAsString());
-//			usernamePassword.resetPassword();
-//		} else {
-//			logger.error("Unknown security profile " + securityProfile);
-//		}
+		if (securityProfile
+				.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)
+				|| securityProfile
+						.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_DIGESTPASSWORD)
+				|| securityProfile
+						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)
+				|| securityProfile
+						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)) {
+			
+			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, false);
+			call.setProperty(Call.USERNAME_PROPERTY, usernamePassword.getUsername());
+			call.setProperty(Call.PASSWORD_PROPERTY, usernamePassword.getPasswordAsString());
+			usernamePassword.resetPassword();
+		} else if (securityProfile.equals(SecurityProfiles.HTTP_BASIC_AUTHN)){
+			// Basic HTTP AuthN - set HTTP headers
+			// pathrecursion allowed
+			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, true);
+			MessageContext context = call.getMessageContext();
+			context.setUsername(usernamePassword.getUsername());
+			context.setPassword(usernamePassword.getPasswordAsString());
+			usernamePassword.resetPassword();
+		} else {
+			logger.error("Unknown security profile " + securityProfile);
+		}
 	}
 
-//	/**
-//	 * Get username and password from Credential Manager or ask user to supply
-//	 * one. Username is the first element of the returned array, and the
-//	 * password is the second.
-//	 */
-//	protected UsernamePassword getUsernameAndPasswordForService(
-//			WSDLActivityConfigurationBean bean, boolean usePathRecursion) throws CMException {
-//
-//		// Try to get username and password for this service from Credential
-//		// Manager (which should pop up UI if needed)
-//		CredentialManager credManager = null;
-//		credManager = CredentialManager.getInstance();
-//		String wsdl = bean
-//				.getWsdl();
-//		URI serviceUri = URI.create(wsdl); 
-//		UsernamePassword username_password = credManager.getUsernameAndPasswordForService(serviceUri, usePathRecursion, null);
-//		if (username_password == null) {
-//			throw new CMException("No username/password provided for service " + bean.getWsdl());
-//		} 
-//		return username_password;
-//	}
+	/**
+	 * Get username and password from Credential Manager or ask user to supply
+	 * one. Username is the first element of the returned array, and the
+	 * password is the second.
+	 */
+	protected UsernamePassword getUsernameAndPasswordForService(
+			WSDLActivityConfigurationBean bean, boolean usePathRecursion) throws CMException {
+
+		// Try to get username and password for this service from Credential
+		// Manager (which should pop up UI if needed)
+		CredentialManager credManager = null;
+		credManager = CredentialManager.getInstance();
+		String wsdl = bean
+				.getWsdl();
+		URI serviceUri = URI.create(wsdl); 
+		UsernamePassword username_password = credManager.getUsernameAndPasswordForService(serviceUri, usePathRecursion, null);
+		if (username_password == null) {
+			throw new CMException("No username/password provided for service " + bean.getWsdl());
+		} 
+		return username_password;
+	}
 
 	@Override
 	protected List<SOAPHeaderElement> makeSoapHeaders() {
@@ -225,9 +233,8 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		String securityProfile = bean.getSecurityProfile();
 		EngineConfiguration wssEngineConfiguration = null;
 		if (securityProfile != null) {
-			// If security settings require WS-Security and not just Basic HTTP
-			// AuthN
-			// - configure the axis engine from the appropriate config strings
+			// If security settings require WS-Security and not just e.g. Basic HTTP
+			// AuthN - configure the axis engine from the appropriate config strings
 			if (securityProfile
 					.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)) {
 				wssEngineConfiguration = new XMLStringProvider(
@@ -247,8 +254,22 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 			}
 		}
 
+		// This does not work
+//		ClassUtils.setClassLoader("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory",TavernaAxisCustomSSLSocketFactory.class.getClassLoader());
+		
+		// Setting Axis property only works when we also set the Thread's classloader as below 
+		// (we do it from the net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke.requestRun())
+//		Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+		if (AxisProperties.getProperty("axis.socketSecureFactory")== null || !AxisProperties.getProperty("axis.socketSecureFactory").equals("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory")){
+			AxisProperties.setProperty("axis.socketSecureFactory", "net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory");
+			logger.info("Setting axis.socketSecureFactory property to " + AxisProperties.getProperty("axis.socketSecureFactory"));
+		}
+        
+		// This also does not work
+		//AxisProperties.setClassDefault(SecureSocketFactory.class, "net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory");
+        
 		Call call = super.getCall(wssEngineConfiguration);
-
+		
 		// Now that we have an axis Call object, configure any additional
 		// security properties on it (or its message context or its Transport
 		// handler),

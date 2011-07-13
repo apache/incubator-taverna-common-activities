@@ -42,8 +42,11 @@
 			<artifactId>wsdl-generic</artifactId>
 			<version>${wsdl.generic.version}</version>
 		</dependency>
-		<!--<dependency> <groupId>net.sf.taverna.t2.security</groupId> <artifactId>credential-manager</artifactId> 
-			<version>${t2.security.version}</version> </dependency> -->
+		<dependency>
+			<groupId>net.sf.taverna.t2.security</groupId>
+			<artifactId>credential-manager</artifactId>
+			<version>${t2.security.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>com.springsource.org.jdom</artifactId>

@@ -37,10 +37,10 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
 import net.sf.taverna.t2.workflowmodel.utils.Tools;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
@@ -105,7 +105,7 @@ public class WSDLActivity extends
 				configurePorts();
 			} catch (Exception ex) {
 				throw new ActivityConfigurationException(
-						"Unable to parse the WSDL " + bean.getOperation().getWsdl(), ex);
+						"Unable to parse the WSDL " + bean.getWsdl(), ex);
 			}
 		}
 	}
@@ -128,7 +128,7 @@ public class WSDLActivity extends
 	public TypeDescriptor getTypeDescriptorForInputPort(String portName)
 			throws UnknownOperationException, IOException {
 		List<TypeDescriptor> inputDescriptors = parser
-				.getOperationInputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationInputParameters(configurationBean.getOperation());
 		TypeDescriptor result = null;
 		for (TypeDescriptor descriptor : inputDescriptors) {
 			if (descriptor.getName().equals(portName)) {
@@ -149,7 +149,7 @@ public class WSDLActivity extends
 			throws UnknownOperationException, IOException {
 		Map<String, TypeDescriptor> descriptors = new HashMap<String, TypeDescriptor>();
 		List<TypeDescriptor> inputDescriptors = parser
-				.getOperationInputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationInputParameters(configurationBean.getOperation());
 		for (TypeDescriptor descriptor : inputDescriptors) {
 			descriptors.put(descriptor.getName(), descriptor);
 		}
@@ -166,7 +166,7 @@ public class WSDLActivity extends
 			throws UnknownOperationException, IOException {
 		TypeDescriptor result = null;
 		List<TypeDescriptor> outputDescriptors = parser
-				.getOperationOutputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationOutputParameters(configurationBean.getOperation());
 		for (TypeDescriptor descriptor : outputDescriptors) {
 			if (descriptor.getName().equals(portName)) {
 				result = descriptor;
@@ -186,7 +186,7 @@ public class WSDLActivity extends
 			throws UnknownOperationException, IOException {
 		Map<String, TypeDescriptor> descriptors = new HashMap<String, TypeDescriptor>();
 		List<TypeDescriptor> inputDescriptors = parser
-				.getOperationOutputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationOutputParameters(configurationBean.getOperation());
 		for (TypeDescriptor descriptor : inputDescriptors) {
 			descriptors.put(descriptor.getName(), descriptor);
 		}
@@ -197,7 +197,7 @@ public class WSDLActivity extends
 			WSDLException, IOException, SAXException, UnknownOperationException {
 	    URLConnection connection = null;
 	    try {
-		URL wsdlURL = configurationBean.getOperation().getWsdl().toURL();
+		URL wsdlURL = new URL(configurationBean.getWsdl());
 		connection = wsdlURL.openConnection();
 		connection.setConnectTimeout(RemoteHealthChecker.getTimeoutInSeconds() * 1000);
 		connection.connect();
@@ -212,14 +212,14 @@ public class WSDLActivity extends
 		    connection.getInputStream().close();
 		}
 	    }
-	    parser = new WSDLParser(configurationBean.getOperation().getWsdl().toASCIIString());
+	    parser = new WSDLParser(configurationBean.getWsdl());
 	}
 
 	private void configurePorts() throws UnknownOperationException, IOException {
 		List<TypeDescriptor> inputDescriptors = parser
-				.getOperationInputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationInputParameters(configurationBean.getOperation());
 		List<TypeDescriptor> outputDescriptors = parser
-				.getOperationOutputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationOutputParameters(configurationBean.getOperation());
 		for (TypeDescriptor descriptor : inputDescriptors) {
 			addInput(descriptor.getName(), descriptor.getDepth(), true, null,
 					String.class);
@@ -284,7 +284,7 @@ public class WSDLActivity extends
 					}
 
 					T2WSDLSOAPInvoker invoker = new T2WSDLSOAPInvoker(parser,
-							configurationBean.getOperation().getOperationName(), outputNames,
+							configurationBean.getOperation(), outputNames,
 							endpointReference);
 					WSDLActivityConfigurationBean bean = getConfiguration();
 

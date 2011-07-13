@@ -118,6 +118,10 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 
 		return report;
 	}
+	
+	public static boolean checkStyleAndUse(String style, String use) {
+		return !(style.equalsIgnoreCase("rpc") && use.equalsIgnoreCase("literal"));
+	}
 
 	private VisitReport testStyleAndUse(String endpoint, WSDLParser parser, String operationName) throws
                 UnknownOperationException {
@@ -125,7 +129,7 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 		String style = parser.getStyle().toLowerCase();
 		String use = "?";
 		use = parser.getUse(operationName).toLowerCase();
-		if (use.equals("literal") && style.equals("rpc")) {
+		if (!checkStyleAndUse(style, use)) {
 		    report = new VisitReport(HealthCheck.getInstance(), activity,
 					     "Unsupported style", HealthCheck.UNSUPPORTED_STYLE, 
 					     Status.SEVERE);
