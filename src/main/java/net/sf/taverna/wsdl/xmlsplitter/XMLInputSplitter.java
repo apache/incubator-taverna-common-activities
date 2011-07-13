@@ -156,7 +156,18 @@ public class XMLInputSplitter {
 				outputElement.addContent(dataElement);
 			}
 		}
-
+		for (TypeDescriptor attribute : complexDescriptor.getAttributes()) {
+			String key = attribute.getName();
+			Object dataObject = inputMap.get("1" + key);
+			if (dataObject == null) {
+				dataObject = inputMap.get(key);
+			}
+			if (dataObject != null) {
+				outputElement.setAttribute(key, dataObject.toString(), Namespace
+						.getNamespace(attribute.getNamespaceURI()));
+			}
+		}
+		
 		outputElement.setNamespace(Namespace.getNamespace(typeDescriptor
 				.getNamespaceURI()));
 		XMLOutputter outputter = new XMLOutputter();

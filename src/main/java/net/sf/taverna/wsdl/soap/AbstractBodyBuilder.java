@@ -45,8 +45,10 @@ import net.sf.taverna.wsdl.parser.WSDLParser;
 import org.apache.axis.encoding.Base64;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -147,7 +149,7 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 			} else {
 				el = createSkeletonElementForSingleItem(namespaceMappings,
 						descriptor, inputName, typeName);
-				populateElementWithObjectData(mimeType, el, dataValue);
+				populateElementWithObjectData(mimeType, el, dataValue, descriptor);
 			}
 
 			body = addElementToBody(operationNamespace, body, el);
@@ -212,7 +214,7 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 			}
 
 			Element item = element.getOwnerDocument().createElement(tag);
-			populateElementWithObjectData(mimeType, item, dataItem);
+			populateElementWithObjectData(mimeType, item, dataItem, elementType);
 			element.appendChild(item);
 		}
 	}
@@ -223,12 +225,13 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 	 * @param mimeType
 	 * @param element
 	 * @param dataValue
+	 * @param descriptor 
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws IOException
 	 */
 	protected void populateElementWithObjectData(String mimeType,
-			Element element, Object dataValue)
+			Element element, Object dataValue, TypeDescriptor descriptor)
 			throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -237,7 +240,26 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 		if (mimeType.equals("'text/xml'")) {
 			Document doc = builder.parse(new ByteArrayInputStream(dataValue
 					.toString().getBytes()));
-			Node child = doc.getDocumentElement().getFirstChild();
+			Element documentElement = doc.getDocumentElement();
+			
+			if (descriptor instanceof ComplexTypeDescriptor) {
+				ComplexTypeDescriptor complexType = (ComplexTypeDescriptor) descriptor;
+				NamedNodeMap attributes = documentElement.getAttributes();
+				if (attributes != null) {
+					for (int i = 0; i < attributes.getLength(); i++) {
+						Node attributeNode = attributes.item(i);
+						if (attributeNode instanceof Attr) {
+							Attr attribute = (Attr) attributeNode;
+							TypeDescriptor typeDescriptor = complexType.attributeForName(attribute.getName());
+							if (typeDescriptor != null) {
+								element.setAttributeNS(typeDescriptor.getNamespaceURI(), typeDescriptor.getName(), attribute.getValue());
+							}
+						}
+					}
+				}
+			}
+			
+			Node child = documentElement.getFirstChild();
 
 			while (child != null) {
 				element.appendChild(element.getOwnerDocument().importNode(

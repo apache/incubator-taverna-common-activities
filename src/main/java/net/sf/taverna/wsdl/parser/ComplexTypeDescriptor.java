@@ -29,6 +29,7 @@ import java.util.List;
  */
 public class ComplexTypeDescriptor extends TypeDescriptor {
 	private List<TypeDescriptor> elements = new ArrayList<TypeDescriptor>();
+	private List<TypeDescriptor> attributes = new ArrayList<TypeDescriptor>();
 
 	public List<TypeDescriptor> getElements() {
 		return elements;
@@ -48,4 +49,24 @@ public class ComplexTypeDescriptor extends TypeDescriptor {
 		}
 		return result;
 	}
+
+	public List<TypeDescriptor> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(List<TypeDescriptor> attributes) {
+		this.attributes = attributes;
+	}
+
+	public TypeDescriptor attributeForName(String name) {
+		TypeDescriptor result=null;
+		for (TypeDescriptor desc : getAttributes()) {
+			if (desc.getName().equals(name)) {
+				result=desc;
+				break;
+			}
+		}
+		return result;
+	}
+
 }

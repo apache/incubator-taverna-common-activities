@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
+import net.sf.taverna.wsdl.parser.AttributeTypeDescriptor;
 import net.sf.taverna.wsdl.parser.BaseTypeDescriptor;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
@@ -150,6 +151,16 @@ public class XMLSplitterSerialisationHelper {
 					elements.addContent(element);
 			}
 			result.addContent(elements);
+			List<TypeDescriptor> attributeDescriptors = descriptor.getAttributes();
+			if (attributeDescriptors != null && attributeDescriptors.size() > 0) {
+				Element attributes = new Element("attributes", XScuflNS);
+				for (TypeDescriptor desc : attributeDescriptors) {
+					Element attribute = new Element("attribute", XScuflNS);
+					populateElement(attribute, desc);
+					attributes.addContent(attribute);
+				}
+				result.addContent(attributes);
+			}
 		}
 		return result;
 	}
@@ -197,6 +208,16 @@ public class XMLSplitterSerialisationHelper {
 							buildTypeDescriptorFromElement(childElement,
 									existingsTypes));
 				}
+				Element attributes = element.getChild("attributes", XScuflNS);
+				if (attributes != null) {
+					for (Iterator<?> iterator = attributes.getChildren().iterator(); iterator
+					.hasNext();) {
+						Element childElement = (Element) iterator.next();
+						((ComplexTypeDescriptor) result).getAttributes().add(
+								buildTypeDescriptorFromElement(childElement,
+										existingsTypes));
+					}
+				}
 
 			} else if (element.getName().equalsIgnoreCase("arraytype")) {
 
@@ -222,6 +243,9 @@ public class XMLSplitterSerialisationHelper {
 
 			} else if (element.getName().equalsIgnoreCase("basetype")) {
 				result = new BaseTypeDescriptor();
+				populateDescriptor(element, result);
+			} else if (element.getName().equalsIgnoreCase("attribute")) {
+				result = new AttributeTypeDescriptor();
 				populateDescriptor(element, result);
 			}
 		}

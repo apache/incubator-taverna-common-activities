@@ -52,6 +52,7 @@ import org.apache.axis.wsdl.gen.NoopFactory;
 import org.apache.axis.wsdl.symbolTable.BindingEntry;
 import org.apache.axis.wsdl.symbolTable.CollectionElement;
 import org.apache.axis.wsdl.symbolTable.CollectionType;
+import org.apache.axis.wsdl.symbolTable.ContainedAttribute;
 import org.apache.axis.wsdl.symbolTable.DefinedElement;
 import org.apache.axis.wsdl.symbolTable.DefinedType;
 import org.apache.axis.wsdl.symbolTable.ElementDecl;
@@ -797,6 +798,12 @@ public class WSDLParser {
 				result.getElements().addAll(
 						constructElements(containedElements));
 			}
+			
+			List containedAttributes = type.getRefType().getContainedAttributes();
+			if (containedAttributes != null) {
+				result.getAttributes().addAll(
+						constructAttributes(containedAttributes));				
+			}
 		}
 
 		return result;
@@ -815,6 +822,11 @@ public class WSDLParser {
 				result.getElements().addAll(
 						constructElements(containedElements));
 			}
+			List containedAttributes = type.getContainedAttributes();
+			if (containedAttributes != null) {
+				result.getAttributes().addAll(
+						constructAttributes(containedAttributes));				
+			}
 			result.setQname(type.getQName());
 		}
 		return result;
@@ -832,6 +844,22 @@ public class WSDLParser {
 			elType.setName(el.getQName().getLocalPart());
 			elType.setQname(el.getQName());
 			result.add(elType);
+		}
+
+		return result;
+	}
+
+	private List constructAttributes(List elements) {
+		List result = new ArrayList();
+
+		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
+			ContainedAttribute attribute = (ContainedAttribute) iterator.next();
+			AttributeTypeDescriptor attributeType = new AttributeTypeDescriptor();
+			attributeType.setType(attribute.getQName().getLocalPart());
+			attributeType.setOptional(attribute.getOptional());
+			attributeType.setName(attribute.getQName().getLocalPart());
+			attributeType.setQname(attribute.getQName());
+			result.add(attributeType);
 		}
 
 		return result;
