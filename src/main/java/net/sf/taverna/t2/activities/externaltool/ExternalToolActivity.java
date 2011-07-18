@@ -37,7 +37,6 @@ import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
 import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.taverna.t2.workflowmodel.EditException;
-import net.sf.taverna.t2.workflowmodel.EditsRegistry;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
@@ -86,7 +85,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			MimeType mimeTypeAnnotation = new MimeType();
 			mimeTypeAnnotation.setText(mimeType);
 			try {
-				EditsRegistry.getEdits().getAddAnnotationChainEdit(annotated, mimeTypeAnnotation).doEdit();
+				edits.getAddAnnotationChainEdit(annotated, mimeTypeAnnotation).doEdit();
 			} catch (EditException e) {
 				Logger.getLogger(ExternalToolActivity.class).error(e);
 			}
@@ -108,7 +107,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	 */
 	private void addInputWithMime(String portName, int portDepth, Class<?> translatedElementClass, List<String> mimeTypes) {
 		List<Class<? extends ExternalReferenceSPI>> handledReferenceSchemes = Collections.emptyList();
-		ActivityInputPort inputPort = EditsRegistry.getEdits().createActivityInputPort(portName, portDepth, true, handledReferenceSchemes,
+		ActivityInputPort inputPort = edits.createActivityInputPort(portName, portDepth, true, handledReferenceSchemes,
 				translatedElementClass);
 		inputPorts.add(inputPort);
 		if (mimeTypes != null) {
@@ -127,7 +126,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	 *            Accepted mime types for this port
 	 */
 	private void addOutputWithMime(String portName, int portDepth, List<String> mimeTypes) {
-		OutputPort outputPort = EditsRegistry.getEdits().createActivityOutputPort(portName, portDepth, portDepth);
+		OutputPort outputPort = edits.createActivityOutputPort(portName, portDepth, portDepth);
 		outputPorts.add(outputPort);
 		addMimeTypes(outputPort, mimeTypes);
 	}
