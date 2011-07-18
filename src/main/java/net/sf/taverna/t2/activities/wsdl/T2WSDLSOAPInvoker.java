@@ -201,12 +201,10 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		// Manager (which should pop up UI if needed)
 		CredentialManager credManager = null;
 		credManager = CredentialManager.getInstance();
-		String wsdl = bean
-				.getWsdl();
-		URI serviceUri = URI.create(wsdl); 
+		URI serviceUri = bean.getOperation().getWsdl();
 		UsernamePassword username_password = credManager.getUsernameAndPasswordForService(serviceUri, usePathRecursion, null);
 		if (username_password == null) {
-			throw new CMException("No username/password provided for service " + bean.getWsdl());
+			throw new CMException("No username/password provided for service " + serviceUri);
 		} 
 		return username_password;
 	}
