@@ -1,48 +1,55 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>net.sf.taverna.t2</groupId>
 		<artifactId>activities</artifactId>
 		<version>2.0-SNAPSHOT</version>
 	</parent>
-  <groupId>net.sf.taverna.t2.activities</groupId>
-  <artifactId>xpath-activity</artifactId>
-  <name>XPath Activity - Core</name>
-  
-  <dependencies>
- 	<dependency>
- 		<groupId>dom4j</groupId>
- 		<artifactId>dom4j</artifactId>
- 		<version>${dom4j.version}</version>
- 	</dependency>
- 	<dependency>
- 		<groupId>jaxen</groupId>
- 		<artifactId>jaxen</artifactId>
- 		<version>${jaxen.version}</version>
- 		<type>jar</type>
- 		<scope>compile</scope>
- 	</dependency>
-  
-	<dependency>
-		<groupId>net.sf.taverna.t2.core</groupId>
-		<artifactId>workflowmodel-api</artifactId>
-		<version>${t2.core.version}</version>
-  	</dependency>
-	<dependency>
-		<groupId>net.sf.taverna.t2.ui-api</groupId>
-		<artifactId>report-api</artifactId>
-		<version>${t2.ui.api.version}</version>
-	</dependency>
-	
-	<!-- 
-	   for opening configuration dialog of XPath activity 
-	   from 'Solution' area of 'VisitExplainer'
-	-->
-	<dependency>
-		<groupId>net.sf.taverna.t2.ui-components</groupId>
-		<artifactId>report-view</artifactId>
-		<version>${t2.ui.components.version}</version>
-	</dependency>
-  </dependencies>
-  
+	<groupId>net.sf.taverna.t2.activities</groupId>
+	<artifactId>xpath-activity</artifactId>
+	<name>XPath Activity - Core</name>
+	<packaging>bundle</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>reference-api</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>workflowmodel-api</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+
+		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+		<!-- +++++++++++++++ TODO remove dependencies on ui +++++++++++++++ -->
+		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+		<!-- for opening configuration dialog of XPath activity from 'Solution' 
+			area of 'VisitExplainer' -->
+		<dependency>
+			<groupId>net.sf.taverna.t2.ui-api</groupId>
+			<artifactId>report-api</artifactId>
+			<version>${t2.ui.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.ui-components</groupId>
+			<artifactId>report-view</artifactId>
+			<version>${t2.ui.components.version}</version>
+		</dependency>
+		<!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>com.springsource.org.dom4j</artifactId>
+			<version>${dom4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jaxen</groupId>
+			<artifactId>com.springsource.org.jaxen</artifactId>
+			<version>${jaxen.version}</version>
+		</dependency>
+	</dependencies>
+
 </project>

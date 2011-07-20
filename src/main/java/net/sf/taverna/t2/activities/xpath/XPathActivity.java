@@ -30,7 +30,9 @@ public class XPathActivity extends
 		AbstractAsynchronousActivity<XPathActivityConfigurationBean>
 		implements AsynchronousActivity<XPathActivityConfigurationBean>
 {
-  
+ 
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/xpath";
+
 	// These ports are default ones (and only ones - XPath activity will not have dynamic ports)
   private static final String IN_XML = "xml_text";
   private static final String OUT_TEXT = "nodelist";
