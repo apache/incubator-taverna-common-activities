@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+
 /**
  * Beans of this class store configuration information for REST activities.
  * Configuration is comprised of the HTTP method to use, URL signature, and MIME
@@ -23,6 +26,7 @@ import java.util.Map;
  * @author Sergejs Aleksejevs
  */
 @SuppressWarnings("serial")
+@ConfigurationBean(uri = RESTActivity.URI + "#Config")
 public class RESTActivityConfigurationBean implements Serializable {
 	private RESTActivity.HTTP_METHOD httpMethod;
 	private String urlSignature;
@@ -119,6 +123,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 				.hasMessageBodyInputPort(httpMethod)));
 	}
 
+	@ConfigurationProperty(name = "httpMethod", label = "HTTP Method")
 	public void setHttpMethod(RESTActivity.HTTP_METHOD httpMethod) {
 		this.httpMethod = httpMethod;
 	}
@@ -131,6 +136,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 		return urlSignature;
 	}
 
+	@ConfigurationProperty(name = "urlSignature", label = "URL Template")
 	public void setUrlSignature(String urlSignature) {
 		this.urlSignature = urlSignature;
 	}
@@ -139,6 +145,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 		return acceptsHeaderValue;
 	}
 
+	@ConfigurationProperty(name = "acceptsHeaderValue", label = "'Accept' Header")
 	public void setAcceptsHeaderValue(String acceptsHeaderValue) {
 		this.acceptsHeaderValue = acceptsHeaderValue;
 	}
@@ -147,6 +154,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 		return contentTypeForUpdates;
 	}
 
+	@ConfigurationProperty(name = "contentTypeForUpdates", label = "Content Type For Updates")
 	public void setContentTypeForUpdates(String contentTypeForUpdates) {
 		this.contentTypeForUpdates = contentTypeForUpdates;
 	}
@@ -163,6 +171,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 		return outgoingDataFormat;
 	}
 
+	@ConfigurationProperty(name = "outgoingDataFormat", label = "Outgoing Data Format")
 	public void setOutgoingDataFormat(
 			RESTActivity.DATA_FORMAT outgoingDataFormat) {
 		this.outgoingDataFormat = outgoingDataFormat;
@@ -172,6 +181,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 		return sendHTTPExpectRequestHeader;
 	}
 
+	@ConfigurationProperty(name = "sendHTTPExpectRequestHeader", label = "Send HTTP Expect request-header field")
 	public void setSendHTTPExpectRequestHeader(
 			boolean sendHTTPExpectRequestHeader) {
 		this.sendHTTPExpectRequestHeader = sendHTTPExpectRequestHeader;
@@ -181,10 +191,12 @@ public class RESTActivityConfigurationBean implements Serializable {
 		return showRedirectionOutputPort;
 	}
 
+	@ConfigurationProperty(name = "showRedirectionOutputPort", label = "Show 'Redirection' output port")
 	public void setShowRedirectionOutputPort(boolean showRedirectionOutputPort) {
 		this.showRedirectionOutputPort = showRedirectionOutputPort;
 	}
 
+	@ConfigurationProperty(name = "escapeParameters", label = "Escape URL parameter values")
 	public void setEscapeParameters(boolean escapeParameters) {
 		this.escapeParameters = Boolean.valueOf(escapeParameters);
 	}

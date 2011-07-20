@@ -26,6 +26,8 @@ public class RESTActivity extends
 		AbstractAsynchronousActivity<RESTActivityConfigurationBean> implements
 		AsynchronousActivity<RESTActivityConfigurationBean> {
 	
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/rest";
+
 	// This generic activity can deal with any of the four HTTP methods
 	public static enum HTTP_METHOD {
 		GET, POST, PUT, DELETE
