@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                      http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="SshReference" class="de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshReference" />
+
+	<bean id="LocalInvocationPersister" class="net.sf.taverna.t2.activities.externaltool.local.LocalInvocationPersister" />
+	<bean id="SshInvocationPersister" class="net.sf.taverna.t2.activities.externaltool.ssh.SshInvocationPersister" />
+
+	<bean id="LocalMechanismCreator" class="net.sf.taverna.t2.activities.externaltool.local.LocalMechanismCreator" />
+	<bean id="SshMechanismCreator" class="net.sf.taverna.t2.activities.externaltool.ssh.SshMechanismCreator" />
+
+	<bean id="ExternalToolRunDeletionListener" class="net.sf.taverna.t2.activities.externaltool.ExternalToolRunDeletionListener" />
+
+	<bean id="SshUrlToSshReference" class="de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrlToSshReference" />
+
+	<bean id="ExternalToolActivityHealthChecker" class="net.sf.taverna.t2.activities.externaltool.ExternalToolActivityHealthChecker" />
+	<bean id="ExternalToolActivityMimeTypeChecker" class="net.sf.taverna.t2.activities.externaltool.ExternalToolActivityMimeTypeChecker" />
+
+	<bean id="LocalInvocationCreator" class="net.sf.taverna.t2.activities.externaltool.local.LocalInvocationCreator" />
+	<bean id="SshInvocationCreator" class="net.sf.taverna.t2.activities.externaltool.ssh.SshInvocationCreator" />
+
+	<bean id="externalToolActivityFactory" class="net.sf.taverna.t2.activities.externaltool.ExternalToolActivityFactory">
+		<property name="invocationCreators" ref="invocationCreators" />
+		<property name="mechanismCreators" ref="mechanismCreators" />
+	</bean>
+
+
+</beans>

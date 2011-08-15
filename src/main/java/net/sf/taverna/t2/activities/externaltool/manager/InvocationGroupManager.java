@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.externaltool.manager;
 
@@ -17,7 +17,6 @@ import net.sf.taverna.t2.activities.externaltool.local.ExternalToolLocalInvocati
 import net.sf.taverna.t2.lang.observer.MultiCaster;
 import net.sf.taverna.t2.lang.observer.Observable;
 import net.sf.taverna.t2.lang.observer.Observer;
-import net.sf.taverna.t2.spi.SPIRegistry;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -33,41 +32,40 @@ import org.jdom.output.XMLOutputter;
  *
  */
 public class InvocationGroupManager implements Observable<InvocationManagerEvent>{
-	
+
 	private static final String DEFAULT_MECHANISM_NAME = "default local";
 	private static final String DEFAULT_GROUP_NAME = "default";
 	private HashSet<InvocationGroup> groups = new HashSet<InvocationGroup>();
 	private InvocationGroup defaultGroup = null;
-	
+
 	private HashSet<InvocationMechanism> mechanisms = new HashSet<InvocationMechanism>();
-	
+
 	private static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
 	private static SAXBuilder builder = new SAXBuilder();
-	
-	private static SPIRegistry<MechanismCreator> mechanismCreatorRegistry = new SPIRegistry(MechanismCreator.class);
 
-	private static SPIRegistry<InvocationPersister> invocationPersisterRegistry = new SPIRegistry(InvocationPersister.class);
+	private static List<MechanismCreator> mechanismCreators;
+
+	private static List<InvocationPersister> invocationPersisters;
 
 	private static Logger logger = Logger.getLogger(InvocationGroupManager.class);
-	
+
 	private HashMap<InvocationGroup, InvocationGroup> groupReplacements = new HashMap<InvocationGroup, InvocationGroup>();
-    
+
 	private HashMap<String, InvocationMechanism> mechanismReplacements = new HashMap<String, InvocationMechanism>();
-	
+
 	private HashMap<String, InvocationGroup> groupImports = new HashMap<String, InvocationGroup> ();
-	
+
 	private HashMap<String, InvocationMechanism> mechanismImports = new HashMap<String, InvocationMechanism> ();
-    
-	
+
 	private static class Singleton {
-		private static InvocationGroupManager instance = new InvocationGroupManager();		
+		private static InvocationGroupManager instance = new InvocationGroupManager();
 	}
-	
+
 	protected MultiCaster<InvocationManagerEvent> observers = new MultiCaster<InvocationManagerEvent>(
 			this);
-	
+
 	private InvocationMechanism defaultMechanism = null;
-	
+
 	private InvocationGroupManager() {
 		readConfiguration();
 		defaultMechanism = getInvocationMechanism(DEFAULT_MECHANISM_NAME);
@@ -78,7 +76,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		if (defaultGroup == null) {
 			createDefaultGroup();
 		}
-		
+
 		saveConfiguration();
 	}
 
@@ -90,7 +88,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		groups.add(group);
 		observers.notify(new InvocationGroupAddedEvent(group));
 	}
-	
+
 	public void replaceInvocationGroup(InvocationGroup originalGroup, InvocationGroup replacementGroup) {
 		Set<String> toReplaceImports = new HashSet<String>();
 		for (Entry<String, InvocationGroup> entry : groupImports.entrySet()) {
@@ -110,19 +108,19 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		}
 		observers.notify(new InvocationGroupRemovedEvent(originalGroup, (replacementGroup == null? getDefaultGroup(): replacementGroup)));
 	}
-	
+
 	public void removeInvocationGroup(InvocationGroup group) {
 		groups.remove(group);
 		replaceInvocationGroup(group, getDefaultGroup());
 	}
-	
+
 	public void replaceInvocationMechanism(InvocationMechanism originalMechanism, InvocationMechanism replacementMechanism) {
 		for (InvocationGroup g : groups) {
 			if (g.getMechanism().equals(originalMechanism)) {
 				if (replacementMechanism == null) {
 					g.setMechanism(getDefaultMechanism());
 				} else {
-					g.setMechanism(replacementMechanism);					
+					g.setMechanism(replacementMechanism);
 				}
 			}
 		}
@@ -144,12 +142,12 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		}
 		observers.notify(new InvocationMechanismRemovedEvent(originalMechanism, (replacementMechanism == null? getDefaultMechanism(): replacementMechanism)));
 	}
-	
+
 	public void removeMechanism(InvocationMechanism mechanism) {
 		mechanisms.remove(mechanism);
 		replaceInvocationMechanism(mechanism, getDefaultMechanism());
 	}
-	
+
 	public HashSet<InvocationGroup> getInvocationGroups() {
 		return groups;
 	}
@@ -180,7 +178,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	public boolean containsGroup(InvocationGroup group) {
 		return groups.contains(group);
 	}
-	
+
 	public InvocationMechanism getInvocationMechanism(
 			String defaultMechanismName) {
 		for (InvocationMechanism m : mechanisms) {
@@ -190,7 +188,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		}
 		return null;
 	}
-	
+
 	InvocationGroup getInvocationGroup(String groupName) {
 		for (InvocationGroup g : groups) {
 			if (g.getName().equals(groupName)) {
@@ -199,25 +197,25 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		}
 		return null;
 	}
-	
+
 	public void mechanismChanged(InvocationMechanism im) {
 		observers.notify(new InvocationMechanismChangedEvent(im));
 	}
 
-	
+
 	private void createDefaultMechanism() {
 		defaultMechanism = new ExternalToolLocalInvocationMechanism();
 		defaultMechanism.setName(DEFAULT_MECHANISM_NAME);
 		mechanisms.add(defaultMechanism);
 	}
-	
+
 	private void createDefaultGroup() {
-		defaultGroup = new InvocationGroup();
+		defaultGroup = new InvocationGroup(mechanismCreators);
 		defaultGroup.setName(DEFAULT_GROUP_NAME);
 		defaultGroup.setMechanism(defaultMechanism);
 		groups.add(defaultGroup);
 	}
-	
+
 	private void readConfiguration() {
 		File f = new File(getInvocationManagerDirectory(), "invocationManager.xml");
 		if (!f.exists()) {
@@ -236,7 +234,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 				Element mechanismDetailsElement = mechanismElement.getChild("mechanismDetails");
 				Element detailsElement = (Element) mechanismDetailsElement.getChildren().get(0);
 				InvocationMechanism mechanism = null;
-				for (MechanismCreator mc : mechanismCreatorRegistry.getInstances()) {
+				for (MechanismCreator mc : mechanismCreators) {
 					if (mc.canHandle(mechanismType)) {
 						mechanism = mc.convert(detailsElement, mechanismName);
 					}
@@ -245,7 +243,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 					this.addMechanism(mechanism);
 				}
 			}
-			
+
 			Element groupsElement = topElement.getChild("invocationGroups");
 			for (Object groupObject : groupsElement.getChildren("invocationGroup")) {
 				Element groupElement = (Element) groupObject;
@@ -258,7 +256,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 					logger.warn("Could not find mechanism " + mechanismName);
 					mechanism = getDefaultMechanism();
 				}
-				InvocationGroup group = new InvocationGroup();
+				InvocationGroup group = new InvocationGroup(mechanismCreators);
 				group.setName(groupName);
 				group.setMechanism(mechanism);
 				group.convertMechanismToDetails();
@@ -270,12 +268,12 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 			logger.error("Unable to read invocation manager", e);
 		}
 	}
-	
+
 	/**
 	 * Get the directory where the invocation information will be/is saved to.
 	 */
 	public static File getInvocationManagerDirectory() {
-		
+
 		File home = ApplicationRuntime.getInstance().getApplicationHomeDir();
 
 		File invocationManagerDirectory = new File(home,"externaltool");
@@ -287,7 +285,7 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 
 	public void saveConfiguration() {
 		File f = new File(getInvocationManagerDirectory(), "invocationManager.xml");
-		
+
 		Document configDocument = new Document();
 		Element topElement = new Element("invocationManager");
 		Element mechanismsElement = new Element("invocationMechanisms");
@@ -303,11 +301,11 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 			Element mechanismDetails = new Element("mechanismDetails");
 			mechanismDetails.addContent(m.getXMLElement());
 			mechanismElement.addContent(mechanismDetails);
-			
+
 			mechanismsElement.addContent(mechanismElement);
 		}
 		topElement.addContent(mechanismsElement);
-		
+
 		Element groupsElement = new Element("invocationGroups");
 		for (InvocationGroup g : groups) {
 			Element groupElement = new Element("invocationGroup");
@@ -320,9 +318,9 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 			groupsElement.addContent(groupElement);
 		}
 		topElement.addContent(groupsElement);
-		
+
 		configDocument.setRootElement(topElement);
-		
+
 		FileWriter writer;
 		try {
 			writer = new FileWriter(f);
@@ -351,21 +349,21 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	public void removeObserver(Observer<InvocationManagerEvent> observer) {
 		observers.removeObserver(observer);
 	}
-	
+
 	public void deleteRun(String runId) {
-		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+		for (InvocationPersister persister : invocationPersisters) {
 			persister.deleteRun(runId);
 		}
 	}
-	
+
 	public void persistInvocations() {
-		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+		for (InvocationPersister persister : invocationPersisters) {
 			persister.persist(getInvocationManagerDirectory());
 		}
 	}
-	
+
 	public void loadInvocations() {
-		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+		for (InvocationPersister persister : invocationPersisters) {
 			persister.load(getInvocationManagerDirectory());
 		}
 	}
@@ -373,15 +371,15 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	public boolean containsMechanism(InvocationMechanism invocationMechanism) {
 		return mechanisms.contains(invocationMechanism);
 	}
-	
+
 	public InvocationGroup getGroupReplacement(InvocationGroup group) {
 		return groupReplacements.get(group);
 	}
-	
+
 	public InvocationMechanism getMechanismReplacement(String invocationMechanismSpecification) {
 		return mechanismReplacements.get(invocationMechanismSpecification);
 	}
-	
+
 	public InvocationGroup getImportedGroup(String groupSpecification) {
 		return groupImports.get(groupSpecification);
 	}

@@ -1,29 +1,31 @@
 package net.sf.taverna.t2.activities.externaltool;
 
+import java.util.List;
+
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroup;
-import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager;
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
 import net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator;
-import net.sf.taverna.t2.spi.SPIRegistry;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 
 public final class ExternalToolActivityConfigurationBean {
-	
+
 	private InvocationGroup group;
-	
+
 	private String mechanismType;
-	
+
 	private String mechanismName;
-	
+
 	private String mechanismXML;
-	
+
 	private transient InvocationMechanism mechanism;
 
 	protected String repositoryUrl;
 	protected String externaltoolid;
 	protected UseCaseDescription useCaseDescription = null;
 	private boolean edited = false;
-	
+
+	private List<MechanismCreator> mechanismCreators;
+
     public boolean isEdited() {
 		return edited;
 	}
@@ -96,7 +98,7 @@ public final class ExternalToolActivityConfigurationBean {
 
 	/**
 	 * Note this also sets the details
-	 * 
+	 *
 	 * @param mechanism the mechanism to set
 	 */
 	public void setMechanism(InvocationMechanism mechanism) {
@@ -104,12 +106,12 @@ public final class ExternalToolActivityConfigurationBean {
 		convertMechanismToDetails();
 		this.group = null;
 	}
-	
+
 	public void convertMechanismToDetails() {
 		if (mechanism != null) {
 			this.setMechanismXML(mechanism.getXML());
 			this.setMechanismName(mechanism.getName());
-			this.setMechanismType(mechanism.getType());			
+			this.setMechanismType(mechanism.getType());
 		}
 	}
 
@@ -133,12 +135,10 @@ public final class ExternalToolActivityConfigurationBean {
 	public void setMechanismXML(String mechanismXML) {
 		this.mechanismXML = mechanismXML;
 	}
-	
-	private static SPIRegistry<MechanismCreator> mechanismCreatorRegistry = new SPIRegistry(MechanismCreator.class);
-	
+
 	public void convertDetailsToMechanism() {
 		if (mechanismXML != null) {
-			for (MechanismCreator mc : mechanismCreatorRegistry.getInstances()) {
+			for (MechanismCreator mc : mechanismCreators) {
 				if (mc.canHandle(getMechanismType())) {
 					mechanism = mc.convert(getMechanismXML(), getMechanismName());
 					break;
@@ -151,7 +151,7 @@ public final class ExternalToolActivityConfigurationBean {
 	 * @return the mechanism
 	 */
 	public InvocationMechanism getMechanism() {
-		
+
 		return mechanism;
 	}
 
@@ -174,6 +174,10 @@ public final class ExternalToolActivityConfigurationBean {
 	 */
 	public String getMechanismXML() {
 		return mechanismXML;
+	}
+
+	public void setMechanismCreators(List<MechanismCreator> mechanismCreators) {
+		this.mechanismCreators = mechanismCreators;
 	}
 
 }

@@ -1,9 +1,9 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.externaltool.manager;
 
-import net.sf.taverna.t2.spi.SPIRegistry;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -16,14 +16,20 @@ public class InvocationGroup {
 	private static Logger logger = Logger.getLogger(InvocationGroup.class);
 
 	private String invocationGroupName;
-	
+
 	private String mechanismType;
-	
+
 	private String mechanismName;
-	
+
 	private String mechanismXML;
-	
+
 	private transient InvocationMechanism mechanism;
+
+	private List<MechanismCreator> mechanismCreators;
+
+	public InvocationGroup(List<MechanismCreator> mechanismCreators) {
+		setMechanismCreators(mechanismCreators);
+	}
 
 	/**
 	 * @return the invocationGroupName
@@ -81,8 +87,6 @@ public class InvocationGroup {
 		this.mechanismXML = mechanismXML;
 	}
 
-	private static SPIRegistry<MechanismCreator> mechanismCreatorRegistry = new SPIRegistry(MechanismCreator.class);
-	
 	/**
 	 * @return the mechanism
 	 */
@@ -92,14 +96,14 @@ public class InvocationGroup {
 
 	/**
 	 * Note this also sets the corresponding details
-	 * 
+	 *
 	 * @param mechanism the mechanism to set
 	 */
 	public void setMechanism(InvocationMechanism mechanism) {
 		this.mechanism = mechanism;
 		convertMechanismToDetails();
 	}
-	
+
 	public String toString() {
 		return getName();
 	}
@@ -107,12 +111,12 @@ public class InvocationGroup {
 	public void convertMechanismToDetails() {
 		this.setMechanismXML(mechanism.getXML());
 		this.setMechanismName(mechanism.getName());
-		this.setMechanismType(mechanism.getType());	
+		this.setMechanismType(mechanism.getType());
 	}
 
 	public void convertDetailsToMechanism() {
 		if (mechanismXML != null) {
-			for (MechanismCreator mc : mechanismCreatorRegistry.getInstances()) {
+			for (MechanismCreator mc : mechanismCreators) {
 				if (mc.canHandle(getMechanismType())) {
 					mechanism = mc.convert(getMechanismXML(), getMechanismName());
 					break;
@@ -120,4 +124,9 @@ public class InvocationGroup {
 			}
 		}
 	}
+
+	public void setMechanismCreators(List<MechanismCreator> mechanismCreators) {
+		this.mechanismCreators = mechanismCreators;
+	}
+
 }

@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2009 Hajo Nils Krabbenhoeft, INB, University of Luebeck   
- * 
+ * Copyright (C) 2009 Hajo Nils Krabbenhoeft, INB, University of Luebeck
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroup;
-import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager;
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
 import net.sf.taverna.t2.annotation.Annotated;
 import net.sf.taverna.t2.annotation.annotationbeans.MimeType;
@@ -35,7 +34,6 @@ import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
-import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.taverna.t2.workflowmodel.EditException;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
@@ -56,11 +54,13 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
  * This is the main class of the use case activity plugin. Here we store the
  * configuration and the description of a use case activity, configure the input
  * and output port and provide use case activity invocation
- * 
+ *
  * @author Hajo Nils Krabbenhoeft
  */
 public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalToolActivityConfigurationBean> {
-	
+
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/externalTool";
+
 	private static final String STDERR = "STDERR";
 
 	private static final String STDOUT = "STDOUT";
@@ -68,13 +68,15 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	private static final String STDIN = "STDIN";
 
 	private static Logger logger = Logger.getLogger(ExternalToolActivity.class);
-	
+
 	private ExternalToolActivityConfigurationBean configurationBean;
 	private UseCaseDescription mydesc;
 
+	private List<InvocationCreator> invocationCreators;
+
 	/**
 	 * Add the given MIME types to the given input/output port.
-	 * 
+	 *
 	 * @param annotated
 	 *            The port to which to add the MIME types.
 	 * @param mimeTypes
@@ -95,7 +97,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	/**
 	 * Create a new input port with the given name, depth, element class and
 	 * MIME types.
-	 * 
+	 *
 	 * @param portName
 	 *            Name of the new port
 	 * @param portDepth
@@ -117,7 +119,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 
 	/**
 	 * Create a new output port with the given MIME types
-	 * 
+	 *
 	 * @param portName
 	 *            Name of the new port
 	 * @param portDepth
@@ -136,13 +138,13 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		this.configurationBean = bean;
 
 		try {
-			mydesc = bean.getUseCaseDescription();		
-			
+			mydesc = bean.getUseCaseDescription();
+
 			inputPorts.clear();
 			outputPorts.clear();
-			
+
 			if (mydesc != null) {
-			
+
 			// loop through all script inputs and add them as taverna activity
 			// input ports
 			for (Map.Entry<String, ScriptInput> cur : mydesc.getInputs().entrySet()) {
@@ -190,15 +192,15 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		}
 		return configurationBean;
 	}
-	
+
 	public ExternalToolActivityConfigurationBean getConfigurationNoConversion() {
 		return configurationBean;
 	}
-	
+
 	public InvocationMechanism recreateMechanism() {
 		if (configurationBean.getInvocationGroup() != null) {
 			if (configurationBean.getInvocationGroup().getMechanism() == null) {
-				configurationBean.getInvocationGroup().convertDetailsToMechanism();			
+				configurationBean.getInvocationGroup().convertDetailsToMechanism();
 			}
 			return configurationBean.getInvocationGroup().getMechanism();
 		} else {
@@ -217,7 +219,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			public void run() {
 				ReferenceService referenceService = callback.getContext().getReferenceService();
 				UseCaseInvocation invoke = null;
-				
+
 				/**
 				 * Note that retrying needs to be either done via Taverna's retry mechanism or as part of the specific invocation
 				 */
@@ -275,13 +277,15 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		});
 
 	}
-	
-	private static SPIRegistry<InvocationCreator> invocationCreatorRegistry = new SPIRegistry(InvocationCreator.class);
-	
+
+	public void setInvocationCreators(List<InvocationCreator> invocationCreators) {
+		this.invocationCreators = invocationCreators;
+	}
+
 	private UseCaseInvocation getInvocation(InvocationMechanism mechanism, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 		UseCaseInvocation result = null;
 		InvocationCreator creator = null;
-		for (InvocationCreator c : invocationCreatorRegistry.getInstances()) {
+		for (InvocationCreator c : invocationCreators) {
 			if (c.canHandle(mechanism.getType())) {
 				creator = c;
 				break;
