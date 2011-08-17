@@ -79,7 +79,13 @@
         <repository>
             <id>odftoolkit</id>
             <name>Odftoolkit Repository</name>
-            <url>http://odftoolkit.org/svn/odfdom~maven2/release/</url>
+            <url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url>
+           <releases>
+               <checksumPolicy>fail</checksumPolicy>
+           </releases>
+           <snapshots>
+               <checksumPolicy>fail</checksumPolicy>
+           </snapshots>
         </repository>
     </repositories>
 
