@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
- * 
+ * Copyright (C) 2007 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -36,6 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
@@ -58,14 +59,14 @@ import org.xml.sax.SAXException;
  * port <em>attachmentList</em> is added to represent any attachements that are
  * returned by the webservice.
  * </p>
- * 
+ *
  * @author Stuart Owen
  * @author Stian Soiland-Reyes
  */
 public class WSDLActivity extends
 		AbstractAsynchronousActivity<WSDLActivityConfigurationBean> implements
 		InputPortTypeDescriptorActivity, OutputPortTypeDescriptorActivity {
-	
+
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/wsdl";
 
 	private static final String ENDPOINT_REFERENCE = "EndpointReference";
@@ -74,6 +75,11 @@ public class WSDLActivity extends
 	private Map<String, Integer> outputDepth = new HashMap<String, Integer>();
 	private boolean isWsrfService = false;
 	private String endpointReferenceInputPortName;
+	private CredentialManager credentialManager;
+
+	public WSDLActivity(CredentialManager credentialManager) {
+		this.credentialManager = credentialManager;
+	}
 
 	public boolean isWsrfService() {
 		return isWsrfService;
@@ -86,7 +92,7 @@ public class WSDLActivity extends
 	 * configuration bean.<br>
 	 * During this process the WSDL is parsed to determine the input and output
 	 * ports.
-	 * 
+	 *
 	 * @param bean
 	 *            the {@link WSDLActivityConfigurationBean} configuration bean
 	 */
@@ -121,7 +127,7 @@ public class WSDLActivity extends
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seenet.sf.taverna.t2.activities.wsdl.InputPortTypeDescriptorActivity#
 	 * getTypeDescriptorForInputPort(java.lang.String)
 	 */
@@ -141,7 +147,7 @@ public class WSDLActivity extends
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seenet.sf.taverna.t2.activities.wsdl.InputPortTypeDescriptorActivity#
 	 * getTypeDescriptorsForInputPorts()
 	 */
@@ -158,7 +164,7 @@ public class WSDLActivity extends
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seenet.sf.taverna.t2.activities.wsdl.OutputPortTypeDescriptorActivity#
 	 * getTypeDescriptorForOutputPort(java.lang.String)
 	 */
@@ -178,7 +184,7 @@ public class WSDLActivity extends
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @seenet.sf.taverna.t2.activities.wsdl.OutputPortTypeDescriptorActivity#
 	 * getTypeDescriptorsForOutputPorts()
 	 */
@@ -285,7 +291,7 @@ public class WSDLActivity extends
 
 					T2WSDLSOAPInvoker invoker = new T2WSDLSOAPInvoker(parser,
 							configurationBean.getOperation().getOperationName(), outputNames,
-							endpointReference);
+							endpointReference, credentialManager);
 					WSDLActivityConfigurationBean bean = getConfiguration();
 
 					Map<String, Object> invokerOutputMap = invoker.invoke(

@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
- * 
+ * Copyright (C) 2007 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -54,14 +54,14 @@ import org.jdom.output.DOMOutputter;
 
 /**
  * Invokes SOAP based Web Services from T2.
- * 
+ *
  * Subclasses WSDLSOAPInvoker used for invoking Web Services from Taverna 1.x
  * and extends it to provide support for invoking secure Web services.
- * 
+ *
  * @author Stuart Owen
  * @author Alex Nenadic
  * @author Stian Soiland-Reyes
- * 
+ *
  */
 public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 
@@ -73,14 +73,17 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 
 	private String wsrfEndpointReference = null;
 
+	private CredentialManager credentialManager;
+
 	public T2WSDLSOAPInvoker(WSDLParser parser, String operationName,
-			List<String> outputNames) {
+			List<String> outputNames, CredentialManager credentialManager) {
 		super(parser, operationName, outputNames);
+		this.credentialManager = credentialManager;
 	}
 
 	public T2WSDLSOAPInvoker(WSDLParser parser, String operationName,
-			List<String> outputNames, String wsrfEndpointReference) {
-		this(parser, operationName, outputNames);
+			List<String> outputNames, String wsrfEndpointReference, CredentialManager credentialManager) {
+		this(parser, operationName, outputNames, credentialManager);
 		this.wsrfEndpointReference = wsrfEndpointReference;
 	}
 
@@ -171,7 +174,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)
 				|| securityProfile
 						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)) {
-			
+
 			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, false);
 			call.setProperty(Call.USERNAME_PROPERTY, usernamePassword.getUsername());
 			call.setProperty(Call.PASSWORD_PROPERTY, usernamePassword.getPasswordAsString());
@@ -199,13 +202,11 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 
 		// Try to get username and password for this service from Credential
 		// Manager (which should pop up UI if needed)
-		CredentialManager credManager = null;
-		credManager = CredentialManager.getInstance();
 		URI serviceUri = bean.getOperation().getWsdl();
-		UsernamePassword username_password = credManager.getUsernameAndPasswordForService(serviceUri, usePathRecursion, null);
+		UsernamePassword username_password = credentialManager.getUsernameAndPasswordForService(serviceUri, usePathRecursion, null);
 		if (username_password == null) {
 			throw new CMException("No username/password provided for service " + serviceUri);
-		} 
+		}
 		return username_password;
 	}
 
@@ -254,20 +255,20 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 
 		// This does not work
 //		ClassUtils.setClassLoader("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory",TavernaAxisCustomSSLSocketFactory.class.getClassLoader());
-		
-		// Setting Axis property only works when we also set the Thread's classloader as below 
+
+		// Setting Axis property only works when we also set the Thread's classloader as below
 		// (we do it from the net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke.requestRun())
 //		Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
 		if (AxisProperties.getProperty("axis.socketSecureFactory")== null || !AxisProperties.getProperty("axis.socketSecureFactory").equals("net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory")){
 			AxisProperties.setProperty("axis.socketSecureFactory", "net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory");
 			logger.info("Setting axis.socketSecureFactory property to " + AxisProperties.getProperty("axis.socketSecureFactory"));
 		}
-        
+
 		// This also does not work
 		//AxisProperties.setClassDefault(SecureSocketFactory.class, "net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory");
-        
+
 		Call call = super.getCall(wssEngineConfiguration);
-		
+
 		// Now that we have an axis Call object, configure any additional
 		// security properties on it (or its message context or its Transport
 		// handler),

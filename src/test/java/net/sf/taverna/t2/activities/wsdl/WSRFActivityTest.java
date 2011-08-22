@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
- * 
+ * Copyright (C) 2007 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -27,7 +27,6 @@ import java.io.StringReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import net.sf.taverna.wsdl.parser.WSDLParser;
@@ -47,7 +46,7 @@ public class WSRFActivityTest {
 
 		public DummyInvoker(String wsrfEndpoint) {
 			super(wsdlParser, "add", Arrays.asList("attachmentList"),
-					wsrfEndpoint);
+					wsrfEndpoint, null);
 		}
 
 		@Override
@@ -85,7 +84,7 @@ public class WSRFActivityTest {
 
 	@Test
 	public void insertedEndpoint() throws Exception {
-		// From T2-677 - support wsa:EndpointReference directly as well 
+		// From T2-677 - support wsa:EndpointReference directly as well
 		String wsrfEndpoint = "" +
 				"<wsa:EndpointReference "
 				+ "xmlns:wsa='http://schemas.xmlsoap.org/ws/2004/03/addressing' "
@@ -101,7 +100,7 @@ public class WSRFActivityTest {
 				+ "\n  default  \n " + "</defaultNamespace>"
 				+ "          <stillEmpty />" + "      </emptyNamespace>"
 				+ "  </wsa:ReferenceProperties>"
-				+ "  <wsa:ReferenceParameters/>" + "</wsa:EndpointReference>"; 
+				+ "  <wsa:ReferenceParameters/>" + "</wsa:EndpointReference>";
 
 		// Note: We'll subclass to avoid calling service
 		// and request attachmentList to trigger TAV-617-code and avoid
@@ -150,13 +149,13 @@ public class WSRFActivityTest {
 		assertEquals(Namespace.NO_NAMESPACE, stillEmpty.getNamespace());
 
 	}
-	
+
 
 	@Test
 	public void insertedEndpointWrapped() throws Exception {
 		// From T2-677 - support wsa:EndpointReference wrapped in <*> to avoid
 		// unnecessary XML splitters and to support legacy workflows
-		
+
 		// Example from http://www.mygrid.org.uk/dev/issues/browse/TAV-23
 		String wsrfEndpoint = "" +
 				"<c:createCounterResponse xmlns:c='http://counter.com'>" +
@@ -174,7 +173,7 @@ public class WSRFActivityTest {
 				+ "\n  default  \n " + "</defaultNamespace>"
 				+ "          <stillEmpty />" + "      </emptyNamespace>"
 				+ "  </wsa:ReferenceProperties>"
-				+ "  <wsa:ReferenceParameters/>" + "</wsa:EndpointReference>" + 
+				+ "  <wsa:ReferenceParameters/>" + "</wsa:EndpointReference>" +
 				"</c:createCounterResponse>";
 
 		// Note: We'll subclass to avoid calling service

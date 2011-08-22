@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
- * 
+ * Copyright (C) 2007 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -40,7 +40,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class AddXMLSplitterEditTest implements LocationConstants {
-	
+
 	private WSDLActivity activity;
 	private DataflowImpl dataflow;
 	private WSDLActivityConfigurationBean configBean;
@@ -52,7 +52,7 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	@Ignore("Integration test")
 	@Before
 	public void setUp() throws Exception {
-		activity = new WSDLActivity();
+		activity = new WSDLActivity(null);
 		configBean = new WSDLActivityConfigurationBean();
 		operationConfigBean = new WSDLOperationConfigurationBean();
 		operationConfigBean.setOperationName("run_eInfo");
@@ -60,16 +60,16 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 		configBean.setOperation(operationConfigBean);
 		activity.configure(configBean);
 		edits = new EditsImpl();
-		
+
 		dataflow = (DataflowImpl)edits.createDataflow();
 		Processor p=edits.createProcessor("run_eInfo");
 		edits.getDefaultDispatchStackEdit(p).doEdit();
 		edits.getAddActivityEdit(p, activity).doEdit();
 		edits.getMapProcessorPortsForActivityEdit(p).doEdit();
 		edits.getAddProcessorEdit(dataflow, p).doEdit();
-		
+
 	}
-	
+
 	@Ignore("Integration test")
 	@Test
 	public void testAddOutputSplitterToWSDLActivity() throws Exception {
@@ -85,17 +85,17 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 		}
 		assertNotNull("There should be a processor named parametersXML",processor);
 		assertEquals("There should be 1 activity",1,processor.getActivityList().size());
-		
+
 		assertEquals("The processor should have 3 output ports",3,processor.getOutputPorts().size());
 		assertEquals("The processor should have 1 input port",1,processor.getInputPorts().size());
-		
+
 		Activity<?>a = processor.getActivityList().get(0);
 		assertEquals("The activity should have 3 output ports",3,a.getOutputPorts().size());
 		assertEquals("The activity should have 1 input port",1,a.getInputPorts().size());
-		
+
 		assertEquals("There should be 1 datalink",1,dataflow.getLinks().size());
 	}
-	
+
 	@Ignore("Integration test")
 	@Test
 	public void testUndo() throws Exception {
@@ -106,7 +106,7 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 		assertEquals("The processor should be called run_eInfo","run_eInfo",dataflow.getProcessors().get(0).getLocalName());
 		assertEquals("There should be no datalinks",0,dataflow.getLinks().size());
 	}
-	
+
 	@Ignore("Integration test")
 	@Test
 	public void testAddInputSplitterToWSDLActivity() throws Exception {
@@ -124,13 +124,13 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 		assertEquals("There should be 1 activity",1,processor.getActivityList().size());
 		assertEquals("THe processor should have 3 input ports",3,processor.getInputPorts().size());
 		assertEquals("THe processor should have 1 output port",1,processor.getOutputPorts().size());
-		
+
 		Activity<?>a = processor.getActivityList().get(0);
-		
+
 		assertEquals("The activity should have 3 input ports",3,a.getInputPorts().size());
 		assertEquals("The activity 1 output port",1,a.getOutputPorts().size());
-		
+
 		assertEquals("There should be 1 datalink",1,dataflow.getLinks().size());
 	}
-	
+
 }
