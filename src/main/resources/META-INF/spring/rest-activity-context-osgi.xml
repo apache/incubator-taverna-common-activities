@@ -6,8 +6,6 @@
                       http://www.springframework.org/schema/osgi
                       http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<service ref="RESTActivityHealthCheckVisitExplainer" interface="net.sf.taverna.t2.workbench.report.explainer.VisitExplainer" />
-
 	<service ref="RESTActivityHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
 
 	<service ref="restActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />

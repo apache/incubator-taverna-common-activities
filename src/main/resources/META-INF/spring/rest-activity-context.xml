@@ -3,8 +3,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="RESTActivityHealthCheckVisitExplainer" class="net.sf.taverna.t2.activities.rest.RESTActivityHealthCheckVisitExplainer" />
-
 	<bean id="RESTActivityHealthChecker" class="net.sf.taverna.t2.activities.rest.RESTActivityHealthChecker" />
 
 	<bean id="restActivityFactory" class="net.sf.taverna.t2.activities.rest.RESTActivityFactory">
