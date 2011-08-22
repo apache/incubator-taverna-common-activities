@@ -24,6 +24,11 @@
 			<version>${t2.core.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>reference-core-extensions</artifactId>
+			<version>${t2.reference-core-extensions.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.taverna.t2.security</groupId>
 			<artifactId>credential-manager</artifactId>
 			<version>${t2.security.version}</version>
