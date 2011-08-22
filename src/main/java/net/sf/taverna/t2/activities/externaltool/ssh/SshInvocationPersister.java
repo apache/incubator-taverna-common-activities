@@ -1,11 +1,12 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.externaltool.ssh;
 
 import java.io.File;
 
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 
 import org.apache.log4j.Logger;
 
@@ -17,8 +18,9 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
  *
  */
 public class SshInvocationPersister extends InvocationPersister {
-	
+
 	private static Logger logger = Logger.getLogger(SshInvocationPersister.class);
+	private CredentialManager credentialManager;
 
 
 
@@ -41,10 +43,14 @@ public class SshInvocationPersister extends InvocationPersister {
 	@Override
 	public void deleteRun(String runId) {
 		try {
-			SshUseCaseInvocation.cleanup(runId);
+			SshUseCaseInvocation.cleanup(runId, credentialManager);
 		} catch (InvocationException e) {
 			logger.error(e);
 		}
+	}
+
+	public void setCredentialManager(CredentialManager credentialManager) {
+		this.credentialManager = credentialManager;
 	}
 
 }

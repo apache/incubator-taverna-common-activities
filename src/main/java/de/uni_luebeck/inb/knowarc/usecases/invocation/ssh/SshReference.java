@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
@@ -10,6 +10,7 @@ import net.sf.taverna.t2.reference.AbstractExternalReference;
 import net.sf.taverna.t2.reference.DereferenceException;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.ReferenceContext;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 
 import org.apache.log4j.Logger;
 
@@ -23,20 +24,22 @@ import com.jcraft.jsch.SftpException;
  */
 public class SshReference extends AbstractExternalReference implements
 	ExternalReferenceSPI {
-	
+
 	private static Logger logger = Logger.getLogger(SshReference.class);
 
-	
+
 	private String host = "127.0.0.1";
 	private int port = 22;
 	private String directory = "/tmp/";
 	private String subDirectory;
 	private String fileName;
-	
+
+	private CredentialManager credentialManager;
+
 	public SshReference() {
 		super();
 	}
-	
+
 	public SshReference(SshUrl url) {
 		super();
 		this.host = url.getSshNode().getHost();
@@ -63,7 +66,7 @@ public class SshReference extends AbstractExternalReference implements
 		try {
 			SshNode node = SshNodeFactory.getInstance().getSshNode(this.getHost(), this.getPort(), this.getDirectory());
 			String fullPath = getDirectory() +  getSubDirectory() + "/" + getFileName();
-			ChannelSftp channel = SshPool.getSftpGetChannel(node, new RetrieveLoginFromTaverna(new SshUrl(node).toString()));
+			ChannelSftp channel = SshPool.getSftpGetChannel(node, new RetrieveLoginFromTaverna(new SshUrl(node).toString(), credentialManager));
 			logger.info("Opening stream on " + fullPath);
 			return (channel.get(fullPath));
 		} catch (JSchException e) {
@@ -145,9 +148,13 @@ public class SshReference extends AbstractExternalReference implements
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	
+
 	public String getFullPath() {
 		return getDirectory() + "/" + getSubDirectory() + "/" + getFileName();
+	}
+
+	public void setCredentialManager(CredentialManager credentialManager) {
+		this.credentialManager = credentialManager;
 	}
 
 }

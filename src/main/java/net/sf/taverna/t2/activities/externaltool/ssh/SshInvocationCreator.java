@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.externaltool.ssh;
 
@@ -31,16 +31,19 @@ import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 
 /**
  * @author alanrw
  *
  */
 public final class SshInvocationCreator implements InvocationCreator {
-	
+
 	private static Logger logger = Logger.getLogger(SshInvocationCreator.class);
 
     private static List<SshNode> knownNodes = new ArrayList<SshNode>();
+
+	private CredentialManager credentialManager;
 
 	@Override
 	public boolean canHandle(String mechanismType) {
@@ -53,7 +56,7 @@ public final class SshInvocationCreator implements InvocationCreator {
 		SshUseCaseInvocation result = null;
 		try {
 		    SshNode chosenNode = chooseNode(mechanism.getNodes(), data, referenceService);
-		    result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString()));
+		    result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString(), credentialManager));
 		} catch (JSchException e) {
 			logger.error("Null invocation", e);
 		} catch (SftpException e) {
@@ -94,7 +97,7 @@ public final class SshInvocationCreator implements InvocationCreator {
 	}
 	return result;
     }
-    
+
     private static SshReference getAsSshReference(ReferenceService referenceService,
 			T2Reference t2Reference) {
     	Identified identified = referenceService.resolveIdentifier(t2Reference, null, null);
@@ -107,6 +110,10 @@ public final class SshInvocationCreator implements InvocationCreator {
 			}
 		}
 		return null;
+	}
+
+	public void setCredentialManager(CredentialManager credentialManager) {
+		this.credentialManager = credentialManager;
 	}
 
 }

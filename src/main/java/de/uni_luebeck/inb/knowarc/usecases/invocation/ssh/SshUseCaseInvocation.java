@@ -53,6 +53,7 @@ import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -74,33 +75,34 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 /**
  * The job is executed by connecting to a worker pc using ssh, i.e. not via the
  * grid.
- * 
+ *
  * @author Hajo Krabbenhoeft
  */
 public class SshUseCaseInvocation extends UseCaseInvocation {
-	
+
 	private static Logger logger = Logger.getLogger(SshUseCaseInvocation.class);
-	
+
 	private InputStream stdInputStream = null;
-	
-	
+
+
 	public static final String SSH_USE_CASE_INVOCATION_TYPE = "D0A4CDEB-DD10-4A8E-A49C-8871003083D8";
 	private String tmpname;
 	private final SshNode workerNode;
 	private final AskUserForPw askUserForPw;
-	
+
 	private ChannelExec running;
-	
+
 	private List<String> precedingCommands = new ArrayList<String>();
-	
+
 	private final ByteArrayOutputStream stdout_buf = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream stderr_buf = new ByteArrayOutputStream();
 
     private static HashMap<String, Object> nodeLock = new HashMap<String,Object>();
-    
+
 	private static Map<String, Set<SshUrl>> runIdToTempDir = new HashMap<String, Set<SshUrl>> ();
-	
+
 	private static String SSH_INVOCATION_FILE = "sshInvocations";
+
 
 	public static String test(final SshNode workerNode, final AskUserForPw askUserForPw) {
 		try {
@@ -118,7 +120,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 		return null;
 	}
-	
+
 	public SshUseCaseInvocation(UseCaseDescription desc, SshNode workerNodeA, AskUserForPw askUserForPwA)
 			throws JSchException, SftpException {
 		this.workerNode = workerNodeA;
@@ -164,15 +166,15 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		sftp.rmdir(path);
 	}
 
-	public static void cleanup(String runId) throws InvocationException {
+	public static void cleanup(String runId, CredentialManager credentialManager) throws InvocationException {
 		Set<SshUrl> tempDirectories = runIdToTempDir.get(runId);
 		if (tempDirectories != null) {
 			for (SshUrl tempUrl : tempDirectories) {
 				URI uri;
 				try {
 					uri = new URI(tempUrl.toString());
-				
-				
+
+
 				ChannelSftp sftp;
 				SshNode workerNode;
 				String fullPath = uri.getPath();
@@ -180,8 +182,8 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 				String tempDir = fullPath.substring(fullPath.lastIndexOf("/"));
 				try {
 					workerNode = SshNodeFactory.getInstance().getSshNode(uri.getHost(), uri.getPort(), path);
-					
-					sftp = SshPool.getSftpPutChannel(workerNode, new RetrieveLoginFromTaverna(workerNode.getUrl().toString()));
+
+					sftp = SshPool.getSftpPutChannel(workerNode, new RetrieveLoginFromTaverna(workerNode.getUrl().toString(), credentialManager));
 				} catch (JSchException e) {
 					throw new InvocationException(e);
 				}
@@ -215,9 +217,9 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 			fullCommand += " && " + preceding;
 		}
 		fullCommand += " && " + command;
-		
+
 		logger.info("Full command is " + fullCommand);
-		
+
 		try {
 			running = SshPool.openExecChannel(workerNode, askUserForPw);
 			running.setCommand(fullCommand);
@@ -254,7 +256,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 
 		HashMap<String, Object> results = new HashMap<String, Object>();
 
-		
+
 			results.put("STDOUT", stdout_buf.toByteArray());
 			results.put("STDERR", stderr_buf.toByteArray());
 			try {
@@ -282,14 +284,14 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 			} catch (SftpException e) {
 				ErrorDocument ed = referenceService.getErrorDocumentService().registerError("No result for " + cur.getKey(), 0, getContext());
 				results.put(cur.getKey(), ed);
-			
+
 			}
 		}
 		}
 		} catch (JSchException e1) {
 			throw new InvocationException(e1);
 		} catch (ErrorDocumentServiceException e) {
-			throw new InvocationException(e);			
+			throw new InvocationException(e);
 		}
 
 		if (running != null) {
@@ -304,7 +306,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 		return results;
 	}
-	
+
 
 	@Override
 	public String setOneInput(ReferenceService referenceService,
@@ -329,7 +331,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 						String actualLinkCommand = getActualOsCommand(linkCommand, sshRef.getFullPath(), remoteName, target);
 						precedingCommands.add(actualLinkCommand);
 						return target;
-						
+
 					}
 				}
 				String copyCommand = workerNode.getCopyCommand();

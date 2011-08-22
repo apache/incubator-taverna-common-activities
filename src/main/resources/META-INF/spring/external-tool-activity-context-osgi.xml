@@ -30,4 +30,6 @@
 
 	<list id="mechanismCreators" interface="net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator" cardinality="0..N" />
 
+	<reference id="credentialManager" interface="net.sf.taverna.t2.security.credentialmanager.CredentialManager" />
+
 </beans:beans>

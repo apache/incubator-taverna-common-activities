@@ -6,19 +6,14 @@ import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 
 public class RetrieveLoginFromTaverna implements AskUserForPw {
-	private CredentialManager credentialManager = null;
 	private final String url;
+	private final CredentialManager credentialManager;
 
-	public RetrieveLoginFromTaverna(String url) {
+	public RetrieveLoginFromTaverna(String url, CredentialManager credentialManager) {
 		this.url = url;
-		try {
-			credentialManager = CredentialManager.getInstance();
-		} catch (CMException e) {
-			throw new RuntimeException("Error in Taverna Credential Manager", e);
-		}
+		this.credentialManager = credentialManager;
 	}
 
 	private UsernamePassword getUserPass() {
