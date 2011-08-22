@@ -118,7 +118,7 @@ public class RESTActivityCredentialsProvider extends BasicCredentialsProvider {
 					// ...then save a second entry with HTTPS protocol (if the
 					// user has chosen to save the credentials)
 					if (credentials != null && credentials.isShouldSave()) {
-						credentialManager.saveUsernameAndPasswordForService(credentials,
+						credentialManager.addUsernameAndPasswordForService(credentials,
 								URI.create(HTTPS_PROTOCOL + serviceURI.toString()));
 					}
 				}
