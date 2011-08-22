@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.CredentialsProvider;
 import org.apache.log4j.Logger;
 
 import net.sf.taverna.t2.activities.rest.HTTPRequestHandler.HTTPRequestResponse;
@@ -12,6 +13,7 @@ import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivity;
@@ -19,13 +21,13 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 
 /**
  * Generic REST activity that is capable to perform all four HTTP methods.
- * 
+ *
  * @author Sergejs Aleksejevs
  */
 public class RESTActivity extends
 		AbstractAsynchronousActivity<RESTActivityConfigurationBean> implements
 		AsynchronousActivity<RESTActivityConfigurationBean> {
-	
+
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/rest";
 
 	// This generic activity can deal with any of the four HTTP methods
@@ -61,6 +63,12 @@ public class RESTActivity extends
 	// instance
 	// of the activity through the values of its parameters
 	private RESTActivityConfigurationBean configBean;
+
+	private CredentialsProvider credentialsProvider;
+
+	public RESTActivity(CredentialsProvider credentialsProvider) {
+		this.credentialsProvider = credentialsProvider;
+	}
 
 	@Override
 	public RESTActivityConfigurationBean getConfiguration() {
@@ -150,7 +158,7 @@ public class RESTActivity extends
 	/**
 	 * Uses HTTP method value of the config bean of the current instance of
 	 * RESTActivity.
-	 * 
+	 *
 	 * @see RESTActivity#hasMessageBodyInputPort(HTTP_METHOD)
 	 */
 	public boolean hasMessageBodyInputPort() {
@@ -162,7 +170,7 @@ public class RESTActivity extends
 	 * Return value of this method has a number of implications - various input
 	 * ports and configuration options for this activity are applied based on
 	 * the selected HTTP method.
-	 * 
+	 *
 	 * @param httpMethod
 	 *            HTTP method to make the decision for.
 	 * @return True if this instance of the REST activity uses HTTP POST / PUT
@@ -232,7 +240,7 @@ public class RESTActivity extends
 				// ---- DO THE ACTUAL SERVICE INVOCATION ----
 				HTTPRequestResponse requestResponse = HTTPRequestHandler
 						.initiateHTTPRequest(completeURL, configBean,
-								inputMessageBody);
+								inputMessageBody, credentialsProvider);
 
 				// test if an internal failure has occurred
 				if (requestResponse.hasException()) {
@@ -252,7 +260,7 @@ public class RESTActivity extends
 				if (requestResponse.hasServerError()) {
 					// test if a server error has occurred -- if so, return
 					// output as an error document
-					
+
 					// Check if error returned is a string - sometimes services return byte[]
 					ErrorDocument errorDocument  = null;
 					if (requestResponse.getResponseBody() == null){
