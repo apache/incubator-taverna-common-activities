@@ -165,7 +165,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 
 		// If security settings require WS-Security - configure the axis call
 		// with appropriate properties
-		String securityProfile = bean.getSecurityProfile();
+		URI securityProfile = bean.getSecurityProfile();
 		if (securityProfile
 				.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)
 				|| securityProfile
@@ -229,7 +229,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 	public Map<String, Object> invoke(Map<String, Object> inputMap,
 			WSDLActivityConfigurationBean bean) throws Exception {
 
-		String securityProfile = bean.getSecurityProfile();
+		URI securityProfile = bean.getSecurityProfile();
 		EngineConfiguration wssEngineConfiguration = null;
 		if (securityProfile != null) {
 			// If security settings require WS-Security and not just e.g. Basic HTTP
@@ -274,7 +274,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		// handler),
 		// such as WS-Security UsernameToken or HTTP Basic AuthN
 		if (securityProfile != null) {
-//			configureSecurity(call, bean);
+			configureSecurity(call, bean);
 		}
 
 		return invoke(inputMap, call);
