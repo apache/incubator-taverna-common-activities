@@ -42,21 +42,25 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>3.5-FINAL</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.5-FINAL</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.odftoolkit</groupId>
 			<artifactId>odfdom-java</artifactId>
 			<version>0.7</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.javacsv</groupId>
 			<artifactId>javacsv</artifactId>
 			<version>2.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.log4j</groupId>
