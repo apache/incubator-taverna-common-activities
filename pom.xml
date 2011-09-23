@@ -19,7 +19,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-					 	<!-- Use the java version instead of xmlcommons for javax.* packages -->
+						<!-- Use the java version instead of xmlcommons for javax.* packages -->
 						<Import-Package>javax.xml.namespace;version="0.0.0",javax.xml.parsers;version="0.0.0",org.w3c.dom;version="0.0.0",org.xml.sax;version="0.0.0",*</Import-Package>
 					</instructions>
 				</configuration>
@@ -56,6 +56,11 @@
 			<groupId>org.apache.ws</groupId>
 			<artifactId>com.springsource.org.apache.ws.security</artifactId>
 			<version>1.5.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xml</groupId>
+			<artifactId>com.springsource.org.apache.xml.security</artifactId>
+			<version>1.4.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.log4j</groupId>
