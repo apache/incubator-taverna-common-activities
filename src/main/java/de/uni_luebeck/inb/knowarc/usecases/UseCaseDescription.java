@@ -114,6 +114,10 @@ public class UseCaseDescription {
 	private boolean includeStdErr = true;
 	
 	private List<Integer> validReturnCodes = new ArrayList<Integer>();
+	
+	public UseCaseDescription() {
+		
+	}
 
 	/**
 	 * Constructor, for special purpose usecases.
