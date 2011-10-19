@@ -115,6 +115,9 @@ public class UseCaseDescription {
 	
 	private List<Integer> validReturnCodes = new ArrayList<Integer>();
 	
+	/**
+	 * Default constructor to make xstream happy
+	 */
 	public UseCaseDescription() {
 		
 	}
