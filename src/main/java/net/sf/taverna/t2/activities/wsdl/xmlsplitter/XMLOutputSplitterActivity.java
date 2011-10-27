@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
- * 
+ * Copyright (C) 2007 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -21,7 +21,6 @@
 package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,14 +43,12 @@ import net.sf.taverna.wsdl.xmlsplitter.XMLOutputSplitter;
 import net.sf.taverna.wsdl.xmlsplitter.XMLSplitterSerialisationHelper;
 
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 /**
  * An activity that replicates the behaviour of the Taverna 1 XMLOutputSplitter.
- * 
+ *
  * @author Stuart Owen
- * 
+ *
  */
 public class XMLOutputSplitterActivity extends
 		AbstractAsynchronousActivity<XMLSplitterConfigurationBean> implements
@@ -67,18 +64,7 @@ public class XMLOutputSplitterActivity extends
 			throws ActivityConfigurationException {
 		this.configBean = configBean;
 		configurePorts(configBean);
-		String xml = configBean.getWrappedTypeXML();
-		Element element;
-		try {
-			element = new SAXBuilder().build(new StringReader(xml))
-					.getRootElement();
-		} catch (JDOMException e) {
-			throw new ActivityConfigurationException(
-					"Error reading xml for XMLInputSplitter", e);
-		} catch (IOException e) {
-			throw new ActivityConfigurationException(
-					"Error reading xml for XMLInputSplitter", e);
-		}
+		Element element = configBean.getWrappedTypeXML();
 		typeDescriptor = XMLSplitterSerialisationHelper
 				.extensionXMLToTypeDescriptor(element);
 	}
@@ -181,8 +167,8 @@ public class XMLOutputSplitterActivity extends
 			}
 		}
 		else if (typeDescriptor instanceof ArrayTypeDescriptor) {
-			TypeDescriptor desc = ((ArrayTypeDescriptor)typeDescriptor).getElementType();	
-			
+			TypeDescriptor desc = ((ArrayTypeDescriptor)typeDescriptor).getElementType();
+
 			if (typeDescriptor.getName().equals(portName)) {
 				result = desc;
 			}
@@ -192,14 +178,14 @@ public class XMLOutputSplitterActivity extends
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 */
 	public Map<String, TypeDescriptor> getTypeDescriptorsForOutputPorts()
 			throws UnknownOperationException, IOException {
 		Map<String, TypeDescriptor> descriptors = new HashMap<String, TypeDescriptor>();
 		if (typeDescriptor instanceof ComplexTypeDescriptor) {
 			for (TypeDescriptor desc : ((ComplexTypeDescriptor) typeDescriptor)
-					.getElements()) {		
+					.getElements()) {
 				descriptors.put(desc.getName(), desc);
 			}
 		}
