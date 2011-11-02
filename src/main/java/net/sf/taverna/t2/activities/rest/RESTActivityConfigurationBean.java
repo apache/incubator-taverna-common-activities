@@ -2,10 +2,10 @@ package net.sf.taverna.t2.activities.rest;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 
@@ -28,20 +28,14 @@ import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
  */
 @SuppressWarnings("serial")
 @ConfigurationBean(uri = RESTActivity.URI + "#Config")
-public class RESTActivityConfigurationBean extends ActivityPortsDefinitionBean implements Serializable {
-	private RESTActivity.HTTP_METHOD httpMethod;
-	private String urlSignature;
-	private String acceptsHeaderValue;
-	private String contentTypeForUpdates;
+public class RESTActivityConfigurationBean implements Serializable {
+	private static final List<String> knownHeaders = Arrays.asList("Accept", "Content-Type", "Expect");
 	private RESTActivity.DATA_FORMAT outgoingDataFormat;
 
-	private boolean sendHTTPExpectRequestHeader;
 	private boolean showRedirectionOutputPort;
 	// whether to perform URL escaping of passed parameters, true by default
 	private boolean escapeParameters = true;
 
-	// list of HTTP headers (other than Accept and Content-Type) and their values
-	private ArrayList<ArrayList<String>> otherHTTPHeaders = new ArrayList<ArrayList<String>>();
 	// only need to store the configuration of inputs, as all of them are dynamic;
 	// only inputs that constitute components of URL signature are to be stored
 	// in this map all outputs are currently fixed, so no need to keep configuration of those
@@ -90,47 +84,45 @@ public class RESTActivityConfigurationBean extends ActivityPortsDefinitionBean i
 	 *         otherwise.
 	 */
 	public boolean isValid() {
-		return (urlSignature != null && URISignatureHandler.isValid(urlSignature) && ((RESTActivity
-				.hasMessageBodyInputPort(httpMethod)
-				&& contentTypeForUpdates != null
-				&& contentTypeForUpdates.length() > 0 && outgoingDataFormat != null) || !RESTActivity
-					.hasMessageBodyInputPort(httpMethod)));
+		return (getUrlSignature() != null && URISignatureHandler.isValid(getUrlSignature()) && ((RESTActivity
+				.hasMessageBodyInputPort(getHttpMethod())
+				&& getContentTypeForUpdates() != null
+				&& getContentTypeForUpdates().length() > 0 && outgoingDataFormat != null) || !RESTActivity
+					.hasMessageBodyInputPort(getHttpMethod())));
 	}
 
-	@ConfigurationProperty(name = "httpMethod", label = "HTTP Method")
 	public void setHttpMethod(RESTActivity.HTTP_METHOD httpMethod) {
-		this.httpMethod = httpMethod;
+		request.setMethod(httpMethod);
 	}
 
 	public RESTActivity.HTTP_METHOD getHttpMethod() {
-		return httpMethod;
+		return request.getMethod();
 	}
 
 	public String getUrlSignature() {
-		return urlSignature;
+		return request.getAbsoluteURITemplate();
 	}
 
-	@ConfigurationProperty(name = "absoluteURITemplate", label = "URL Template")
 	public void setUrlSignature(String urlSignature) {
-		this.urlSignature = urlSignature;
+		request.setAbsoluteURITemplate(urlSignature);
 	}
 
 	public String getAcceptsHeaderValue() {
-		return acceptsHeaderValue;
+		HTTPRequestHeader header = request.getHeader("Accept");
+		return header == null ? null : header.getFieldValue();
 	}
 
-	@ConfigurationProperty(name = "acceptsHeaderValue", label = "'Accept' Header")
 	public void setAcceptsHeaderValue(String acceptsHeaderValue) {
-		this.acceptsHeaderValue = acceptsHeaderValue;
+		request.setHeader("Accept", acceptsHeaderValue);
 	}
 
 	public String getContentTypeForUpdates() {
-		return contentTypeForUpdates;
+		HTTPRequestHeader header = request.getHeader("Content-Type");
+		return header == null ? null : header.getFieldValue();
 	}
 
-	@ConfigurationProperty(name = "contentTypeForUpdates", label = "Content Type For Updates")
 	public void setContentTypeForUpdates(String contentTypeForUpdates) {
-		this.contentTypeForUpdates = contentTypeForUpdates;
+		request.setHeader("Content-Type", contentTypeForUpdates);
 	}
 
 	public void setActivityInputs(Map<String, Class<?>> activityInputs) {
@@ -145,30 +137,30 @@ public class RESTActivityConfigurationBean extends ActivityPortsDefinitionBean i
 		return outgoingDataFormat;
 	}
 
-	@ConfigurationProperty(name = "outgoingDataFormat", label = "Outgoing Data Format")
+	@ConfigurationProperty(name = "outgoingDataFormat", label = "Send data as", required = false)
 	public void setOutgoingDataFormat(RESTActivity.DATA_FORMAT outgoingDataFormat) {
 		this.outgoingDataFormat = outgoingDataFormat;
 	}
 
 	public boolean getSendHTTPExpectRequestHeader() {
-		return sendHTTPExpectRequestHeader;
+		HTTPRequestHeader header = request.getHeader("Expect");
+		return header == null ? null : header.isUse100Continue();
 	}
 
-	@ConfigurationProperty(name = "sendHTTPExpectRequestHeader", label = "Send HTTP Expect request-header field")
 	public void setSendHTTPExpectRequestHeader(boolean sendHTTPExpectRequestHeader) {
-		this.sendHTTPExpectRequestHeader = sendHTTPExpectRequestHeader;
+		request.setHeader("Expect", sendHTTPExpectRequestHeader);
 	}
 
 	public boolean getShowRedirectionOutputPort() {
 		return showRedirectionOutputPort;
 	}
 
-	@ConfigurationProperty(name = "showRedirectionOutputPort", label = "Show 'Redirection' output port")
+	@ConfigurationProperty(name = "showRedirectionOutputPort", label = "Show 'Redirection' output port", required = false)
 	public void setShowRedirectionOutputPort(boolean showRedirectionOutputPort) {
 		this.showRedirectionOutputPort = showRedirectionOutputPort;
 	}
 
-	@ConfigurationProperty(name = "escapeParameters", label = "Escape URL parameter values")
+	@ConfigurationProperty(name = "escapeParameters", label = "Escape URL parameter values", required = false)
 	public void setEscapeParameters(boolean escapeParameters) {
 		this.escapeParameters = Boolean.valueOf(escapeParameters);
 	}
@@ -178,10 +170,22 @@ public class RESTActivityConfigurationBean extends ActivityPortsDefinitionBean i
 	}
 
 	public void setOtherHTTPHeaders(ArrayList<ArrayList<String>> otherHTTPHeaders) {
-		this.otherHTTPHeaders = otherHTTPHeaders;
+		for (ArrayList<String> otherHTTPHeader : otherHTTPHeaders) {
+			request.setHeader(otherHTTPHeader.get(0), otherHTTPHeader.get(1));
+		}
 	}
 
 	public ArrayList<ArrayList<String>> getOtherHTTPHeaders() {
+		ArrayList<ArrayList<String>> otherHTTPHeaders = new ArrayList<ArrayList<String>>();
+		List<HTTPRequestHeader> headers = request.getHeaders();
+		for (HTTPRequestHeader header : headers) {
+			if (!knownHeaders.contains(header.getFieldName())) {
+				ArrayList<String> nameValuePair = new ArrayList<String>();
+				nameValuePair.add(header.getFieldName());
+				nameValuePair.add(header.getFieldValue());
+				otherHTTPHeaders.add(nameValuePair);
+			}
+		}
 		return otherHTTPHeaders;
 	}
 
@@ -189,6 +193,7 @@ public class RESTActivityConfigurationBean extends ActivityPortsDefinitionBean i
 		return request;
 	}
 
+	@ConfigurationProperty(name = "request", label = "HTTP Request")
 	public void setRequest(HTTPRequest request) {
 		this.request = request;
 	}

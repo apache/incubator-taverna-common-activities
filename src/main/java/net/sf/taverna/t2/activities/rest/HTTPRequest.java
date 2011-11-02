@@ -47,7 +47,11 @@ public class HTTPRequest {
 
 	@ConfigurationProperty(name = "mthd", label = "HTTP Method", uri="http://www.w3.org/2011/http#mthd")
 	public void setMethod(URI method) {
-		this.method = HTTP_METHOD.valueOf(method.getFragment());;
+		setMethod(HTTP_METHOD.valueOf(method.getFragment()));
+	}
+
+	public void setMethod(HTTP_METHOD method) {
+		this.method = method;
 	}
 
 	public String getAbsoluteURITemplate() {
@@ -68,5 +72,33 @@ public class HTTPRequest {
 		this.headers = headers;
 	}
 
+	public HTTPRequestHeader getHeader(String name) {
+		for (HTTPRequestHeader httpRequestHeader : headers) {
+			if (httpRequestHeader.getFieldName().equals(name)) {
+				return httpRequestHeader;
+			}
+		}
+		return null;
+	}
+
+	public void setHeader(String name, String value) {
+		HTTPRequestHeader httpRequestHeader = getHeader(name);
+		if (httpRequestHeader == null) {
+			httpRequestHeader = new HTTPRequestHeader();
+			httpRequestHeader.setFieldName(name);
+			headers.add(httpRequestHeader);
+		}
+		httpRequestHeader.setFieldValue(value);
+	}
+
+	public void setHeader(String name, boolean use100Continue) {
+		HTTPRequestHeader httpRequestHeader = getHeader(name);
+		if (httpRequestHeader == null) {
+			httpRequestHeader = new HTTPRequestHeader();
+			httpRequestHeader.setFieldName(name);
+			headers.add(httpRequestHeader);
+		}
+		httpRequestHeader.setUse100Continue(use100Continue);
+	}
 
 }

@@ -39,7 +39,7 @@ public class HTTPRequestHeader {
 		return fieldName;
 	}
 
-	@ConfigurationProperty(name = "fieldName", label = "Field Name")
+	@ConfigurationProperty(name = "fieldName", label = "HTTP Header Name")
 	public void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
 	}
@@ -48,7 +48,7 @@ public class HTTPRequestHeader {
 		return fieldValue;
 	}
 
-	@ConfigurationProperty(name = "fieldValue", label = "Field Value")
+	@ConfigurationProperty(name = "fieldValue", label = "HTTP Header Value")
 	public void setFieldValue(String fieldValue) {
 		this.fieldValue = fieldValue;
 	}
