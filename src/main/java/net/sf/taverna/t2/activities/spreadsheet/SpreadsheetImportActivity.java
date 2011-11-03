@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2009 The University of Manchester   
- * 
+ * Copyright (C) 2009 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -57,13 +57,13 @@ import com.csvreader.CsvWriter;
 /**
  * An {@link net.sf.taverna.t2.workflowmodel.processor.activity.Activity} that reads spreadsheet
  * files.
- * 
+ *
  * @author David Withers
  */
 public class SpreadsheetImportActivity extends
 		AbstractAsynchronousActivity<SpreadsheetImportConfiguration> {
 
-	public static final String URI = "http://ns.taverna.org.uk/2010/activity/spreadsheetImport";
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/spreadsheet-import";
 
 	private static final String INPUT_PORT_NAME = "fileurl";
 
@@ -153,7 +153,7 @@ public class SpreadsheetImportActivity extends
 					SpreadsheetRowProcessor spreadsheetRowProcessor = null;
 					Map<String, List<T2Reference>> outputLists = null;
 					StringWriter output = null;
-					
+
 					if (outputFormat.equals(SpreadsheetOutputFormat.PORT_PER_COLUMN)) {
 						outputLists = new HashMap<String, List<T2Reference>>();
 						for (Port port : getOutputPorts()) {
@@ -193,7 +193,7 @@ public class SpreadsheetImportActivity extends
 								inputStream.close();
 								inputStream = getInputStream(context, referenceService, inputRef);
 								new CSVSpreadsheetReader().read(inputStream, new Range(rowRange),
-										new Range(columnRange), ignoreBlankRows, spreadsheetRowProcessor);							
+										new Range(columnRange), ignoreBlankRows, spreadsheetRowProcessor);
 							}
 						} finally {
 							inputStream.close();
@@ -234,7 +234,7 @@ public class SpreadsheetImportActivity extends
 
 		});
 	}
-	
+
 	private InputStream getInputStream(InvocationContext context,
 			ReferenceService referenceService, T2Reference inputRef)
 			throws IOException {
@@ -280,7 +280,7 @@ public class SpreadsheetImportActivity extends
 
 		/**
 		 * Constructs a new SingleOutputRowProcessor.
-		 * 
+		 *
 		 * @param csvWriter
 		 */
 		private SingleOutputRowProcessor(CsvWriter csvWriter) {
@@ -321,7 +321,7 @@ public class SpreadsheetImportActivity extends
 
 		/**
 		 * Constructs a new MultiplePortRowProcessor.
-		 * 
+		 *
 		 * @param referenceService
 		 * @param outputLists
 		 * @param context
