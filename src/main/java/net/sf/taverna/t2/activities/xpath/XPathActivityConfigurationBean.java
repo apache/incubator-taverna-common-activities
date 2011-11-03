@@ -1,8 +1,10 @@
 package net.sf.taverna.t2.activities.xpath;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
@@ -12,7 +14,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.InvalidXPathException;
 
 /**
- * 
+ *
  * @author Sergejs Aleksejevs
  */
 @ConfigurationBean(uri = XPathActivity.URI + "#Config")
@@ -42,7 +44,7 @@ public class XPathActivityConfigurationBean implements Serializable {
 
 	/**
 	 * Validates an XPath expression.
-	 * 
+	 *
 	 * @return {@link XPathActivityConfigurationBean#XPATH_VALID XPATH_VALID} -
 	 *         if the expression is valid;<br/>
 	 *         {@link XPathActivityConfigurationBean#XPATH_EMPTY XPATH_EMPTY} -
@@ -70,7 +72,7 @@ public class XPathActivityConfigurationBean implements Serializable {
 
 	/**
 	 * Tests validity of the configuration held in this bean.
-	 * 
+	 *
 	 * @return <code>true</code> if the configuration in the bean is valid;
 	 *         <code>false</code> otherwise.
 	 */
@@ -83,7 +85,7 @@ public class XPathActivityConfigurationBean implements Serializable {
 		return xmlDocument;
 	}
 
-	@ConfigurationProperty(name = "xmlDocument", label = "XML document")
+	@ConfigurationProperty(name = "xmlDocument", label = "XML document", required = false)
 	public void setXmlDocument(String xmlDocument) {
 		this.xmlDocument = xmlDocument;
 	}
@@ -103,6 +105,41 @@ public class XPathActivityConfigurationBean implements Serializable {
 
 	public void setXpathNamespaceMap(Map<String, String> xpathNamespaceMap) {
 		this.xpathNamespaceMap = xpathNamespaceMap;
+	}
+
+	@ConfigurationProperty(name = "xpathNamespaceMap", label = "XPath Namespace Map", required = false)
+	public void setXpathNamespaceMap(Set<NamespaceMapping> xpathNamespaceMap) {
+		Map<String, String> namespaceMap = new HashMap<String, String>();
+		for (NamespaceMapping namespaceMapping : xpathNamespaceMap) {
+			namespaceMap.put(namespaceMapping.getPrefix(), namespaceMapping.getUri().toASCIIString());
+		}
+		setXpathNamespaceMap(namespaceMap);
+	}
+
+	@ConfigurationBean(uri = XPathActivity.URI + "/NamespaceMapping")
+	public static class NamespaceMapping {
+		private String prefix;
+
+		private URI uri;
+
+		public String getPrefix() {
+			return prefix;
+		}
+
+		@ConfigurationProperty(name = "prefix", label = "Namespace Prefix")
+		public void setPrefix(String prefix) {
+			this.prefix = prefix;
+		}
+
+		public URI getUri() {
+			return uri;
+		}
+
+		@ConfigurationProperty(name = "uri", label = "Namespace URI")
+		public void setUri(URI uri) {
+			this.uri = uri;
+		}
+
 	}
 
 }
