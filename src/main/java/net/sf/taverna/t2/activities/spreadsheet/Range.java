@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2009 The University of Manchester   
- * 
+ * Copyright (C) 2009 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -28,10 +28,10 @@ import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * A range of integer values.
- * 
+ *
  * @author David Withers
  */
-@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/range#Config")
+@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/Range")
 public class Range {
 
 	/**
@@ -45,8 +45,14 @@ public class Range {
 	private List<Range> excludes = new ArrayList<Range>();
 
 	/**
+	 * Constructs a <code>Range</code>.
+	 */
+	public Range() {
+	}
+
+	/**
 	 * Constructs a <code>Range</code> with the specified start and end values.
-	 * 
+	 *
 	 * @param start
 	 *            the start of the range
 	 * @param end
@@ -60,7 +66,7 @@ public class Range {
 	/**
 	 * Constructs a <code>Range</code> with the specified start and end values and a
 	 * <code>Range</code> of excluded values.
-	 * 
+	 *
 	 * @param start
 	 *            the start of the range
 	 * @param end
@@ -79,7 +85,7 @@ public class Range {
 	/**
 	 * Constructs a <code>Range</code> with the specified start and end values and
 	 * <code>Range</code>s of excluded values.
-	 * 
+	 *
 	 * @param start
 	 *            the start of the range
 	 * @param end
@@ -99,7 +105,7 @@ public class Range {
 
 	/**
 	 * Constructs a <code>Range</code> that is a deep copy of the specified range.
-	 * 
+	 *
 	 * @param range
 	 *            the <code>Range</code> to copy
 	 */
@@ -115,7 +121,7 @@ public class Range {
 
 	/**
 	 * Returns <code>true</code> if <code>value</code> is included in this <code>Range</code>.
-	 * 
+	 *
 	 * @param value
 	 * @return
 	 */
@@ -133,7 +139,7 @@ public class Range {
 
 	/**
 	 * Returns an array of the values contained in this <code>Range</code>.
-	 * 
+	 *
 	 * @return an array of the values contained in this <code>Range</code>
 	 */
 	public int[] getRangeValues() {
@@ -159,7 +165,7 @@ public class Range {
 
 	/**
 	 * Returns the start of the <code>Range</code>.
-	 * 
+	 *
 	 * @return the start of the <code>Range</code>
 	 */
 	public int getStart() {
@@ -168,7 +174,7 @@ public class Range {
 
 	/**
 	 * Sets the start of the <code>Range</code>.
-	 * 
+	 *
 	 * @param start
 	 *            the new value for start of the <code>Range</code>
 	 */
@@ -179,7 +185,7 @@ public class Range {
 
 	/**
 	 * Returns the end of the <code>Range</code>.
-	 * 
+	 *
 	 * @return the end of the <code>Range</code>
 	 */
 	public int getEnd() {
@@ -188,7 +194,7 @@ public class Range {
 
 	/**
 	 * Sets the end of the range.
-	 * 
+	 *
 	 * @param end
 	 *            the new value for end of the <code>Range</code>
 	 */
@@ -199,7 +205,7 @@ public class Range {
 
 	/**
 	 * Adds a <code>Range</code> to be excluded from this <code>Range</code>.
-	 * 
+	 *
 	 * @param exclude
 	 *            a <code>Range</code> to be excluded
 	 */
@@ -209,7 +215,7 @@ public class Range {
 
 	/**
 	 * Removes a <code>Range</code> from the exclusions for this range.
-	 * 
+	 *
 	 * @param exclude
 	 *            a <code>Range</code> to be removed from the exclusions
 	 */
@@ -219,7 +225,7 @@ public class Range {
 
 	/**
 	 * Returns the exclusions for this range.
-	 * 
+	 *
 	 * @return the exclusions for this range
 	 */
 	public List<Range> getExcludes() {
@@ -228,11 +234,11 @@ public class Range {
 
 	/**
 	 * Sets the exclusions for this range.
-	 * 
+	 *
 	 * @param excludes
 	 *            the exclusions for this range
 	 */
-	@ConfigurationProperty(name = "excludes", label = "Excludes Ranges", description = "The ranges the exclude from this range")
+	@ConfigurationProperty(name = "excludes", label = "Excludes Ranges", description = "The ranges the exclude from this range", required = false)
 	public void setExcludes(List<Range> excludes) {
 		this.excludes = excludes;
 	}
@@ -250,7 +256,7 @@ public class Range {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -265,7 +271,7 @@ public class Range {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
