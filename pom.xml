@@ -19,8 +19,8 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Export-Package>net.sf.taverna.t2.activities.spreadsheet,org.apache.poi.*,org.openxmlformats.schemas.*,schemasMicrosoftCom*,org.odftoolkit.*,com.csvreader.*</Export-Package>
-						<Import-Package>!org.apache.poi.hdgf.extractor,!org.apache.poi.hslf.extractor,!org.apache.poi.hwpf.extractor,!org.apache.poi.sl.*, *</Import-Package>
+						<Export-Package>net.sf.taverna.t2.activities.spreadsheet,org.apache.poi.*,org.openxmlformats.schemas.*,schemasMicrosoftCom*,schemaorg_apache_xmlbeans.system.*,org.odftoolkit.*,com.csvreader.*</Export-Package>
+						<Import-Package>!org.apache.poi.hdgf.extractor,!org.apache.poi.hslf.extractor,!org.apache.poi.hwpf.extractor,!org.apache.poi.sl.*,org.apache.xmlbeans.impl.schema,*</Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
