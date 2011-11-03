@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2009 The University of Manchester   
- * 
+ * Copyright (C) 2009 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -29,7 +29,7 @@ import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * Configuration for the SpreadsheetImport activity.
- * 
+ *
  * @author David Withers
  */
 @ConfigurationBean(uri = SpreadsheetImportActivity.URI + "#Config")
@@ -45,7 +45,7 @@ public class SpreadsheetImportConfiguration {
 	private SpreadsheetEmptyCellPolicy emptyCellPolicy;
 	private SpreadsheetOutputFormat outputFormat;
 	private String csvDelimiter;
-	
+
 	/**
 	 * Constructs a new SpreadsheetImportConfiguration.
 	 */
@@ -65,7 +65,7 @@ public class SpreadsheetImportConfiguration {
 	/**
 	 * Constructs a new SpreadsheetImportConfiguration that copies the values from the given
 	 * configuration.
-	 * 
+	 *
 	 * @param configuration
 	 */
 	public SpreadsheetImportConfiguration(SpreadsheetImportConfiguration configuration) {
@@ -83,7 +83,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Returns the columnRange.
-	 * 
+	 *
 	 * @return the value of columnRange
 	 */
 	public Range getColumnRange() {
@@ -92,7 +92,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the columnRange.
-	 * 
+	 *
 	 * @param columnRange
 	 *            the new value for columnRange
 	 */
@@ -103,7 +103,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Returns the rowRange.
-	 * 
+	 *
 	 * @return the value of rowRange
 	 */
 	public Range getRowRange() {
@@ -112,7 +112,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the rowRange.
-	 * 
+	 *
 	 * @param rowRange
 	 *            the new value for rowRange
 	 */
@@ -123,7 +123,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Returns the emptyCellValue. The default value is "".
-	 * 
+	 *
 	 * @return the value of emptyCellValue
 	 */
 	public String getEmptyCellValue() {
@@ -132,7 +132,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the emptyCellValue.
-	 * 
+	 *
 	 * @param emptyCellValue
 	 *            the new value for emptyCellValue
 	 */
@@ -143,7 +143,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Returns the columnNames. The default value is an empty map.
-	 * 
+	 *
 	 * @return the value of columnNames
 	 */
 	public Map<String, String> getColumnNames() {
@@ -152,7 +152,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the columnNames.
-	 * 
+	 *
 	 * @param columnNames
 	 *            the new value for columnNames
 	 */
@@ -162,7 +162,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the columnNames.
-	 * 
+	 *
 	 * @param columnNames
 	 *            the new value for columnNames
 	 */
@@ -177,7 +177,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Returns the allRows property. The default value is <code>true</code>.
-	 * 
+	 *
 	 * @return the value of allRows
 	 */
 	public boolean isAllRows() {
@@ -186,7 +186,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the allRows property.
-	 * 
+	 *
 	 * @param allRows
 	 *            the new value for allRows
 	 */
@@ -197,7 +197,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Returns the excludeFirstRow property. The default value is <code>false</code>.
-	 * 
+	 *
 	 * @return the value of excludeFirstRow
 	 */
 	public boolean isExcludeFirstRow() {
@@ -206,7 +206,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the excludeFirstRow property.
-	 * 
+	 *
 	 * @param excludeFirstRow
 	 *            the new value for excludeFirstRow
 	 */
@@ -237,7 +237,7 @@ public class SpreadsheetImportConfiguration {
 	/**
 	 * Returns the emptyCellPolicy. The default value is
 	 * <code>SpreadsheetEmptyCellPolicy.EMPTY_STRING</code>.
-	 * 
+	 *
 	 * @return the value of emptyCellPolicy
 	 */
 	public SpreadsheetEmptyCellPolicy getEmptyCellPolicy() {
@@ -246,7 +246,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the emptyCellPolicy.
-	 * 
+	 *
 	 * @param emptyCellPolicy
 	 *            the new value for emptyCellPolicy
 	 */
@@ -258,7 +258,7 @@ public class SpreadsheetImportConfiguration {
 	/**
 	 * Returns the outputFormat. The default value is
 	 * <code>SpreadsheetOutputFormat.PORT_PER_COLUMN</code>.
-	 * 
+	 *
 	 * @return the value of outputFormat
 	 */
 	public SpreadsheetOutputFormat getOutputFormat() {
@@ -267,7 +267,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the outputFormat.
-	 * 
+	 *
 	 * @param outputFormat
 	 *            the new value for outputFormat
 	 */
@@ -279,7 +279,7 @@ public class SpreadsheetImportConfiguration {
 	/**
 	 * Returns the delimiter for CSV formatted output. The default value is
 	 * <code>","</code>.
-	 * 
+	 *
 	 * @return the delimiter for CSV formatted output
 	 */
 	public String getCsvDelimiter() {
@@ -288,7 +288,7 @@ public class SpreadsheetImportConfiguration {
 
 	/**
 	 * Sets the delimiter for CSV formatted output.
-	 * 
+	 *
 	 * @param outputFormat
 	 *            the new delimiter for CSV formatted output
 	 */
@@ -387,7 +387,7 @@ public class SpreadsheetImportConfiguration {
 		return true;
 	}
 
-	@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/mapping#Config")
+	@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/Mapping")
 	class Mapping {
 		private String column, port;
 
@@ -412,7 +412,7 @@ public class SpreadsheetImportConfiguration {
 		@ConfigurationProperty(name = "port", label = "Port", description = "The name of the port")
 		public void setPort(String port) {
 			this.port = port;
-		}		
+		}
 	}
-	
+
 }
