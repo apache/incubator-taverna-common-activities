@@ -388,12 +388,10 @@ public class SpreadsheetImportConfiguration {
 	}
 
 	@ConfigurationBean(uri = SpreadsheetImportActivity.URI + "/Mapping")
-	class Mapping {
+	public static class Mapping {
 		private String column, port;
 
-		public Mapping(String column, String name) {
-			this.column = column;
-			this.port = name;
+		public Mapping() {
 		}
 
 		public String getColumn() {
