@@ -48,7 +48,7 @@ public class RESTActivityFactory implements ActivityFactory {
 
 	@Override
 	public Object createActivityConfiguration() {
-		return new RESTActivityConfigurationBean();
+		return RESTActivityConfigurationBean.getDefaultInstance();
 	}
 
 	public void setCredentialManager(CredentialManager credentialManager) {

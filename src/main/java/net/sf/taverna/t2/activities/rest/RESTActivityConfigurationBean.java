@@ -50,6 +50,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 	public static RESTActivityConfigurationBean getDefaultInstance() {
 		// TODO - set sensible default values here
 		RESTActivityConfigurationBean defaultBean = new RESTActivityConfigurationBean();
+		defaultBean.setRequest(new HTTPRequest());
 		defaultBean.setHttpMethod(RESTActivity.HTTP_METHOD.GET);
 		defaultBean.setAcceptsHeaderValue("application/xml");
 		defaultBean.setContentTypeForUpdates("application/xml");

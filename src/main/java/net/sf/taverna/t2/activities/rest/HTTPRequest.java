@@ -21,6 +21,7 @@
 package net.sf.taverna.t2.activities.rest;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.taverna.t2.activities.rest.RESTActivity.HTTP_METHOD;
@@ -39,7 +40,7 @@ public class HTTPRequest {
 
 	private String absoluteURITemplate;
 
-	private List<HTTPRequestHeader> headers;
+	private List<HTTPRequestHeader> headers = new ArrayList<HTTPRequestHeader>();
 
 	public HTTP_METHOD getMethod() {
 		return method;
