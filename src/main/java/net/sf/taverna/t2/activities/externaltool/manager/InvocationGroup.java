@@ -5,12 +5,17 @@ package net.sf.taverna.t2.activities.externaltool.manager;
 
 import java.util.List;
 
+import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+
 import org.apache.log4j.Logger;
 
 /**
  * @author alanrw
  *
  */
+@ConfigurationBean(uri = ExternalToolActivity.URI + "#InvocationGroup")
 public class InvocationGroup {
 
 	private static Logger logger = Logger.getLogger(InvocationGroup.class);
@@ -41,6 +46,7 @@ public class InvocationGroup {
 	/**
 	 * @param invocationGroupName the invocationGroupName to set
 	 */
+	@ConfigurationProperty(name = "name", label = "Invocation Group Name")
 	public void setName(String invocationGroupName) {
 		this.invocationGroupName = invocationGroupName;
 	}
@@ -55,6 +61,7 @@ public class InvocationGroup {
 	/**
 	 * @param mechanismType the mechanismType to set
 	 */
+	@ConfigurationProperty(name = "mechanismType", label = "Mechanism Type")
 	public void setMechanismType(String mechanismType) {
 		this.mechanismType = mechanismType;
 	}
@@ -69,6 +76,7 @@ public class InvocationGroup {
 	/**
 	 * @param mechanismName the mechanismName to set
 	 */
+	@ConfigurationProperty(name = "mechanismName", label = "Mechanism Name")
 	public void setMechanismName(String mechanismName) {
 		this.mechanismName = mechanismName;
 	}
@@ -83,6 +91,7 @@ public class InvocationGroup {
 	/**
 	 * @param mechanismXML the mechanismXML to set
 	 */
+	@ConfigurationProperty(name = "mechanismXML", label = "Mechanism XML")
 	public void setMechanismXML(String mechanismXML) {
 		this.mechanismXML = mechanismXML;
 	}

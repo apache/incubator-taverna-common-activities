@@ -22,13 +22,18 @@ package de.uni_luebeck.inb.knowarc.usecases;
 
 import java.nio.charset.Charset;
 
+import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+
 /**
  * Integrates inputs to the grid that come from the use case descriptions
  * with those that are fed through the workflow.
- * 
+ *
  * this class controls name and data storage of one input,
  * no matter where the data comes from
  */
+@ConfigurationBean(uri = ExternalToolActivity.URI + "#AbstractScriptInput")
 public abstract class ScriptInput {
 	/**
 	 * This input can be referenced under the name 'tag'.
@@ -45,14 +50,14 @@ public abstract class ScriptInput {
 	 * via the tagging principle.
 	 */
 	private boolean tempFile = false;
-	/**	
+	/**
 	 * True if (!) the data is binary. (Text otherwise)
 	 */
 	private boolean binary = false;
-	
+
 	private String charsetName = Charset.defaultCharset().name();
 	private boolean forceCopy = false;
-	
+
 	/**
 	 * @return the tag
 	 */
@@ -62,6 +67,7 @@ public abstract class ScriptInput {
 	/**
 	 * @param tag the tag to set
 	 */
+	@ConfigurationProperty(name = "tag", label = "Tag")
 	public final void setTag(String tag) {
 		this.tag = tag;
 	}
@@ -74,6 +80,7 @@ public abstract class ScriptInput {
 	/**
 	 * @param file the file to set
 	 */
+	@ConfigurationProperty(name = "file", label = "File")
 	public final void setFile(boolean file) {
 		this.file = file;
 	}
@@ -86,6 +93,7 @@ public abstract class ScriptInput {
 	/**
 	 * @param tempFile the tempFile to set
 	 */
+	@ConfigurationProperty(name = "tempFile", label = "Temporary File")
 	public final void setTempFile(boolean tempFile) {
 		this.tempFile = tempFile;
 	}
@@ -98,23 +106,26 @@ public abstract class ScriptInput {
 	/**
 	 * @param binary the binary to set
 	 */
+	@ConfigurationProperty(name = "binary", label = "Binary")
 	public final void setBinary(boolean binary) {
 		this.binary = binary;
 	}
-	
+
 	public String getCharsetName() {
 		return this.charsetName;
 	}
 	/**
 	 * @param charsetName the charsetName to set
 	 */
+	@ConfigurationProperty(name = "charsetName", label = "Chararter Set")
 	public void setCharsetName(String charsetName) {
 		this.charsetName = charsetName;
 	}
-	
+
+	@ConfigurationProperty(name = "forceCopy", label = "Force Copy")
 	public final void setForceCopy(boolean forceCopy) {
 		this.forceCopy = forceCopy;
-		
+
 	}
 	/**
 	 * @return the forceCopy

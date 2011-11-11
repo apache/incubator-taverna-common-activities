@@ -21,20 +21,25 @@
 package de.uni_luebeck.inb.knowarc.usecases;
 import java.util.ArrayList;
 
+import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+
 /**
  * Internal description of output
  */
+@ConfigurationBean(uri = ExternalToolActivity.URI + "#ScriptInput")
 public class ScriptInputUser extends ScriptInput {
 
 	/**
-	 * This input may be fed from multiple ouputs. 
+	 * This input may be fed from multiple ouputs.
 	 */
 	private boolean list = false;
 	/**
 	 * True if the data from a list input in taverna is concatenated into one single input file.
 	 */
 	private boolean concatenate = false;
-	
+
 	private ArrayList<String> mime = new ArrayList<String>();
 
 	@Override
@@ -56,6 +61,7 @@ public class ScriptInputUser extends ScriptInput {
 	/**
 	 * @param list the list to set
 	 */
+	@ConfigurationProperty(name = "list", label = "List")
 	public final void setList(boolean list) {
 		this.list = list;
 	}
@@ -70,6 +76,7 @@ public class ScriptInputUser extends ScriptInput {
 	/**
 	 * @param concatenate the concatenate to set
 	 */
+	@ConfigurationProperty(name = "concatenate", label = "Concatenate")
 	public final void setConcatenate(boolean concatenate) {
 		this.concatenate = concatenate;
 	}
@@ -87,6 +94,7 @@ public class ScriptInputUser extends ScriptInput {
 	/**
 	 * @param mime the mime to set
 	 */
+	@ConfigurationProperty(name = "mime", label = "Mime Types", required=false)
 	public final void setMime(ArrayList<String> mime) {
 		this.mime = mime;
 	}

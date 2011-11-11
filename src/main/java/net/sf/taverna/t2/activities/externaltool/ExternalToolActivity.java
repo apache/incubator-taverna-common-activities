@@ -59,7 +59,7 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
  */
 public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalToolActivityConfigurationBean> {
 
-	public static final String URI = "http://ns.taverna.org.uk/2010/activity/externalTool";
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/tool";
 
 	private static final String STDERR = "STDERR";
 

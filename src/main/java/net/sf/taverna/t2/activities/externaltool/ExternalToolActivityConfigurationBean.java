@@ -5,8 +5,11 @@ import java.util.List;
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationGroup;
 import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
 import net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 
+@ConfigurationBean(uri = ExternalToolActivity.URI + "#Config")
 public final class ExternalToolActivityConfigurationBean {
 
 	private InvocationGroup group;
@@ -37,6 +40,7 @@ public final class ExternalToolActivityConfigurationBean {
 	    return group;
 	}
 
+	@ConfigurationProperty(name = "invocationGroup", label = "InvocationGroup", required=false)
 	public void setInvocationGroup(
 			InvocationGroup group) {
 		this.group = group;
@@ -60,6 +64,7 @@ public final class ExternalToolActivityConfigurationBean {
 	/**
 	 * @param repositoryUrl the repositoryUrl to set
 	 */
+	@ConfigurationProperty(name = "repositoryUrl", label = "Repository URL", required=false)
 	public void setRepositoryUrl(String repositoryUrl) {
 		this.repositoryUrl = repositoryUrl;
 	}
@@ -74,6 +79,7 @@ public final class ExternalToolActivityConfigurationBean {
 	/**
 	 * @param externaltoolid the externaltoolid to set
 	 */
+	@ConfigurationProperty(name = "toolId", label = "Tool ID")
 	public void setExternaltoolid(String externaltoolid) {
 		this.externaltoolid = externaltoolid;
 	}
@@ -88,10 +94,12 @@ public final class ExternalToolActivityConfigurationBean {
 	/**
 	 * @param useCaseDescription the useCaseDescription to set
 	 */
+	@ConfigurationProperty(name = "toolDescription", label = "Tool Description")
 	public void setUseCaseDescription(UseCaseDescription useCaseDescription) {
 		this.useCaseDescription = useCaseDescription;
 	}
 
+	@ConfigurationProperty(name = "edited", label = "Edited", required=false)
 	public void setEdited(boolean b) {
 		this.edited  = b;
 	}
@@ -118,6 +126,7 @@ public final class ExternalToolActivityConfigurationBean {
 	/**
 	 * @param mechanismType the mechanismType to set
 	 */
+	@ConfigurationProperty(name = "mechanismType", label = "Mechanism Type", required=false)
 	public void setMechanismType(String mechanismType) {
 		this.mechanismType = mechanismType;
 	}
@@ -125,6 +134,7 @@ public final class ExternalToolActivityConfigurationBean {
 	/**
 	 * @param mechanismName the mechanismName to set
 	 */
+	@ConfigurationProperty(name = "mechanismName", label = "Mechanism Name", required=false)
 	public void setMechanismName(String mechanismName) {
 		this.mechanismName = mechanismName;
 	}
@@ -132,6 +142,7 @@ public final class ExternalToolActivityConfigurationBean {
 	/**
 	 * @param mechanismXML the mechanismXML to set
 	 */
+	@ConfigurationProperty(name = "mechanismXML", label = "Mechanism XML", required=false)
 	public void setMechanismXML(String mechanismXML) {
 		this.mechanismXML = mechanismXML;
 	}

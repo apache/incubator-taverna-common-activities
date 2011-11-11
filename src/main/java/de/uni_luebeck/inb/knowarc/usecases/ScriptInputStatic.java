@@ -20,17 +20,22 @@
 
 package de.uni_luebeck.inb.knowarc.usecases;
 
+import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+
 /**
  * This subclass of script input is used to manage static content
  * which is embedded into the use case description.
  */
+@ConfigurationBean(uri = ExternalToolActivity.URI + "#ScriptInputStatic")
 public class ScriptInputStatic extends ScriptInput {
 
 	public ScriptInputStatic() {
 	}
 
 	private String url = null;  //if this is set, load content from remote URL
-	private Object content = null; //this may be a String or a byte[]
+	private String content = null;
 
 	@Override
 	public String toString() {
@@ -48,6 +53,7 @@ public class ScriptInputStatic extends ScriptInput {
 	/**
 	 * @param url the url to set
 	 */
+	@ConfigurationProperty(name = "url", label = "URL", required=false)
 	public final void setUrl(String url) {
 		this.url = url;
 	}
@@ -55,14 +61,15 @@ public class ScriptInputStatic extends ScriptInput {
 	/**
 	 * @return the content
 	 */
-	public final Object getContent() {
+	public final String getContent() {
 		return content;
 	}
 
 	/**
 	 * @param content the content to set
 	 */
-	public final void setContent(Object content) {
+	@ConfigurationProperty(name = "content", label = "Content", required=false)
+	public final void setContent(String content) {
 		this.content = content;
 	}
 }

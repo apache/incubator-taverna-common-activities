@@ -21,9 +21,14 @@
 package de.uni_luebeck.inb.knowarc.usecases;
 import java.util.ArrayList;
 
+import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+
 /**
  * Internal description of input
  */
+@ConfigurationBean(uri = ExternalToolActivity.URI + "#ScriptOutput")
 public class ScriptOutput {
 	private String path;
 	private boolean binary;
@@ -45,6 +50,7 @@ public class ScriptOutput {
 	/**
 	 * @param path the path to set
 	 */
+	@ConfigurationProperty(name = "path", label = "Path")
 	public final void setPath(String path) {
 		this.path = path;
 	}
@@ -59,6 +65,7 @@ public class ScriptOutput {
 	/**
 	 * @param binary the binary to set
 	 */
+	@ConfigurationProperty(name = "binary", label = "Binary")
 	public final void setBinary(boolean binary) {
 		this.binary = binary;
 	}
@@ -76,6 +83,7 @@ public class ScriptOutput {
 	/**
 	 * @param mime the mime to set
 	 */
+	@ConfigurationProperty(name = "mime", label = "Mime Types", required=false)
 	public final void setMime(ArrayList<String> mime) {
 		this.mime = mime;
 	}

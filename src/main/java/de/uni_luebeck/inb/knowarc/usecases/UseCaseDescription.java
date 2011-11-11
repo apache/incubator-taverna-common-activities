@@ -30,9 +30,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 
+import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty.OrderPolicy;
 import net.sf.taverna.t2.workflowmodel.serialization.DeserializationException;
 import net.sf.taverna.t2.workflowmodel.utils.Tools;
 
@@ -47,10 +52,11 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Class representation of XML-description of UseCases
  */
+@ConfigurationBean(uri = ExternalToolActivity.URI + "#ToolDescription")
 public class UseCaseDescription {
 
 	private static Logger logger = Logger.getLogger(UseCaseDescription.class);
-	
+
 	/**
 	 * Identifier for the retrieval of this UseCase in the sharedRepository
 	 * database, respectively its XML export.
@@ -74,7 +80,7 @@ public class UseCaseDescription {
 
 	/**
 	 * Accessor function of command
-	 * 
+	 *
 	 * @return shell-executable series of commands
 	 */
 	public String getCommand() {
@@ -91,7 +97,7 @@ public class UseCaseDescription {
 	 * installed.
 	 */
 	private String test_local = null;
-	
+
 	/**
 	 * URL of an icon that would help users to recognise the use case
 	 */
@@ -108,16 +114,19 @@ public class UseCaseDescription {
 	private List<ScriptInputStatic> static_inputs = new ArrayList<ScriptInputStatic>();
 	private Map<String, ScriptInput> inputs = new HashMap<String, ScriptInput>();
 	private Map<String, ScriptOutput> outputs = new HashMap<String, ScriptOutput>();
-	
+
 	private boolean includeStdIn = false;
 	private boolean includeStdOut = true;
 	private boolean includeStdErr = true;
-	
+
 	private List<Integer> validReturnCodes = new ArrayList<Integer>();
+
+	public UseCaseDescription() {
+	}
 
 	/**
 	 * Constructor, for special purpose usecases.
-	 * 
+	 *
 	 * @param usecaseid
 	 */
 	public UseCaseDescription(String usecaseid) {
@@ -296,7 +305,7 @@ public class UseCaseDescription {
 	/**
 	 * Specifies the UseCaseDescription from the root of an XML description
 	 * which is accessible online.
-	 * 
+	 *
 	 * @param programNode
 	 * @throws DeserializationException
 	 */
@@ -313,7 +322,7 @@ public class UseCaseDescription {
 		timeoutStr = programNode.getAttributeValue("preparing_timeout");
 		if (timeoutStr != null)
 			setPreparingTimeoutInSeconds(Integer.parseInt(timeoutStr));
-		
+
 		String includeStdInStr = programNode.getAttributeValue("includeStdIn");
 		if (includeStdInStr != null && !includeStdInStr.isEmpty()) {
 			setIncludeStdIn(includeStdInStr.equals("true"));
@@ -483,7 +492,7 @@ public class UseCaseDescription {
 	 * String representation of the use case. It also contains interesting
 	 * information on the availability of resources in the grid to actually
 	 * execute that workflow element.
-	 * 
+	 *
 	 * @return String
 	 */
 	@Override
@@ -514,10 +523,10 @@ public class UseCaseDescription {
 
 	/**
 	 * hajo's test just pass an url or file url to an xml file
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws MalformedURLException
-	 * @throws DeserializationException 
+	 * @throws DeserializationException
 	 */
 	public static void main(String[] argv) throws MalformedURLException, IOException, DeserializationException {
 		UseCaseDescription d = new UseCaseDescription(new URL(argv[0]).openStream());
@@ -527,6 +536,7 @@ public class UseCaseDescription {
 	/**
 	 * @param command the command to set
 	 */
+	@ConfigurationProperty(name = "command", label = "Command", description="What is actually executed on the shell")
 	public void setCommand(String command) {
 		this.command = command;
 	}
@@ -534,6 +544,7 @@ public class UseCaseDescription {
 	/**
 	 * @param description the description to set
 	 */
+	@ConfigurationProperty(name = "description", label = "Description", description="Textual description of the tool", required=false, uri="http://purl.org/dc/elements/1.1/description")
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -548,6 +559,7 @@ public class UseCaseDescription {
 	/**
 	 * @param executionTimeoutInSeconds the executionTimeoutInSeconds to set
 	 */
+	@ConfigurationProperty(name = "executionTimeoutInSeconds", label = "Execution Timeout In Seconds")
 	public void setExecutionTimeoutInSeconds(int executionTimeoutInSeconds) {
 		this.executionTimeoutInSeconds = executionTimeoutInSeconds;
 	}
@@ -564,6 +576,18 @@ public class UseCaseDescription {
 	 */
 	public void setInputs(Map<String, ScriptInput> inputs) {
 		this.inputs = inputs;
+	}
+
+	@ConfigurationProperty(name = "inputs", label = "Inputs", required=false)
+	public void setInputs(Set<InputMap> inputs) {
+		if (inputs != null) {
+			this.inputs = new HashMap<String, ScriptInput>();
+			for (InputMap inputMap : inputs) {
+				this.inputs.put(inputMap.getPort(), inputMap.getInput());
+			}
+		} else {
+			this.inputs = null;
+		}
 	}
 
 	/**
@@ -583,6 +607,18 @@ public class UseCaseDescription {
 		this.outputs = outputs;
 	}
 
+	@ConfigurationProperty(name = "outputs", label = "Outputs", required=false)
+	public void setOutputs(Set<OutputMap> outputs) {
+		if (outputs != null) {
+			this.outputs = new HashMap<String, ScriptOutput>();
+			for (OutputMap outputMap : outputs) {
+				this.outputs.put(outputMap.getPort(), outputMap.getOutput());
+			}
+		} else {
+			this.outputs = null;
+		}
+	}
+
 	/**
 	 * @return the outputs
 	 */
@@ -596,6 +632,7 @@ public class UseCaseDescription {
 	/**
 	 * @param preparingTimeoutInSeconds the preparingTimeoutInSeconds to set
 	 */
+	@ConfigurationProperty(name = "preparingTimeoutInSeconds", label = "Preparing Timeout In Seconds")
 	public void setPreparingTimeoutInSeconds(int preparingTimeoutInSeconds) {
 		this.preparingTimeoutInSeconds = preparingTimeoutInSeconds;
 	}
@@ -661,6 +698,7 @@ public class UseCaseDescription {
 	/**
 	 * @param static_inputs the static_inputs to set
 	 */
+	@ConfigurationProperty(name = "staticInputs", label = "Static Inputs", ordering=OrderPolicy.NON_ORDERED)
 	public void setStatic_inputs(List<ScriptInputStatic> static_inputs) {
 		this.static_inputs = static_inputs;
 	}
@@ -695,6 +733,7 @@ public class UseCaseDescription {
 	/**
 	 * @param usecaseid the usecaseid to set
 	 */
+	@ConfigurationProperty(name = "usecaseid", label = "Title", uri="http://purl.org/dc/elements/1.1/title", required=false)
 	public void setUsecaseid(String usecaseid) {
 		this.usecaseid = usecaseid;
 	}
@@ -710,6 +749,7 @@ public class UseCaseDescription {
 		return includeStdIn;
 	}
 
+	@ConfigurationProperty(name = "includeStdIn", label = "Include STDIN")
 	public void setIncludeStdIn(boolean includeStdIn) {
 		this.includeStdIn = includeStdIn;
 	}
@@ -718,6 +758,7 @@ public class UseCaseDescription {
 		return includeStdOut;
 	}
 
+	@ConfigurationProperty(name = "includeStdOut", label = "Include STDOUT")
 	public void setIncludeStdOut(boolean includeStdOut) {
 		this.includeStdOut = includeStdOut;
 	}
@@ -726,6 +767,7 @@ public class UseCaseDescription {
 		return includeStdErr;
 	}
 
+	@ConfigurationProperty(name = "includeStdErr", label = "Include STDERR")
 	public void setIncludeStdErr(boolean includeStdErr) {
 		this.includeStdErr = includeStdErr;
 	}
@@ -797,4 +839,55 @@ public class UseCaseDescription {
 	public String getIcon_url() {
 		return icon_url;
 	}
+
+	@ConfigurationBean(uri = ExternalToolActivity.URI + "#OutputMap")
+	public static class OutputMap {
+		private String port;
+
+		private ScriptOutput output;
+
+		public String getPort() {
+			return port;
+		}
+
+		@ConfigurationProperty(name = "port", label = "Port")
+		public void setPort(String port) {
+			this.port = port;
+		}
+
+		public ScriptOutput getOutput() {
+			return output;
+		}
+
+		@ConfigurationProperty(name = "output", label = "Output")
+		public void setOutput(ScriptOutput output) {
+			this.output = output;
+		}
+	}
+
+	@ConfigurationBean(uri = ExternalToolActivity.URI + "#InputMap")
+	public static class InputMap {
+		private String port;
+
+		private ScriptInputUser input;
+
+		public String getPort() {
+			return port;
+		}
+
+		@ConfigurationProperty(name = "port", label = "Port")
+		public void setPort(String port) {
+			this.port = port;
+		}
+
+		public ScriptInputUser getInput() {
+			return input;
+		}
+
+		@ConfigurationProperty(name = "input", label = "Input")
+		public void setInput(ScriptInputUser input) {
+			this.input = input;
+		}
+	}
+
 }
