@@ -75,6 +75,7 @@ import org.apache.axis.wsdl.symbolTable.SchemaUtils;
  * 
  * @author Stuart Owen
  * @author Stian Soiland-Reyes
+ * @author Asger Askov-Bleking
  * 
  */
 
@@ -496,7 +497,7 @@ public class WSDLParser {
 	 * 
 	 * @param operationName
 	 * @return a matching WSDLOperation descriptor
-	 * @throws UnknowOperationException
+	 * @throws UnknownOperationException
 	 *             if no operation matches the name
 	 */
 	public Operation getOperation(String operationName)
@@ -793,6 +794,7 @@ public class WSDLParser {
 
 			result.setType(type.getQName().getLocalPart());
 			result.setQname(type.getQName());
+			
 			List containedElements = type.getRefType().getContainedElements();
 			if (containedElements != null) {
 				result.getElements().addAll(
@@ -843,6 +845,12 @@ public class WSDLParser {
 			elType.setUnbounded(el.getMaxOccursIsUnbounded());
 			elType.setName(el.getQName().getLocalPart());
 			elType.setQname(el.getQName());
+			if (el.getDocumentation() != null && !el.getDocumentation().isEmpty()) {
+               elType.setDocumentation(el.getDocumentation());
+           } else {
+        	   System.err.println("No documentation found in descriptor for " + el.getQName().getLocalPart());
+           }
+
 			result.add(elType);
 		}
 
@@ -909,6 +917,7 @@ public class WSDLParser {
 		result.setQname(cached.getQname());
 		result.setElements(cached.getElements());
 		result.setType(cached.getType());
+		result.setDocumentation(cached.getDocumentation());
 
 		return result;
 	}

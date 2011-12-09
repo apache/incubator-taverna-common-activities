@@ -45,6 +45,7 @@ import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
 import org.apache.log4j.Logger;
+import org.jdom.Content;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
@@ -55,6 +56,7 @@ import org.jdom.Namespace;
  * describes the TypeDescriptor tree that the Splitter wraps.
  * 
  * @author Stuart Owen
+ * @author Asger Askov-Bleking
  * 
  */
 
@@ -74,12 +76,14 @@ public class XMLSplitterSerialisationHelper {
 	public static Element typeDescriptorToExtensionXML(TypeDescriptor descriptor) {
 		Element result = new Element("extensions", XScuflNS);
 		Element type = null;
-		if (descriptor instanceof ComplexTypeDescriptor)
+		if (descriptor instanceof ComplexTypeDescriptor) {
 			type = constructElementForComplexType(
 					(ComplexTypeDescriptor) descriptor, new ArrayList<String>());
-		else if (descriptor instanceof ArrayTypeDescriptor)
+		}
+		else if (descriptor instanceof ArrayTypeDescriptor) {
 			type = constructElementForArrayType(
 					(ArrayTypeDescriptor) descriptor, new ArrayList<String>());
+		}
 		result.addContent(type);
 		return result;
 	}
@@ -179,6 +183,16 @@ public class XMLSplitterSerialisationHelper {
 		element.setAttribute("name", descriptor.getName() == null ? ""
 				: descriptor.getName());
 		element.setAttribute("qname", descriptor.getQname().toString());
+		if (descriptor.getDocumentation() != null){
+           Element annotationElement =
+                   new Element("annotation", Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema"));
+           Element documentationElemenet =
+                    new Element("documentation", Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema"));
+            documentationElemenet.setText(descriptor.getDocumentation());
+            annotationElement.addContent(documentationElemenet);
+            element.addContent(annotationElement);
+		}
+
 	}
 
 	private static TypeDescriptor buildTypeDescriptorFromElement(
@@ -314,6 +328,21 @@ public class XMLSplitterSerialisationHelper {
 				.equalsIgnoreCase("true"));
 		result.setUnbounded(element.getAttributeValue("unbounded")
 				.equalsIgnoreCase("true"));
+
+		Element annotationChild =
+               element.getChild("annotation", Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema"));
+        if (annotationChild != null){
+           List documentationChildren = annotationChild
+                    .getChildren("documentation", Namespace.getNamespace("xsd", "http://www.w3.org/2001/XMLSchema"));
+			 
+           String documentation = "";
+            for (Object documentationChild : documentationChildren) {
+                documentation += ((Element)documentationChild).getText();
+            }
+            if (!documentation.isEmpty()){
+               result.setDocumentation(documentation);
+            }
+        }
 
 		// qname has been added since 1.3.2-RC1 so need to test if missing for
 		// older workflows
