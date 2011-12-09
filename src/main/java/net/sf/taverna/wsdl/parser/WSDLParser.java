@@ -847,8 +847,6 @@ public class WSDLParser {
 			elType.setQname(el.getQName());
 			if (el.getDocumentation() != null && !el.getDocumentation().isEmpty()) {
                elType.setDocumentation(el.getDocumentation());
-           } else {
-        	   System.err.println("No documentation found in descriptor for " + el.getQName().getLocalPart());
            }
 
 			result.add(elType);
