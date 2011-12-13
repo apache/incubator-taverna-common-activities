@@ -795,17 +795,22 @@ public class WSDLParser {
 			result.setType(type.getQName().getLocalPart());
 			result.setQname(type.getQName());
 			
-			List containedElements = type.getRefType().getContainedElements();
-			if (containedElements != null) {
-				result.getElements().addAll(
-						constructElements(containedElements));
-			}
-			
-			List containedAttributes = type.getRefType().getContainedAttributes();
-			if (containedAttributes != null) {
-				result.getAttributes().addAll(
-						constructAttributes(containedAttributes));				
-			}
+			DefinedType refType = (DefinedType) type.getRefType();
+
+			do {
+				List containedElements = refType.getContainedElements();
+				if (containedElements != null) {
+					result.getElements().addAll(
+							constructElements(containedElements));
+				}
+				List containedAttributes = refType.getContainedAttributes();
+				if (containedAttributes != null) {
+					result.getAttributes().addAll(
+							constructAttributes(containedAttributes));
+				}
+			} while ((refType = (DefinedType) refType
+					.getComplexTypeExtensionBase(getSymbolTable())) != null);
+
 		}
 
 		return result;
@@ -817,6 +822,14 @@ public class WSDLParser {
 		if (cachedComplexTypes.get(type.getQName().toString()) != null) {
 			result = copyFromCache(type.getQName().toString());
 		} else {
+			TypeEntry baseTypeEntry = type
+					.getComplexTypeExtensionBase(getSymbolTable());
+			if (baseTypeEntry != null) {
+				ComplexTypeDescriptor baseTypeDescriptor = constructComplexType((DefinedType) baseTypeEntry);
+				result.getElements().addAll(baseTypeDescriptor.getElements());
+				result.getAttributes().addAll(
+						baseTypeDescriptor.getAttributes());
+			}
 			result.setType(type.getQName().getLocalPart());
 			cachedComplexTypes.put(type.getQName().toString(), result);
 			List containedElements = type.getContainedElements();
