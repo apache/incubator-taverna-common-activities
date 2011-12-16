@@ -123,9 +123,78 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		c.delete();
 	}
 	
+	private String setOneBinaryInput(ReferenceService referenceService,
+			T2Reference t2Reference, ScriptInput input, String targetSuffix)
+			throws InvocationException {
+
+		if (input.isFile() || input.isTempFile()) {
+			String target = tempDir.getAbsolutePath() + "/" + targetSuffix;
+			// Try to get it as a file
+			InputStream is = null;
+			OutputStream os = null;
+			FileReference fileRef = getAsFileReference(referenceService,
+					t2Reference);
+			if (fileRef != null) {
+
+				if (!input.isForceCopy()) {
+					if (linkCommand != null) {
+						String source = fileRef.getFile().getAbsolutePath();
+						String actualLinkCommand = getActualOsCommand(
+								linkCommand, source, targetSuffix, target);
+						logger.info("Link command is " + actualLinkCommand);
+						String[] splitCmds = actualLinkCommand.split(" ");
+						ProcessBuilder builder = new ProcessBuilder(splitCmds);
+						builder.directory(tempDir);
+						try {
+							int code = builder.start().waitFor();
+							if (code == 0) {
+								return target;
+							} else {
+								logger.error("Link command gave errorcode: "
+										+ code);
+							}
+
+						} catch (InterruptedException e) {
+							// go through
+						} catch (IOException e) {
+							// go through
+						}
+
+					}
+				}
+			}
+			is = getAsStream(referenceService, t2Reference);
+
+			try {
+				os = new FileOutputStream(target);
+			} catch (FileNotFoundException e) {
+				throw new InvocationException(e);
+			}
+
+			try {
+				IOUtils.copyLarge(is, os);
+			} catch (IOException e) {
+				throw new InvocationException(e);
+			}
+			try {
+				is.close();
+				os.close();
+			} catch (IOException e) {
+				throw new InvocationException(e);
+			}
+			return target;
+		} else {
+			String value = (String) referenceService.renderIdentifier(
+					t2Reference, String.class, this.getContext());
+			return value;
+		}
+	}
+	
 	@Override
-	public String setOneInput(ReferenceService referenceService, T2Reference t2Reference, ScriptInput input) throws InvocationException {
-		
+	public String setOneInput(ReferenceService referenceService,
+			T2Reference t2Reference, ScriptInput input)
+			throws InvocationException {
+
 		if (input.getCharsetName() == null) {
 			input.setCharsetName(Charset.defaultCharset().name());
 		}
@@ -136,19 +205,27 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		} else if (input.isTempFile()) {
 			targetSuffix = "tempfile." + (nTempFiles++) + ".tmp";
 		}
+
+		if (input.isBinary()) {
+			return setOneBinaryInput(referenceService, t2Reference, input,
+					targetSuffix);
+		}
+
 		logger.info("Target is " + target);
 		if (input.isFile() || input.isTempFile()) {
 			target = tempDir.getAbsolutePath() + "/" + targetSuffix;
 			// Try to get it as a file
 			Reader r;
 			Writer w;
-			FileReference fileRef = getAsFileReference(referenceService, t2Reference);
+			FileReference fileRef = getAsFileReference(referenceService,
+					t2Reference);
 			if (fileRef != null) {
-				
+
 				if (!input.isForceCopy()) {
 					if (linkCommand != null) {
 						String source = fileRef.getFile().getAbsolutePath();
-						String actualLinkCommand = getActualOsCommand(linkCommand, source, targetSuffix, target);
+						String actualLinkCommand = getActualOsCommand(
+								linkCommand, source, targetSuffix, target);
 						logger.info("Link command is " + actualLinkCommand);
 						String[] splitCmds = actualLinkCommand.split(" ");
 						ProcessBuilder builder = new ProcessBuilder(splitCmds);
@@ -158,9 +235,10 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 							if (code == 0) {
 								return target;
 							} else {
-								logger.error("Link command gave errorcode: " + code);
+								logger.error("Link command gave errorcode: "
+										+ code);
 							}
-								
+
 						} catch (InterruptedException e) {
 							// go through
 						} catch (IOException e) {
@@ -169,42 +247,29 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 
 					}
 				}
-				
-				if (input.isBinary()) {
-						try {
-							r = new FileReader(fileRef.getFile());
-						} catch (FileNotFoundException e) {
-							throw new InvocationException(e);
-						}
-						
+
+				if (fileRef.getDataNature().equals(ReferencedDataNature.TEXT)) {
+					r = new InputStreamReader(fileRef.openStream(this
+							.getContext()), Charset.forName(fileRef
+							.getCharset()));
 				} else {
-					if (fileRef.getDataNature().equals(ReferencedDataNature.TEXT)) {
-						r = new InputStreamReader(fileRef.openStream(this.getContext()), Charset.forName(fileRef.getCharset()));
-					} else {
-						try {
-							r = new FileReader(fileRef.getFile());
-						} catch (FileNotFoundException e) {
-							throw new InvocationException(e);
-						}
+					try {
+						r = new FileReader(fileRef.getFile());
+					} catch (FileNotFoundException e) {
+						throw new InvocationException(e);
 					}
 				}
 			} else {
-					r = new InputStreamReader(getAsStream(referenceService, t2Reference));
+				r = new InputStreamReader(getAsStream(referenceService,
+						t2Reference));
 			}
-			if (input.isBinary()) {
-				try {
-					w = new FileWriter(target);
-				} catch (IOException e) {
-					throw new InvocationException(e);
-				}				
-			} else {
-				try {
-					w = new OutputStreamWriter(new FileOutputStream(target), input.getCharsetName());
-				} catch (UnsupportedEncodingException e) {
-					throw new InvocationException(e);
-				} catch (FileNotFoundException e) {
-					throw new InvocationException(e);
-				}				
+			try {
+				w = new OutputStreamWriter(new FileOutputStream(target), input
+						.getCharsetName());
+			} catch (UnsupportedEncodingException e) {
+				throw new InvocationException(e);
+			} catch (FileNotFoundException e) {
+				throw new InvocationException(e);
 			}
 			try {
 				IOUtils.copyLarge(r, w);
@@ -218,13 +283,12 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 				throw new InvocationException(e);
 			}
 			return target;
-		}
-		else {
-			String value = (String) referenceService.renderIdentifier(t2Reference, String.class, this.getContext());
+		} else {
+			String value = (String) referenceService.renderIdentifier(
+					t2Reference, String.class, this.getContext());
 			return value;
 		}
 	}
-	
 
 	public static void cleanup(String runId) {
 		Set<String> tempDirectories = runIdToTempDir.get(runId);
