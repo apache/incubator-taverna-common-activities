@@ -52,6 +52,7 @@ import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
+import net.sf.taverna.t2.reference.ReferencedDataNature;
 import net.sf.taverna.t2.reference.T2Reference;
 
 import org.apache.commons.io.FileUtils;
@@ -268,12 +269,19 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 			ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
 		synchronized(getNodeLock(workerNode)) {
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
-			String fullPath = workerNode.getDirectory() + tmpname + "/" + cur.getValue().getPath();
+			ScriptOutput scriptOutput = cur.getValue();
+			String fullPath = workerNode.getDirectory() + tmpname + "/" + scriptOutput.getPath();
 			try {
 				if (sftp.stat(fullPath) != null) {
 					SshUrl url = new SshUrl(workerNode);
 					url.setSubDirectory(tmpname);
-					url.setFileName(cur.getValue().getPath());
+					url.setFileName(scriptOutput.getPath());
+					if (scriptOutput.isBinary()) {
+						url.setDataNature(ReferencedDataNature.BINARY);
+					} else {
+						url.setDataNature(ReferencedDataNature.TEXT);
+						url.setCharset("UTF-8");
+					}
 					results.put(cur.getKey(), url);
 				} else {
 					ErrorDocument ed = referenceService.getErrorDocumentService().registerError("No result for " + cur.getKey(), 0, getContext());

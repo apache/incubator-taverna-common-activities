@@ -128,10 +128,8 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 			throws InvocationException {
 
 		if (input.isFile() || input.isTempFile()) {
-			String target = tempDir.getAbsolutePath() + "/" + targetSuffix;
 			// Try to get it as a file
-			InputStream is = null;
-			OutputStream os = null;
+			String target = tempDir.getAbsolutePath() + "/" + targetSuffix;
 			FileReference fileRef = getAsFileReference(referenceService,
 					t2Reference);
 			if (fileRef != null) {
@@ -163,6 +161,9 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 					}
 				}
 			}
+
+			InputStream is = null;
+			OutputStream os = null;
 			is = getAsStream(referenceService, t2Reference);
 
 			try {

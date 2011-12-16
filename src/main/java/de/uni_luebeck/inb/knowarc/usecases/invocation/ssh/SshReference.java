@@ -10,6 +10,7 @@ import net.sf.taverna.t2.reference.AbstractExternalReference;
 import net.sf.taverna.t2.reference.DereferenceException;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.ReferenceContext;
+import net.sf.taverna.t2.reference.ReferencedDataNature;
 
 import org.apache.log4j.Logger;
 
@@ -33,6 +34,9 @@ public class SshReference extends AbstractExternalReference implements
 	private String subDirectory;
 	private String fileName;
 	
+	private ReferencedDataNature dataNature = ReferencedDataNature.UNKNOWN;
+	private String charset = "UTF-8";
+	
 	public SshReference() {
 		super();
 	}
@@ -44,6 +48,8 @@ public class SshReference extends AbstractExternalReference implements
 		this.directory = url.getSshNode().getDirectory();
 		this.subDirectory = url.getSubDirectory();
 		this.fileName = url.getFileName();
+		this.setDataNature(url.getDataNature());
+		this.setCharset(url.getCharset());
 	}
 
 	/* (non-Javadoc)
@@ -149,5 +155,23 @@ public class SshReference extends AbstractExternalReference implements
 	public String getFullPath() {
 		return getDirectory() + "/" + getSubDirectory() + "/" + getFileName();
 	}
+	
+	public ReferencedDataNature getDataNature() {
+		return dataNature;
+	}
+
+	public void setDataNature(ReferencedDataNature dataNature) {
+		this.dataNature = dataNature;
+	}
+
+	public String getCharset() {
+		return charset;
+	}
+
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+
+
 
 }

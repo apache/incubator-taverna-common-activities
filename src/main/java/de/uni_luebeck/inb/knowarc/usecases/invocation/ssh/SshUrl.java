@@ -3,6 +3,8 @@
  */
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
+import net.sf.taverna.t2.reference.ReferencedDataNature;
+
 /**
  * @author alanrw
  *
@@ -12,7 +14,11 @@ public class SshUrl {
 	private SshNode sshNode;
 	private String subDirectory;
 	private String fileName;
+
+	private ReferencedDataNature dataNature = ReferencedDataNature.UNKNOWN;
+	private String charset = "UTF-8";
 	
+
 	public SshUrl(SshNode sshNode) {
 		this.setSshNode(sshNode);
 	}
@@ -122,5 +128,26 @@ public class SshUrl {
 	public void setSshNode(SshNode sshNode) {
 		this.sshNode = sshNode;
 	}
+	
+	public ReferencedDataNature getDataNature() {
+		return dataNature;
+	}
+
+
+	public void setDataNature(ReferencedDataNature dataNature) {
+		this.dataNature = dataNature;
+	}
+
+
+	public String getCharset() {
+		return charset;
+	}
+
+
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+
+
 	
 }
