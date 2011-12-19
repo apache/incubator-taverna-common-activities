@@ -54,6 +54,7 @@ public class RESTActivity extends
 	private static final String OUT_RESPONSE_BODY = "responseBody";
 	private static final String OUT_STATUS = "status";
 	private static final String OUT_REDIRECTION = "redirection";
+	private static final String OUT_COMPLETE_URL = "actualURL";
 
 	// Configuration bean for this activity - essentially defines a particular
 	// instance
@@ -138,6 +139,7 @@ public class RESTActivity extends
 		// depend on the configuration of the activity;
 		addOutput(OUT_RESPONSE_BODY, 0);
 		addOutput(OUT_STATUS, 0);
+		addOutput(OUT_COMPLETE_URL, 0);
 
 		// Redirection port may be hidden/shown
 		if (configBean.getShowRedirectionOutputPort()) {
@@ -306,6 +308,10 @@ public class RESTActivity extends
 				T2Reference statusRef = referenceService.register(
 						requestResponse.getStatusCode(), 0, true, context);
 				outputs.put(OUT_STATUS, statusRef);
+				
+				T2Reference completeURLRef = referenceService.register(
+						completeURL, 0, true, context);
+				outputs.put(OUT_COMPLETE_URL, completeURLRef);
 
 				// only put an output to the Redirection port if the processor
 				// is configured to display that port
