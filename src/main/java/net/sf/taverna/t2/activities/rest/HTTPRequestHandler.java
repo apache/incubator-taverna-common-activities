@@ -38,6 +38,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
 import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
@@ -56,7 +57,8 @@ import org.apache.log4j.Logger;
  */
 public class HTTPRequestHandler
 {
-  private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
+  private static final int HTTPS_DEFAULT_PORT = 443;
+private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
   private static final String ACCEPT_HEADER_NAME = "Accept";
   private static Logger logger = Logger.getLogger(HTTPRequestHandler.class);
   
@@ -97,14 +99,14 @@ public class HTTPRequestHandler
 				// parse the port out for us
 				int port = url.getPort();
 				if (port == -1) { // no port was defined in the URL
-					port = 433; // default HTTPS port
+					port = HTTPS_DEFAULT_PORT; // default HTTPS port
 				}
-				Scheme https = new Scheme("https",
+				Scheme https = new Scheme("https", port,
 						new org.apache.http.conn.ssl.SSLSocketFactory(
-								SSLContext.getDefault()), port);
+								SSLContext.getDefault()));
 				SchemeRegistry schemeRegistry = new SchemeRegistry();
 				schemeRegistry.register(https);
-				connectionManager = new SingleClientConnManager(null,
+				connectionManager = new SingleClientConnManager(
 						schemeRegistry);
 			} catch (MalformedURLException ex) {
 				logger.error(
