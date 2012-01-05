@@ -101,12 +101,12 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 				if (port == -1) { // no port was defined in the URL
 					port = HTTPS_DEFAULT_PORT; // default HTTPS port
 				}
-				Scheme https = new Scheme("https", port,
+				Scheme https = new Scheme("https",
 						new org.apache.http.conn.ssl.SSLSocketFactory(
-								SSLContext.getDefault()));
+								SSLContext.getDefault()), port);
 				SchemeRegistry schemeRegistry = new SchemeRegistry();
 				schemeRegistry.register(https);
-				connectionManager = new SingleClientConnManager(
+				connectionManager = new SingleClientConnManager(null,
 						schemeRegistry);
 			} catch (MalformedURLException ex) {
 				logger.error(
