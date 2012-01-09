@@ -42,6 +42,8 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.ReferenceSet;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.reference.impl.external.object.InlineByteArrayReferenceBuilder;
+import net.sf.taverna.t2.reference.impl.external.object.InlineStringReferenceBuilder;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInputStatic;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;
@@ -55,6 +57,8 @@ import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
  * @author Steffen Moeller
  */
 public abstract class UseCaseInvocation {
+	
+	private String runId;
 	
 	
 	protected static String getActualOsCommand(String osCommand, String pathToOriginal,
@@ -70,7 +74,10 @@ public abstract class UseCaseInvocation {
 	protected final HashMap<String, String> tags = new HashMap<String, String>();
 	protected int nTempFiles = 0;
 	private static int submissionID = 0;
+	protected static InlineByteArrayReferenceBuilder inlineByteArrayReferenceBuilder = new InlineByteArrayReferenceBuilder();
+	protected static InlineStringReferenceBuilder inlineStringReferenceBuilder = new InlineStringReferenceBuilder();
 	private InvocationContext invocationContext;
+	private boolean retrieveData;
 	
 	/*
 	 * get the class of the data we expect for a given input
@@ -284,6 +291,34 @@ public abstract class UseCaseInvocation {
 			T2Reference t2Reference);
 
 	public abstract void rememberRun(String runId);
+
+	/**
+	 * @return the runId
+	 */
+	protected String getRunId() {
+		return runId;
+	}
+
+	/**
+	 * @param runId the runId to set
+	 */
+	protected void setRunId(String runId) {
+		this.runId = runId;
+	}
+
+	/**
+	 * @return the retrieveData
+	 */
+	protected boolean isRetrieveData() {
+		return retrieveData;
+	}
+
+	/**
+	 * @param retrieveData the retrieveData to set
+	 */
+	protected void setRetrieveData(boolean retrieveData) {
+		this.retrieveData = retrieveData;
+	}
 	
 
 }

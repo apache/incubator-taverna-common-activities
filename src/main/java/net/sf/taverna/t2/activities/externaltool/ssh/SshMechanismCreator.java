@@ -70,6 +70,9 @@ public class SshMechanismCreator extends MechanismCreator {
 			if (copyCommandElement != null) {
 				node.setCopyCommand(copyCommandElement.getText());
 			}
+			
+			Element retrieveDataElement = nodeElement.getChild("retrieveData");
+			node.setRetrieveData(retrieveDataElement != null);
 			}
 			nodeList.add(node);
 

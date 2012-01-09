@@ -34,7 +34,7 @@ public class SshReference extends AbstractExternalReference implements
 	private String subDirectory;
 	private String fileName;
 	
-	private ReferencedDataNature dataNature = ReferencedDataNature.UNKNOWN;
+	private int dataNatureInteger = ReferencedDataNature.UNKNOWN.ordinal();
 	private String charset = "UTF-8";
 	
 	public SshReference() {
@@ -157,11 +157,11 @@ public class SshReference extends AbstractExternalReference implements
 	}
 	
 	public ReferencedDataNature getDataNature() {
-		return dataNature;
+		return ReferencedDataNature.values()[dataNatureInteger];
 	}
 
 	public void setDataNature(ReferencedDataNature dataNature) {
-		this.dataNature = dataNature;
+		this.dataNatureInteger = dataNature.ordinal();
 	}
 
 	public String getCharset() {
@@ -170,6 +170,20 @@ public class SshReference extends AbstractExternalReference implements
 
 	public void setCharset(String charset) {
 		this.charset = charset;
+	}
+
+	/**
+	 * @return the dataNatureInteger
+	 */
+	public int getDataNatureInteger() {
+		return dataNatureInteger;
+	}
+
+	/**
+	 * @param dataNatureInteger the dataNatureInteger to set
+	 */
+	public void setDataNatureInteger(int dataNatureInteger) {
+		this.dataNatureInteger = dataNatureInteger;
 	}
 
 

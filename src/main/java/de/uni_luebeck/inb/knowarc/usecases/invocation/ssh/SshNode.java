@@ -36,6 +36,7 @@ public class SshNode {
 	
 	private String linkCommand = null;
 	private String copyCommand = null;
+	private boolean retrieveData = false;
 
 	/**
 	 * 
@@ -139,6 +140,20 @@ public class SshNode {
 			this.copyCommand = null;
 		} else {
 			this.copyCommand = copyCommand;
-		}	}
+		}
+	}
+	
+	/**
+	 * @return the retrieveData
+	 */
+	public boolean isRetrieveData() {
+		return retrieveData;
+	}
+	/**
+	 * @param retrieveData the retrieveData to set
+	 */
+	public void setRetrieveData(boolean retrieveData) {
+		this.retrieveData = retrieveData;
+	}
 	
 }

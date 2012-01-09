@@ -83,6 +83,10 @@ public class ExternalToolSshInvocationMechanism extends InvocationMechanism {
 				copyCommandElement.addContent(new Text(copyCommand));
 				nodeElement.addContent(copyCommandElement);
 			}
+			if (node.isRetrieveData()) {
+				Element retrieveDataElement = new Element("retrieveData");
+				nodeElement.addContent(retrieveDataElement);
+			}
 			
 			top.addContent(nodeElement);
 		}

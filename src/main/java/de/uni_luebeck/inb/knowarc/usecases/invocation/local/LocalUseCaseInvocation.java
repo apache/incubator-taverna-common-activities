@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.taverna.t2.reference.AbstractExternalReference;
 import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
@@ -93,9 +95,10 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	
 	private static String LOCAL_INVOCATION_FILE = "localInvocations";
 
-	public LocalUseCaseInvocation(UseCaseDescription desc, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
+	public LocalUseCaseInvocation(UseCaseDescription desc, boolean retrieveData, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
 
 		usecase = desc;
+		setRetrieveData(retrieveData);
 		this.shellPrefix = shellPrefix;
 		this.linkCommand = linkCommand;
 		
@@ -290,16 +293,29 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 			return value;
 		}
 	}
+	
+	private void forgetRun() {
+		Set<String> directories = runIdToTempDir.get(getRunId());
+		try {
+			directories.remove(tempDir.getCanonicalPath());
+		} catch (IOException e) {
+			logger.error(e);
+		}
+	}
 
+	private static void deleteDirectory(String location) {
+		try {
+			FileUtils.deleteDirectory(new File(location));
+		} catch (IOException e) {
+			logger.error("Problem deleting " + location, e);
+		}
+	}
+	
 	public static void cleanup(String runId) {
 		Set<String> tempDirectories = runIdToTempDir.get(runId);
 		if (tempDirectories != null) {
 			for (String tempDir : tempDirectories) {
-				try {
-					FileUtils.deleteDirectory(new File(tempDir));
-				} catch (IOException e) {
-					logger.error("Problem deleting " + tempDir, e);
-				}
+				deleteDirectory(tempDir);
 			}
 			runIdToTempDir.remove(runId);
 		}
@@ -393,13 +409,52 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 			results.put("STDERR", stderr_buf.toByteArray());
 
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
+			ScriptOutput scriptOutput = cur.getValue();
 			File result = new File(tempDir.getAbsoluteFile() + "/" + cur.getValue().getPath());
 			if (result.exists()) {
-				FileReference ref = new FileReference(result);
+				AbstractExternalReference ref;
+				if (isRetrieveData()) {
+					FileInputStream is;
+					try {
+						is = new FileInputStream(result);
+					} catch (FileNotFoundException e) {
+						throw new InvocationException(e);
+					}
+					if (scriptOutput.isBinary()) {
+						ref = inlineByteArrayReferenceBuilder.createReference(is, null);
+					} else {
+						ref = inlineStringReferenceBuilder.createReference(is, null);
+					}
+					try {
+						is.close();
+					} catch (IOException e) {
+						throw new InvocationException(e);
+					}
+				}
+				else {
+					ref = new FileReference(result);
+					if (scriptOutput.isBinary()) {
+						((FileReference) ref)
+								.setDataNature(ReferencedDataNature.BINARY);
+					} else {
+						((FileReference) ref)
+								.setDataNature(ReferencedDataNature.TEXT);
+						((FileReference) ref).setCharset("UTF-8");
+					}
+				}
 				results.put(cur.getKey(), ref);
 			} else {
 				ErrorDocument ed = referenceService.getErrorDocumentService().registerError("No result for " + cur.getKey(), 0, getContext());
 				results.put(cur.getKey(), ed);
+			}
+		}
+		
+		if (isRetrieveData()) {
+			forgetRun();
+			try {
+				deleteDirectory(tempDir.getCanonicalPath());
+			} catch (IOException e) {
+				throw new InvocationException(e);
 			}
 		}
 
@@ -426,6 +481,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 
 	@Override
 	public void rememberRun(String runId) {
+		this.setRunId(runId);
 		Set<String> directories = runIdToTempDir.get(runId);
 		if (directories == null) {
 			directories = Collections.synchronizedSet(new HashSet<String> ());
