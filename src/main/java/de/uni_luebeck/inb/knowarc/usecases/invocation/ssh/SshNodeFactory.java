@@ -3,6 +3,7 @@
  */
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  */
 public class SshNodeFactory {
 	
-	private Map<String, SshNode> nodeMap = new HashMap<String, SshNode> ();
+	private Map<String, SshNode> nodeMap = Collections.synchronizedMap(new HashMap<String, SshNode> ());
 	
 	private static SshNodeFactory INSTANCE = new SshNodeFactory();
 	

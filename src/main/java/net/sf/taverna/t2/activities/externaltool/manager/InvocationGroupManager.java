@@ -6,9 +6,11 @@ package net.sf.taverna.t2.activities.externaltool.manager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -50,13 +52,13 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 
 	private static Logger logger = Logger.getLogger(InvocationGroupManager.class);
 	
-	private HashMap<InvocationGroup, InvocationGroup> groupReplacements = new HashMap<InvocationGroup, InvocationGroup>();
+	private Map<InvocationGroup, InvocationGroup> groupReplacements = Collections.synchronizedMap(new HashMap<InvocationGroup, InvocationGroup>());
     
-	private HashMap<String, InvocationMechanism> mechanismReplacements = new HashMap<String, InvocationMechanism>();
+	private Map<String, InvocationMechanism> mechanismReplacements = Collections.synchronizedMap(new HashMap<String, InvocationMechanism>());
 	
-	private HashMap<String, InvocationGroup> groupImports = new HashMap<String, InvocationGroup> ();
+	private Map<String, InvocationGroup> groupImports = Collections.synchronizedMap(new HashMap<String, InvocationGroup> ());
 	
-	private HashMap<String, InvocationMechanism> mechanismImports = new HashMap<String, InvocationMechanism> ();
+	private Map<String, InvocationMechanism> mechanismImports = Collections.synchronizedMap(new HashMap<String, InvocationMechanism> ());
     
 	
 	private static class Singleton {
@@ -224,7 +226,10 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 			return;
 		}
 		try {
-			Document document = builder.build(f);
+			Document document = null;
+			synchronized(builder) {
+				document = builder.build(f);
+			}
 			Element topElement = document.getRootElement();
 			Element mechanismsElement = topElement.getChild("invocationMechanisms");
 			for (Object mechanismObject : mechanismsElement.getChildren("invocationMechanism")) {
@@ -236,7 +241,11 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 				Element mechanismDetailsElement = mechanismElement.getChild("mechanismDetails");
 				Element detailsElement = (Element) mechanismDetailsElement.getChildren().get(0);
 				InvocationMechanism mechanism = null;
-				for (MechanismCreator mc : mechanismCreatorRegistry.getInstances()) {
+				List<MechanismCreator> instances = null;
+				synchronized (mechanismCreatorRegistry) {
+					instances = mechanismCreatorRegistry.getInstances();
+				}
+				for (MechanismCreator mc : instances) {
 					if (mc.canHandle(mechanismType)) {
 						mechanism = mc.convert(detailsElement, mechanismName);
 					}
@@ -326,7 +335,9 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 		FileWriter writer;
 		try {
 			writer = new FileWriter(f);
-			outputter.output(configDocument, writer);
+			synchronized(outputter) {
+				outputter.output(configDocument, writer);
+			}
 			writer.close();
 		} catch (IOException e) {
 			logger.error("Unable to save invocation manager", e);
@@ -353,19 +364,31 @@ public class InvocationGroupManager implements Observable<InvocationManagerEvent
 	}
 	
 	public void deleteRun(String runId) {
-		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+		List<InvocationPersister> instances = null;
+		synchronized (invocationPersisterRegistry) {
+			instances = invocationPersisterRegistry.getInstances();
+		}
+		for (InvocationPersister persister : instances) {
 			persister.deleteRun(runId);
 		}
 	}
 	
 	public void persistInvocations() {
-		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+		List<InvocationPersister> instances = null;
+		synchronized (invocationPersisterRegistry) {
+			instances = invocationPersisterRegistry.getInstances();
+		}
+		for (InvocationPersister persister : instances) {
 			persister.persist(getInvocationManagerDirectory());
 		}
 	}
 	
 	public void loadInvocations() {
-		for (InvocationPersister persister : invocationPersisterRegistry.getInstances()) {
+		List<InvocationPersister> instances = null;
+		synchronized (invocationPersisterRegistry) {
+			instances = invocationPersisterRegistry.getInstances();
+		}
+		for (InvocationPersister persister : instances) {
 			persister.load(getInvocationManagerDirectory());
 		}
 	}

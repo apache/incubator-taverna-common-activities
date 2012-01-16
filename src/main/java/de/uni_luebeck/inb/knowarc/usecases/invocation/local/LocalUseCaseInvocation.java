@@ -91,7 +91,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 
 	private Reader stdInReader = null;
 	
-	private static Map<String, Set<String>> runIdToTempDir = new HashMap<String, Set<String>> ();
+	private static Map<String, Set<String>> runIdToTempDir = Collections.synchronizedMap(new HashMap<String, Set<String>> ());
 	
 	private static String LOCAL_INVOCATION_FILE = "localInvocations";
 

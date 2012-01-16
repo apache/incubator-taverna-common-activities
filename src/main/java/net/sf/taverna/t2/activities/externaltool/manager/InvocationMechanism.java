@@ -28,7 +28,11 @@ public abstract class InvocationMechanism {
 
 	public final String getXML() {
 		Document document = new Document(getXMLElement());
-		return outputter.outputString(document);
+		String result = null;
+		synchronized (outputter) {
+			result = outputter.outputString(document);
+		}
+		return result;
 	}
 	
 	public abstract Element getXMLElement();
