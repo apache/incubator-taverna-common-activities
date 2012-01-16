@@ -5,6 +5,7 @@ package net.sf.taverna.t2.activities.externaltool;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -135,9 +136,15 @@ public final class ExternalToolActivityMimeTypeChecker implements HealthChecker<
 
 	private Set<String> getMimeTypesForInput(ExternalToolActivity a, ActivityInputPort aip) {
 		ScriptInputUser si = (ScriptInputUser) a.getConfiguration().getUseCaseDescription().getInputs().get(aip.getName());
-		List mimeList = Arrays.asList(si.getMime());
-		Set mimeSet = new HashSet(mimeList);
-		return mimeSet;
+		ArrayList<String> mime = si.getMime();
+		if (mime != null) {
+			List mimeList = Arrays.asList(mime);
+			Set mimeSet = new HashSet(mimeList);
+		
+			return mimeSet;
+		} else {
+			return Collections.EMPTY_SET;
+		}
 	}
 	
 	private static ActivityOutputPort getActivityOutputPort(
