@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>net.sf.taverna</groupId>
 	<artifactId>wsdl-generic</artifactId>
-	<version>1.9-SNAPSHOT</version>
+	<version>1.10-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>wsdl-generic</name>
 	<description>
@@ -101,7 +101,7 @@
 			<artifactId>com.springsource.javax.activation</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		
+
 		<!--<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis</artifactId>
@@ -122,7 +122,7 @@
 			<artifactId>axis-wsdl4j</artifactId>
 			<version>1.5.1</version>
 		</dependency>-->
-		<!-- to make security work inside Raven, instead use a single dependency that bundles the above together 
+		<!-- to make security work inside Raven, instead use a single dependency that bundles the above together
 			with wss4j: -->
 		<!--<dependency>
 			<groupId>axis</groupId>
