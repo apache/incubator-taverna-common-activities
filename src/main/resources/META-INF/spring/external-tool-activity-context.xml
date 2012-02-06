@@ -15,13 +15,17 @@
 	<bean id="LocalMechanismCreator" class="net.sf.taverna.t2.activities.externaltool.local.LocalMechanismCreator" />
 	<bean id="SshMechanismCreator" class="net.sf.taverna.t2.activities.externaltool.ssh.SshMechanismCreator" />
 
-	<bean id="ExternalToolRunDeletionListener" class="net.sf.taverna.t2.activities.externaltool.ExternalToolRunDeletionListener" />
+	<bean id="ExternalToolRunDeletionListener" class="net.sf.taverna.t2.activities.externaltool.ExternalToolRunDeletionListener">
+		<property name="invocationGroupManager" ref="invocationGroupManager" />
+	</bean>
 
 	<bean id="SshUrlToSshReference" class="de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrlToSshReference">
 		<property name="credentialManager" ref="credentialManager" />
 	</bean>
 
-	<bean id="ExternalToolActivityHealthChecker" class="net.sf.taverna.t2.activities.externaltool.ExternalToolActivityHealthChecker" />
+	<bean id="ExternalToolActivityHealthChecker" class="net.sf.taverna.t2.activities.externaltool.ExternalToolActivityHealthChecker">
+		<property name="invocationGroupManager" ref="invocationGroupManager" />
+	</bean>
 	<bean id="ExternalToolActivityMimeTypeChecker" class="net.sf.taverna.t2.activities.externaltool.ExternalToolActivityMimeTypeChecker" />
 
 	<bean id="LocalInvocationCreator" class="net.sf.taverna.t2.activities.externaltool.local.LocalInvocationCreator" />
@@ -33,6 +37,12 @@
 	<bean id="externalToolActivityFactory" class="net.sf.taverna.t2.activities.externaltool.ExternalToolActivityFactory">
 		<property name="invocationCreators" ref="invocationCreators" />
 		<property name="mechanismCreators" ref="mechanismCreators" />
+	</bean>
+
+	<bean id="invocationGroupManager" class="net.sf.taverna.t2.activities.externaltool.manager.impl.InvocationGroupManagerImpl">
+		<constructor-arg name="applicationConfiguration" ref="applicationConfiguration" />
+		<constructor-arg name="mechanismCreators" ref="mechanismCreators" />
+		<constructor-arg name="invocationPersisters" ref="invocationPersisters" />
 	</bean>
 
 

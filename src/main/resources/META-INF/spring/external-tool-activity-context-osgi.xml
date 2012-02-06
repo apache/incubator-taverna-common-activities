@@ -8,6 +8,8 @@
 
 	<service ref="SshReference" interface="net.sf.taverna.t2.reference.ExternalReferenceSPI" />
 
+	<service ref="invocationGroupManager" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager" />
+
 	<service ref="LocalInvocationPersister" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister" />
 	<service ref="SshInvocationPersister" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister" />
 
@@ -30,6 +32,11 @@
 
 	<list id="mechanismCreators" interface="net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator" cardinality="0..N" />
 
+    <list id="invocationPersisters" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister" cardinality="0..N" />
+
 	<reference id="credentialManager" interface="net.sf.taverna.t2.security.credentialmanager.CredentialManager" />
+
+	<reference id="applicationConfiguration" interface="uk.org.taverna.platform.configuration.app.ApplicationConfiguration" />
+
 
 </beans:beans>

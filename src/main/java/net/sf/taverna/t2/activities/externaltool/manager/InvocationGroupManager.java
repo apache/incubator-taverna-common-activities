@@ -1,403 +1,102 @@
-/**
+/*******************************************************************************
+ * Copyright (C) 2012 The University of Manchester
  *
- */
+ *  Modifications to the initial code base are copyright of their
+ *  respective authors, or their employers as appropriate.
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public License
+ *  as published by the Free Software Foundation; either version 2.1 of
+ *  the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ ******************************************************************************/
 package net.sf.taverna.t2.activities.externaltool.manager;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
 
-import net.sf.taverna.raven.appconfig.ApplicationRuntime;
-import net.sf.taverna.t2.activities.externaltool.local.ExternalToolLocalInvocationMechanism;
-import net.sf.taverna.t2.lang.observer.MultiCaster;
-import net.sf.taverna.t2.lang.observer.Observable;
 import net.sf.taverna.t2.lang.observer.Observer;
 
-import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
-
 /**
- * @author alanrw
  *
+ *
+ * @author David Withers
  */
-public class InvocationGroupManager implements Observable<InvocationManagerEvent>{
+public interface InvocationGroupManager {
 
-	private static final String DEFAULT_MECHANISM_NAME = "default local";
-	private static final String DEFAULT_GROUP_NAME = "default";
-	private HashSet<InvocationGroup> groups = new HashSet<InvocationGroup>();
-	private InvocationGroup defaultGroup = null;
+	public void addInvocationGroup(InvocationGroup group);
 
-	private HashSet<InvocationMechanism> mechanisms = new HashSet<InvocationMechanism>();
+	public void replaceInvocationGroup(InvocationGroup originalGroup,
+			InvocationGroup replacementGroup);
 
-	private static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-	private static SAXBuilder builder = new SAXBuilder();
+	public void removeInvocationGroup(InvocationGroup group);
 
-	private static List<MechanismCreator> mechanismCreators;
+	public void replaceInvocationMechanism(InvocationMechanism originalMechanism,
+			InvocationMechanism replacementMechanism);
 
-	private static List<InvocationPersister> invocationPersisters;
+	public void removeMechanism(InvocationMechanism mechanism);
 
-	private static Logger logger = Logger.getLogger(InvocationGroupManager.class);
+	public HashSet<InvocationGroup> getInvocationGroups();
 
-	private HashMap<InvocationGroup, InvocationGroup> groupReplacements = new HashMap<InvocationGroup, InvocationGroup>();
+	public InvocationGroup getDefaultGroup();
 
-	private HashMap<String, InvocationMechanism> mechanismReplacements = new HashMap<String, InvocationMechanism>();
+	public Set<InvocationMechanism> getMechanisms();
 
-	private HashMap<String, InvocationGroup> groupImports = new HashMap<String, InvocationGroup> ();
+	public void addMechanism(InvocationMechanism mechanism);
 
-	private HashMap<String, InvocationMechanism> mechanismImports = new HashMap<String, InvocationMechanism> ();
+	public InvocationMechanism getDefaultMechanism();
 
-	private static class Singleton {
-		private static InvocationGroupManager instance = new InvocationGroupManager();
-	}
+	public boolean containsGroup(InvocationGroup group);
 
-	protected MultiCaster<InvocationManagerEvent> observers = new MultiCaster<InvocationManagerEvent>(
-			this);
+	public InvocationMechanism getInvocationMechanism(String defaultMechanismName);
 
-	private InvocationMechanism defaultMechanism = null;
-
-	private InvocationGroupManager() {
-		readConfiguration();
-		defaultMechanism = getInvocationMechanism(DEFAULT_MECHANISM_NAME);
-		if (defaultMechanism == null) {
-			createDefaultMechanism();
-		}
-		defaultGroup = getInvocationGroup(DEFAULT_GROUP_NAME);
-		if (defaultGroup == null) {
-			createDefaultGroup();
-		}
-
-		saveConfiguration();
-	}
-
-	public static InvocationGroupManager getInstance() {
-		return Singleton.instance;
-	}
-
-	public void addInvocationGroup(InvocationGroup group) {
-		groups.add(group);
-		observers.notify(new InvocationGroupAddedEvent(group));
-	}
-
-	public void replaceInvocationGroup(InvocationGroup originalGroup, InvocationGroup replacementGroup) {
-		Set<String> toReplaceImports = new HashSet<String>();
-		for (Entry<String, InvocationGroup> entry : groupImports.entrySet()) {
-			if (entry.getValue() == originalGroup) {
-				toReplaceImports.add(entry.getKey());
-			}
-		}
-		for (String spec : toReplaceImports) {
-			if (replacementGroup == null) {
-				groupImports.remove(spec);
-			} else {
-				groupImports.put(spec, replacementGroup);
-			}
-		}
-		if (replacementGroup != null) {
-			groupReplacements.put(originalGroup, replacementGroup);
-		}
-		observers.notify(new InvocationGroupRemovedEvent(originalGroup, (replacementGroup == null? getDefaultGroup(): replacementGroup)));
-	}
-
-	public void removeInvocationGroup(InvocationGroup group) {
-		groups.remove(group);
-		replaceInvocationGroup(group, getDefaultGroup());
-	}
-
-	public void replaceInvocationMechanism(InvocationMechanism originalMechanism, InvocationMechanism replacementMechanism) {
-		for (InvocationGroup g : groups) {
-			if (g.getMechanism().equals(originalMechanism)) {
-				if (replacementMechanism == null) {
-					g.setMechanism(getDefaultMechanism());
-				} else {
-					g.setMechanism(replacementMechanism);
-				}
-			}
-		}
-		Set<String> toRemoveImports = new HashSet<String>();
-		for (Entry<String, InvocationMechanism> entry : mechanismImports.entrySet()) {
-			if (entry.getValue() == originalMechanism) {
-				toRemoveImports.add(entry.getKey());
-			}
-		}
-		for (String spec : toRemoveImports) {
-			if (replacementMechanism == null) {
-				mechanismImports.remove(spec);
-			} else {
-				mechanismImports.put(spec, replacementMechanism);
-			}
-		}
-		if (replacementMechanism != null) {
-			mechanismReplacements.put(originalMechanism.getName() + ":" + originalMechanism.getXML(), replacementMechanism);
-		}
-		observers.notify(new InvocationMechanismRemovedEvent(originalMechanism, (replacementMechanism == null? getDefaultMechanism(): replacementMechanism)));
-	}
-
-	public void removeMechanism(InvocationMechanism mechanism) {
-		mechanisms.remove(mechanism);
-		replaceInvocationMechanism(mechanism, getDefaultMechanism());
-	}
-
-	public HashSet<InvocationGroup> getInvocationGroups() {
-		return groups;
-	}
-
-	public InvocationGroup getDefaultGroup() {
-		if (defaultGroup == null) {
-			createDefaultGroup();
-		}
-		return defaultGroup;
-	}
-
-	public Set<InvocationMechanism> getMechanisms() {
-		return mechanisms;
-	}
-
-	public void addMechanism(InvocationMechanism mechanism) {
-		mechanisms.add(mechanism);
-		observers.notify(new InvocationMechanismAddedEvent(mechanism));
-	}
-
-	public InvocationMechanism getDefaultMechanism() {
-		if (defaultMechanism == null) {
-			createDefaultMechanism();
-		}
-		return defaultMechanism;
-	}
-
-	public boolean containsGroup(InvocationGroup group) {
-		return groups.contains(group);
-	}
-
-	public InvocationMechanism getInvocationMechanism(
-			String defaultMechanismName) {
-		for (InvocationMechanism m : mechanisms) {
-			if (m.getName().equals(defaultMechanismName)) {
-				return m;
-			}
-		}
-		return null;
-	}
-
-	InvocationGroup getInvocationGroup(String groupName) {
-		for (InvocationGroup g : groups) {
-			if (g.getName().equals(groupName)) {
-				return g;
-			}
-		}
-		return null;
-	}
-
-	public void mechanismChanged(InvocationMechanism im) {
-		observers.notify(new InvocationMechanismChangedEvent(im));
-	}
-
-
-	private void createDefaultMechanism() {
-		defaultMechanism = new ExternalToolLocalInvocationMechanism();
-		defaultMechanism.setName(DEFAULT_MECHANISM_NAME);
-		mechanisms.add(defaultMechanism);
-	}
-
-	private void createDefaultGroup() {
-		defaultGroup = new InvocationGroup(mechanismCreators);
-		defaultGroup.setName(DEFAULT_GROUP_NAME);
-		defaultGroup.setMechanism(defaultMechanism);
-		groups.add(defaultGroup);
-	}
-
-	private void readConfiguration() {
-		File f = new File(getInvocationManagerDirectory(), "invocationManager.xml");
-		if (!f.exists()) {
-			return;
-		}
-		try {
-			Document document = builder.build(f);
-			Element topElement = document.getRootElement();
-			Element mechanismsElement = topElement.getChild("invocationMechanisms");
-			for (Object mechanismObject : mechanismsElement.getChildren("invocationMechanism")) {
-				Element mechanismElement = (Element) mechanismObject;
-				Element mechanismNameElement = mechanismElement.getChild("invocationMechanismName");
-				String mechanismName = mechanismNameElement.getText();
-				Element mechanismTypeElement = mechanismElement.getChild("invocationMechanismType");
-				String mechanismType = mechanismTypeElement.getText();
-				Element mechanismDetailsElement = mechanismElement.getChild("mechanismDetails");
-				Element detailsElement = (Element) mechanismDetailsElement.getChildren().get(0);
-				InvocationMechanism mechanism = null;
-				for (MechanismCreator mc : mechanismCreators) {
-					if (mc.canHandle(mechanismType)) {
-						mechanism = mc.convert(detailsElement, mechanismName);
-					}
-				}
-				if (mechanism != null) {
-					this.addMechanism(mechanism);
-				}
-			}
-
-			Element groupsElement = topElement.getChild("invocationGroups");
-			for (Object groupObject : groupsElement.getChildren("invocationGroup")) {
-				Element groupElement = (Element) groupObject;
-				Element groupNameElement = groupElement.getChild("invocationGroupName");
-				String groupName = groupNameElement.getText();
-				Element mechanismNameElement = groupElement.getChild("mechanismName");
-				String mechanismName = mechanismNameElement.getText();
-				InvocationMechanism mechanism = getInvocationMechanism(mechanismName);
-				if (mechanism == null) {
-					logger.warn("Could not find mechanism " + mechanismName);
-					mechanism = getDefaultMechanism();
-				}
-				InvocationGroup group = new InvocationGroup(mechanismCreators);
-				group.setName(groupName);
-				group.setMechanism(mechanism);
-				group.convertMechanismToDetails();
-				this.addInvocationGroup(group);
-			}
-		} catch (JDOMException e) {
-			logger.error("XML parsing problem", e);
-		} catch (IOException e) {
-			logger.error("Unable to read invocation manager", e);
-		}
-	}
+	public void mechanismChanged(InvocationMechanism im);
 
 	/**
 	 * Get the directory where the invocation information will be/is saved to.
 	 */
-	public static File getInvocationManagerDirectory() {
+	public File getInvocationManagerDirectory();
 
-		File home = ApplicationRuntime.getInstance().getApplicationHomeDir();
+	public void saveConfiguration();
 
-		File invocationManagerDirectory = new File(home,"externaltool");
-		if (!invocationManagerDirectory.exists()) {
-			invocationManagerDirectory.mkdir();
-		}
-		return invocationManagerDirectory;
-	}
+	public void groupChanged(InvocationGroup group);
 
-	public void saveConfiguration() {
-		File f = new File(getInvocationManagerDirectory(), "invocationManager.xml");
+	public void addObserver(Observer<InvocationManagerEvent> observer);
 
-		Document configDocument = new Document();
-		Element topElement = new Element("invocationManager");
-		Element mechanismsElement = new Element("invocationMechanisms");
+	public List<Observer<InvocationManagerEvent>> getObservers();
 
-		for (InvocationMechanism m : mechanisms) {
-			Element mechanismElement = new Element("invocationMechanism");
-			Element nameElement = new Element("invocationMechanismName");
-			nameElement.setText(m.getName());
-			mechanismElement.addContent(nameElement);
-			Element typeElement = new Element("invocationMechanismType");
-			typeElement.setText(m.getType());
-			mechanismElement.addContent(typeElement);
-			Element mechanismDetails = new Element("mechanismDetails");
-			mechanismDetails.addContent(m.getXMLElement());
-			mechanismElement.addContent(mechanismDetails);
+	public void removeObserver(Observer<InvocationManagerEvent> observer);
 
-			mechanismsElement.addContent(mechanismElement);
-		}
-		topElement.addContent(mechanismsElement);
+	public void deleteRun(String runId);
 
-		Element groupsElement = new Element("invocationGroups");
-		for (InvocationGroup g : groups) {
-			Element groupElement = new Element("invocationGroup");
-			Element nameElement = new Element("invocationGroupName");
-			nameElement.setText(g.getName());
-			groupElement.addContent(nameElement);
-			Element mechanismNameElement = new Element("mechanismName");
-			mechanismNameElement.setText(g.getMechanism().getName());
-			groupElement.addContent(mechanismNameElement);
-			groupsElement.addContent(groupElement);
-		}
-		topElement.addContent(groupsElement);
+	public void persistInvocations();
 
-		configDocument.setRootElement(topElement);
+	public void loadInvocations();
 
-		FileWriter writer;
-		try {
-			writer = new FileWriter(f);
-			outputter.output(configDocument, writer);
-			writer.close();
-		} catch (IOException e) {
-			logger.error("Unable to save invocation manager", e);
-		}
-	}
+	public boolean containsMechanism(InvocationMechanism invocationMechanism);
 
-	public void groupChanged(InvocationGroup group) {
-		observers.notify(new InvocationGroupChangedEvent(group));
-	}
+	public InvocationGroup getGroupReplacement(InvocationGroup group);
 
-	@Override
-	public void addObserver(Observer<InvocationManagerEvent> observer) {
-		observers.addObserver(observer);
-	}
+	public InvocationMechanism getMechanismReplacement(String invocationMechanismSpecification);
 
-	@Override
-	public List<Observer<InvocationManagerEvent>> getObservers() {
-		return observers.getObservers();
-	}
+	public InvocationGroup getImportedGroup(String groupSpecification);
 
-	@Override
-	public void removeObserver(Observer<InvocationManagerEvent> observer) {
-		observers.removeObserver(observer);
-	}
-
-	public void deleteRun(String runId) {
-		for (InvocationPersister persister : invocationPersisters) {
-			persister.deleteRun(runId);
-		}
-	}
-
-	public void persistInvocations() {
-		for (InvocationPersister persister : invocationPersisters) {
-			persister.persist(getInvocationManagerDirectory());
-		}
-	}
-
-	public void loadInvocations() {
-		for (InvocationPersister persister : invocationPersisters) {
-			persister.load(getInvocationManagerDirectory());
-		}
-	}
-
-	public boolean containsMechanism(InvocationMechanism invocationMechanism) {
-		return mechanisms.contains(invocationMechanism);
-	}
-
-	public InvocationGroup getGroupReplacement(InvocationGroup group) {
-		return groupReplacements.get(group);
-	}
-
-	public InvocationMechanism getMechanismReplacement(String invocationMechanismSpecification) {
-		return mechanismReplacements.get(invocationMechanismSpecification);
-	}
-
-	public InvocationGroup getImportedGroup(String groupSpecification) {
-		return groupImports.get(groupSpecification);
-	}
-
-	public InvocationMechanism getImportedMechanism(String mechanismSpecification) {
-		return mechanismImports.get(mechanismSpecification);
-	}
+	public InvocationMechanism getImportedMechanism(String mechanismSpecification);
 
 	public void importMechanism(String invocationMechanismSpecification,
-			InvocationMechanism createdMechanism) {
-		addMechanism(createdMechanism);
-		mechanismImports.put(invocationMechanismSpecification, createdMechanism);
-	}
+			InvocationMechanism createdMechanism);
 
 	public void importInvocationGroup(String invocationGroupSpecification,
-			InvocationGroup invocationGroup) {
-		addInvocationGroup(invocationGroup);
-		groupImports.put(invocationGroupSpecification, invocationGroup);
-	}
+			InvocationGroup invocationGroup);
 
 }
