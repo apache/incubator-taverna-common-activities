@@ -1,0 +1,73 @@
+#require("selectionValues",1)
+#require("message")
+#require("title")
+#produce("answer")
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+      <title>$!title</title>
+  </head>
+  <body>
+  
+       <script type="text/javascript">
+
+         function createReplyContent(results) {
+           date = new Date();
+           msg = "";
+           msg += "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
+           msg += "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:thr=\"http://purl.org/syndication/thread/1.0\">\n";
+           msg += "<title>\"A reply\"</title>\n";
+           msg += "<id>" + "$entryId" + "-reply" + "</id>\n";
+           msg += "<thr:in-reply-to ref=\"" + "$entryId" + "\"/>\n";
+           msg += "<content/>\n";
+           msg += "<interaction:resultData xmlns:interaction=\"http://www.taverna.org.uk/interaction\">\n";
+		   msg += "{ \"answer\" : \"" + GetSelectedItem() + "\"}";
+           msg += "</interaction:resultData>\n";
+           msg += "</entry>\n";
+           return msg;
+         }
+
+         function reply() {
+           msg = createReplyContent();
+           xmlhttp = new XMLHttpRequest();
+           xmlhttp.open("POST", "$feed", true);
+           xmlhttp.onreadystatechange=function() {
+             if (xmlhttp.readyState==4) {
+               alert(xmlhttp.responseText);
+             }
+           }
+           xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
+           xmlhttp.setRequestHeader("Content-Length", msg.length);
+           xmlhttp.setRequestHeader("Slug", "$entryId" + "-reply");
+           xmlhttp.send(msg);
+           return false;
+         }
+         
+         function GetSelectedItem() {
+
+chosen = ""
+len = document.myform.group.length
+
+for (i = 0; i <len; i++) {
+if (document.myform.group[i].checked) {
+chosen = document.myform.group[i].value
+}
+}
+
+if (chosen == "") {
+alert("No Location Chosen")
+}
+return chosen;
+}
+
+      </script>
+  
+  <h2>$!message</h2>
+<form name="myform" onsubmit="reply()" method="get">
+#foreach( $value in $selectionValues )
+  <input type="radio" name="group" value="$value" />$value<br />  
+#end
+<input type="submit" value="Submit" />
+</form> 
+
+  </body>
+</html>
