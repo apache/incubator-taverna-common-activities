@@ -17,6 +17,8 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.abdera.Abdera;
+import org.apache.abdera.i18n.text.Normalizer;
+import org.apache.abdera.i18n.text.Sanitizer;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.parser.stax.util.FOMHelper;
@@ -62,8 +64,6 @@ public class InteractionActivity extends
 	private static boolean velocityInitialized = false;
 	
 	private static Abdera ABDERA = Abdera.getInstance();
-
-	private static File tempDir;
 	
 	private Template template;
 	
@@ -125,6 +125,7 @@ public class InteractionActivity extends
         velocityInitialized = true;
         communicationTemplate = Velocity.getTemplate(COMMUNICATION_TEMPLATE_NAME + TEMPLATE_SUFFIX);
         interactionTemplate = Velocity.getTemplate(INTERACTION_TEMPLATE_NAME + TEMPLATE_SUFFIX);
+		copyJavacript(getTempDir(), "pmrpc.js");
 	}
 
 	protected void configurePortsFromTemplate() {
@@ -214,6 +215,9 @@ public class InteractionActivity extends
 	}
 	
 	private String generateHtml(Map<String, Object> inputData, String id, String slug) {
+		
+		String slugForFile = Sanitizer.sanitize(slug, "", true, Normalizer.Form.D);
+		
 		VelocityContext velocityContext = new VelocityContext();
 		for (String inputName : inputData.keySet()) {
 			Object input = inputData.get(inputName);
@@ -230,7 +234,8 @@ public class InteractionActivity extends
 					InteractionActivityType.VelocityTemplate)) {
 				// Write presentation frame file
 				File presentationFile = new File(getTempDir(), "presentation"
-						+ slug + ".html");
+						+ slugForFile + ".html");
+				presentationFile.createNewFile();
 				FileWriter presentationFileWriter = new FileWriter(
 						presentationFile);
 				template.merge(velocityContext, presentationFileWriter);
@@ -246,7 +251,8 @@ public class InteractionActivity extends
 		velocityContext.put("slug", slug);
 		
 		// Write communication frame file		
-		File communicationFile = new File(getTempDir(), "communication" + slug + ".html");
+		File communicationFile = new File(getTempDir(), "communication" + slugForFile + ".html");
+		communicationFile.createNewFile();
 		FileWriter communicationFileWriter = new FileWriter(communicationFile);
 		communicationTemplate.merge(velocityContext, communicationFileWriter);
 		communicationFileWriter.close();
@@ -258,7 +264,8 @@ public class InteractionActivity extends
 		
 		if (!configBean.getInteractionActivityType().equals(InteractionActivityType.RemotelyPresentededHtml)) {
 		// Write main html file
-		File mainFile = new File(getTempDir(), "interaction" + slug + ".html");
+		File mainFile = new File(getTempDir(), "interaction" + slugForFile + ".html");
+		mainFile.createNewFile();
 		FileWriter mainFileWriter = new FileWriter(mainFile);
 		interactionTemplate.merge(velocityContext, mainFileWriter);
 		mainFileWriter.close();
@@ -279,11 +286,8 @@ public class InteractionActivity extends
 	}
 
 	protected static File getTempDir() {
-		if (tempDir == null) {
-			tempDir = new File(InteractionPreference.getInstance()
+			File tempDir = new File(InteractionPreference.getInstance()
 					.getPresentationDirectory());
-			copyJavacript(tempDir, "pmrpc.js");
-		}
 		return tempDir;
 	}
 
@@ -292,7 +296,7 @@ public class InteractionActivity extends
 		FileOutputStream fos = null;
 		try {
 			is = InteractionActivity.class.getResourceAsStream("/" + javascriptFileName);
-			File jsonFile = new File(tempDir, javascriptFileName);
+			File jsonFile = new File(tempDir2, javascriptFileName);
 			fos = new FileOutputStream(jsonFile);
 			IOUtils.copy(is, fos);
 			is.close();
