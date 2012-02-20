@@ -1,0 +1,12 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+      <title></title>
+  </head>
+  <body>
+  
+     <iframe name="presentationFrame" height="100%" width="100%" frameborder="0" src="$presentationUrl">
+</iframe>
+     <iframe name="communicationFrame" height="0" width="100%" frameborder="0" src="$communicationUrl">
+</iframe>
+  </body>
+</html>

@@ -29,13 +29,13 @@ public class InteractionActivityTest {
 	@Before
 	public void makeConfigBean() throws Exception {
 		configBean = new InteractionActivityConfigurationBean();
-		configBean.setTemplateName("test.vm");
+		configBean.setPresentationOrigin("test.vm");
 	}
 
 	@Test(expected = ActivityConfigurationException.class)
 	public void invalidConfiguration() throws ActivityConfigurationException {
 		InteractionActivityConfigurationBean invalidBean = new InteractionActivityConfigurationBean();
-		invalidBean.setTemplateName("nothing.vm");
+		invalidBean.setPresentationOrigin("nothing.vm");
 		// Should throw ActivityConfigurationException
 		activity.configure(invalidBean);
 	}
@@ -81,7 +81,7 @@ public class InteractionActivityTest {
 		activity.configure(configBean);
 
 		InteractionActivityConfigurationBean specialBean = new InteractionActivityConfigurationBean();
-		specialBean.setTemplateName("test.vm");
+		specialBean.setPresentationOrigin("test.vm");
 		activity.configure(specialBean);		
 		// Should now have added the optional ports
 		assertEquals("Unexpected inputs", 2, activity.getInputPorts().size());

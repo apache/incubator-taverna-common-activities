@@ -4,42 +4,27 @@
 #produce("answer")
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-      <title>$!title</title>
+      <title></title>
   </head>
   <body>
-  
+
+       <script type="text/javascript" src="$pmrpcUrl"></script>
+
        <script type="text/javascript">
 
-         function createReplyContent(results) {
-           date = new Date();
-           msg = "";
-           msg += "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
-           msg += "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:thr=\"http://purl.org/syndication/thread/1.0\">\n";
-           msg += "<title>\"A reply\"</title>\n";
-           msg += "<id>" + "$entryId" + "-reply" + "</id>\n";
-           msg += "<thr:in-reply-to ref=\"" + "$entryId" + "\"/>\n";
-           msg += "<content/>\n";
-           msg += "<interaction:resultData xmlns:interaction=\"http://www.taverna.org.uk/interaction\">\n";
-		   msg += "{ \"answer\" : \"" + GetSelectedItem() + "\"}";
-           msg += "</interaction:resultData>\n";
-           msg += "</entry>\n";
-           return msg;
-         }
-
          function reply() {
-           msg = createReplyContent();
-           xmlhttp = new XMLHttpRequest();
-           xmlhttp.open("POST", "$feed", true);
-           xmlhttp.onreadystatechange=function() {
-             if (xmlhttp.readyState==4) {
-               alert(xmlhttp.responseText);
-             }
-           }
-           xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
-           xmlhttp.setRequestHeader("Content-Length", msg.length);
-           xmlhttp.setRequestHeader("Slug", "$entryId" + "-reply");
-           xmlhttp.send(msg);
-           return false;
+ 	  resultObject = {};
+	  resultObject.answer = GetSelectedItem();
+	  results = JSON.stringify(resultObject);
+          alert("About to send message\n" + results);
+          x = pmrpc.call({
+             destination : "publish",
+             publicProcedureName : "reply",
+             params : [resultObject],
+             onSuccess : function(retVal) { alert ("This is the return value\n" + retVal.returnValue); }
+          });
+      alert("At end of dealing with reply");
+	  return true;
          }
          
          function GetSelectedItem() {
@@ -62,12 +47,12 @@ return chosen;
       </script>
   
   <h2>$!message</h2>
-<form name="myform" onsubmit="reply()" method="get">
+<form name="myform">
 #foreach( $value in $selectionValues )
   <input type="radio" name="group" value="$value" />$value<br />  
 #end
-<input type="submit" value="Submit" />
+<input type="button" value="Submit" onClick = "reply()"/>
 </form> 
-
   </body>
 </html>
+

@@ -1,8 +1,10 @@
 package net.sf.taverna.t2.activities.interaction;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,7 +54,7 @@ public class InteractionActivity extends
 		implements AsynchronousActivity<InteractionActivityConfigurationBean> {
 	
 	private static Logger logger = Logger.getLogger(InteractionActivity.class);
-	
+
 	private static String TEMPLATE_SUFFIX = ".vm";
 	
 	private InteractionActivityConfigurationBean configBean;
@@ -71,6 +73,16 @@ public class InteractionActivity extends
 	private static QName inputDataQName = new QName("http://www.taverna.org.uk/interaction", "inputData", "interaction");
 	private static QName resultDataQName = new QName("http://www.taverna.org.uk/interaction", "resultData", "interaction");
 	private static QName resultStatusQName = new QName("http://www.taverna.org.uk/interaction", "resultStatus", "interaction");
+	
+	private static Template interactionTemplate = null;
+	private static String INTERACTION_TEMPLATE_NAME = "interaction";
+	
+	private static Template communicationTemplate = null;
+	private static String COMMUNICATION_TEMPLATE_NAME = "communication";
+	
+	public InteractionActivity() {
+		configBean = new InteractionActivityConfigurationBean();
+	}
 
 	@Override
 	public void configure(InteractionActivityConfigurationBean configBean)
@@ -80,20 +92,28 @@ public class InteractionActivity extends
 		// getConfiguration() return a new bean from other sources
 		this.configBean = configBean;
 		
+		inputDepths.clear();
+		outputDepths.clear();
+
 		if (!velocityInitialized) {
 			initializeVelocity();
 		}
-		
-		template = Velocity.getTemplate(configBean.getTemplateName() + TEMPLATE_SUFFIX);
-		inputDepths.clear();
-		RequireChecker requireChecker = new RequireChecker();
-		requireChecker.visit((ASTprocess) template.getData(), inputDepths);
-		
-		outputDepths.clear();
-		ProduceChecker produceChecker = new ProduceChecker();
-		produceChecker.visit((ASTprocess) template.getData(), outputDepths);
 
-		configurePorts();
+		if (this.configBean.getInteractionActivityType().equals(
+				InteractionActivityType.VelocityTemplate)) {
+			template = Velocity.getTemplate(configBean.getPresentationOrigin()
+					+ TEMPLATE_SUFFIX);
+			RequireChecker requireChecker = new RequireChecker();
+			requireChecker.visit((ASTprocess) template.getData(), inputDepths);
+
+			ProduceChecker produceChecker = new ProduceChecker();
+			produceChecker.visit((ASTprocess) template.getData(), outputDepths);
+			configurePortsFromTemplate();
+		}
+		else {
+			configurePorts(this.configBean);
+		}
+
 	}
 
 	private void initializeVelocity() {
@@ -103,10 +123,11 @@ public class InteractionActivity extends
         Velocity.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         Velocity.init();
         velocityInitialized = true;
-
+        communicationTemplate = Velocity.getTemplate(COMMUNICATION_TEMPLATE_NAME + TEMPLATE_SUFFIX);
+        interactionTemplate = Velocity.getTemplate(INTERACTION_TEMPLATE_NAME + TEMPLATE_SUFFIX);
 	}
 
-	protected void configurePorts() {
+	protected void configurePortsFromTemplate() {
 		// In case we are being reconfigured - remove existing ports first
 		// to avoid duplicates
 		removeInputs();
@@ -146,27 +167,6 @@ public class InteractionActivity extends
 					inputData.put(inputName, input);
 				}
 
-				// Only do if working with template
-				VelocityContext velocityContext = new VelocityContext();
-				for (String inputName : inputs.keySet()) {
-					Object input = inputData.get(inputName);
-					velocityContext.put(inputName, input);
-				}
-				velocityContext.put("feed", InteractionPreference.getInstance().getFeedUrl());
-				velocityContext.put("entryId", id);
-
-                File tempFile = null;
-                try {
-					tempFile = File.createTempFile("interaction", ".html", getTempDir());
-					FileWriter fileWriter = new FileWriter(tempFile);
-					template.merge(velocityContext, fileWriter);
-					fileWriter.close();
-				} catch (IOException e) {
-					logger.error(e);
-					callback.fail("Unable to write HTML file", e);
-					return;
-				}
-				// End of template specific part
 				
 				synchronized(ABDERA) {
 					Entry entry = ABDERA.newEntry();
@@ -194,16 +194,16 @@ public class InteractionActivity extends
 					Element inputDataElement = entry.addExtension(getInputDataQName());
 					inputDataElement.setText(sw.toString());
 					
-						String lastFilePart = tempFile.getName();
-						String webFile = InteractionPreference.getInstance().getLocationUrl() + "/" + lastFilePart;
-						entry.addLink(webFile, "presentation");
-						entry.setContentAsXhtml("<p><a href=\"" + webFile + "\">Open: " + webFile + "</a></p>");
-
-
-
 					AbderaClient client = new AbderaClient(ABDERA);
 					RequestOptions rOptions = client.getDefaultRequestOptions();
 		            rOptions.setSlug(id);
+		            String slug = rOptions.getHeader("Slug");
+
+		            String webFile = generateHtml(inputData, id, slug);
+
+						entry.addLink(webFile, "presentation");
+							entry.setContentAsXhtml("<p><a href=\"" + webFile + "\">Open: " + webFile + "</a></p>");
+
 					ClientResponse resp = client.post(
 					InteractionPreference.getInstance().getFeedUrl(), entry, rOptions);
 						client.teardown();
@@ -211,6 +211,66 @@ public class InteractionActivity extends
 						}
 			}
 		});
+	}
+	
+	private String generateHtml(Map<String, Object> inputData, String id, String slug) {
+		VelocityContext velocityContext = new VelocityContext();
+		for (String inputName : inputData.keySet()) {
+			Object input = inputData.get(inputName);
+			velocityContext.put(inputName, input);
+		}
+		velocityContext.put("feed", InteractionPreference.getInstance().getFeedUrl());
+		velocityContext.put("entryId", id);
+		String pmrpcUrl = InteractionPreference.getInstance().getLocationUrl() + "/" + "pmrpc.js";
+		velocityContext.put("pmrpcUrl", pmrpcUrl);
+		
+		String presentationUrl = "";
+        try {
+			if (configBean.getInteractionActivityType().equals(
+					InteractionActivityType.VelocityTemplate)) {
+				// Write presentation frame file
+				File presentationFile = new File(getTempDir(), "presentation"
+						+ slug + ".html");
+				FileWriter presentationFileWriter = new FileWriter(
+						presentationFile);
+				template.merge(velocityContext, presentationFileWriter);
+				presentationFileWriter.close();
+				presentationUrl = InteractionPreference.getInstance()
+						.getLocationUrl()
+						+ "/" + presentationFile.getName();
+			} else if (configBean.getInteractionActivityType().equals(
+					InteractionActivityType.LocallyPresentedHtml)) {
+				presentationUrl = configBean.getPresentationOrigin();
+			}
+
+		velocityContext.put("slug", slug);
+		
+		// Write communication frame file		
+		File communicationFile = new File(getTempDir(), "communication" + slug + ".html");
+		FileWriter communicationFileWriter = new FileWriter(communicationFile);
+		communicationTemplate.merge(velocityContext, communicationFileWriter);
+		communicationFileWriter.close();
+		
+		String communicationUrl = InteractionPreference.getInstance().getLocationUrl() + "/" + communicationFile.getName();
+
+		velocityContext.put("presentationUrl", presentationUrl);
+		velocityContext.put("communicationUrl", communicationUrl);
+		
+		if (!configBean.getInteractionActivityType().equals(InteractionActivityType.RemotelyPresentededHtml)) {
+		// Write main html file
+		File mainFile = new File(getTempDir(), "interaction" + slug + ".html");
+		FileWriter mainFileWriter = new FileWriter(mainFile);
+		interactionTemplate.merge(velocityContext, mainFileWriter);
+		mainFileWriter.close();
+		
+		return InteractionPreference.getInstance().getLocationUrl() + "/" + mainFile.getName();
+		} else {
+			return (configBean.getPresentationOrigin() + "?communicationFrame=" + communicationUrl);
+		}
+		} catch (IOException e) {
+			logger.error(e);
+			return null;
+		}
 	}
 
 	protected static String generateId(AsynchronousActivityCallback callback) {
@@ -220,9 +280,37 @@ public class InteractionActivity extends
 
 	protected static File getTempDir() {
 		if (tempDir == null) {
-			tempDir = new File(InteractionPreference.getInstance().getPresentationDirectory());
+			tempDir = new File(InteractionPreference.getInstance()
+					.getPresentationDirectory());
+			copyJavacript(tempDir, "pmrpc.js");
 		}
 		return tempDir;
+	}
+
+	private static void copyJavacript(File tempDir2, String javascriptFileName) {
+		InputStream is = null;
+		FileOutputStream fos = null;
+		try {
+			is = InteractionActivity.class.getResourceAsStream("/" + javascriptFileName);
+			File jsonFile = new File(tempDir, javascriptFileName);
+			fos = new FileOutputStream(jsonFile);
+			IOUtils.copy(is, fos);
+			is.close();
+			fos.close();
+		} catch (IOException e) {
+			logger.error(e);
+		} finally {
+			try {
+				if (is != null) {
+					is.close();
+				}
+				if (fos != null) {
+					fos.close();
+				}
+			} catch (IOException e) {
+				logger.error(e);
+			}
+		}		
 	}
 
 	@Override
