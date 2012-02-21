@@ -7,7 +7,7 @@
        
        <script type="text/javascript">
 
-         function createReplyContent(results) {
+         function createReplyContent(status, results) {
            date = new Date();
            msg = "";
            msg += "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
@@ -16,22 +16,22 @@
            msg += "<id>" + "$entryId" + "-reply" + "</id>\n";
            msg += "<thr:in-reply-to ref=\"" + "$entryId" + "\"/>\n";
            msg += "<content/>\n";
-           msg += "<interaction:resultData xmlns:interaction=\"http://www.taverna.org.uk/interaction\">\n";
+           msg += "<interaction:resultStatus xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">"
+           msg += status;
+           msg += "</interaction:resultStatus>";
+           msg += "<interaction:resultData xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">\n";
 		   msg += results;
            msg += "</interaction:resultData>\n";
            msg += "</entry>\n";
-	   alert("Created content is " + msg);
            return msg;
          }
 
-         function reply(results) {
-	   alert("Received message");
-           msg = createReplyContent(JSON.stringify(results));
-	   alert(msg);
+         function reply(status, results) {
+           msg = createReplyContent(status, JSON.stringify(results));
            xmlhttp = new XMLHttpRequest();
            xmlhttp.open("POST", "$feed", true);
            xmlhttp.onreadystatechange=function() {
-               alert(xmlhttp.responseText);
+//               alert(xmlhttp.responseText);
            }
            xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
            xmlhttp.setRequestHeader("Content-Length", msg.length);
@@ -41,8 +41,18 @@
          }
          
          pmrpc.register( {
-         	"publicProcedureName" : "reply",
-         	"procedure" : reply
+         	publicProcedureName : "reply",
+         	procedure : function(status, results) {
+         	   reply(status, results);
+         	   return "OK";
+         	}
+         });
+         
+         pmrpc.register( {
+           publicProcedureName : "getInputData",
+           procedure : function() {
+             return JSON.parse('$inputData');
+           }
          });
      </script>
   </body>
