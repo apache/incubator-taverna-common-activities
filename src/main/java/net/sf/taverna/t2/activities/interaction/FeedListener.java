@@ -41,6 +41,8 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class FeedListener {
 	
+	private static final String STATUS_OK = "OK";
+
 	private static FeedListener instance = null;
 	
 	private static Logger logger = Logger.getLogger(FeedListener.class);
@@ -119,6 +121,12 @@ public class FeedListener {
 			AsynchronousActivityCallback callback = callbackMap.get(refString);
 			InvocationContext context = callback
 			.getContext();
+			Element statusElement = entry.getExtension(InteractionActivity.getResultStatusQName());
+			String statusContent = statusElement.getText().trim();
+			if (!statusContent.equals(STATUS_OK)) {
+				callback.fail(statusContent);
+				return;
+			}
 			Element resultElement = entry.getExtension(InteractionActivity.getResultDataQName());
 			String content = resultElement.getText();
 	ReferenceService referenceService = context

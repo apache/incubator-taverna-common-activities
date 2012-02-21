@@ -70,9 +70,9 @@ public class InteractionActivity extends
 	private Map<String, Integer> inputDepths = new HashMap<String, Integer> ();
 	private Map<String, Integer> outputDepths = new HashMap<String, Integer> ();
 	
-	private static QName inputDataQName = new QName("http://www.taverna.org.uk/interaction", "inputData", "interaction");
-	private static QName resultDataQName = new QName("http://www.taverna.org.uk/interaction", "resultData", "interaction");
-	private static QName resultStatusQName = new QName("http://www.taverna.org.uk/interaction", "resultStatus", "interaction");
+	private static QName inputDataQName = new QName("http://ns.taverna.org.uk/2012/interaction", "inputData", "interaction");
+	private static QName resultDataQName = new QName("http://ns.taverna.org.uk/2012/interaction", "resultData", "interaction");
+	private static QName resultStatusQName = new QName("http://ns.taverna.org.uk/2012/interaction", "resultStatus", "interaction");
 	
 	private static Template interactionTemplate = null;
 	private static String INTERACTION_TEMPLATE_NAME = "interaction";
@@ -193,14 +193,15 @@ public class InteractionActivity extends
 					}
 					
 					Element inputDataElement = entry.addExtension(getInputDataQName());
-					inputDataElement.setText(sw.toString());
+					String inputDataString = sw.toString();
+					inputDataElement.setText(inputDataString);
 					
 					AbderaClient client = new AbderaClient(ABDERA);
 					RequestOptions rOptions = client.getDefaultRequestOptions();
 		            rOptions.setSlug(id);
 		            String slug = rOptions.getHeader("Slug");
 
-		            String webFile = generateHtml(inputData, id, slug);
+		            String webFile = generateHtml(inputData, inputDataString, id, slug);
 
 						entry.addLink(webFile, "presentation");
 							entry.setContentAsXhtml("<p><a href=\"" + webFile + "\">Open: " + webFile + "</a></p>");
@@ -214,7 +215,7 @@ public class InteractionActivity extends
 		});
 	}
 	
-	private String generateHtml(Map<String, Object> inputData, String id, String slug) {
+	private String generateHtml(Map<String, Object> inputData, String inputDataString, String id, String slug) {
 		
 		String slugForFile = Sanitizer.sanitize(slug, "", true, Normalizer.Form.D);
 		
@@ -227,6 +228,7 @@ public class InteractionActivity extends
 		velocityContext.put("entryId", id);
 		String pmrpcUrl = InteractionPreference.getInstance().getLocationUrl() + "/" + "pmrpc.js";
 		velocityContext.put("pmrpcUrl", pmrpcUrl);
+		velocityContext.put("inputData", inputDataString);
 		
 		String presentationUrl = "";
         try {
