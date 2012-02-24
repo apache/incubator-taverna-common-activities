@@ -9,9 +9,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -61,8 +63,9 @@ public class FeedListener {
 
 			@Override
 			public void run() {
+				InteractionJetty.checkJetty();
 				Parser parser = Abdera.getNewParser();
-				IRI lastCheckedId = null;
+				Date lastCheckedDate = new Date();
 					while (true) {
 						try {
 							sleep(5000);
@@ -76,21 +79,16 @@ public class FeedListener {
 						Document<Feed> doc = parser.parse(openStream, url.toString());
 						Feed feed = doc.getRoot().sortEntriesByEdited(true);
 
-						IRI newLastCheckedId = null;
+						Date newLastCheckedDate = new Date();
 						for (Entry entry : feed.getEntries()) {
-							if (entry.getId().equals(lastCheckedId)) {
+							if (entry.getEdited().before(lastCheckedDate)) {
 								break;
-							}
-							if (newLastCheckedId == null) {
-								newLastCheckedId = entry.getId();
 							}
 							if (ThreadHelper.getInReplyTo(entry) != null) {
 								considerInReplyTo(feed, entry);
 							}
 						}
-						if (newLastCheckedId != null) {
-							lastCheckedId = newLastCheckedId;
-						}
+						lastCheckedDate = newLastCheckedDate;
 						} catch (MalformedURLException e) {
 							logger.error(e);
 						} catch (ParseException e) {

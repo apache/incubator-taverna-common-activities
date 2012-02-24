@@ -5,13 +5,19 @@
 	<parent>
 		<groupId>net.sf.taverna.t2</groupId>
 		<artifactId>interaction-service</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>interaction-activity</artifactId>
 	<name>Interaction activity</name>
-	
-  <dependencies>
+  
+      <properties>
+      <jettyVersion>6.1.24</jettyVersion>
+    </properties>
+ 
+  
+
+	<dependencies>
 
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>

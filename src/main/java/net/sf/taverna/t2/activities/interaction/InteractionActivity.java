@@ -30,13 +30,16 @@ import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.RuntimeSingleton;
 import org.apache.velocity.runtime.parser.node.ASTDirective;
 import org.apache.velocity.runtime.parser.node.ASTprocess;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
+import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
 import net.sf.taverna.t2.activities.interaction.velocity.ProduceChecker;
 import net.sf.taverna.t2.activities.interaction.velocity.ProduceDirective;
 import net.sf.taverna.t2.activities.interaction.velocity.RequireChecker;
@@ -57,11 +60,8 @@ public class InteractionActivity extends
 	
 	private static Logger logger = Logger.getLogger(InteractionActivity.class);
 
-	private static String TEMPLATE_SUFFIX = ".vm";
 	
 	private InteractionActivityConfigurationBean configBean;
-	
-	private static boolean velocityInitialized = false;
 	
 	private static Abdera ABDERA = Abdera.getInstance();
 	
@@ -74,11 +74,6 @@ public class InteractionActivity extends
 	private static QName resultDataQName = new QName("http://ns.taverna.org.uk/2012/interaction", "resultData", "interaction");
 	private static QName resultStatusQName = new QName("http://ns.taverna.org.uk/2012/interaction", "resultStatus", "interaction");
 	
-	private static Template interactionTemplate = null;
-	private static String INTERACTION_TEMPLATE_NAME = "interaction";
-	
-	private static Template communicationTemplate = null;
-	private static String COMMUNICATION_TEMPLATE_NAME = "communication";
 	
 	public InteractionActivity() {
 		configBean = new InteractionActivityConfigurationBean();
@@ -95,14 +90,11 @@ public class InteractionActivity extends
 		inputDepths.clear();
 		outputDepths.clear();
 
-		if (!velocityInitialized) {
-			initializeVelocity();
-		}
+		InteractionVelocity.checkVelocity();
 
 		if (this.configBean.getInteractionActivityType().equals(
 				InteractionActivityType.VelocityTemplate)) {
-			template = Velocity.getTemplate(configBean.getPresentationOrigin()
-					+ TEMPLATE_SUFFIX);
+			template = Velocity.getTemplate(configBean.getPresentationOrigin());
 			RequireChecker requireChecker = new RequireChecker();
 			requireChecker.visit((ASTprocess) template.getData(), inputDepths);
 
@@ -114,18 +106,6 @@ public class InteractionActivity extends
 			configurePorts(this.configBean);
 		}
 
-	}
-
-	private void initializeVelocity() {
-        Velocity.setProperty(Velocity.RESOURCE_LOADER, "class");
-        Velocity.setProperty("userdirective", RequireDirective.class.getName() + "," + ProduceDirective.class.getName());
-        Velocity.setProperty("class.resource.loader.description", "Velocity Classpath Resource Loader");
-        Velocity.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-        Velocity.init();
-        velocityInitialized = true;
-        communicationTemplate = Velocity.getTemplate(COMMUNICATION_TEMPLATE_NAME + TEMPLATE_SUFFIX);
-        interactionTemplate = Velocity.getTemplate(INTERACTION_TEMPLATE_NAME + TEMPLATE_SUFFIX);
-		copyJavacript(getTempDir(), "pmrpc.js");
 	}
 
 	protected void configurePortsFromTemplate() {
@@ -168,7 +148,7 @@ public class InteractionActivity extends
 					inputData.put(inputName, input);
 				}
 
-				
+				InteractionJetty.checkJetty();
 				synchronized(ABDERA) {
 					Entry entry = ABDERA.newEntry();
 
@@ -178,7 +158,7 @@ public class InteractionActivity extends
 					entry.setUpdated(timestamp);
 
 					entry.addAuthor("Taverna");
-					entry.setTitle("Interaction");
+					entry.setTitle("Interaction from Taverna for " + id);
 					
 					ObjectMapper mapper = new ObjectMapper();
 					StringWriter sw = new StringWriter();
@@ -256,7 +236,7 @@ public class InteractionActivity extends
 		File communicationFile = new File(getTempDir(), "communication" + slugForFile + ".html");
 		communicationFile.createNewFile();
 		FileWriter communicationFileWriter = new FileWriter(communicationFile);
-		communicationTemplate.merge(velocityContext, communicationFileWriter);
+		InteractionVelocity.getCommunicationTemplate().merge(velocityContext, communicationFileWriter);
 		communicationFileWriter.close();
 		
 		String communicationUrl = InteractionPreference.getInstance().getLocationUrl() + "/" + communicationFile.getName();
@@ -269,7 +249,7 @@ public class InteractionActivity extends
 		File mainFile = new File(getTempDir(), "interaction" + slugForFile + ".html");
 		mainFile.createNewFile();
 		FileWriter mainFileWriter = new FileWriter(mainFile);
-		interactionTemplate.merge(velocityContext, mainFileWriter);
+		InteractionVelocity.getInteractionTemplate().merge(velocityContext, mainFileWriter);
 		mainFileWriter.close();
 		
 		return InteractionPreference.getInstance().getLocationUrl() + "/" + mainFile.getName();
@@ -287,37 +267,13 @@ public class InteractionActivity extends
 		return (workflowRunId + ":" + callback.getParentProcessIdentifier());
 	}
 
-	protected static File getTempDir() {
+	public static File getTempDir() {
 			File tempDir = new File(InteractionPreference.getInstance()
 					.getPresentationDirectory());
 		return tempDir;
 	}
 
-	private static void copyJavacript(File tempDir2, String javascriptFileName) {
-		InputStream is = null;
-		FileOutputStream fos = null;
-		try {
-			is = InteractionActivity.class.getResourceAsStream("/" + javascriptFileName);
-			File jsonFile = new File(tempDir2, javascriptFileName);
-			fos = new FileOutputStream(jsonFile);
-			IOUtils.copy(is, fos);
-			is.close();
-			fos.close();
-		} catch (IOException e) {
-			logger.error(e);
-		} finally {
-			try {
-				if (is != null) {
-					is.close();
-				}
-				if (fos != null) {
-					fos.close();
-				}
-			} catch (IOException e) {
-				logger.error(e);
-			}
-		}		
-	}
+
 
 	@Override
 	public InteractionActivityConfigurationBean getConfiguration() {

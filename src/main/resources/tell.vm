@@ -1,4 +1,3 @@
-#require("selectionValues",1)
 #require("message")
 #require("title")
 #produce("answer")
@@ -17,26 +16,11 @@
            pmrpc.call({
              destination : "publish",
              publicProcedureName : "reply",
-             params : ["OK", {"answer" : getSelectedItem()}],
+             params : ["OK", {"answer" : "answer"}],
              onSuccess : function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Data submitted</h1>';},
              onFailure: function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Data submission failed</h1>';}
            });
 	       return true;
-         }
-         
-         function getSelectedItem() {
-           chosen = "";
-           len = document.myform.group.length
-           for (i = 0; i <len; i++) {
-             if (document.myform.group[i].checked) {
-               chosen = document.myform.group[i].value
-             }
-           }
-
-           if (chosen == "") {
-             alert("No Location Chosen")
-           }
-           return chosen;
          }
          
          function cancel() {
@@ -50,13 +34,10 @@
 
        </script>
   
-  <h2>$!message</h2>
+  <h2>Message: $!message</h2>
     <form name="myform">
-#foreach( $value in $selectionValues )
-      <label>$value<input type="radio" name="group" value="$value" /></label><br />  
-#end
       <input type="button" value="Cancel" onClick = "cancel()"/>
-      <input type="button" value="Submit" onClick = "reply()"/>
+      <input type="button" value="OK" onClick = "reply()"/>
     </form> 
   </body>
 </html>

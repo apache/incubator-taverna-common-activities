@@ -85,7 +85,7 @@ public class InteractionPreference {
 		}
 	}
 
-	String getFilePrefix() {
+	public String getFilePrefix() {
 		return "Interaction";
 	}
 	
