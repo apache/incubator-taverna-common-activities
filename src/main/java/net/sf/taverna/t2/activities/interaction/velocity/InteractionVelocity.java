@@ -66,6 +66,7 @@ public class InteractionVelocity {
 	private static void loadTemplates() {
 		InputStream is = InteractionActivity.class.getResourceAsStream("/index");
 		if (is == null) {
+			logger.error("Unable to reading /index");
 			return;
 		}
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -74,9 +75,18 @@ public class InteractionVelocity {
 					if (line.startsWith("#")) {
 						continue;
 					}
+					line = line.trim();
+					if (line.isEmpty()) {
+						continue;
+					}
 					String templatePath = line + TEMPLATE_SUFFIX;
 					StringResourceRepository repo = StringResourceLoader.getRepository();
 				    repo.putStringResource(line, getTemplateFromResource(templatePath));
+				    logger.error("Registered " + templatePath + " as " + line);
+				    Template t = Velocity.getTemplate(line);
+				    if (t == null) {
+				    	logger.error("Registration failed");
+				    }
 				    if (!line.equals(COMMUNICATION_TEMPLATE_NAME) && !line.equals(INTERACTION_TEMPLATE_NAME)) {
 				    	templateNames.add(line);
 				    }
@@ -131,7 +141,9 @@ public class InteractionVelocity {
 	private static String getTemplateFromResource(final String templatePath) {
 	    try {
 	        InputStream stream = InteractionVelocity.class.getResourceAsStream("/" + templatePath);
-	        return IOUtils.toString(stream, "UTF-8");
+	        String result = IOUtils.toString(stream, "UTF-8");
+	        logger.error("Read template " + result);
+	        return result;
 	    } catch (IOException ex) {
 	        throw new RuntimeException(ex);
 	    }
