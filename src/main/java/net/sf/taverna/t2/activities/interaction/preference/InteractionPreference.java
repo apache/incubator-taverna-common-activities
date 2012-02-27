@@ -24,9 +24,17 @@ public class InteractionPreference {
 
 	private static final String DEFAULT_PORT = "8080";
 
-	private static final String PRESENTATION_DIRECTORY = "presentationDirectory";
+	private static final String WORKING_DIRECTORY = "workingDirectory";
+	
+	private static final String DEFAULT_WORKING_DIRECTORY = "/tmp";
 
+	private static final String PRESENTATION_DIRECTORY = "presentationDirectory";
+	
 	private static final String DEFAULT_PRESENTATION_DIRECTORY = "/tmp/interaction";
+	
+	private static final String FEED_DIRECTORY = "feedDirectory";
+	
+	private static final String DEFAULT_FEED_DIRECTORY = "/tmp/fs";
 
 	private static final String HOSTNAME = "hostname";
 
@@ -70,12 +78,18 @@ public class InteractionPreference {
 				logger.error(e);
 			}
 		}
-			fillDefaultProperties();
+		fillDefaultProperties();
 	}
 
 	private void fillDefaultProperties() {
 		if (!properties.containsKey(PORT)) {
 			properties.setProperty(PORT, DEFAULT_PORT);
+		}
+		if (!properties.containsKey(WORKING_DIRECTORY)) {
+			properties.setProperty(WORKING_DIRECTORY, DEFAULT_WORKING_DIRECTORY);
+		}
+		if (!properties.containsKey(FEED_DIRECTORY)) {
+			properties.setProperty(FEED_DIRECTORY, DEFAULT_FEED_DIRECTORY);
 		}
 		if (!properties.containsKey(PRESENTATION_DIRECTORY)) {
 			properties.setProperty(PRESENTATION_DIRECTORY, DEFAULT_PRESENTATION_DIRECTORY);
@@ -123,6 +137,14 @@ public class InteractionPreference {
 
 	public String getPresentationDirectory() {
 		return properties.getProperty(PRESENTATION_DIRECTORY);
+	}
+
+	public String getWorkingDirectory() {
+		return properties.getProperty(WORKING_DIRECTORY);
+	}
+
+	public String getFeedDirectory() {
+		return properties.getProperty(FEED_DIRECTORY);
 	}
 
 	public String getHostname() {
