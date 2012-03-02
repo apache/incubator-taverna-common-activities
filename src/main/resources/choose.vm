@@ -26,10 +26,11 @@
          
          function getSelectedItem() {
            chosen = "";
-           len = document.myform.group.length
-           for (i = 0; i <len; i++) {
-             if (document.myform.group[i].checked) {
-               chosen = document.myform.group[i].value
+           theForm = document.myform;
+           buttons = document.getElementsByTagName('input');
+           for (i = 0; i <buttons.length; i++) {
+             if ((buttons[i].type == 'radio') && buttons[i].checked) {
+               chosen = buttons[i].value
              }
            }
 
@@ -43,7 +44,9 @@
            pmrpc.call({
              destination : "publish",
              publicProcedureName : "reply",
-             params : ["Cancelled", {}]
+             params : ["Cancelled", {}],
+             onSuccess : function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Cancelled</h1>';},
+             onFailure: function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Cancellation failed</h1>';}
            });
 	       return true;
          }

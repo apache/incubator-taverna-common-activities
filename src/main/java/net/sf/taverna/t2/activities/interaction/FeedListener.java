@@ -51,7 +51,7 @@ public class FeedListener {
 
 	private static Map<String, AsynchronousActivityCallback> callbackMap = new HashMap<String, AsynchronousActivityCallback>();
 	
-	public static FeedListener getInstance() {
+	public static synchronized FeedListener getInstance() {
 		if (instance == null) {
 			instance = new FeedListener();
 		}
@@ -59,27 +59,29 @@ public class FeedListener {
 	}
 	
 	private FeedListener() {
-		Thread feeListenerThread = new Thread(){
+		Thread feeListenerThread = new Thread() {
 
 			@Override
 			public void run() {
 				InteractionJetty.checkJetty();
 				Parser parser = Abdera.getNewParser();
 				Date lastCheckedDate = new Date();
-					while (true) {
-						try {
-							sleep(5000);
-						} catch (InterruptedException e1) {
-							logger.error(e1);
-						}
-						InputStream openStream = null;
-						try {
-						URL url = new URL(InteractionPreference.getInstance().getFeedUrl());
+				while (true) {
+					try {
+						sleep(5000);
+					} catch (InterruptedException e1) {
+						logger.error(e1);
+					}
+					InputStream openStream = null;
+					try {
+						Date newLastCheckedDate = new Date();
+						URL url = new URL(InteractionPreference.getInstance()
+								.getFeedUrl());
 						openStream = url.openStream();
-						Document<Feed> doc = parser.parse(openStream, url.toString());
+						Document<Feed> doc = parser.parse(openStream, url
+								.toString());
 						Feed feed = doc.getRoot().sortEntriesByEdited(true);
 
-						Date newLastCheckedDate = new Date();
 						for (Entry entry : feed.getEntries()) {
 							if (entry.getEdited().before(lastCheckedDate)) {
 								break;
@@ -89,30 +91,28 @@ public class FeedListener {
 							}
 						}
 						lastCheckedDate = newLastCheckedDate;
-						} catch (MalformedURLException e) {
-							logger.error(e);
-						} catch (ParseException e) {
-							logger.error(e);
+					} catch (MalformedURLException e) {
+						logger.error(e);
+					} catch (ParseException e) {
+						logger.error(e);
+					} catch (IOException e) {
+						logger.error(e);
+					} finally {
+						try {
+							openStream.close();
 						} catch (IOException e) {
 							logger.error(e);
 						}
-						finally {
-							/*try {
-								openStream.close();
-							} catch (IOException e) {
-								logger.error(e);
-							}*/
-
-						}
 					}
+				}
 			}
 
-
-			};
+		};
 		feeListenerThread.start();
 	}
 	
 	private static void considerInReplyTo(Feed feed, Entry entry) {
+		synchronized(callbackMap) {
 		InReplyTo irt = ThreadHelper.getInReplyTo(entry);
 		String refString = irt.getRef().toString();
 		if (callbackMap.containsKey(refString)) {
@@ -150,12 +150,15 @@ public class FeedListener {
 			}
 			
 		}
+		}
 	}
 
 	public void registerInteraction(Entry entry,
 			AsynchronousActivityCallback callback) {
+		synchronized(callbackMap) {
 		String refString = entry.getId().toString();
 		callbackMap.put(refString, callback);
+		}
 	}
 
 }

@@ -27,7 +27,9 @@
            pmrpc.call({
              destination : "publish",
              publicProcedureName : "reply",
-             params : ["Cancelled", {}]
+             params : ["Cancelled", {}],
+             onSuccess : function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Cancelled</h1>';},
+             onFailure: function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Cancellation failed</h1>';}
            });
 	       return true;
          }
