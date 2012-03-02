@@ -52,6 +52,7 @@ public class RESTActivity extends
 	// URI signature used to configure the activity
 	private static final String IN_BODY = "inputBody";
 	private static final String OUT_RESPONSE_BODY = "responseBody";
+	private static final String OUT_RESPONSE_HEADERS = "responseHeaders";
 	private static final String OUT_STATUS = "status";
 	private static final String OUT_REDIRECTION = "redirection";
 	private static final String OUT_COMPLETE_URL = "actualURL";
@@ -139,7 +140,12 @@ public class RESTActivity extends
 		// depend on the configuration of the activity;
 		addOutput(OUT_RESPONSE_BODY, 0);
 		addOutput(OUT_STATUS, 0);
-		addOutput(OUT_COMPLETE_URL, 0);
+		if (configBean.getShowActualUrlPort()) {
+			addOutput(OUT_COMPLETE_URL, 0);
+		}
+		if (configBean.getShowResponseHeadersPort()) {
+			addOutput(OUT_RESPONSE_HEADERS, 1);
+		}
 
 		// Redirection port may be hidden/shown
 		if (configBean.getShowRedirectionOutputPort()) {
@@ -309,10 +315,15 @@ public class RESTActivity extends
 						requestResponse.getStatusCode(), 0, true, context);
 				outputs.put(OUT_STATUS, statusRef);
 				
-				T2Reference completeURLRef = referenceService.register(
+				if (configBean.getShowActualUrlPort()) {
+					T2Reference completeURLRef = referenceService.register(
 						completeURL, 0, true, context);
-				outputs.put(OUT_COMPLETE_URL, completeURLRef);
-
+					outputs.put(OUT_COMPLETE_URL, completeURLRef);
+				}
+				if (configBean.getShowResponseHeadersPort()) {
+					outputs.put(OUT_RESPONSE_HEADERS, referenceService.register(requestResponse.getHeadersAsStrings(), 1, true, context));					
+				}
+				
 				// only put an output to the Redirection port if the processor
 				// is configured to display that port
 				if (configBean.getShowRedirectionOutputPort()) {

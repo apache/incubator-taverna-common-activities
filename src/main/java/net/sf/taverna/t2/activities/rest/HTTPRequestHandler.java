@@ -298,6 +298,7 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 			requestResponse.setRedirectionURL("" + targetHost
 					+ targetRequest.getURI());
 			requestResponse.setRedirectionHTTPMethod(targetRequest.getMethod());
+			requestResponse.setHeaders(response.getAllHeaders());
 
 			// read and store response body
 			// (check there is some content - negative length of content means
@@ -496,6 +497,7 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
     private Object responseBody;
     
     private Exception exception;
+	private Header[] allHeaders;
     
     
     /**
@@ -510,7 +512,23 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
        */
     }
     
-    /**
+    public void setHeaders(Header[] allHeaders) {
+		this.allHeaders = allHeaders;
+	}
+    
+    public Header[] getHeaders() {
+    	return allHeaders;
+    }
+    
+    public List<String> getHeadersAsStrings() {
+    	List<String> headerStrings = new ArrayList<String>();
+    	for (Header h : getHeaders()) {
+    		headerStrings.add(h.toString());
+    	}
+    	return headerStrings;
+    }
+
+	/**
      * Standard public constructor for a regular case, where all values are known and
      * the request has succeeded.
      * 
