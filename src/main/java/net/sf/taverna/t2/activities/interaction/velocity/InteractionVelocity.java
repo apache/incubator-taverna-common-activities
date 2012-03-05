@@ -17,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeSingleton;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
@@ -49,6 +50,10 @@ public class InteractionVelocity {
 		Velocity
 				.setProperty("resource.loader.class",
 						"org.apache.velocity.runtime.resource.loader.StringResourceLoader");
+		Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+			      "org.apache.velocity.runtime.log.Log4JLogChute");
+		Velocity.setProperty("runtime.log.logsystem.log4j.logger",
+                "net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity");
 		Velocity.init();
 		RuntimeSingleton.getRuntimeInstance().addDirective(
 				new RequireDirective());
@@ -60,7 +65,13 @@ public class InteractionVelocity {
 		loadTemplates();
 		communicationTemplate = Velocity
 		.getTemplate(COMMUNICATION_TEMPLATE_NAME);
+		if (communicationTemplate == null) {
+			logger.error("Could not open communication template " + COMMUNICATION_TEMPLATE_NAME);
+		}
 		interactionTemplate = Velocity.getTemplate(INTERACTION_TEMPLATE_NAME);
+		if (interactionTemplate == null) {
+			logger.error("Could not open interaction template " + INTERACTION_TEMPLATE_NAME);
+		}
 	}
 
 	private static void loadTemplates() {
@@ -123,14 +134,17 @@ public class InteractionVelocity {
 	}
 
 	public static Template getCommunicationTemplate() {
+		checkVelocity();
 		return communicationTemplate;
 	}
 
 	public static Template getInteractionTemplate() {
+		checkVelocity();
 		return interactionTemplate;
 	}
 	
 	private static Template getTemplate(final String templatePath) {
+		checkVelocity();
 	    if (!Velocity.resourceExists(templatePath)) {
 	        StringResourceRepository repo = StringResourceLoader.getRepository();
 	        repo.putStringResource(templatePath, getTemplateFromResource(templatePath));
@@ -139,6 +153,7 @@ public class InteractionVelocity {
 	}
 	
 	private static String getTemplateFromResource(final String templatePath) {
+		checkVelocity();
 	    try {
 	        InputStream stream = InteractionVelocity.class.getResourceAsStream("/" + templatePath);
 	        String result = IOUtils.toString(stream, "UTF-8");
@@ -150,6 +165,7 @@ public class InteractionVelocity {
 	}
 
 	public static ArrayList<String> getTemplateNames() {
+		checkVelocity();
 		return templateNames;
 	}
 }
