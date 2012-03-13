@@ -18,10 +18,10 @@
            msg += "<thr:in-reply-to ref=\"" + "$entryId" + "\"/>\n";
            msg += "<content/>\n";
            msg += "<interaction:resultStatus xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">"
-           msg += status;
+           msg += escape(status);
            msg += "</interaction:resultStatus>";
            msg += "<interaction:resultData xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">\n";
-		   msg += results;
+		   msg += escape(results);
            msg += "</interaction:resultData>\n";
            msg += "</entry>\n";
            return msg;
