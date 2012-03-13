@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>net.sf.taverna.t2</groupId>
 		<artifactId>interaction-service</artifactId>
-		<version>0.1</version>
+		<version>0.1.1</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>interaction-activity</artifactId>
@@ -141,12 +141,6 @@
        <systemPath>${project.basedir}/lib/axiom-dom-1.2.10.jar</systemPath>
 </dependency>
              
-              <dependency>
-	<groupId>commons-httpclient</groupId>
-	<artifactId>commons-httpclient</artifactId>
-	<version>3.1</version>
-</dependency>
-
 <dependency>
 	<groupId>commons-codec</groupId>
 	<artifactId>commons-codec</artifactId>
@@ -184,6 +178,31 @@
               <artifactId>commons-io</artifactId>
               <version>2.1</version>
             </dependency>
-		
+            
+<!-- The JCR API --> 
+<dependency> 
+<groupId>javax.jcr</groupId> 
+<artifactId>jcr</artifactId> 
+<version>2.0</version> 
+</dependency> 
+
+<!-- Jackrabbit content repository -->
+ 
+<dependency> 
+<groupId>org.apache.jackrabbit</groupId> 
+<artifactId>jackrabbit-core</artifactId> 
+<version>2.4.0</version>
+	     <scope>system</scope>
+       <systemPath>${project.basedir}/lib/jackrabbit-core-2.4.0.jar</systemPath>
+</dependency>
+
+ 
+<dependency>
+	<groupId>org.apache.jackrabbit</groupId>
+	<artifactId>jackrabbit-jcr-rmi</artifactId>
+	<version>2.4.0</version>
+	     <scope>system</scope>
+       <systemPath>${project.basedir}/lib/jackrabbit-jcr-rmi-2.4.0.jar</systemPath></dependency>
+ 		
 	</dependencies>
 </project>
