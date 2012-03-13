@@ -9,15 +9,18 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.abdera.Abdera;
@@ -57,6 +60,8 @@ public class FeedListener {
 		}
 		return instance;
 	}
+
+	private static Map<String, Set<OutputPort>> outputPortsMap = new HashMap<String, Set<OutputPort>>();
 	
 	private FeedListener() {
 		Thread feeListenerThread = new Thread() {
@@ -131,6 +136,7 @@ public class FeedListener {
 			.getReferenceService();
 			
 			try {
+				content = URLDecoder.decode(content,"UTF-8");
 				ObjectMapper mapper = new ObjectMapper();
 				Map<?,?> rootAsMap = mapper.readValue(content, Map.class);
 				
@@ -139,7 +145,8 @@ public class FeedListener {
 				for (Object key : rootAsMap.keySet()) {
 					String keyString = (String) key;
 					Object value = rootAsMap.get(key);
-					outputs.put(keyString, referenceService.register(value, 0, true, context));
+					int depth = findPortDepth(refString, keyString);
+					outputs.put(keyString, referenceService.register(value, depth, true, context));
 				}
 				callback.receiveResult(outputs, new int[0]);
 				
@@ -153,11 +160,22 @@ public class FeedListener {
 		}
 	}
 
+	private static int findPortDepth(String refString, String portName) {
+		Set<OutputPort> ports = outputPortsMap.get(refString);
+		for (OutputPort op : ports) {
+			if (op.getName().equals(portName)) {
+				return op.getDepth();
+			}
+		}
+		return 0;
+	}
+
 	public void registerInteraction(Entry entry,
-			AsynchronousActivityCallback callback) {
+			AsynchronousActivityCallback callback, Set<OutputPort> outputPorts) {
 		synchronized(callbackMap) {
 		String refString = entry.getId().toString();
 		callbackMap.put(refString, callback);
+		outputPortsMap.put(refString, outputPorts);
 		}
 	}
 
