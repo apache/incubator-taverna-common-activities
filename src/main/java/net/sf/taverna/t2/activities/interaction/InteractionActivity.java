@@ -1,49 +1,20 @@
 package net.sf.taverna.t2.activities.interaction;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-
-import org.apache.abdera.Abdera;
-import org.apache.abdera.i18n.text.Normalizer;
-import org.apache.abdera.i18n.text.Sanitizer;
-import org.apache.abdera.model.Element;
-import org.apache.abdera.model.Entry;
-import org.apache.abdera.parser.stax.util.FOMHelper;
-import org.apache.abdera.protocol.client.AbderaClient;
-import org.apache.abdera.protocol.client.ClientResponse;
-import org.apache.abdera.protocol.client.RequestOptions;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeSingleton;
-import org.apache.velocity.runtime.parser.node.ASTDirective;
-import org.apache.velocity.runtime.parser.node.ASTprocess;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
 import net.sf.taverna.t2.activities.interaction.velocity.ProduceChecker;
-import net.sf.taverna.t2.activities.interaction.velocity.ProduceDirective;
 import net.sf.taverna.t2.activities.interaction.velocity.RequireChecker;
-import net.sf.taverna.t2.activities.interaction.velocity.RequireDirective;
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
@@ -53,6 +24,23 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationE
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+
+import org.apache.abdera.Abdera;
+import org.apache.abdera.i18n.text.Normalizer;
+import org.apache.abdera.i18n.text.Sanitizer;
+import org.apache.abdera.model.Element;
+import org.apache.abdera.model.Entry;
+import org.apache.abdera.protocol.client.AbderaClient;
+import org.apache.abdera.protocol.client.ClientResponse;
+import org.apache.abdera.protocol.client.RequestOptions;
+import org.apache.log4j.Logger;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.parser.node.ASTprocess;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class InteractionActivity extends
 		AbstractAsynchronousActivity<InteractionActivityConfigurationBean>
@@ -189,7 +177,7 @@ public class InteractionActivity extends
 					ClientResponse resp = client.post(
 					InteractionPreference.getInstance().getFeedUrl(), entry, rOptions);
 						client.teardown();
-						FeedListener.getInstance().registerInteraction(entry, callback);
+						FeedListener.getInstance().registerInteraction(entry, callback, getOutputPorts());
 						}
 			}
 		});
