@@ -63,6 +63,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>com.springsource.org.apache.xmlbeans</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.log4j</groupId>
 			<artifactId>com.springsource.org.apache.log4j</artifactId>
 		</dependency>
@@ -79,18 +84,22 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-    <repositories>
-        <repository>
-            <id>odftoolkit</id>
-            <name>Odftoolkit Repository</name>
-            <url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url>
-           <releases>
-               <checksumPolicy>fail</checksumPolicy>
-           </releases>
-           <snapshots>
-               <checksumPolicy>fail</checksumPolicy>
-           </snapshots>
-        </repository>
-    </repositories>
+	<repositories>
+		<!-- This repository is down (2012-03-19) and as the project has moved to
+		     apache it's unclear if it will return. odfdom-java-0.7 artifact has been
+		     deployed to the mygrid repository.
+		<repository>
+			<id>odftoolkit</id>
+			<name>Odftoolkit Repository</name>
+			<url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url>
+			<releases>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository>
+		 -->
+	</repositories>
 
 </project>
