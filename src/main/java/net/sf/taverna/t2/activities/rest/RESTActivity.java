@@ -1,6 +1,7 @@
 package net.sf.taverna.t2.activities.rest;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import net.sf.taverna.t2.activities.rest.HTTPRequestHandler.HTTPRequestResponse;
+import net.sf.taverna.t2.activities.rest.URISignatureHandler.URISignatureParsingException;
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -25,6 +27,8 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 public class RESTActivity extends
 		AbstractAsynchronousActivity<RESTActivityConfigurationBean> implements
 		AsynchronousActivity<RESTActivityConfigurationBean> {
+	
+	private static Logger logger = Logger.getLogger(RESTActivity.class);
 	
 	// This generic activity can deal with any of the four HTTP methods
 	public static enum HTTP_METHOD {
@@ -118,6 +122,29 @@ public class RESTActivity extends
 		Map<String, Class<?>> activityInputs = new HashMap<String, Class<?>>();
 		List<String> placeholders = URISignatureHandler
 				.extractPlaceholders(configBean.getUrlSignature());
+		String acceptsHeaderValue = configBean.getAcceptsHeaderValue();
+		if (acceptsHeaderValue != null && !acceptsHeaderValue.isEmpty()) {
+			try {
+			List acceptsPlaceHolders = URISignatureHandler
+				.extractPlaceholders(acceptsHeaderValue);
+			acceptsPlaceHolders.removeAll(placeholders);
+			placeholders.addAll(acceptsPlaceHolders);
+			}
+			catch (URISignatureParsingException e) {
+				logger.error(e);
+			}
+		}
+		for (ArrayList<String> httpHeaderNameValuePair : configBean.getOtherHTTPHeaders()) {
+			try {
+				List headerPlaceHolders = URISignatureHandler
+				.extractPlaceholders(httpHeaderNameValuePair.get(1));
+				headerPlaceHolders.removeAll(placeholders);
+				placeholders.addAll(headerPlaceHolders);
+			}
+			catch (URISignatureParsingException e) {
+				logger.error(e);
+			}
+		}
 		for (String placeholder : placeholders) {
 			// these inputs will have a dynamic name each;
 			// the data type is string as they are the values to be
@@ -238,7 +265,7 @@ public class RESTActivity extends
 				// ---- DO THE ACTUAL SERVICE INVOCATION ----
 				HTTPRequestResponse requestResponse = HTTPRequestHandler
 						.initiateHTTPRequest(completeURL, configBean,
-								inputMessageBody);
+								inputMessageBody, urlParameters);
 
 				// test if an internal failure has occurred
 				if (requestResponse.hasException()) {

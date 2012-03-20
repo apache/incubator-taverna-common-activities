@@ -12,6 +12,7 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
@@ -88,7 +89,8 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
    * @return
    */
   public static HTTPRequestResponse initiateHTTPRequest(String requestURL,
-      RESTActivityConfigurationBean configBean, Object inputMessageBody)
+      RESTActivityConfigurationBean configBean, Object inputMessageBody,
+		Map<String, String> urlParameters)
   {	  
 		ClientConnectionManager connectionManager = null;
 		if (requestURL.toLowerCase().startsWith("https")) {
@@ -127,10 +129,10 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 		}
 	  
     switch (configBean.getHttpMethod()) {
-      case GET:    return (doGET   (connectionManager, requestURL, configBean));
-      case POST:   return (doPOST  (connectionManager, requestURL, configBean, inputMessageBody));
-      case PUT:    return (doPUT   (connectionManager, requestURL, configBean, inputMessageBody));
-      case DELETE: return (doDELETE(connectionManager, requestURL, configBean));
+      case GET:    return (doGET   (connectionManager, requestURL, configBean, urlParameters));
+      case POST:   return (doPOST  (connectionManager, requestURL, configBean, inputMessageBody, urlParameters));
+      case PUT:    return (doPUT   (connectionManager, requestURL, configBean, inputMessageBody, urlParameters));
+      case DELETE: return (doDELETE(connectionManager, requestURL, configBean, urlParameters));
       default:     return (new HTTPRequestResponse(new Exception("Error: something went wrong; " +
       		                  "no failure has occurred, but but unexpected HTTP method (\"" +
       		                  configBean.getHttpMethod() + "\") encountered.")));
@@ -138,14 +140,16 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
   }
   
   
-  private static HTTPRequestResponse doGET(ClientConnectionManager connectionManager, String requestURL, RESTActivityConfigurationBean configBean) {
+  private static HTTPRequestResponse doGET(ClientConnectionManager connectionManager, String requestURL, RESTActivityConfigurationBean configBean,
+			Map<String, String> urlParameters) {
     HttpGet httpGet = new HttpGet(requestURL);
-    return (performHTTPRequest(connectionManager, httpGet, configBean));
+    return (performHTTPRequest(connectionManager, httpGet, configBean, urlParameters));
   }
   
   
   private static HTTPRequestResponse doPOST(ClientConnectionManager connectionManager, String requestURL,
-      RESTActivityConfigurationBean configBean, Object inputMessageBody)
+      RESTActivityConfigurationBean configBean, Object inputMessageBody,
+		Map<String, String> urlParameters)
   {
     HttpPost httpPost = new HttpPost(requestURL);
     
@@ -177,12 +181,13 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
       		"attach a message body to the POST request. See attached cause of this " +
       		"exception for details.")));
     }
-    return(performHTTPRequest(connectionManager, httpPost, configBean));
+    return(performHTTPRequest(connectionManager, httpPost, configBean, urlParameters));
   }
   
   
   private static HTTPRequestResponse doPUT(ClientConnectionManager connectionManager, String requestURL,
-      RESTActivityConfigurationBean configBean, Object inputMessageBody)
+      RESTActivityConfigurationBean configBean, Object inputMessageBody,
+		Map<String, String> urlParameters)
   {
     HttpPut httpPut = new HttpPut(requestURL);
     if (!configBean.getContentTypeForUpdates().equals("")){
@@ -206,13 +211,14 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
           "attach a message body to the PUT request. See attached cause of this " +
           "exception for details.")));
     }
-    return (performHTTPRequest(connectionManager, httpPut, configBean));
+    return (performHTTPRequest(connectionManager, httpPut, configBean, urlParameters));
   }
   
   
-  private static HTTPRequestResponse doDELETE(ClientConnectionManager connectionManager, String requestURL, RESTActivityConfigurationBean configBean) {
+  private static HTTPRequestResponse doDELETE(ClientConnectionManager connectionManager, String requestURL, RESTActivityConfigurationBean configBean,
+			Map<String, String> urlParameters) {
     HttpDelete httpDelete = new HttpDelete(requestURL);
-    return (performHTTPRequest(connectionManager, httpDelete, configBean));
+    return (performHTTPRequest(connectionManager, httpDelete, configBean, urlParameters));
   }
   
   
@@ -226,7 +232,8 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 	private static HTTPRequestResponse performHTTPRequest(
 			ClientConnectionManager connectionManager,
 			HttpRequestBase httpRequest,
-			RESTActivityConfigurationBean configBean) {
+			RESTActivityConfigurationBean configBean,
+			Map<String, String> urlParameters) {
 		// headers are set identically for all HTTP methods, therefore can do
 		// centrally - here
 		
@@ -234,7 +241,7 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 		String acceptsHeaderValue = configBean
 						.getAcceptsHeaderValue();
 		if ((acceptsHeaderValue != null) && !acceptsHeaderValue.isEmpty()) {
-			httpRequest.setHeader(ACCEPT_HEADER_NAME, acceptsHeaderValue);			
+			httpRequest.setHeader(ACCEPT_HEADER_NAME, URISignatureHandler.generateCompleteURI(acceptsHeaderValue, urlParameters, configBean.getEscapeParameters()));			
 		}
 		
 		// See if user wanted to set any other HTTP headers
@@ -242,10 +249,13 @@ private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 		if (!otherHTTPHeaders.isEmpty()){
 			for (ArrayList<String> httpHeaderNameValuePair : otherHTTPHeaders){
 				if (httpHeaderNameValuePair.get(0)!= null && !httpHeaderNameValuePair.get(0).equals("")){
-					httpRequest.setHeader(httpHeaderNameValuePair.get(0), httpHeaderNameValuePair.get(1));	
+					String headerParameterizedValue = httpHeaderNameValuePair.get(1);
+					String headerValue = URISignatureHandler.generateCompleteURI(headerParameterizedValue, urlParameters, configBean.getEscapeParameters());
+					httpRequest.setHeader(httpHeaderNameValuePair.get(0), headerValue);	
 				}	
 			}		
 		}
+		
 		
 		HTTPRequestResponse requestResponse = new HTTPRequestResponse();
 
