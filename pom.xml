@@ -20,17 +20,6 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>odftoolkit</id>
-			<name>Odftoolkit Repository</name>
-			<url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url>
-			<releases>								
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>				
-			</snapshots>
-		</repository>
 	</repositories>
 
 	<dependencies>
