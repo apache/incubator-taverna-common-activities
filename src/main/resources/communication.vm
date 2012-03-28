@@ -55,6 +55,13 @@
              return JSON.parse('$inputData');
            }
          });
+         
+         pmrpc.register( {
+           publicProcedureName : "getWorkflowRunId",
+           procedure : function () {
+             return '$runId';
+           }
+         });
      </script>
   </body>
 </html>
