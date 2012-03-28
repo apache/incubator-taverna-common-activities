@@ -122,6 +122,9 @@ public class InteractionActivity extends
 			public void run() {
 				InvocationContext context = callback
 						.getContext();
+				String runId = callback.getContext()
+				.getEntities(WorkflowRunIdEntity.class).get(0)
+				.getWorkflowRunId();
 				ReferenceService referenceService = context
 						.getReferenceService();
 				
@@ -162,6 +165,7 @@ public class InteractionActivity extends
 					
 					Element inputDataElement = entry.addExtension(getInputDataQName());
 					String inputDataString = sw.toString();
+					inputDataString = inputDataString.replace("\\", "\\\\");
 					inputDataElement.setText(inputDataString);
 					
 					AbderaClient client = new AbderaClient(ABDERA);
@@ -169,7 +173,7 @@ public class InteractionActivity extends
 		            rOptions.setSlug(id);
 		            String slug = rOptions.getHeader("Slug");
 
-		            String webFile = generateHtml(inputData, inputDataString, id, slug);
+		            String webFile = generateHtml(inputData, inputDataString, runId, id, slug);
 
 						entry.addLink(webFile, "presentation");
 							entry.setContentAsXhtml("<p><a href=\"" + webFile + "\">Open: " + webFile + "</a></p>");
@@ -183,7 +187,7 @@ public class InteractionActivity extends
 		});
 	}
 	
-	private String generateHtml(Map<String, Object> inputData, String inputDataString, String id, String slug) {
+	private String generateHtml(Map<String, Object> inputData, String inputDataString, String runId, String id, String slug) {
 		
 		String slugForFile = Sanitizer.sanitize(slug, "", true, Normalizer.Form.D);
 		
@@ -193,6 +197,7 @@ public class InteractionActivity extends
 			velocityContext.put(inputName, input);
 		}
 		velocityContext.put("feed", InteractionPreference.getInstance().getFeedUrl());
+		velocityContext.put("runId", runId);
 		velocityContext.put("entryId", id);
 		String pmrpcUrl = InteractionPreference.getInstance().getLocationUrl() + "/" + "pmrpc.js";
 		velocityContext.put("pmrpcUrl", pmrpcUrl);
