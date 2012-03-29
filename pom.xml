@@ -32,12 +32,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.codec</artifactId>
-			<version>1.3.0</version>
+			<version>${commons.codec.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>com.springsource.org.apache.httpcomponents.httpclient</artifactId>
-			<version>4.1.1</version>
+			<version>${apache.httpclient.version}</version>
 		</dependency>
 
 		<dependency>
