@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
@@ -33,6 +34,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
 import org.apache.abdera.protocol.client.RequestOptions;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -128,7 +130,7 @@ public class InteractionActivity extends
 				ReferenceService referenceService = context
 						.getReferenceService();
 				
-				String id = generateId(callback);
+				String id = Sanitizer.sanitize(UUID.randomUUID().toString(), "", true, Normalizer.Form.D);
 				
 				Map<String, Object> inputData = new HashMap<String, Object>();
 				for (String inputName : inputs.keySet()) {
@@ -149,7 +151,7 @@ public class InteractionActivity extends
 					entry.setUpdated(timestamp);
 
 					entry.addAuthor("Taverna");
-					entry.setTitle("Interaction from Taverna for " + id);
+					entry.setTitle("Interaction from Taverna for " + generateId(callback));
 					
 					ObjectMapper mapper = new ObjectMapper();
 					StringWriter sw = new StringWriter();
@@ -165,7 +167,7 @@ public class InteractionActivity extends
 					
 					Element inputDataElement = entry.addExtension(getInputDataQName());
 					String inputDataString = sw.toString();
-					inputDataString = inputDataString.replace("\\", "\\\\");
+					inputDataString = StringEscapeUtils.escapeJavaScript(inputDataString);
 					inputDataElement.setText(inputDataString);
 					
 					AbderaClient client = new AbderaClient(ABDERA);
@@ -173,7 +175,7 @@ public class InteractionActivity extends
 		            rOptions.setSlug(id);
 		            String slug = rOptions.getHeader("Slug");
 
-		            String webFile = generateHtml(inputData, inputDataString, runId, id, slug);
+		            String webFile = generateHtml(inputData, inputDataString, runId, id);
 
 						entry.addLink(webFile, "presentation");
 							entry.setContentAsXhtml("<p><a href=\"" + webFile + "\">Open: " + webFile + "</a></p>");
@@ -187,9 +189,7 @@ public class InteractionActivity extends
 		});
 	}
 	
-	private String generateHtml(Map<String, Object> inputData, String inputDataString, String runId, String id, String slug) {
-		
-		String slugForFile = Sanitizer.sanitize(slug, "", true, Normalizer.Form.D);
+	private String generateHtml(Map<String, Object> inputData, String inputDataString, String runId, String id) {
 		
 		VelocityContext velocityContext = new VelocityContext();
 		for (String inputName : inputData.keySet()) {
@@ -209,7 +209,7 @@ public class InteractionActivity extends
 					InteractionActivityType.VelocityTemplate)) {
 				// Write presentation frame file
 				File presentationFile = new File(getTempDir(), "presentation"
-						+ slugForFile + ".html");
+						+ id + ".html");
 				presentationFile.createNewFile();
 				FileWriter presentationFileWriter = new FileWriter(
 						presentationFile);
@@ -222,11 +222,9 @@ public class InteractionActivity extends
 					InteractionActivityType.LocallyPresentedHtml)) {
 				presentationUrl = configBean.getPresentationOrigin();
 			}
-
-		velocityContext.put("slug", slug);
 		
 		// Write communication frame file		
-		File communicationFile = new File(getTempDir(), "communication" + slugForFile + ".html");
+		File communicationFile = new File(getTempDir(), "communication" + id + ".html");
 		communicationFile.createNewFile();
 		FileWriter communicationFileWriter = new FileWriter(communicationFile);
 		InteractionVelocity.getCommunicationTemplate().merge(velocityContext, communicationFileWriter);
@@ -239,7 +237,7 @@ public class InteractionActivity extends
 		
 		if (!configBean.getInteractionActivityType().equals(InteractionActivityType.RemotelyPresentededHtml)) {
 		// Write main html file
-		File mainFile = new File(getTempDir(), "interaction" + slugForFile + ".html");
+		File mainFile = new File(getTempDir(), "interaction" + id + ".html");
 		mainFile.createNewFile();
 		FileWriter mainFileWriter = new FileWriter(mainFile);
 		InteractionVelocity.getInteractionTemplate().merge(velocityContext, mainFileWriter);
