@@ -5,6 +5,19 @@
   </head>
   <body>
   
+       <script type="text/javascript" src="$pmrpcUrl"></script>
+       
+       <script type="text/javascript">
+       
+         pmrpc.register( {
+         	publicProcedureName : "setTitle",
+         	procedure : function(title) {
+         	   document.title = title;
+         	   return "OK";
+         	}
+         });
+  	   </script>
+  
      <iframe name="presentationFrame" height="100%" width="100%" frameborder="0" src="$presentationUrl">
 </iframe>
      <iframe name="communicationFrame" height="0" width="100%" frameborder="0" src="$communicationUrl">
