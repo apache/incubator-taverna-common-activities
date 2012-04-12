@@ -85,7 +85,7 @@ public class XPathActivityConfigurationBean implements Serializable {
 		return xmlDocument;
 	}
 
-	@ConfigurationProperty(name = "xmlDocument", label = "XML document", required = false)
+	@ConfigurationProperty(name = "exampleXmlDocument", label = "Example XML document", required = false)
 	public void setXmlDocument(String xmlDocument) {
 		this.xmlDocument = xmlDocument;
 	}
