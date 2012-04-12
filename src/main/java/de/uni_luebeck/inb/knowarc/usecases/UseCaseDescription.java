@@ -698,7 +698,7 @@ public class UseCaseDescription {
 	/**
 	 * @param static_inputs the static_inputs to set
 	 */
-	@ConfigurationProperty(name = "staticInputs", label = "Static Inputs", ordering=OrderPolicy.NON_ORDERED)
+	@ConfigurationProperty(name = "staticInputs", label = "Static Inputs", ordering=OrderPolicy.NON_ORDERED, required=false)
 	public void setStatic_inputs(List<ScriptInputStatic> static_inputs) {
 		this.static_inputs = static_inputs;
 	}
