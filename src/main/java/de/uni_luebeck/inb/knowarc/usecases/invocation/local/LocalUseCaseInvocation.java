@@ -47,6 +47,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import net.sf.taverna.t2.reference.AbstractExternalReference;
 import net.sf.taverna.t2.reference.ErrorDocument;
@@ -326,7 +327,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 		tags.put("uniqueID", "" + getSubmissionID());
 		String command = usecase.getCommand();
 		for (String cur : tags.keySet()) {
-			command = command.replaceAll("\\Q%%" + cur + "%%\\E", tags.get(cur));
+		    command = command.replaceAll("\\Q%%" + cur + "%%\\E", Matcher.quoteReplacement(tags.get(cur)));
 		}
 
 		List<String> cmds = new ArrayList<String>();
