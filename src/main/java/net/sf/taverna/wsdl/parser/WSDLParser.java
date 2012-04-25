@@ -382,7 +382,20 @@ public class WSDLParser {
 
                 for (String partName : partNames) {
                     Part part = inputMessage.getPart(partName);
-                    result.add(processParameter(part));
+                    
+                    TypeDescriptor typeDesc = processParameter(part);
+                    
+//                    if (partNames.size() > 1 || !typeDesc.getName().equals(operationName)) {
+//                        typeDesc.setName(part.getName());
+//                    } else if (typeDesc instanceof ComplexTypeDescriptor) {
+//                        ComplexTypeDescriptor wrapper = (ComplexTypeDescriptor)typeDesc;
+//                        if (!wrapper.getAttributes().isEmpty()) {
+//                             typeDesc.setName(part.getName());
+//                        }
+//                    }
+
+                    typeDesc.setName(part.getName());
+                    result.add(typeDesc);
                 }
             }
         }
@@ -422,7 +435,19 @@ public class WSDLParser {
 
                 for (String partName : partNames) {
                     Part part = outputMessage.getPart(partName);
-                    result.add(processParameter(part));
+                    
+                    TypeDescriptor typeDesc = processParameter(part);
+//                    if (partNames.size() == 1 && typeDesc instanceof ComplexTypeDescriptor) {
+//                        ComplexTypeDescriptor wrapper = (ComplexTypeDescriptor)typeDesc;
+//
+//                        if (wrapper.getName().equals(operationName + "Response") &&
+//                            wrapper.getAttributes().isEmpty()) {
+//                            result.add(typeDesc);
+//                            continue;
+//                        }
+//                    }
+                    typeDesc.setName(part.getName());
+                    result.add(typeDesc);
                 }
             }
         }
@@ -683,9 +708,7 @@ public class WSDLParser {
                 return null;
             }
         }
-
-        typeDesc.setName(part.getName());
-
+        
         return typeDesc;
     }
 }

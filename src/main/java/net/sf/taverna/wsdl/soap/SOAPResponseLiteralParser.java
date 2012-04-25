@@ -36,11 +36,10 @@ package net.sf.taverna.wsdl.soap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.soap.SOAPElement;
 
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.utils.XMLUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -51,7 +50,7 @@ import org.w3c.dom.Element;
  * 
  */
 @SuppressWarnings("unchecked")
-public class SOAPResponseLiteralParser implements SOAPResponseParser {
+public class SOAPResponseLiteralParser extends AbstractSOAPResponseParser {
 
 	List<TypeDescriptor>outputDescriptors;
 
@@ -66,16 +65,15 @@ public class SOAPResponseLiteralParser implements SOAPResponseParser {
 	 * 
 	 * @return Map of the outputs
 	 */
+    @Override
 	public Map parse(List response) throws Exception {
 		Map result = new HashMap();
 
-		if (response.size()>0) {
-			SOAPBodyElement rpcElement = (SOAPBodyElement) response.get(0);
-	
-			Element dom = rpcElement.getAsDOM();
+		if (response.size() > 0) {
+			SOAPElement rpcElement = (SOAPElement) response.get(0);
 	
 			String outputName = getOutputName();
-			String xml = XMLUtils.ElementToString(dom);
+			String xml = toString(rpcElement);
 	
 			result.put(outputName, xml);
 		}

@@ -46,7 +46,8 @@ import net.sf.taverna.wsdl.parser.BaseTypeDescriptor;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
-import org.apache.axis.encoding.Base64;
+import javax.xml.bind.DatatypeConverter;
+
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -160,8 +161,7 @@ public class XMLOutputSplitter {
 					} else if (outputTypes[i]
 							.equals("'application/octet-stream'")) { // base64Binary
 						
-						byte[] data = Base64.decode(child
-								.getText());
+						byte[] data = DatatypeConverter.parseBase64Binary(child.getText());
 						result.put(child.getName(), data);
 					} else if (outputTypes[i].equals("l('text/plain')")) { // an
 																			// inner

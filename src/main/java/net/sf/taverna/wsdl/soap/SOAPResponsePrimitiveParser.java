@@ -38,11 +38,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
+import javax.xml.soap.SOAPElement;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
-import org.apache.axis.message.RPCElement;
-import org.apache.axis.message.RPCParam;
 
 /**
  * SOAPResponseParser responsible for parsing soap responses that map to outputs
@@ -55,46 +53,37 @@ import org.apache.axis.message.RPCParam;
 @SuppressWarnings("unchecked")
 public class SOAPResponsePrimitiveParser implements SOAPResponseParser {
 
-	private List<String> outputNames;
+    private List<String> outputNames;
 
-	public SOAPResponsePrimitiveParser(List<TypeDescriptor> outputDescriptors) {
-		outputNames=new ArrayList<String>();
-		for (TypeDescriptor desc : outputDescriptors) {
-			outputNames.add(desc.getName());
-		}
-	}
+    public SOAPResponsePrimitiveParser(List<TypeDescriptor> outputDescriptors) {
+        outputNames=new ArrayList<String>();
+        for (TypeDescriptor desc : outputDescriptors) {
+            outputNames.add(desc.getName());
+        }
+    }
 
-	/**
-	 * Parses each SOAPBodyElement for the primitive type, and places it in the
-	 * output Map
-	 */
-	public Map parse(List response) throws Exception {
-		Map result = new HashMap();
-		int c = 0;
+    /**
+     * Parses each SOAPBodyElement for the primitive type, and places it in the
+     * output Map
+     */
+    @Override
+    public Map parse(List<SOAPElement> response) throws Exception {
+        Map result = new HashMap();
+        int c = 0;
 
-		
-		RPCElement responseElement = (RPCElement) response.get(0);
-		List params = responseElement.getParams();
+        SOAPElement responseElement = response.get(0);
 
-		for (Iterator paramIterator = params.iterator(); paramIterator
-				.hasNext();) {
-			RPCParam param = (RPCParam) paramIterator.next();
-			Object value = param.getObjectValue();
-			// use the param name if it matches the outputname list,
-			// otherwise use the defined output name.
-			// Outputs should come back in the order of the outputNames
-			// as this is specified in the WSDL (only an issue for multiple
-			// outputs which is very rare, and is going to be documented as
-			// unrecommended for Taverna).
-			if (outputNames.contains(param.getName())) {
-				result.put(param.getName(), ObjectConverter.convertObject(value));
-			} else {
-				result.put(outputNames.get(c), value);
-			}
-			c++;
-		}
+        for (Iterator<SOAPElement> paramIterator = responseElement.getChildElements(); paramIterator.hasNext();) {
+            SOAPElement param = paramIterator.next();
+            Object value = param.getTextContent();
+            if (outputNames.contains(param.getLocalName())) {
+                result.put(param.getElementName(), ObjectConverter.convertObject(value));
+            } else {
+                result.put(outputNames.get(c), value);
+            }
+            c++;
+        }
 
-		return result;
-	}
-
+        return result;
+    }
 }

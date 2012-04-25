@@ -38,11 +38,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.xml.soap.SOAPElement;
 
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.utils.XMLUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -79,11 +78,11 @@ public class SOAPResponseEncodedMultiRefParser extends
 	 *            List of XML SOAPBodyElement fragments.
 	 */
 	@Override
-	public Map parse(List response) throws Exception, CyclicReferenceException {
+	public Map parse(List<SOAPElement> response) throws Exception, CyclicReferenceException {
 		Map result = new HashMap();
 		generateRefMap(response);
 		expandRefMap();
-		Element mainBody = ((SOAPBodyElement) response.get(0)).getAsDOM();
+		SOAPElement mainBody = response.get(0);
 
 		for (TypeDescriptor descriptor : outputDescriptors) {
 			String outputName = descriptor.getName();
@@ -94,10 +93,9 @@ public class SOAPResponseEncodedMultiRefParser extends
 				String xml;
 				if (getStripAttributes()) {
 					stripAttributes(outputNode);
-					outputNode = removeNamespace(outputName,
-							(Element) outputNode);
+					outputNode = removeNamespace(outputName, (Element) outputNode);
 				}
-				xml = XMLUtils.ElementToString((Element) outputNode);
+				xml = toString(outputNode);
 
 				result.put(outputName, xml);
 			} 
@@ -117,10 +115,10 @@ public class SOAPResponseEncodedMultiRefParser extends
 		Map result = new HashMap();
 
 		for (Iterator iterator = response.iterator(); iterator.hasNext();) {
-			SOAPBodyElement bodyElement = (SOAPBodyElement) iterator.next();
+			SOAPElement bodyElement = (SOAPElement) iterator.next();
 			String id = bodyElement.getAttribute("id");
-			if (id != null) {
-				result.put("#" + id, bodyElement.getAsDOM());
+			if (id.length() > 0) {
+				result.put("#" + id, bodyElement);
 			}
 		}
 

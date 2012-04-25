@@ -25,16 +25,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPElement;
 
 import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.testutils.LocationConstants;
 import net.sf.taverna.wsdl.testutils.WSDLTestHelper;
 
-import org.apache.axis.message.SOAPBodyElement;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
@@ -54,12 +54,19 @@ public class LiteralBodyBuilderTest implements LocationConstants{
 		Map<String,Object> inputMap = new HashMap<String, Object>();
 		inputMap.put("parameters", parameters);
 		
-		SOAPBodyElement body = builder.build(inputMap);
-		
-		String xml = body.getAsString();
-		
-		assertTrue("Content of body is incorrect in the definition of the pipelineName and pmid:"+xml,xml.contains("<pipelineName xmlns=\"\">swissProt</pipelineName><pmid xmlns=\"\">1234</pmid>"));
-		assertTrue("Wrapping element should have its namespace declared",xml.contains("<ns1:queryPmid"));
+		SOAPElement body = builder.build(inputMap);
+	
+                assertTrue("Wrong wrapping element name", "queryPmid".equals(body.getLocalName()) && "http://www.ebi.ac.uk/webservices/whatizit/ws".equals(body.getNamespaceURI()));
+
+                Iterator<Node> pipelineNames = body.getChildElements(new QName("","pipelineName"));
+                
+                assertTrue("No pipelineName defined", pipelineNames.hasNext());
+                assertTrue("Wrong pipelineName value (must be 'swissProt')", "swissProt".equals(pipelineNames.next().getTextContent()));
+                
+                Iterator<Node> pmids = body.getChildElements(new QName("","pmid"));
+
+                assertTrue("No pmid defined", pmids.hasNext());
+                assertTrue("Wrong pmid value (must be '1234')", "1234".equals(pmids.next().getTextContent()));
 	}
 	
 	@Test
@@ -70,9 +77,10 @@ public class LiteralBodyBuilderTest implements LocationConstants{
 		Map<String,Object>inputMap = new HashMap<String, Object>();
 		inputMap.put("str", "bob");
 		
-		String xml = builder.build(inputMap).getAsString();
+                SOAPElement body = builder.build(inputMap);
 		
-		assertEquals("XML should containe qualifed namespace for str",xml,"<ns1:str xmlns:ns1=\"http://testing.org\">bob</ns1:str>");
+                assertEquals("Wrong localName","str", body.getLocalName());
+                assertEquals("XML should containe qualifed namespace for str","http://testing.org", body.getNamespaceURI());
 	}
 	
 	@Test
@@ -84,10 +92,11 @@ public class LiteralBodyBuilderTest implements LocationConstants{
 		Map<String,Object> inputMap = new HashMap<String, Object>();
 		inputMap.put("str", "12345");
 		
-		SOAPBodyElement body = builder.build(inputMap);
+		SOAPElement body = builder.build(inputMap);
 		
-		assertEquals("Input element should be named str:","str",body.getNodeName());
-		assertEquals("Value should be 12345:","12345",body.getFirstChild().getNextSibling().getNodeValue());
+                assertTrue("Input element should be named {http://testing.org}str ", "str".equals(body.getLocalName()) && "http://testing.org".equals(body.getNamespaceURI()));
+
+		assertEquals("Value should be 12345:","12345",body.getFirstChild().getNodeValue());
 	}
 	
 	@Test
@@ -99,14 +108,16 @@ public class LiteralBodyBuilderTest implements LocationConstants{
 		Map<String,Object> inputMap = new HashMap<String, Object>();
 		inputMap.put("array", "<array><item>1</item><item>2</item><item>3</item></array>");
 		
-		SOAPBodyElement body = builder.build(inputMap);
+		SOAPElement body = builder.build(inputMap);
 		
-		String xml = body.getAsString();
-		assertEquals("Outer element should be named array. xml = "+xml,"array",body.getNodeName());
-		
-		Node itemElement = body.getFirstChild().getNextSibling();
-		assertEquals("Array element should be named item. xml = "+xml,"item",itemElement.getNodeName());
-		assertEquals("First Array element should have the value '1'. xml = "+xml,"1",itemElement.getFirstChild().getNodeValue());
+                assertTrue("Outer element should be named {http://testing.org}array ", "array".equals(body.getLocalName()) && "http://testing.org".equals(body.getNamespaceURI()));
+                
+                assertTrue("There must be three child nodes in array", body.getChildNodes().getLength() == 3);
+
+                Iterator<Node> items = body.getChildElements(new QName("", "item"));
+                assertTrue("Array element should be named item", items.hasNext());
+                
+                assertTrue("First Array element should have the value '1'", "1".equals(items.next().getTextContent()));
 	}
 	
 	@Test 
@@ -124,10 +135,10 @@ public class LiteralBodyBuilderTest implements LocationConstants{
 						+ "<e:db>database</e:db>" + "<e:tool>myTool</e:tool>"
 						+ "<e:email>nobody@nowhere.net</e:email>"
 						+ "</parameters>");
-		SOAPBodyElement body = builder.build(inputMap);
+		SOAPElement body = builder.build(inputMap);
 		assertEquals("QName of SOAP body's element did not match expected qname ", 
 				new QName("http://www.ncbi.nlm.nih.gov/soap/eutils/einfo", "eInfoRequest"), 
-				body.getQName());
+				body.getElementQName());
 	}
 	
 	@Test 
@@ -140,10 +151,10 @@ public class LiteralBodyBuilderTest implements LocationConstants{
 		assertTrue("Wrong type of builder, it should be Literal based",builder instanceof LiteralBodyBuilder);
 		Map<String,Object> inputMap = new HashMap<String, Object>();
 		// No inputs
-		SOAPBodyElement body = builder.build(inputMap);
+		SOAPElement body = builder.build(inputMap);
 		assertEquals("QName of SOAP body's element did not match expected qname ", 
 				new QName("http://InstrumentService.uniparthenope.it/InstrumentService", "GetListRequest"), 
-				body.getQName());
+				body.getElementQName());
 	}
 	
 	@Test
@@ -155,12 +166,13 @@ public class LiteralBodyBuilderTest implements LocationConstants{
 		Map<String,Object> inputMap = new HashMap<String, Object>();
 		inputMap.put("str", "abcdef");
 		
-		SOAPBodyElement body = builder.build(inputMap);
+		SOAPElement body = builder.build(inputMap);
 		
-		assertEquals("Outer element should be named countString","countString",body.getNodeName());
+		assertTrue("Outer element should be named {http://testing.org}countString","countString".equals(body.getLocalName()) && "http://testing.org".equals(body.getNamespaceURI()));
+                
 		Node strNode = body.getFirstChild();
 		assertEquals("Inner element should be called 'str'","str",strNode.getNodeName());
-		assertEquals("str content should be abcdef","abcdef",strNode.getFirstChild().getNextSibling().getNodeValue());
+		assertEquals("str content should be abcdef","abcdef",strNode.getFirstChild().getNodeValue());
 	}
 	
 	protected BodyBuilder createBuilder(String wsdl, String operation) throws Exception {

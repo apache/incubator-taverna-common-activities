@@ -44,11 +44,10 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPElement;
 
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -62,7 +61,7 @@ import org.xml.sax.SAXException;
  * 
  */
 @SuppressWarnings("unchecked")
-public class SOAPResponseEncodedParser implements SOAPResponseParser {
+public class SOAPResponseEncodedParser extends AbstractSOAPResponseParser {
 
 	protected List<TypeDescriptor> outputDescriptors;
 
@@ -80,25 +79,23 @@ public class SOAPResponseEncodedParser implements SOAPResponseParser {
 	 * @param List
 	 * @return Map
 	 */
-	public Map parse(List response) throws Exception {
+    @Override
+    public Map parse(List<SOAPElement> response) throws Exception {
 
 		Map result = new HashMap();
-		Element mainBody = ((SOAPBodyElement) response.get(0)).getAsDOM();
+		SOAPElement mainBody = response.get(0);
 
 		for (TypeDescriptor descriptor : outputDescriptors) {
 			String outputName = descriptor.getName();
 
 			Node outputNode = getOutputNode(mainBody, outputName);
 			if (outputNode != null) {
-				String xml;				
-				
 				if (stripAttributes) {					
 					stripAttributes(outputNode);
-					outputNode = removeNamespace(outputName,
-							(Element) outputNode);
+					outputNode = removeNamespace(outputName, (Element) outputNode);
 				}
 				
-				xml = XMLUtils.ElementToString((Element) outputNode);
+                                String xml = toString(outputNode);
 				result.put(outputName, xml);
 			} 
 		}
@@ -139,17 +136,21 @@ public class SOAPResponseEncodedParser implements SOAPResponseParser {
 	 */
 	protected Element removeNamespace(String outputName, Element element)
 			throws ParserConfigurationException, SAXException, IOException {
-		String xml;
-		String innerXML = XMLUtils.getInnerXMLString(element);
-		if (innerXML != null) {
-			xml = "<" + outputName + ">" + innerXML + "</" + outputName + ">";
-		} else {
-			xml = "<" + outputName + " />";
-		}
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-		return doc.getDocumentElement();
+            
+            return (Element)element.getOwnerDocument().renameNode(element, null, element.getLocalName());
+
+                // :-O
+//		String xml;
+//		String innerXML = XMLUtils.getInnerXMLString(element);
+//		if (innerXML != null) {
+//			xml = "<" + outputName + ">" + innerXML + "</" + outputName + ">";
+//		} else {
+//			xml = "<" + outputName + " />";
+//		}
+//		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
+//				.newDocumentBuilder();
+//		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+//		return doc.getDocumentElement();
 	}
 
 	protected void stripAttributes(Node node) {

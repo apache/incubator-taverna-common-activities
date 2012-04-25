@@ -33,25 +33,22 @@
  *****************************************************************/
 package net.sf.taverna.wsdl.soap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
+import javax.xml.soap.SOAPFactory;
 import net.sf.taverna.wsdl.parser.BaseTypeDescriptor;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
-
-import org.apache.axis.message.SOAPBodyElement;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 public class SOAPResponseLiteralTest{
 
@@ -60,11 +57,13 @@ public class SOAPResponseLiteralTest{
 	public void testLiteralParserResultInTextBlock() throws Exception {
 		List response = new ArrayList();
 		String xml = "<testResponse><out>&lt;data name=&quot;a&quot;&gt;some data&lt;/data&gt;&lt;data name=&quot;b&quot;&gt;some more data&lt;/data&gt;</out></testResponse>";
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
 
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(new InputSource(new StringReader(xml)));
+
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
 		TypeDescriptor descriptor = new ComplexTypeDescriptor();
 		descriptor.setName("testResponse");
@@ -86,7 +85,7 @@ public class SOAPResponseLiteralTest{
 
 		assertEquals(
 				"xml is wrong",
-				"<testResponse><out>&lt;data name=&quot;a&quot;&gt;some data&lt;/data&gt;&lt;data name=&quot;b&quot;&gt;some more data&lt;/data&gt;</out></testResponse>",
+				"<testResponse><out>&lt;data name=\"a\"&gt;some data&lt;/data&gt;&lt;data name=\"b\"&gt;some more data&lt;/data&gt;</out></testResponse>",
 				testResponse.toString());
 	}
 
@@ -95,11 +94,11 @@ public class SOAPResponseLiteralTest{
 	public void testLiteralParser() throws Exception {
 		List response = new ArrayList();
 		String xml = "<testResponse><out><data name=\"a\">some data</data><data name=\"b\">some more data</data></out></testResponse>";
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(new InputSource(new StringReader(xml)));
+                response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
 		TypeDescriptor descriptor = new ComplexTypeDescriptor();
 		descriptor.setName("testResponse");
@@ -131,11 +130,12 @@ public class SOAPResponseLiteralTest{
 		List response = new ArrayList();
 		
 		String xml = "<getStringReturn xmlns=\"http://testing.org\">a string</getStringReturn>";
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-		.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(new InputSource(new StringReader(xml)));
 
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
 		TypeDescriptor descriptor = new BaseTypeDescriptor();
 		descriptor.setName("getStringReturn");
