@@ -1,7 +1,7 @@
 package net.sf.taverna.t2.activities.interaction;
 
 import java.io.Serializable;
-import java.net.URI;
+import java.util.ArrayList;
 
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
 
@@ -9,12 +9,20 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDe
  * Example activity configuration bean.
  * 
  */
-public class InteractionActivityConfigurationBean extends ActivityPortsDefinitionBean implements Serializable {
-	
+public class InteractionActivityConfigurationBean extends
+		ActivityPortsDefinitionBean implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1827843116765609367L;
+
 	private String presentationOrigin;
-	
+
 	private InteractionActivityType interactionActivityType;
-	
+
+	private ArrayList<String> publishedList;
+
 	public InteractionActivityConfigurationBean() {
 		super();
 		interactionActivityType = InteractionActivityType.LocallyPresentedHtml;
@@ -37,5 +45,24 @@ public class InteractionActivityConfigurationBean extends ActivityPortsDefinitio
 		this.presentationOrigin = presentationOrigin;
 	}
 
+	private ArrayList<String> getPublishedList() {
+		if (publishedList == null) {
+			publishedList = new ArrayList<String>();
+		}
+		return publishedList;
+	}
+
+	public boolean isPublished(String portName) {
+		return getPublishedList().contains(portName);
+	}
+
+	public void setPublished(String portName, boolean isPublished) {
+		if (isPublished && !isPublished(portName)) {
+			getPublishedList().add(portName);
+		}
+		if (!isPublished && isPublished(portName)) {
+			getPublishedList().remove(portName);
+		}
+	}
 
 }

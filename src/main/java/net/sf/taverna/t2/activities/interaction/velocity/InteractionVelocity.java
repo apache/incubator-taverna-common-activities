@@ -4,14 +4,13 @@
 package net.sf.taverna.t2.activities.interaction.velocity;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import net.sf.taverna.t2.activities.interaction.InteractionActivity;
+import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -28,7 +27,7 @@ import org.apache.velocity.runtime.resource.util.StringResourceRepository;
  */
 public class InteractionVelocity {
 	
-	private static Logger logger = Logger.getLogger(InteractionVelocity.class);
+	public static Logger logger = Logger.getLogger(InteractionVelocity.class);
 	
 	private static boolean velocityInitialized = false;
 	
@@ -60,7 +59,6 @@ public class InteractionVelocity {
 		RuntimeSingleton.getRuntimeInstance().addDirective(
 				new ProduceDirective());
 		velocityInitialized = true;
-		copyJavacript(InteractionActivity.getTempDir(), "pmrpc.js");
 		
 		loadTemplates();
 		communicationTemplate = Velocity
@@ -105,32 +103,6 @@ public class InteractionVelocity {
 			} catch (IOException e) {
 				logger.error(e);
 			}
-	}
-
-	private static void copyJavacript(File tempDir2, String javascriptFileName) {
-		InputStream is = null;
-		FileOutputStream fos = null;
-		try {
-			is = InteractionActivity.class.getResourceAsStream("/" + javascriptFileName);
-			File jsonFile = new File(tempDir2, javascriptFileName);
-			fos = new FileOutputStream(jsonFile);
-			IOUtils.copy(is, fos);
-			is.close();
-			fos.close();
-		} catch (IOException e) {
-			logger.error(e);
-		} finally {
-			try {
-				if (is != null) {
-					is.close();
-				}
-				if (fos != null) {
-					fos.close();
-				}
-			} catch (IOException e) {
-				logger.error(e);
-			}
-		}		
 	}
 
 	public static Template getCommunicationTemplate() {

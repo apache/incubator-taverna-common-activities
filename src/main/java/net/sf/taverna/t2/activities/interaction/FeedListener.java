@@ -25,6 +25,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.thread.InReplyTo;
+import org.apache.abdera.ext.thread.ThreadConstants;
 import org.apache.abdera.ext.thread.ThreadHelper;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Document;
@@ -68,7 +69,9 @@ public class FeedListener {
 
 			@Override
 			public void run() {
-				InteractionJetty.checkJetty();
+				if (InteractionPreference.getInstance().getUseJetty()) {
+					InteractionJetty.checkJetty();
+				}
 				Parser parser = Abdera.getNewParser();
 				Date lastCheckedDate = new Date();
 				while (true) {
@@ -80,20 +83,24 @@ public class FeedListener {
 					InputStream openStream = null;
 					try {
 						Date newLastCheckedDate = new Date();
-						URL url = new URL(InteractionPreference.getInstance()
-								.getFeedUrl());
+						URL url = new URL(InteractionPreference.getInstance().getFeedUrl());
 						openStream = url.openStream();
 						Document<Feed> doc = parser.parse(openStream, url
 								.toString());
 						Feed feed = doc.getRoot().sortEntriesByEdited(true);
 
 						for (Entry entry : feed.getEntries()) {
-							if (entry.getEdited().before(lastCheckedDate)) {
+							Date d = entry.getEdited();
+							if (d == null) {
+								d = entry.getUpdated();
+							}
+							if (d == null) {
+								d = entry.getPublished();
+							}
+							if (d.before(lastCheckedDate)) {
 								break;
 							}
-							if (ThreadHelper.getInReplyTo(entry) != null) {
-								considerInReplyTo(feed, entry);
-							}
+							considerInReplyTo(feed, entry);
 						}
 						lastCheckedDate = newLastCheckedDate;
 					} catch (MalformedURLException e) {
@@ -104,7 +111,9 @@ public class FeedListener {
 						logger.error(e);
 					} finally {
 						try {
-							openStream.close();
+							if (openStream != null) {
+								openStream.close();
+							}
 						} catch (IOException e) {
 							logger.error(e);
 						}
@@ -118,8 +127,10 @@ public class FeedListener {
 	
 	private static void considerInReplyTo(Feed feed, Entry entry) {
 		synchronized(callbackMap) {
-		InReplyTo irt = ThreadHelper.getInReplyTo(entry);
-		String refString = irt.getRef().toString();
+		String refString = getReplyTo(entry);
+		if (refString == null) {
+			return;
+		}
 		if (callbackMap.containsKey(refString)) {
 			AsynchronousActivityCallback callback = callbackMap.get(refString);
 			InvocationContext context = callback
@@ -158,6 +169,14 @@ public class FeedListener {
 			
 		}
 		}
+	}
+	
+	private static String getReplyTo(Entry entry) {
+	        Element replyTo = entry.getFirstChild(InteractionActivity.getInReplyToQName());
+	        if (replyTo == null) {
+	        	return null;
+	        }
+	        return replyTo.getText();
 	}
 
 	private static int findPortDepth(String refString, String portName) {

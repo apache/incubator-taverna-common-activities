@@ -15,8 +15,8 @@
            msg += "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:thr=\"http://purl.org/syndication/thread/1.0\">\n";
            msg += "<title>\"A reply to " + "$entryId" + "\"</title>\n";
            msg += "<id>" + "$entryId" + "-reply" + "</id>\n";
-           msg += "<thr:in-reply-to ref=\"" + "$entryId" + "\"/>\n";
            msg += "<content/>\n";
+           msg += "<interaction:in-reply-to  xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$entryId" + "</interaction:in-reply-to>\n";
            msg += "<interaction:resultStatus xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">"
            msg += escape(status);
            msg += "</interaction:resultStatus>";
