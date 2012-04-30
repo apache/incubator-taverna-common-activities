@@ -22,6 +22,8 @@ public class InteractionActivityConfigurationBean extends
 	private InteractionActivityType interactionActivityType;
 
 	private ArrayList<String> publishedList;
+	
+	private boolean progressNotification;
 
 	public InteractionActivityConfigurationBean() {
 		super();
@@ -63,6 +65,20 @@ public class InteractionActivityConfigurationBean extends
 		if (!isPublished && isPublished(portName)) {
 			getPublishedList().remove(portName);
 		}
+	}
+
+	/**
+	 * @return the progressNotification
+	 */
+	public boolean isProgressNotification() {
+		return progressNotification;
+	}
+
+	/**
+	 * @param progressNotification the progressNotification to set
+	 */
+	public void setProgressNotification(boolean progressNotification) {
+		this.progressNotification = progressNotification;
 	}
 
 }

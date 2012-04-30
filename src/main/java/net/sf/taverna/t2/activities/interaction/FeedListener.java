@@ -138,6 +138,7 @@ public class FeedListener {
 			Element statusElement = entry.getExtension(InteractionActivity.getResultStatusQName());
 			String statusContent = statusElement.getText().trim();
 			if (!statusContent.equals(STATUS_OK)) {
+				cleanup (refString);
 				callback.fail(statusContent);
 				return;
 			}
@@ -156,9 +157,14 @@ public class FeedListener {
 				for (Object key : rootAsMap.keySet()) {
 					String keyString = (String) key;
 					Object value = rootAsMap.get(key);
-					int depth = findPortDepth(refString, keyString);
+					Integer depth = findPortDepth(refString, keyString);
+					if (depth == null) {
+						cleanup (refString);
+						callback.fail("Data sent for unknown port : " + keyString);
+					}
 					outputs.put(keyString, referenceService.register(value, depth, true, context));
 				}
+				cleanup (refString);
 				callback.receiveResult(outputs, new int[0]);
 				
 			} catch (JsonParseException e) {
@@ -171,6 +177,11 @@ public class FeedListener {
 		}
 	}
 	
+	private static void cleanup (String refString) {
+		outputPortsMap.remove(refString);
+		callbackMap.remove(refString);		
+	}
+	
 	private static String getReplyTo(Entry entry) {
 	        Element replyTo = entry.getFirstChild(InteractionActivity.getInReplyToQName());
 	        if (replyTo == null) {
@@ -179,14 +190,14 @@ public class FeedListener {
 	        return replyTo.getText();
 	}
 
-	private static int findPortDepth(String refString, String portName) {
+	private static Integer findPortDepth(String refString, String portName) {
 		Set<OutputPort> ports = outputPortsMap.get(refString);
 		for (OutputPort op : ports) {
 			if (op.getName().equals(portName)) {
 				return op.getDepth();
 			}
 		}
-		return 0;
+		return null;
 	}
 
 	public void registerInteraction(Entry entry,

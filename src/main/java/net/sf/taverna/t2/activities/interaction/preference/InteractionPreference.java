@@ -79,8 +79,7 @@ public class InteractionPreference {
 				logger.error(e);
 			}
 		}
-		if (GraphicsEnvironment.isHeadless() || System.getProperty("java.awt.headless").equals("true")) {
-			System.err.println("Running headless");
+		if (GraphicsEnvironment.isHeadless() || (System.getProperty("java.awt.headless") != null) && System.getProperty("java.awt.headless").equals("true")) {
 			String definedHost = System.getProperty("taverna.interaction.host");
 			if (definedHost != null){
 				properties.setProperty(USE_JETTY, "false");
@@ -101,7 +100,6 @@ public class InteractionPreference {
 			}
 		}
 		else {
-			System.err.println("Running non-headless");
 			logger.error("Running non-headless");
 		}
 		fillDefaultProperties();
