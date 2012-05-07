@@ -72,14 +72,8 @@ import org.xml.sax.InputSource;
 @SuppressWarnings("unchecked")
 public class WSDLParser {
 
-    private static final String GET_SERVICE_SECURITY_METADATA_REQUEST = "GetServiceSecurityMetadataRequest";
-    private static final String GET_SERVICE_SECURITY_METADATA = "getServiceSecurityMetadata";
-    private static final String SET_TERMINATION_TIME = "SetTerminationTime";
-    private static final String GET_RESOURCE_PROPERTY = "GetResourceProperty";
-    private static final String DESTROY = "Destroy";
     private static final String SERVICE_SECURITY_URI = "http://security.introduce.cagrid.nci.nih.gov/ServiceSecurity/";
-    private static final String RESOURCE_LIFETIME_URI = "http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceLifetime/";
-    private static final String RESOURCE_PROPERTIES_URI = "http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/";
+
     private static Logger logger = Logger.getLogger(WSDLParser.class);
     /**
      * Cache for operations, to remove the need for reprocessing each time.
@@ -89,10 +83,13 @@ public class WSDLParser {
     private static Map<String, String> styleMap = Collections.synchronizedMap(new HashMap<String, String>());
     private static Map<String, Map<String, PortType>> portTypeMap = Collections.synchronizedMap(new HashMap<String, Map<String, PortType>>());
     private Map<String, BindingOperation> bindingOperations = Collections.synchronizedMap(new HashMap<String, BindingOperation>());
-    private boolean isWsrfService;
+    
     private Definition definition;
     private TypeDescriptors types;
 
+    private boolean isWsrfService;
+    private Map<String, WSRF_Version> wsrfOperations;
+            
     public boolean isWsrfService() {
         return isWsrfService;
     }
@@ -616,47 +613,66 @@ public class WSDLParser {
     }
 
     /**
-     * SOAP actions/operations that if present indicates a WSRF service. <p>
-     * Used by {@link #checkWSRF()}
-     *
-     * @return A {@link Map} mapping SOAP operation name to SOAP action URI.
-     */
-    protected Map<String, String> getWSRFPredictorOperations() {
-        Map<String, String> operations = new HashMap<String, String>();
-
-        operations.put(GET_RESOURCE_PROPERTY, RESOURCE_PROPERTIES_URI
-                + GET_RESOURCE_PROPERTY);
-
-        operations.put(DESTROY, RESOURCE_LIFETIME_URI + DESTROY);
-
-        operations.put(SET_TERMINATION_TIME, RESOURCE_LIFETIME_URI
-                + SET_TERMINATION_TIME);
-
-        operations.put(GET_SERVICE_SECURITY_METADATA, SERVICE_SECURITY_URI
-                + GET_SERVICE_SECURITY_METADATA_REQUEST);
-
-        return operations;
-    }
-
-    /**
      * Check if this is a WSRF-resource property supporting binding. <p> The
      * service is determined to be WSRF-supporting if the WSDL contains at least
      * one of the operations specified by {@link #getWSRFPredictorOperations()}.
      *
      */
     protected void checkWSRF() {
-        isWsrfService = false;
-        for (Entry<String, String> resourceEntry : getWSRFPredictorOperations().entrySet()) {
-            String actionURI;
-            try {
-                actionURI = getSOAPActionURI(resourceEntry.getKey());
-            } catch (UnknownOperationException e) {
-                continue;
+        
+        wsrfOperations = new HashMap<String, WSRF_Version>();
+
+        List<Operation> operations = getOperations();
+        for (Operation operation : operations) {
+            String operationName = operation.getName();
+            for (WSRF_RPOperation resourcePropertyOperation : WSRF_RPOperation.values()) {
+                if (operationName.equals(resourcePropertyOperation.name())) {
+                    try {
+                        String operationNamespace = getOperationNamespaceURI(operationName);
+                        for (WSRF_Version wsrfVersion : WSRF_Version.values()) {
+                            if (wsrfVersion.WSRF_RP.equals(operationNamespace)) {
+                                String soapAction = getSOAPActionURI(operationName);
+                                if (!WSRF_Version.Standard.equals(wsrfVersion)) {
+                                    logger.warn("draft WSRF version found for the WSRF operation: " + operationName + " (" + wsrfVersion.name() + ")");
+                                } else if (!resourcePropertyOperation.SOAP_ACTION.equals(soapAction)) {
+                                    logger.warn("wrong soap action for the WSRF operation: " + operationName + "( " + resourcePropertyOperation.SOAP_ACTION + ")");
+                                }
+
+                                wsrfOperations.put(operationName, wsrfVersion);
+                                
+                                isWsrfService = true; // remove later...
+
+                                break;
+                            }
+                        }
+                    } catch (UnknownOperationException ex) {}
+                    break;
+                }
             }
-            isWsrfService = resourceEntry.getValue().equals(actionURI);
-            if (isWsrfService) {
-                // Just need to match one of the predictors
-                break;
+
+            for (WSRF_RLOperation resourceLifetimeOperation : WSRF_RLOperation.values()) {
+                if (operationName.equals(resourceLifetimeOperation.name())) {
+                    try {
+                        String operationNamespace = getOperationNamespaceURI(operationName);
+                        for (WSRF_Version wsrfVersion : WSRF_Version.values()) {
+                            if (wsrfVersion.WSRF_RL.equals(operationNamespace)) {
+                                String soapAction = getSOAPActionURI(operationName);
+                                if (!WSRF_Version.Standard.equals(wsrfVersion)) {
+                                    logger.warn("draft WSRF version found for the WSRF operation: " + operationName + " (" + wsrfVersion.name() + ")");
+                                } else if (!resourceLifetimeOperation.SOAP_ACTION.equals(soapAction)) {
+                                    logger.warn("wrong soap action for the WSRF operation: " + operationName + "( " + resourceLifetimeOperation.SOAP_ACTION + ")");
+                                }
+
+                                wsrfOperations.put(operationName, wsrfVersion);
+                                
+                                isWsrfService = true; // remove later...
+
+                                break;
+                            }
+                        }
+                    } catch (UnknownOperationException ex) {}
+                    break;
+                }
             }
         }
     }
@@ -710,5 +726,10 @@ public class WSDLParser {
         }
         
         return typeDesc;
+    }
+        
+    public WSRF_Version isWSRFOperation(String operationName)
+    {
+        return wsrfOperations.get(operationName);
     }
 }
