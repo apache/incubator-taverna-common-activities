@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.sf.taverna.t2</groupId>
 		<artifactId>activities</artifactId>
-		<version>2.0-SNAPSHOT</version>
+		<version>2.0.0</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>spreadsheet-import-activity</artifactId>
@@ -19,7 +19,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
-						<Export-Package>net.sf.taverna.t2.activities.spreadsheet,org.apache.poi.*,org.openxmlformats.schemas.*,schemasMicrosoftCom*,schemaorg_apache_xmlbeans.system.*,org.odftoolkit.*,com.csvreader.*</Export-Package>
+						<Private-Package>org.apache.poi.*;-split-package:=merge-first,org.openxmlformats.schemas.*,schemasMicrosoftCom*,schemaorg_apache_xmlbeans.system.*,org.odftoolkit.*,com.csvreader.*</Private-Package>
 						<Import-Package>!org.apache.poi.hdgf.extractor,!org.apache.poi.hslf.extractor,!org.apache.poi.hwpf.extractor,!org.apache.poi.sl.*,org.apache.xmlbeans.impl.schema,*</Import-Package>
 					</instructions>
 				</configuration>
@@ -41,31 +41,37 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.5-FINAL</version>
+			<version>${poi.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.5-FINAL</version>
+			<version>${poi.version}</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.xmlbeans</groupId>
+					<artifactId>xmlbeans</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.odftoolkit</groupId>
 			<artifactId>odfdom-java</artifactId>
-			<version>0.7</version>
+			<version>${odfdom.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.javacsv</groupId>
 			<artifactId>javacsv</artifactId>
-			<version>2.0</version>
+			<version>${javacsv.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>com.springsource.org.apache.xmlbeans</artifactId>
-			<version>2.4.0</version>
+			<version>${xmlbeans.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.log4j</groupId>
@@ -85,21 +91,12 @@
 		</dependency>
 	</dependencies>
 	<repositories>
-		<!-- This repository is down (2012-03-19) and as the project has moved to
-		     apache it's unclear if it will return. odfdom-java-0.7 artifact has been
-		     deployed to the mygrid repository.
-		<repository>
-			<id>odftoolkit</id>
-			<name>Odftoolkit Repository</name>
-			<url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url>
-			<releases>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-		 -->
+		<!-- This repository is down (2012-03-19) and as the project has moved
+			to apache it's unclear if it will return. odfdom-java-0.7 artifact has been
+			deployed to the mygrid repository. <repository> <id>odftoolkit</id> <name>Odftoolkit
+			Repository</name> <url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url>
+			<releases> <checksumPolicy>fail</checksumPolicy> </releases> <snapshots>
+			<checksumPolicy>fail</checksumPolicy> </snapshots> </repository> -->
 	</repositories>
 
 </project>
