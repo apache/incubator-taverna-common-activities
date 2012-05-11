@@ -79,6 +79,9 @@ public class TypeDescriptors
      */
     public TypeDescriptor getElementDescriptor(QName elementName) {
         XmlSchemaElement element = schemas.getElementByQName(elementName);
+        if (element == null) {
+            return null;
+        }
         return getElementDescriptor(element);
     }
 
@@ -91,6 +94,10 @@ public class TypeDescriptors
     public TypeDescriptor getTypeDescriptor(QName typeName) {
         XmlSchemaType xmlSchemaType = schemas.getTypeByQName(typeName);
 
+        if (xmlSchemaType == null) {
+            return null;
+        }
+        
         TypeDescriptor typeDesc;
         if (SOAPConstants.URI_NS_SOAP_ENCODING.equals(typeName.getNamespaceURI()) &&
             "Array".equals(typeName.getLocalPart())) {

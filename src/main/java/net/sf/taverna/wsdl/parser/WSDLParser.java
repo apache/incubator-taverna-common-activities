@@ -364,35 +364,38 @@ public class WSDLParser {
         Operation operation = bindingOperation.getOperation();
 
         Input input = operation.getInput();
-        Message inputMessage = input.getMessage();
+        
+        if (input != null) {
+            Message inputMessage = input.getMessage();
 
-        List<ExtensibilityElement> extensibilityElements = bindingOperation.getBindingInput().getExtensibilityElements();
-        for (ExtensibilityElement extensibilityElement : extensibilityElements) {
-            if (extensibilityElement instanceof SOAPBody) {
-                SOAPBody soapBody = (SOAPBody) extensibilityElement;
+            List<ExtensibilityElement> extensibilityElements = bindingOperation.getBindingInput().getExtensibilityElements();
+            for (ExtensibilityElement extensibilityElement : extensibilityElements) {
+                if (extensibilityElement instanceof SOAPBody) {
+                    SOAPBody soapBody = (SOAPBody) extensibilityElement;
 
-                Collection<String> partNames = soapBody.getParts();
+                    Collection<String> partNames = soapBody.getParts();
 
-                if (partNames == null) {
-                    partNames = inputMessage.getParts().keySet();
-                }
+                    if (partNames == null) {
+                        partNames = inputMessage.getParts().keySet();
+                    }
 
-                for (String partName : partNames) {
-                    Part part = inputMessage.getPart(partName);
-                    
-                    TypeDescriptor typeDesc = processParameter(part);
-                    
-//                    if (partNames.size() > 1 || !typeDesc.getName().equals(operationName)) {
-//                        typeDesc.setName(part.getName());
-//                    } else if (typeDesc instanceof ComplexTypeDescriptor) {
-//                        ComplexTypeDescriptor wrapper = (ComplexTypeDescriptor)typeDesc;
-//                        if (!wrapper.getAttributes().isEmpty()) {
-//                             typeDesc.setName(part.getName());
-//                        }
-//                    }
+                    for (String partName : partNames) {
+                        Part part = inputMessage.getPart(partName);
 
-                    typeDesc.setName(part.getName());
-                    result.add(typeDesc);
+                        TypeDescriptor typeDesc = processParameter(part);
+
+    //                    if (partNames.size() > 1 || !typeDesc.getName().equals(operationName)) {
+    //                        typeDesc.setName(part.getName());
+    //                    } else if (typeDesc instanceof ComplexTypeDescriptor) {
+    //                        ComplexTypeDescriptor wrapper = (ComplexTypeDescriptor)typeDesc;
+    //                        if (!wrapper.getAttributes().isEmpty()) {
+    //                             typeDesc.setName(part.getName());
+    //                        }
+    //                    }
+
+                        typeDesc.setName(part.getName());
+                        result.add(typeDesc);
+                    }
                 }
             }
         }
@@ -417,34 +420,36 @@ public class WSDLParser {
         Operation operation = bindingOperation.getOperation();
 
         Output output = operation.getOutput();
-        Message outputMessage = output.getMessage();
+        if (output != null) {
+            Message outputMessage = output.getMessage();
 
-        List<ExtensibilityElement> extensibilityElements = bindingOperation.getBindingOutput().getExtensibilityElements();
-        for (ExtensibilityElement extensibilityElement : extensibilityElements) {
-            if (extensibilityElement instanceof SOAPBody) {
-                SOAPBody soapBody = (SOAPBody) extensibilityElement;
+            List<ExtensibilityElement> extensibilityElements = bindingOperation.getBindingOutput().getExtensibilityElements();
+            for (ExtensibilityElement extensibilityElement : extensibilityElements) {
+                if (extensibilityElement instanceof SOAPBody) {
+                    SOAPBody soapBody = (SOAPBody) extensibilityElement;
 
-                Collection<String> partNames = soapBody.getParts();
+                    Collection<String> partNames = soapBody.getParts();
 
-                if (partNames == null) {
-                    partNames = outputMessage.getParts().keySet();
-                }
+                    if (partNames == null) {
+                        partNames = outputMessage.getParts().keySet();
+                    }
 
-                for (String partName : partNames) {
-                    Part part = outputMessage.getPart(partName);
-                    
-                    TypeDescriptor typeDesc = processParameter(part);
-//                    if (partNames.size() == 1 && typeDesc instanceof ComplexTypeDescriptor) {
-//                        ComplexTypeDescriptor wrapper = (ComplexTypeDescriptor)typeDesc;
-//
-//                        if (wrapper.getName().equals(operationName + "Response") &&
-//                            wrapper.getAttributes().isEmpty()) {
-//                            result.add(typeDesc);
-//                            continue;
-//                        }
-//                    }
-                    typeDesc.setName(part.getName());
-                    result.add(typeDesc);
+                    for (String partName : partNames) {
+                        Part part = outputMessage.getPart(partName);
+
+                        TypeDescriptor typeDesc = processParameter(part);
+    //                    if (partNames.size() == 1 && typeDesc instanceof ComplexTypeDescriptor) {
+    //                        ComplexTypeDescriptor wrapper = (ComplexTypeDescriptor)typeDesc;
+    //
+    //                        if (wrapper.getName().equals(operationName + "Response") &&
+    //                            wrapper.getAttributes().isEmpty()) {
+    //                            result.add(typeDesc);
+    //                            continue;
+    //                        }
+    //                    }
+                        typeDesc.setName(part.getName());
+                        result.add(typeDesc);
+                    }
                 }
             }
         }
@@ -716,6 +721,10 @@ public class WSDLParser {
         QName elementName = part.getElementName();
         if (elementName != null) {
             typeDesc = types.getElementDescriptor(elementName);
+            if (typeDesc == null) {
+                logger.warn("can't find a global element: " + elementName + " trying with type...");
+                typeDesc = types.getTypeDescriptor(elementName);
+            }
         } else {
             QName typeName = part.getTypeName();
             if (typeName != null) {
