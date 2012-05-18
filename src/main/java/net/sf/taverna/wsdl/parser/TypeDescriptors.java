@@ -157,7 +157,7 @@ public class TypeDescriptors
         }
         elementDescriptor.setType(typeName == null ? "" : typeName.getLocalPart());
 
-        elementDescriptor.setName(element.getName());
+        elementDescriptor.setName(element.isRef() ? element.getWireName().getLocalPart() : element.getName());
         elementDescriptor.setQname(element.getWireName());
         elementDescriptor.setOptional(element.getMinOccurs() == 0);
         elementDescriptor.setUnbounded(Long.MAX_VALUE == element.getMaxOccurs());
