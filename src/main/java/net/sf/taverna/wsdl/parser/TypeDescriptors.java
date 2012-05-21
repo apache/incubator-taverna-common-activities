@@ -408,6 +408,8 @@ public class TypeDescriptors
             } else {
                     attrName = xmlSchemaAttribute.getQName();
             }
+            
+            typeDesc.setName(xmlSchemaAttribute.isRef() ? xmlSchemaAttribute.getWireName().getLocalPart() : xmlSchemaAttribute.getName());
             typeDesc.setQname(attrName);
 
             QName attrTypeName = xmlSchemaAttribute.getSchemaTypeName();
@@ -419,6 +421,7 @@ public class TypeDescriptors
             TypeDescriptor attrTypeDesc = getTypeDescriptor(attrTypeName);
             typeDesc.setType(attrTypeDesc.getType());
 
+            typeDesc.setOptional(XmlSchemaUse.OPTIONAL == xmlSchemaAttribute.getUse());
             attributes.add(typeDesc);
         }
         else {
