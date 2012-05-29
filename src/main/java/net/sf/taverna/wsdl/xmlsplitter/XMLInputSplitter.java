@@ -162,7 +162,7 @@ public class XMLInputSplitter {
 			}
 			if (dataObject != null) {
 				outputElement.setAttribute(key, dataObject.toString(), Namespace
-						.getNamespace(attribute.getNamespaceURI()));
+						.getNamespace(attribute.getQname().getPrefix(), attribute.getNamespaceURI()));
 			}
 		}
 		

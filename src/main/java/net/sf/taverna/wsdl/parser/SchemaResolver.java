@@ -110,9 +110,10 @@ public class SchemaResolver extends ArrayList<Element> implements EntityResolver
         InputSource source = new InputSource(new StringReader(writer.toString()));
         
         String publicId = element.getAttribute("targetNamespace");
-        source.setPublicId(publicId != null ? publicId : element.getNamespaceURI());
-        
-        if (source.getPublicId().isEmpty()) {
+        source.setPublicId(publicId);
+
+        if (publicId.isEmpty()) {
+            //source.setPublicId(element.getNamespaceURI());
             // if the element has no targetNamespace defined, provide a synthetic systemId, so both publicId = "" + systenId never clashes.
             URI base = URI.create(baseUri);
             URI synthetic;

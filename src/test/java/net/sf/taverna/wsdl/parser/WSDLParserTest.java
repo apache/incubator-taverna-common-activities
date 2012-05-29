@@ -44,9 +44,8 @@ public class WSDLParserTest {
 				"wrong number of operations found (wsdl may have changed)", 12,
 				operations.size());
 		Operation op = operations.get(0);
-		assertEquals("wrong name for first operation", "run_eGquery", op
-				.getName());
-		assertEquals("wrong style", "document", parser.getStyle());
+		assertEquals("wrong name for first operation", "run_eGquery", op.getName());
+		assertEquals("wrong style", "document", parser.getStyle("run_eGquery"));
 	}
 
 	private String wsdlResourcePath(String wsdlName) throws Exception {
@@ -159,11 +158,15 @@ public class WSDLParserTest {
 				(typeDesc.getElements().get(6)).getType());
 	}
 	
+        /* comment: while soap binding style must be defaulted to 'document'
+         * in 'SBWReader.wsdl' all operations has style defined ('document')
+         * what overrides style defined in binding...
+         */
 	@Test
 	public void testMissingStyleInBinding() throws Exception {
 		WSDLParser parser = new WSDLParser(wsdlResourcePath("SBWReader.wsdl"));
 		assertEquals("Style should default to document if missing", "document",
-				parser.getStyle());
+				parser.getStyle("doAnalysis"));
 	}
 
 	@Test

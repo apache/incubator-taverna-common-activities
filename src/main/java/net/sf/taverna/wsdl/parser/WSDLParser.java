@@ -21,44 +21,17 @@
 package net.sf.taverna.wsdl.parser;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.wsdl.Binding;
-import javax.wsdl.BindingOperation;
-import javax.wsdl.Definition;
-import javax.wsdl.Import;
 import javax.wsdl.Operation;
-import javax.wsdl.Part;
-import javax.wsdl.Port;
-import javax.wsdl.PortType;
-import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
-import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.wsdl.extensions.soap.SOAPBinding;
-import javax.wsdl.extensions.soap.SOAPBody;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.log4j.Logger;
+import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.xml.sax.SAXException;
 
-import com.ibm.wsdl.extensions.soap.SOAPBindingImpl;
-import com.ibm.wsdl.extensions.soap.SOAPOperationImpl;
-import javax.wsdl.*;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
-import org.apache.ws.commons.schema.*;
-import org.apache.ws.commons.schema.utils.NamespaceMap;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
 /**
  * A Parser for processing WSDL files to determine information about available
@@ -73,26 +46,8 @@ import org.xml.sax.InputSource;
 public class WSDLParser {
 
     private static final String SERVICE_SECURITY_URI = "http://security.introduce.cagrid.nci.nih.gov/ServiceSecurity/";
-
-    private static Logger logger = Logger.getLogger(WSDLParser.class);
-    /**
-     * Cache for operations, to remove the need for reprocessing each time.
-     */
-    private static Map<String, List<Operation>> operationMap = Collections.synchronizedMap(new HashMap<String, List<Operation>>());
-    private static Map<String, Map<String, Binding>> bindingMap = Collections.synchronizedMap(new HashMap<String, Map<String, Binding>>());
-    private static Map<String, String> styleMap = Collections.synchronizedMap(new HashMap<String, String>());
-    private static Map<String, Map<String, PortType>> portTypeMap = Collections.synchronizedMap(new HashMap<String, Map<String, PortType>>());
-    private Map<String, BindingOperation> bindingOperations = Collections.synchronizedMap(new HashMap<String, BindingOperation>());
     
-    private Definition definition;
-    private TypeDescriptors types;
-
-    private boolean isWsrfService;
-    private Map<String, WSRF_Version> wsrfOperations;
-            
-    public boolean isWsrfService() {
-        return isWsrfService;
-    }
+    private WSDL11Parser wsdl11parser;
 
     /**
      * Constructor which takes the location of the base wsdl file, and begins to
@@ -106,64 +61,54 @@ public class WSDLParser {
      */
     public WSDLParser(String wsdlLocation) throws ParserConfigurationException,
             WSDLException, IOException, SAXException {
-        try {
-            WSDLFactory factory = WSDLFactory.newInstance();
-            WSDLReader reader = factory.newWSDLReader();
-            reader.setFeature("javax.wsdl.verbose", false);
-            definition = reader.readWSDL(wsdlLocation);
 
-            XmlSchemaCollection schemas = new XmlSchemaCollection();
-            addXmlSchemas(schemas, definition);
-
-            types = new TypeDescriptors(schemas);
-
-            operationMap.put(wsdlLocation, determineOperations());
-        } catch (WSDLException ex) {
-            throw new IOException(ex.getMessage());
-        }
-
-        checkWSRF();
+        wsdl11parser = WSDL11Parser.getWSDL11Parser(wsdlLocation);
     }
 
-    /*
-     * Recursive method to process all Schemas defined in definition and its imports
+    public List<QName> getServices() {
+        return wsdl11parser.getServices();
+    }
+    
+    public List<String> getPorts(QName serviceName) {
+        return wsdl11parser.getPorts(serviceName);
+    }
+    
+    public List<String> getOperations(String portName) {
+        return wsdl11parser.getOperations(portName);
+    }
+
+    public List<Operation> getOperations() {
+        return wsdl11parser.getOperations();
+    }
+
+//////    /**
+//////     * @return a list of WSDLOperations for all operations for this service,
+//////     */
+//////    public List<String> getOperations() {
+//////        List<String> operations = new ArrayList<String>();
+//////        
+//////        for (QName serviceName : wsdl11parser.getServices()) {
+//////            for (String portName : wsdl11parser.getPorts(serviceName)) {
+//////                operations.addAll(wsdl11parser.getOperations(portName));
+//////            }
+//////        }
+//////        return operations;
+//////    }
+
+    /**
+     * Checks whether ANY of defined ports is an WSRF one.
+     * 
+     * @return true if there is at least one WSRF port found.
      */
-    private void addXmlSchemas(XmlSchemaCollection xmlSchemaCollection, Definition definition) throws IOException {
-        xmlSchemaCollection.setNamespaceContext(new NamespaceMap(definition.getNamespaces()));
-
-        SchemaResolver resolver = new SchemaResolver(definition.getDocumentBaseURI());
-        xmlSchemaCollection.setSchemaResolver(resolver);
-
-        Types types = definition.getTypes();
-        if (types != null) {
-            List elements = types.getExtensibilityElements();
-            for (Object o : elements) {
-                if (o instanceof Schema) {
-                    Schema schema = (Schema) o;
-                    Element element = schema.getElement();
-                    if (element != null) {
-                        resolver.add(element);
-                    }
-                }
-            }
-
-            for (Element element : resolver) {
-                InputSource source = resolver.getInputSource(element);
-                if (xmlSchemaCollection.schemaForNamespace(source.getPublicId()) == null) {
-                    xmlSchemaCollection.read(source);
+    public boolean isWsrfService() {
+        for (QName serviceName : wsdl11parser.getServices()) {
+            for (String portName : wsdl11parser.getPorts(serviceName)) {
+                if (wsdl11parser.isWSRFPort(portName) != null) {
+                    return true;
                 }
             }
         }
-
-        // process imported schemas
-        Map imports = definition.getImports();
-        if (imports != null) {
-            for (Iterator<List<Import>> iter = imports.values().iterator(); iter.hasNext();) {
-                for (Import _import : iter.next()) {
-                    addXmlSchemas(xmlSchemaCollection, _import.getDefinition());
-                }
-            }
-        }
+        return false;
     }
 
     /**
@@ -172,177 +117,43 @@ public class WSDLParser {
      * @param wsdlLocation
      */
     public synchronized static void flushCache(String wsdlLocation) {
-        operationMap.remove(wsdlLocation);
-        bindingMap.remove(wsdlLocation);
-        styleMap.remove(wsdlLocation);
-        portTypeMap.remove(wsdlLocation);
-    }
-
-    /**
-     * @return a list of WSDLOperations for all operations for this service,
-     */
-    public List<Operation> getOperations() {
-        return operationMap.get(getWSDLLocation());
     }
 
     /**
      * @return the wsdl location for which this parser was constructed
      */
     public String getWSDLLocation() {
-        return definition.getDocumentBaseURI();
+        return wsdl11parser.getDocumentBaseURI();
+    }
+
+    public String getOperationEndpointLocation(String portName) {
+        return wsdl11parser.getSoapAddress(portName);
+    }
+    
+    public List<String> getOperationEndpointLocations(String operationName) throws UnknownOperationException {
+        
+        String soapAddress = wsdl11parser.getOperationEndpointLocation(operationName);
+        return Arrays.asList(soapAddress);
     }
 
     /**
-     * @return the Definition for this service
-     */
-    public Definition getDefinition() {
-        return definition;
-    }
-
-    public List<String> getOperationEndpointLocations(String operationName) {
-        List<String> result = new ArrayList<String>();
-        Collection<Service> services = getDefinition().getServices().values();
-        Binding binding = getBinding(operationName);
-        for (Service service : services) {
-            Collection<Port> ports = service.getPorts().values();
-            for (Port port : ports) {
-                if (port.getBinding().equals(binding)) {
-                    for (Object obj : port.getExtensibilityElements()) {
-                        if (obj instanceof SOAPAddress) {
-                            SOAPAddress address = (SOAPAddress) obj;
-                            String endpoint = address.getLocationURI();
-                            result.add(endpoint);
-                        }
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    private List<Operation> determineOperations() {
-        List<Operation> result = new ArrayList<Operation>();
-
-        Map<String, PortType> portToOperationMap = portTypeToOperationMap();
-        Map<String, Binding> bindingToOperationMap = bindingToOperationMap();
-
-        Map bindings = definition.getBindings();
-        for (Iterator iterator = bindings.values().iterator(); iterator.hasNext();) {
-            Binding binding = (Binding) iterator.next();
-            List extensibilityElementList = binding.getExtensibilityElements();
-            for (Iterator k = extensibilityElementList.iterator(); k.hasNext();) {
-                ExtensibilityElement ee = (ExtensibilityElement) k.next();
-                if (ee instanceof SOAPBindingImpl) {
-                    SOAPBinding soapBinding = (SOAPBinding) ee;
-                    PortType portType = binding.getPortType();
-
-                    setStyleForBinding(soapBinding);
-
-                    for (Iterator opIterator = portType.getOperations().iterator(); opIterator.hasNext();) {
-                        Operation op = (Operation) opIterator.next();
-                        result.add(op);
-                        portToOperationMap.put(op.getName(), portType);
-                        bindingToOperationMap.put(op.getName(), binding);
-                    }
-                }
-            }
-        }
-
-        Map imports = definition.getImports();
-        if (imports != null && imports.size() > 0) {
-            result.addAll(processImports(imports));
-        }
-
-        return result;
-    }
-
-    private Map<String, Binding> bindingToOperationMap() {
-        Map<String, Binding> bindingToOperationMap = bindingMap.get(getWSDLLocation());
-        if (bindingToOperationMap == null) {
-            bindingToOperationMap = new HashMap<String, Binding>();
-            bindingMap.put(getWSDLLocation(), bindingToOperationMap);
-        }
-        return bindingToOperationMap;
-    }
-
-    private Map<String, PortType> portTypeToOperationMap() {
-        Map<String, PortType> portToOperationMap = portTypeMap.get(getWSDLLocation());
-        if (portToOperationMap == null) {
-            portToOperationMap = new HashMap<String, PortType>();
-            portTypeMap.put(getWSDLLocation(), portToOperationMap);
-        }
-        return portToOperationMap;
-    }
-
-    private List<Operation> processImports(Map imports) {
-        List<Operation> result = new ArrayList<Operation>();
-
-        Map<String, PortType> portToOperationMap = portTypeToOperationMap();
-        Map<String, Binding> bindingToOperationMap = bindingToOperationMap();
-
-        for (Iterator iterator = imports.values().iterator(); iterator.hasNext();) {
-            List list = (List) iterator.next();
-            for (Iterator importIterator = list.iterator(); importIterator.hasNext();) {
-                Import imp = (Import) importIterator.next();
-                Map bindings = imp.getDefinition().getBindings();
-                for (Iterator bindingsIterator = bindings.values().iterator(); bindingsIterator.hasNext();) {
-                    Binding binding = (Binding) bindingsIterator.next();
-                    List extensibilityElementList = binding.getExtensibilityElements();
-                    for (Iterator k = extensibilityElementList.iterator(); k.hasNext();) {
-                        ExtensibilityElement ee = (ExtensibilityElement) k.next();
-                        if (ee instanceof SOAPBindingImpl) {
-                            SOAPBinding soapBinding = (SOAPBinding) ee;
-                            PortType portType = binding.getPortType();
-
-                            setStyleForBinding(soapBinding);
-
-                            for (Iterator opIterator = portType.getOperations().iterator(); opIterator.hasNext();) {
-                                Operation op = (Operation) opIterator.next();
-                                result.add(op);
-                                portToOperationMap.put(op.getName(), portType);
-                                bindingToOperationMap.put(op.getName(), binding);
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
-
-        return result;
-    }
-
-    private Binding getBinding(String operationName) {
-        Binding result = null;
-        Map<String, Binding> bindingToOpMap = bindingMap.get(getWSDLLocation());
-        if (bindingToOpMap != null) {
-            result = bindingToOpMap.get(operationName);
-        }
-        return result;
-    }
-
-    /**
-     *
+     * N.B. a style is defined on per operation basis, so there can be different types within a same document.
+     * This method is to be removed in the next versions of parser.
+     * 
      * @return the style, i.e. document or rpc
+     * @deprecated
      */
-    public String getStyle() {
-        return styleMap.get(getWSDLLocation());
-    }
-
-    /**
-     * Provides the PortType for a given operation.
-     *
-     * @param operationName the name of the operation the PortType is required
-     * for.
-     * @return the PortType
-     */
-    public PortType getPortType(String operationName) {
-        PortType result = null;
-        Map<String, PortType> portToOpMap = portTypeMap.get(getWSDLLocation());
-        if (portToOpMap != null) {
-            result = portToOpMap.get(operationName);
+    @Deprecated
+    public String getStyle() throws UnknownOperationException {
+        List<Operation> operations = wsdl11parser.getOperations();
+        if (operations.isEmpty()) {
+            return "document";
         }
-        return result;
+        return wsdl11parser.getOperationStyle(operations.get(0).getName());
+    }
+    
+    public String getStyle(String operationName) throws UnknownOperationException {
+        return wsdl11parser.getOperationStyle(operationName);
     }
 
     /**
@@ -358,49 +169,7 @@ public class WSDLParser {
     public List<TypeDescriptor> getOperationInputParameters(String operationName)
             throws UnknownOperationException, IOException {
 
-        List<TypeDescriptor> result = new ArrayList<TypeDescriptor>();
-
-        BindingOperation bindingOperation = getBindingOperation(operationName);
-        Operation operation = bindingOperation.getOperation();
-
-        Input input = operation.getInput();
-        
-        if (input != null) {
-            Message inputMessage = input.getMessage();
-
-            List<ExtensibilityElement> extensibilityElements = bindingOperation.getBindingInput().getExtensibilityElements();
-            for (ExtensibilityElement extensibilityElement : extensibilityElements) {
-                if (extensibilityElement instanceof SOAPBody) {
-                    SOAPBody soapBody = (SOAPBody) extensibilityElement;
-
-                    Collection<String> partNames = soapBody.getParts();
-
-                    if (partNames == null) {
-                        partNames = inputMessage.getParts().keySet();
-                    }
-
-                    for (String partName : partNames) {
-                        Part part = inputMessage.getPart(partName);
-
-                        TypeDescriptor typeDesc = processParameter(part);
-
-    //                    if (partNames.size() > 1 || !typeDesc.getName().equals(operationName)) {
-    //                        typeDesc.setName(part.getName());
-    //                    } else if (typeDesc instanceof ComplexTypeDescriptor) {
-    //                        ComplexTypeDescriptor wrapper = (ComplexTypeDescriptor)typeDesc;
-    //                        if (!wrapper.getAttributes().isEmpty()) {
-    //                             typeDesc.setName(part.getName());
-    //                        }
-    //                    }
-
-                        typeDesc.setName(part.getName());
-                        result.add(typeDesc);
-                    }
-                }
-            }
-        }
-
-        return result;
+        return TypeDescriptors.getDescriptors(wsdl11parser.getInputParameters(operationName));
     }
 
     /**
@@ -414,47 +183,8 @@ public class WSDLParser {
      */
     public List<TypeDescriptor> getOperationOutputParameters(
             String operationName) throws UnknownOperationException, IOException {
-        List<TypeDescriptor> result = new ArrayList<TypeDescriptor>();
-
-        BindingOperation bindingOperation = getBindingOperation(operationName);
-        Operation operation = bindingOperation.getOperation();
-
-        Output output = operation.getOutput();
-        if (output != null) {
-            Message outputMessage = output.getMessage();
-
-            List<ExtensibilityElement> extensibilityElements = bindingOperation.getBindingOutput().getExtensibilityElements();
-            for (ExtensibilityElement extensibilityElement : extensibilityElements) {
-                if (extensibilityElement instanceof SOAPBody) {
-                    SOAPBody soapBody = (SOAPBody) extensibilityElement;
-
-                    Collection<String> partNames = soapBody.getParts();
-
-                    if (partNames == null) {
-                        partNames = outputMessage.getParts().keySet();
-                    }
-
-                    for (String partName : partNames) {
-                        Part part = outputMessage.getPart(partName);
-
-                        TypeDescriptor typeDesc = processParameter(part);
-    //                    if (partNames.size() == 1 && typeDesc instanceof ComplexTypeDescriptor) {
-    //                        ComplexTypeDescriptor wrapper = (ComplexTypeDescriptor)typeDesc;
-    //
-    //                        if (wrapper.getName().equals(operationName + "Response") &&
-    //                            wrapper.getAttributes().isEmpty()) {
-    //                            result.add(typeDesc);
-    //                            continue;
-    //                        }
-    //                    }
-                        typeDesc.setName(part.getName());
-                        result.add(typeDesc);
-                    }
-                }
-            }
-        }
-
-        return result;
+        
+        return TypeDescriptors.getDescriptors(wsdl11parser.getOutputParameters(operationName));
     }
 
     /**
@@ -471,55 +201,33 @@ public class WSDLParser {
      */
     public String getOperationNamespaceURI(String operationName)
             throws UnknownOperationException {
-
-        String result = null;
-        if (getStyle().equals("document")) {
-            try {
-                // this lovely line of code gets the correct namespace ....
-                result = ((Part) getBindingOperation(operationName).getOperation().getInput().getMessage().getOrderedParts(null).get(0)).getElementName().getNamespaceURI();
-            } catch (Exception e) {
-                // .... but this gets a good approximation if the above fails
-                result = getDefinition().getTargetNamespace();
-            }
-        } else {
-            BindingOperation binding = getBindingOperation(operationName);
-            List extElements = binding.getBindingInput().getExtensibilityElements();
-            if (extElements != null && extElements.size() > 0) {
-                SOAPBody body = (SOAPBody) extElements.get(0);
-                result = body.getNamespaceURI();
-            } else {
-                extElements = binding.getBindingOutput().getExtensibilityElements();
-                if (extElements != null && extElements.size() > 0) {
-                    SOAPBody body = (SOAPBody) extElements.get(0);
-                    result = body.getNamespaceURI();
-                }
-            }
-
-            if (result == null) {
-                // as a fall back, this almost always gives the right namespace
-                result = getDefinition().getTargetNamespace();
-            }
-        }
-
-        return result;
+        QName rpcMethodName = getOperationQname(operationName);
+        return rpcMethodName == null ? "" : rpcMethodName.getNamespaceURI();
     }
 
     public QName getOperationQname(String operationName)
             throws UnknownOperationException {
-        if (getStyle().equals("document")) {
-            try {
-                // Get the QName of the first element of the input message
-                return ((Part) getBindingOperation(operationName).getOperation().getInput().getMessage().getOrderedParts(null).get(0)).getElementName();
-            } catch (RuntimeException e) {
-                logger.warn("Could not find qname of message for operation "
-                        + operationName, e);
-                String ns = getDefinition().getTargetNamespace();
-                return new QName(ns, operationName);
+        
+        if ("rpc".equals(wsdl11parser.getOperationStyle(operationName))) {
+            QName rpcMethodName = wsdl11parser.getRPCRequestMethodName(operationName);
+            if (rpcMethodName == null) {
+                wsdl11parser.getRPCResponseMethodName(operationName);
             }
-        } else {
-            String ns = getOperationNamespaceURI(operationName);
-            return new QName(ns, operationName);
+            
+            return rpcMethodName;
         }
+        
+        // all these things are odd... there is no any wrapper for the 'document' style
+        LinkedHashMap<String, XmlSchemaObject> parameters = wsdl11parser.getInputParameters(operationName);
+        if (parameters.size() > 0) {
+            XmlSchemaObject xmlSchemaObject = parameters.values().iterator().next();
+            if (xmlSchemaObject instanceof XmlSchemaElement) {
+                XmlSchemaElement element = (XmlSchemaElement)xmlSchemaObject;
+                return element.getQName();
+            }
+        }
+        
+        return null;
     }
 
     /**
@@ -531,19 +239,10 @@ public class WSDLParser {
      * @throws UnknownOperationException
      */
     public String getUse(String operationName) throws UnknownOperationException {
-        String result = null;
-
-        BindingOperation binding = getBindingOperation(operationName);
-        List extElements = binding.getBindingInput().getExtensibilityElements();
-        if (extElements != null && extElements.size() > 0) {
-            SOAPBody body = (SOAPBody) extElements.get(0);
-            result = body.getUse();
-        } else {
-            extElements = binding.getBindingOutput().getExtensibilityElements();
-            if (extElements != null && extElements.size() > 0) {
-                SOAPBody body = (SOAPBody) extElements.get(0);
-                result = body.getUse();
-            }
+        
+        String result = wsdl11parser.getSoapInputUse(operationName);
+        if (result == null) {
+            result = wsdl11parser.getSoapOutputUse(operationName);
         }
 
         return result;
@@ -558,15 +257,7 @@ public class WSDLParser {
      */
     public String getSOAPActionURI(String operationName)
             throws UnknownOperationException {
-        String result = null;
-        BindingOperation op = getBindingOperation(operationName);
-        List elements = op.getExtensibilityElements();
-        for (Iterator elIterator = elements.iterator(); elIterator.hasNext();) {
-            SOAPOperationImpl extension = (SOAPOperationImpl) elIterator.next();
-            result = extension.getSoapActionURI();
-            break;
-        }
-        return result;
+        return wsdl11parser.getSOAPActionURI(operationName);
     }
 
     /**
@@ -579,166 +270,10 @@ public class WSDLParser {
      */
     public String getOperationDocumentation(String operationName)
             throws UnknownOperationException {
-        String result = "";
-
-        Operation operation = getOperation(operationName);
-        if (operation.getDocumentationElement() != null) {
-            if (operation.getDocumentationElement().getFirstChild() != null) {
-                result = operation.getDocumentationElement().getFirstChild().getNodeValue();
-            }
-        }
-
-        return result;
+        return wsdl11parser.getOperationDocumentation(operationName);
     }
 
-    /**
-     * Returns a WSDLOperation descriptor for an operation that matches the
-     * operationName.
-     *
-     * @param operationName
-     * @return a matching WSDLOperation descriptor
-     * @throws UnknowOperationException if no operation matches the name
-     */
-    public Operation getOperation(String operationName)
-            throws UnknownOperationException {
-        Operation result = null;
-
-        for (Iterator iterator = getOperations().iterator(); iterator.hasNext();) {
-            Operation op = (Operation) iterator.next();
-            if (op.getName().equals(operationName)) {
-                result = op;
-                break;
-            }
-        }
-        if (result == null) {
-            throw new UnknownOperationException("No operation named: "
-                    + operationName + " exists");
-        }
-        return result;
-    }
-
-    /**
-     * Check if this is a WSRF-resource property supporting binding. <p> The
-     * service is determined to be WSRF-supporting if the WSDL contains at least
-     * one of the operations specified by {@link #getWSRFPredictorOperations()}.
-     *
-     */
-    protected void checkWSRF() {
-        
-        wsrfOperations = new HashMap<String, WSRF_Version>();
-
-        List<Operation> operations = getOperations();
-        for (Operation operation : operations) {
-            String operationName = operation.getName();
-            for (WSRF_RPOperation resourcePropertyOperation : WSRF_RPOperation.values()) {
-                if (operationName.equals(resourcePropertyOperation.name())) {
-                    try {
-                        String operationNamespace = getOperationNamespaceURI(operationName);
-                        for (WSRF_Version wsrfVersion : WSRF_Version.values()) {
-                            if (wsrfVersion.WSRF_RP.equals(operationNamespace)) {
-                                String soapAction = getSOAPActionURI(operationName);
-                                if (!WSRF_Version.Standard.equals(wsrfVersion)) {
-                                    logger.warn("draft WSRF version found for the WSRF operation: " + operationName + " (" + wsrfVersion.name() + ")");
-                                } else if (!resourcePropertyOperation.SOAP_ACTION.equals(soapAction)) {
-                                    logger.warn("wrong soap action for the WSRF operation: " + operationName + "( " + resourcePropertyOperation.SOAP_ACTION + ")");
-                                }
-
-                                wsrfOperations.put(operationName, wsrfVersion);
-                                
-                                isWsrfService = true; // remove later...
-
-                                break;
-                            }
-                        }
-                    } catch (UnknownOperationException ex) {}
-                    break;
-                }
-            }
-
-            for (WSRF_RLOperation resourceLifetimeOperation : WSRF_RLOperation.values()) {
-                if (operationName.equals(resourceLifetimeOperation.name())) {
-                    try {
-                        String operationNamespace = getOperationNamespaceURI(operationName);
-                        for (WSRF_Version wsrfVersion : WSRF_Version.values()) {
-                            if (wsrfVersion.WSRF_RL.equals(operationNamespace)) {
-                                String soapAction = getSOAPActionURI(operationName);
-                                if (!WSRF_Version.Standard.equals(wsrfVersion)) {
-                                    logger.warn("draft WSRF version found for the WSRF operation: " + operationName + " (" + wsrfVersion.name() + ")");
-                                } else if (!resourceLifetimeOperation.SOAP_ACTION.equals(soapAction)) {
-                                    logger.warn("wrong soap action for the WSRF operation: " + operationName + "( " + resourceLifetimeOperation.SOAP_ACTION + ")");
-                                }
-
-                                wsrfOperations.put(operationName, wsrfVersion);
-                                
-                                isWsrfService = true; // remove later...
-
-                                break;
-                            }
-                        }
-                    } catch (UnknownOperationException ex) {}
-                    break;
-                }
-            }
-        }
-    }
-
-    private void setStyleForBinding(SOAPBinding soapBinding) {
-        String style = soapBinding.getStyle();
-        if (style == null) {
-            style = "document"; // soap spec specifies to default to document if
-        }								// missing.
-        styleMap.put(getWSDLLocation(), style);
-    }
-
-    private BindingOperation getBindingOperation(String operationName)
-            throws UnknownOperationException {
-        BindingOperation result = bindingOperations.get(operationName);
-        if (result == null) {
-            Binding binding = getBinding(operationName);
-            if (binding != null) {
-                List bindings = binding.getBindingOperations();
-                for (Iterator iterator = bindings.iterator(); iterator.hasNext();) {
-                    BindingOperation bindingOperation = (BindingOperation) iterator.next();
-                    if (bindingOperation.getOperation().getName().equals(
-                            operationName)) {
-                        result = bindingOperation;
-                        bindingOperations.put(operationName, result);
-                        break;
-                    }
-                }
-            }
-        }
-        if (result == null) {
-            throw new UnknownOperationException(
-                    "Can't find binding operation for '" + operationName + "'");
-        }
-        return result;
-    }
-
-    private TypeDescriptor processParameter(Part part) {
-        TypeDescriptor typeDesc;
-
-        QName elementName = part.getElementName();
-        if (elementName != null) {
-            typeDesc = types.getElementDescriptor(elementName);
-            if (typeDesc == null) {
-                logger.warn("can't find a global element: " + elementName + " trying with type...");
-                typeDesc = types.getTypeDescriptor(elementName);
-            }
-        } else {
-            QName typeName = part.getTypeName();
-            if (typeName != null) {
-                typeDesc = types.getTypeDescriptor(typeName);
-            } else {
-                return null;
-            }
-        }
-        
-        return typeDesc;
-    }
-        
-    public WSRF_Version isWSRFOperation(String operationName)
-    {
-        return wsrfOperations.get(operationName);
+    public WSRF_Version isWSRFPort(String portName) {
+        return wsdl11parser.isWSRFPort(portName);
     }
 }

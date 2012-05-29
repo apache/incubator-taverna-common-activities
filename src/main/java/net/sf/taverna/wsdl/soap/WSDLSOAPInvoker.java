@@ -36,7 +36,6 @@ package net.sf.taverna.wsdl.soap;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,9 +46,6 @@ import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.SOAPConnection;
-import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPEnvelope;
@@ -70,30 +66,44 @@ import org.xml.sax.SAXException;
 public class WSDLSOAPInvoker {
 
 	private static final String ATTACHMENT_LIST = "attachmentList";
+	
+	private static Logger logger = Logger.getLogger(WSDLSOAPInvoker.class);
+
 	private BodyBuilderFactory bodyBuilderFactory = BodyBuilderFactory.instance();
 	private WSDLParser parser;
 	private String operationName;
 	private List<String> outputNames;
-	
-	private static Logger logger = Logger.getLogger(WSDLSOAPInvoker.class);
-
+        
+        private JaxWSInvoker invoker;
+        
 	public WSDLSOAPInvoker(WSDLParser parser, String operationName,
 			List<String> outputNames) {
-		this.parser = parser;
-		this.operationName = operationName;
-		this.outputNames = outputNames;
+            this.parser = parser;
+            this.operationName = operationName;
+            this.outputNames = outputNames;
+    
+            invoker = new JaxWSInvoker(parser, null, operationName);
+            invoker.setTimeout(getTimeout());
 	}
 	
+        public void setCredentials(String username, String password) {
+            invoker.setCredentials(username, password);
+        }
+        
+        public void setWSSSecurity(WSSTokenProfile token) {
+            invoker.setWSSSecurity(token);
+        }
+        
 	protected String getOperationName() {
-		return operationName;
+            return operationName;
 	}
 	
 	protected WSDLParser getParser() {
-		return parser;
+            return parser;
 	}
 
 	protected List<String> getOutputNames() {
-		return outputNames;
+            return outputNames;
 	}
 	
 
@@ -107,29 +117,31 @@ public class WSDLSOAPInvoker {
 	 */
 	public Map<String, Object> invoke(Map inputMap) throws Exception {
 
-                SOAPMessage message = makeRequestEnvelope(inputMap);
+            SOAPMessage message = makeRequestEnvelope(inputMap);
                 
-                return invoke(message);
+            return invoke(message);
 	}
 
 	public SOAPMessage call(SOAPMessage message) throws Exception
         {
-            String endpoint = parser.getOperationEndpointLocations(operationName).get(0);
-            URL endpointURL = new URL(endpoint);
-
-            String soapAction = parser.getSOAPActionURI(operationName);
-            if (soapAction != null) {
-                MimeHeaders headers = message.getMimeHeaders();
-                headers.setHeader("SOAPAction", soapAction);
-            }
-
-            logger.info("Invoking service with SOAP envelope:\n" + message.getSOAPPart().getEnvelope());
-
-            SOAPConnectionFactory factory = SOAPConnectionFactory.newInstance();
-            SOAPConnection connection = factory.createConnection();  
-
-//		call.setTimeout(getTimeout());
-            return connection.call(message, endpointURL); 
+            return invoker.call(message);
+            
+//            String endpoint = parser.getOperationEndpointLocations(operationName).get(0);
+//            URL endpointURL = new URL(endpoint);
+//
+//            String soapAction = parser.getSOAPActionURI(operationName);
+//            if (soapAction != null) {
+//                MimeHeaders headers = message.getMimeHeaders();
+//                headers.setHeader("SOAPAction", soapAction);
+//            }
+//
+//            logger.info("Invoking service with SOAP envelope:\n" + message.getSOAPPart().getEnvelope());
+//            
+//            SOAPConnectionFactory factory = SOAPConnectionFactory.newInstance();
+//            SOAPConnection connection = factory.createConnection();  
+//
+////		call.setTimeout(getTimeout());
+//            return connection.call(message, endpointURL);
         }
         
 	/**
@@ -178,15 +190,22 @@ public class WSDLSOAPInvoker {
 			throws UnknownOperationException, IOException, WSDLException,
 			ParserConfigurationException, SOAPException, SAXException {
 	
-            MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
+            MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL); // TODO: SOAP version
             SOAPMessage message = factory.createMessage();
+//            
+//            String soapAction = parser.getSOAPActionURI(operationName);
+//            if (soapAction != null) {
+//                MimeHeaders headers = message.getMimeHeaders();
+//                headers.addHeader("SOAPAction", soapAction);
+//            }
+//
+//            if (username != null && username.length() > 0 && 
+//                password != null && password.length() > 0) {
+//                String authorization = DatatypeConverter.printBase64Binary((username+":"+password).getBytes());
+//                MimeHeaders headers = message.getMimeHeaders();
+//                headers.addHeader("Authorization", "Basic " + authorization);
+//            }
             
-            String soapAction = parser.getSOAPActionURI(operationName);
-            if (soapAction != null) {
-                MimeHeaders headers = message.getMimeHeaders();
-                headers.addHeader("SOAPAction", soapAction);
-            }
-
             SOAPEnvelope requestEnv = message.getSOAPPart().getEnvelope();
                 
             addSoapHeader(requestEnv);
@@ -233,8 +252,8 @@ public class WSDLSOAPInvoker {
 		return result;
 	}
 
-	protected String getStyle() {
-		return parser.getStyle();
+	protected String getStyle() throws UnknownOperationException {
+		return parser.getStyle(operationName);
 	}
 
 	protected String getUse() throws UnknownOperationException {

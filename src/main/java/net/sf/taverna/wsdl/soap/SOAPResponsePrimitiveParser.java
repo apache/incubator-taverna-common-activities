@@ -77,7 +77,7 @@ public class SOAPResponsePrimitiveParser implements SOAPResponseParser {
             SOAPElement param = paramIterator.next();
             Object value = param.getTextContent();
             if (outputNames.contains(param.getLocalName())) {
-                result.put(param.getElementName(), ObjectConverter.convertObject(value));
+                result.put(param.getElementName().getLocalName(), ObjectConverter.convertObject(value));
             } else {
                 result.put(outputNames.get(c), value);
             }

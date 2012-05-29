@@ -22,13 +22,11 @@ package net.sf.taverna.wsdl.soap;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.wsdl.WSDLException;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
@@ -38,14 +36,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
-
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
 import net.sf.taverna.wsdl.parser.BaseTypeDescriptor;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
-
 import org.apache.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;

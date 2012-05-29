@@ -28,7 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPConstants;
@@ -56,21 +59,83 @@ public class TypeDescriptors
     public TypeDescriptors(XmlSchemaCollection schemas) {
         this.schemas = schemas;
         
-        // get soapEncoding datatypes 
-        try {
-            URL soapEncodingURL = new URL(SOAPConstants.URI_NS_SOAP_ENCODING);
-            InputStream soapEncodingStream = soapEncodingURL.openStream();
-            try { 
-                schemas.read(new InputSource(soapEncodingStream));
+        if (schemas.schemaForNamespace(SOAPConstants.URI_NS_SOAP_ENCODING) == null) {
+            // get soapEncoding datatypes 
+            try {
+                InputStream soapEncodingStream = TypeDescriptors.class.getClassLoader().getResourceAsStream("META-INF/soap-encoding.xsd");
+                try { 
+                    schemas.read(new InputSource(soapEncodingStream));
+                }
+                finally {
+                    soapEncodingStream.close();
+                }
+
+//                URL soapEncodingURL = new URL(SOAPConstants.URI_NS_SOAP_ENCODING);
+//                InputStream soapEncodingStream = soapEncodingURL.openStream();
+//                try { 
+//                    schemas.read(new InputSource(soapEncodingStream));
+//                }
+//                finally {
+//                    soapEncodingStream.close();
+//                }
             }
-            finally {
-                soapEncodingStream.close();
-            }
+            catch(MalformedURLException ex) {}
+            catch(IOException ex) {}
         }
-        catch(MalformedURLException ex) {}
-        catch(IOException ex) {}
     }
 
+    public static List<TypeDescriptor> getDescriptors(LinkedHashMap<String, XmlSchemaObject> map) {
+        
+        List<TypeDescriptor> result = new ArrayList<TypeDescriptor>();
+
+        for (Map.Entry<String, XmlSchemaObject> parameter : map.entrySet()) {
+            
+            TypeDescriptor typeDescriptor;
+            
+            String partName = parameter.getKey();
+            XmlSchemaObject xmlSchemaObject = parameter.getValue();
+            
+            if (xmlSchemaObject instanceof XmlSchemaElement) {
+                typeDescriptor = getDescriptor((XmlSchemaElement)xmlSchemaObject);
+            } else if (xmlSchemaObject instanceof XmlSchemaType) {
+                typeDescriptor = getDescriptor((XmlSchemaType)xmlSchemaObject);
+            } else {
+                throw new IllegalArgumentException("wrong XmlSchemaObject. Mast be either xs:element or xs:type");
+            }
+            
+            typeDescriptor.setName(partName);
+            
+            result.add(typeDescriptor);
+        }
+        
+        return result;
+    }
+    
+    public static TypeDescriptor getDescriptor(XmlSchemaElement element) {
+        XmlSchema xmlSchema = element.getParent();
+        
+        XmlSchemaCollection schemas = xmlSchema.getParent();
+        if (schemas == null) {
+            schemas = new XmlSchemaCollection();
+            // TODO: put somehow schema inside
+        }
+        
+        TypeDescriptors descriptors = new TypeDescriptors(schemas);
+        return descriptors.getElementDescriptor(element);
+    }
+    
+    public static TypeDescriptor getDescriptor(XmlSchemaType type) {
+        XmlSchema xmlSchema = type.getParent();
+        
+        XmlSchemaCollection schemas = xmlSchema.getParent();
+        if (schemas == null) {
+            schemas = new XmlSchemaCollection();
+        }
+        
+        TypeDescriptors descriptors = new TypeDescriptors(schemas);
+        return descriptors.getTypeDescriptor(type.getQName());
+    }
+    
     /**
      * Builds a type descriptor for a "Literal" parameter.
      * 
@@ -403,13 +468,13 @@ public class TypeDescriptors
                 attrName = xmlSchemaRef.getTargetQName();
                 if (attrName == null) {
                     XmlSchemaAttribute xmlSchemaRefAttribute = xmlSchemaRef.getTarget();
-                    attrName = xmlSchemaRefAttribute.getQName();
+                    attrName = xmlSchemaRefAttribute.getWireName();
                 }
             } else {
-                    attrName = xmlSchemaAttribute.getQName();
+                    attrName = xmlSchemaAttribute.getWireName();
             }
             
-            typeDesc.setName(xmlSchemaAttribute.isRef() ? xmlSchemaAttribute.getWireName().getLocalPart() : xmlSchemaAttribute.getName());
+            typeDesc.setName(attrName.getLocalPart());
             typeDesc.setQname(attrName);
 
             QName attrTypeName = xmlSchemaAttribute.getSchemaTypeName();
@@ -468,10 +533,10 @@ public class TypeDescriptors
                 attrName = xmlSchemaRef.getTargetQName();
                 if (attrName == null) {
                     XmlSchemaAttribute xmlSchemaRefAttribute = xmlSchemaRef.getTarget();
-                    attrName = xmlSchemaRefAttribute.getQName();
+                    attrName = xmlSchemaRefAttribute.getWireName();
                 }
             } else {
-                    attrName = xmlSchemaAttribute.getQName();
+                    attrName = xmlSchemaAttribute.getWireName();
             }
 
             if (SOAPConstants.URI_NS_SOAP_ENCODING.equals(attrName.getNamespaceURI()) &&
