@@ -2,10 +2,10 @@
 <html>
   <head>
       <title></title>
-  </head>
-  <body>
        <script type="text/javascript" src="$pmrpcUrl"></script>
        
+  </head>
+  <body>
        <script type="text/javascript">
 
          function createReplyContent(status, results) {
@@ -16,13 +16,14 @@
            msg += "<title>\"A reply to " + "$entryId" + "\"</title>\n";
            msg += "<id>" + "$entryId" + "-reply" + "</id>\n";
            msg += "<content/>\n";
+           msg += "<interaction:run-id xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$runId" + "</interaction:run-id>\n";
            msg += "<interaction:in-reply-to  xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$entryId" + "</interaction:in-reply-to>\n";
-           msg += "<interaction:resultStatus xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">"
+           msg += "<interaction:result-status xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">";
            msg += escape(status);
-           msg += "</interaction:resultStatus>";
-           msg += "<interaction:resultData xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">\n";
+           msg += "</interaction:result-status>";
+           msg += "<interaction:result-data xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">\n";
 		   msg += escape(results);
-           msg += "</interaction:resultData>\n";
+           msg += "</interaction:result-data>\n";
            msg += "</entry>\n";
            return msg;
          }
@@ -41,28 +42,40 @@
            return false;
          }
          
-         pmrpc.register( {
-         	publicProcedureName : "reply",
-         	procedure : function(status, results) {
-         	   reply(status, results);
-         	   return "OK";
-         	}
-         });
+
          
-         pmrpc.register( {
-           publicProcedureName : "getInputData",
-           procedure : function() {
-             return JSON.parse('$inputData');
-           }
-         });
+         window.onload = function() {
+           pmrpc.register( {
+         	  publicProcedureName : "reply",
+         	  procedure : function(status, results) {
+         	     reply(status, results);
+         	     return "OK";
+         	  }
+           });
          
-         pmrpc.register( {
-           publicProcedureName : "getWorkflowRunId",
-           procedure : function () {
-             return '$runId';
-           }
-         });
+           pmrpc.register( {
+             publicProcedureName : "getInputData",
+             procedure : function() {
+               return JSON.parse('$inputData');
+             }
+           });
+         
+           pmrpc.register( {
+             publicProcedureName : "getWorkflowRunId",
+             procedure : function () {
+               return '$runId';
+             }
+           });
+
+           pmrpc.call({
+ 			 destination : "publish",
+             publicProcedureName : "communicationFrameLoaded",
+             params : []
+          });
+         };
+         
      </script>
+
   </body>
 </html>
 

@@ -2,13 +2,27 @@
 <html>
   <head>
       <title></title>
+      <style>
+      	html, body { height: 100%; width: 100%; margin: 0; }
+      </style>
+       <script type="text/javascript" src="$pmrpcUrl"></script>
+       
   </head>
   <body>
   
-       <script type="text/javascript" src="$pmrpcUrl"></script>
-       
        <script type="text/javascript">
        
+       var appendError = function(str){
+         throw new Error("DEBUG: "+str)
+       }
+
+       function log(str){
+         setTimeout("appendError('"+str+"')", 1)
+       }
+       
+         var communicationFrameReady = false;
+
+       function registerCalls() {
          pmrpc.register( {
          	publicProcedureName : "setTitle",
          	procedure : function(title) {
@@ -16,11 +30,30 @@
          	   return "OK";
          	}
          });
-  	   </script>
-  
-     <iframe name="presentationFrame" height="100%" width="100%" frameborder="0" src="$presentationUrl">
+
+         pmrpc.register( {
+			publicProcedureName : "communicationFrameLoaded",
+         	procedure : function() {
+         	   log("Communication frame loaded");
+         	   communicationFrameReady = true;
+         	   document.getElementById('presentationFrame').src = "$presentationUrl";
+         	   return "OK";
+         	}
+         });
+       };
+       
+       window.onload = function() {
+           log("Interaction loaded");
+           registerCalls();
+           document.getElementById('communicationFrame').src = "$communicationUrl";
+           };
+      
+  	   </script>      
+
+     <iframe id="communicationFrame" name="communicationFrame" height="0" width="100%" frameborder="0" src="">
+</iframe>  
+     <iframe id="presentationFrame" name="presentationFrame" height="95%" width="100%" frameborder="0" src="">
 </iframe>
-     <iframe name="communicationFrame" height="0" width="100%" frameborder="0" src="$communicationUrl">
-</iframe>
+
   </body>
 </html>

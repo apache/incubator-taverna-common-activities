@@ -12,9 +12,13 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.namespace.QName;
@@ -69,20 +73,27 @@ public class InteractionActivity extends
 	private Map<String, Integer> outputDepths = new HashMap<String, Integer>();
 
 	private static QName inputDataQName = new QName(
-			"http://ns.taverna.org.uk/2012/interaction", "inputData",
+			"http://ns.taverna.org.uk/2012/interaction", "input-data",
 			"interaction");
 	private static QName resultDataQName = new QName(
-			"http://ns.taverna.org.uk/2012/interaction", "resultData",
+			"http://ns.taverna.org.uk/2012/interaction", "result-data",
 			"interaction");
 	private static QName resultStatusQName = new QName(
-			"http://ns.taverna.org.uk/2012/interaction", "resultStatus",
+			"http://ns.taverna.org.uk/2012/interaction", "result-status",
 			"interaction");
 	private static QName idQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "id", "interaction");
+	private static QName runIdQName = new QName(
+			"http://ns.taverna.org.uk/2012/interaction", "run-id", "interaction");
 	private static QName inReplyToQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "in-reply-to",
 			"interaction");
-
+	private static QName progressQName = new QName(
+			"http://ns.taverna.org.uk/2012/interaction", "progress",
+			"interaction");
+	
+	private static Set<String> publishedUrls = Collections.synchronizedSet(new HashSet<String> ());
+	
 	public InteractionActivity() {
 		configBean = new InteractionActivityConfigurationBean();
 	}
@@ -146,6 +157,10 @@ public class InteractionActivity extends
 				InvocationContext context = callback.getContext();
 				String runId = callback.getContext().getEntities(
 						WorkflowRunIdEntity.class).get(0).getWorkflowRunId();
+				String specifiedId = System.getProperty("taverna.runid");
+				if (specifiedId != null) {
+					runId = specifiedId;
+				}
 				ReferenceService referenceService = context
 						.getReferenceService();
 
@@ -165,7 +180,12 @@ public class InteractionActivity extends
 				if (InteractionPreference.getInstance().getUseJetty()) {
 					InteractionJetty.checkJetty();
 				}
-				copyJavaScript("pmrpc.js");
+				try {
+					copyJavaScript("pmrpc.js");
+				} catch (IOException e1) {
+					logger.error(e1);
+					callback.fail("Unable to copy necessary Javascript");
+				}
 				synchronized (ABDERA) {
 					Entry entry = ABDERA.newEntry();
 
@@ -184,12 +204,21 @@ public class InteractionActivity extends
 						mapper.writeValue(sw, inputData);
 					} catch (JsonGenerationException e) {
 						logger.error(e);
+						callback.fail("Unable to generate JSON");
 					} catch (JsonMappingException e) {
 						logger.error(e);
+						callback.fail("Unable to generate JSON");
 					} catch (IOException e) {
 						logger.error(e);
+						callback.fail("Unable to generate JSON");
 					}
 
+					Element runIdElement = entry.addExtension(getRunIdQName());
+					runIdElement.setText(StringEscapeUtils
+							.escapeJavaScript(runId));
+					if (configBean.isProgressNotification()) {
+						entry.addExtension(getProgressQName());
+					}
 					Element inputDataElement = entry
 							.addExtension(getInputDataQName());
 					String inputDataString = sw.toString();
@@ -226,9 +255,10 @@ public class InteractionActivity extends
 		});
 	}
 
-	protected void copyJavaScript(String javascriptFileName) {
+	protected void copyJavaScript(String javascriptFileName) throws IOException {
 		String targetUrl = InteractionPreference.getInstance().getLocationUrl()
 				+ "/" + javascriptFileName;
+		publishFile(targetUrl, InteractionActivity.class.getResourceAsStream("/" + javascriptFileName));
 	}
 
 	private String generateHtml(Map<String, Object> inputData,
@@ -314,6 +344,10 @@ public class InteractionActivity extends
 
 	private void publishFile(String urlString, InputStream is)
 			throws IOException {
+		if (publishedUrls.contains(urlString)) {
+			return;
+		}
+		publishedUrls.add(urlString);
 		URL url = new URL(urlString);
 		HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
 		httpCon.setDoOutput(true);
@@ -363,6 +397,20 @@ public class InteractionActivity extends
 
 	public static QName getResultStatusQName() {
 		return resultStatusQName;
+	}
+
+	/**
+	 * @return the runIdQName
+	 */
+	public static QName getRunIdQName() {
+		return runIdQName;
+	}
+
+	/**
+	 * @return the progressQName
+	 */
+	public static QName getProgressQName() {
+		return progressQName;
 	}
 
 }

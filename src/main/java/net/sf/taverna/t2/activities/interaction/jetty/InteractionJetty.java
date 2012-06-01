@@ -67,6 +67,7 @@ public class InteractionJetty {
 
     overallContext.addServlet(abderaHolder,"/*");
     overallContext.addServlet(interactionHolder, "/interaction/*");
+    createDirectory("/tmp/fs");
     
     handlers.setHandlers(new Handler[] { overallContext, new DefaultHandler() });
     server.setHandler(handlers);
