@@ -20,16 +20,64 @@
          setTimeout("appendError('"+str+"')", 1)
        }
        
-         var communicationFrameReady = false;
+         function createReplyContent(status, results) {
+           date = new Date();
+           msg = "";
+           msg += "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
+           msg += "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:thr=\"http://purl.org/syndication/thread/1.0\">\n";
+           msg += "<title>\"A reply to " + "$entryId" + "\"</title>\n";
+           msg += "<id>" + "$entryId" + "-reply" + "</id>\n";
+           msg += "<content/>\n";
+           msg += "<interaction:run-id xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$runId" + "</interaction:run-id>\n";
+           msg += "<interaction:in-reply-to  xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$entryId" + "</interaction:in-reply-to>\n";
+           msg += "<interaction:result-status xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">";
+           msg += escape(status);
+           msg += "</interaction:result-status>";
+           msg += "<interaction:result-data xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">\n";
+		   msg += escape(results);
+           msg += "</interaction:result-data>\n";
+           msg += "</entry>\n";
+           return msg;
+         }
 
-       function registerCalls() {
+         function reply(status, results) {
+           msg = createReplyContent(status, JSON.stringify(results));
+           xmlhttp = new XMLHttpRequest();
+           xmlhttp.open("POST", "$feed", true);
+           xmlhttp.onreadystatechange=function() {
+//               alert(xmlhttp.responseText);
+           }
+           xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
+           xmlhttp.setRequestHeader("Content-Length", msg.length);
+           xmlhttp.setRequestHeader("Slug", "$entryId" + "-reply");
+           xmlhttp.send(msg);
+           return false;
+         }
+         
+
+      function registerCalls() {
+			pmrpc.register( {
+         	  publicProcedureName : "reply",
+         	  procedure : function(status, results) {
+         	     reply(status, results);
+         	     return "OK";
+         	  }
+           });
+         
            pmrpc.register( {
              publicProcedureName : "getInputData",
              procedure : function() {
-               alert("Request for input data before communication frame is loaded");
+               log("Returning input data");
+               return JSON.parse('$inputData');
              }
            });
          
+           pmrpc.register( {
+             publicProcedureName : "getWorkflowRunId",
+             procedure : function () {
+               return '$runId';
+             }
+           });
  
          pmrpc.register( {
          	publicProcedureName : "setTitle",
@@ -39,27 +87,16 @@
          	}
          });
 
-         pmrpc.register( {
-			publicProcedureName : "communicationFrameLoaded",
-         	procedure : function() {
-         	   log("Communication frame loaded");
-     		   pmrpc.unregister("getInputData");
-         	   document.getElementById('presentationFrame').src = "$presentationUrl";
-         	   return "OK";
-         	}
-         });
-       };
+         document.getElementById('presentationFrame').src = "$presentationUrl";
+       }
        
        window.onload = function() {
            log("Interaction loaded");
            registerCalls();
-           document.getElementById('communicationFrame').src = "$communicationUrl";
            };
       
   	   </script>      
-
-     <iframe id="communicationFrame" name="communicationFrame" height="0" width="100%" frameborder="0" src="">
-</iframe>  
+ 
      <iframe id="presentationFrame" name="presentationFrame" height="95%" width="100%" frameborder="0" src="">
 </iframe>
 

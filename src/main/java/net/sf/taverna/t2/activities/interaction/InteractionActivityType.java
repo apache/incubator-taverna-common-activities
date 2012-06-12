@@ -10,7 +10,6 @@ package net.sf.taverna.t2.activities.interaction;
 public enum InteractionActivityType {
 	
 	VelocityTemplate,
-	RemotelyPresentededHtml,
 	LocallyPresentedHtml
 
 }

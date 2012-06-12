@@ -295,20 +295,8 @@ public class InteractionActivity extends
 				presentationUrl = configBean.getPresentationOrigin();
 			}
 
-			// Write communication frame file
-			String communicationUrl = InteractionPreference.getInstance()
-					.getLocationUrl()
-					+ "/communication" + id + ".html";
-			String communicationString = processTemplate(InteractionVelocity
-					.getCommunicationTemplate(), velocityContext);
-			publishFile(communicationUrl, communicationString);
-
 			velocityContext.put("presentationUrl", presentationUrl);
-			velocityContext.put("communicationUrl", communicationUrl);
 
-			if (!configBean.getInteractionActivityType().equals(
-					InteractionActivityType.RemotelyPresentededHtml)) {
-				// Write main html file
 				String interactionUrl = InteractionPreference.getInstance()
 						.getLocationUrl()
 						+ "/interaction" + id + ".html";
@@ -317,10 +305,6 @@ public class InteractionActivity extends
 				publishFile(interactionUrl, interactionString);
 
 				return interactionUrl;
-			} else {
-				return (configBean.getPresentationOrigin()
-						+ "?communicationFrame=" + communicationUrl);
-			}
 		} catch (IOException e) {
 			logger.error(e);
 			return null;
