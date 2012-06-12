@@ -82,8 +82,14 @@ public class InteractionVelocity {
 						continue;
 					}
 					String templatePath = line + TEMPLATE_SUFFIX;
+					logger.error("Looking for " + templatePath);
 					StringResourceRepository repo = StringResourceLoader.getRepository();
-				    repo.putStringResource(line, getTemplateFromResource(templatePath));
+					try {
+						repo.putStringResource(line, getTemplateFromResource(templatePath));
+					}
+					catch (IOException e) {
+						logger.error("Failed reading template from " + templatePath, e);
+					}
 				    Template t = Velocity.getTemplate(line);
 				    if (t == null) {
 				    	logger.error("Registration failed");
@@ -93,7 +99,7 @@ public class InteractionVelocity {
 				    }
 				}
 			} catch (IOException e) {
-				logger.error(e);
+				logger.error("Failed reading template index", e);
 			}
 	}
 
@@ -102,7 +108,7 @@ public class InteractionVelocity {
 		return interactionTemplate;
 	}
 	
-	private static Template getTemplate(final String templatePath) {
+	private static Template getTemplate(final String templatePath) throws IOException {
 		checkVelocity();
 	    if (!Velocity.resourceExists(templatePath)) {
 	        StringResourceRepository repo = StringResourceLoader.getRepository();
@@ -111,15 +117,11 @@ public class InteractionVelocity {
 	    return Velocity.getTemplate(templatePath);
 	}
 	
-	private static String getTemplateFromResource(final String templatePath) {
+	private static String getTemplateFromResource(final String templatePath) throws IOException {
 		checkVelocity();
-	    try {
 	        InputStream stream = InteractionVelocity.class.getResourceAsStream("/" + templatePath);
 	        String result = IOUtils.toString(stream, "UTF-8");
 	        return result;
-	    } catch (IOException ex) {
-	        throw new RuntimeException(ex);
-	    }
 	}
 
 	public static ArrayList<String> getTemplateNames() {
