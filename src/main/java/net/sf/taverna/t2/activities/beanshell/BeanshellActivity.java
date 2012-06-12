@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
- * 
+ * Copyright (C) 2007 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -37,6 +37,8 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputP
 
 import org.apache.log4j.Logger;
 
+import uk.org.taverna.configuration.app.ApplicationConfiguration;
+
 import bsh.EvalError;
 import bsh.Interpreter;
 
@@ -44,7 +46,7 @@ import bsh.Interpreter;
  * <p>
  * An Activity providing Beanshell functionality.
  * </p>
- * 
+ *
  * @author David Withers
  * @author Stuart Owen
  * @author Alex Nenadic
@@ -59,10 +61,11 @@ public class BeanshellActivity extends
 	private static Logger logger = Logger.getLogger(BeanshellActivity.class);
 
 	private Interpreter interpreter;
-	
+
 	private static String CLEAR_COMMAND = "clear();";
 
-	public BeanshellActivity() {
+	public BeanshellActivity(ApplicationConfiguration applicationConfiguration) {
+		super(applicationConfiguration);
 	}
 
 	@Override
@@ -76,12 +79,12 @@ public class BeanshellActivity extends
 
 	/**
 	 * Creates the interpreter required to run the beanshell script, and assigns the correct classloader
-	 * setting according to the 
+	 * setting according to the
 	 */
 	private void createInterpreter() {
 		interpreter = new Interpreter();
-		
-		
+
+
 	}
 
 	/**
@@ -93,7 +96,7 @@ public class BeanshellActivity extends
 	 * always set the granular depth to 0.
 	 * <p>
 	 * This method modifies the granular depths to be equal to the depths.
-	 * 
+	 *
 	 */
 	protected void checkGranularDepths() {
 		for (ActivityOutputPortDefinitionBean outputPortDef : configurationBean
@@ -110,7 +113,7 @@ public class BeanshellActivity extends
 	public BeanshellActivityConfigurationBean getConfiguration() {
 		return configurationBean;
 	}
-	
+
 	public ActivityInputPort getInputPort(String name) {
 		for (ActivityInputPort port : getInputPorts()) {
 			if (port.getName().equals(name)) {
@@ -135,7 +138,7 @@ public class BeanshellActivity extends
 		callback.requestRun(new Runnable() {
 
 			public void run() {
-				
+
 				// Workflow run identifier (needed when classloader sharing is set to 'workflow').
 				String procID = callback.getParentProcessIdentifier();
 				String workflowRunID;
@@ -144,7 +147,7 @@ public class BeanshellActivity extends
 				}
 				else
 					workflowRunID = procID; // for tests, will be an empty string
-				
+
 				// Configure the classloader for executing the Beanshell
 				if (classLoader == null) {
 					try {
@@ -156,15 +159,15 @@ public class BeanshellActivity extends
 						callback.fail(message, rex);
 						return;
 					}
-					
+
 				}
-								
+
 				synchronized (interpreter) {
-					
+
 					ReferenceService referenceService = callback.getContext().getReferenceService();
-	
+
 					Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
-	
+
 					clearInterpreter();
 					try {
 						// set inputs
@@ -185,7 +188,7 @@ public class BeanshellActivity extends
 							Object value = interpreter.get(name);
 							if (value == null) {
 								ErrorDocumentService errorDocService = referenceService.getErrorDocumentService();
-								value = errorDocService.registerError("No value produced for output variable " + name, 
+								value = errorDocService.registerError("No value produced for output variable " + name,
 										outputPort.getDepth(), callback.getContext());
 							}
 							outputData.put(name, referenceService.register(value,
@@ -202,12 +205,12 @@ public class BeanshellActivity extends
 					clearInterpreter();
 				}
 			}
-			
+
 			/**
 			 * Removes any invalid characters from the port name.
 			 * For example, xml-text would become xmltext.
-			 * 
-			 * 
+			 *
+			 *
 			 * @param name
 			 * @return
 			 */

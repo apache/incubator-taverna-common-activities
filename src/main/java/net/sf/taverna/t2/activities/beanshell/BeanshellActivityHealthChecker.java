@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
- * 
+ * Copyright (C) 2007 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -48,10 +48,10 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 			subject = activity;
 		}
 		List<VisitReport> reports = new ArrayList<VisitReport>();
-		
+
 		String script = activity.getConfiguration().getScript();
 		if (! script.trim().endsWith(";")) {
-			/** Missing ; on last line is not allowed by Parser, 
+			/** Missing ; on last line is not allowed by Parser,
 			 * but is allowed by Interpreter.eval() used at runtime
 			 */
 			script = script + ";";
@@ -65,15 +65,15 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		    report.setProperty("exception", e);
 		    reports.add(report);
 		}
-		
+
 		// Check if we can find all the Beanshell's dependencies
 		LinkedHashSet<String> localDependencies = new LinkedHashSet<String>();
 		localDependencies.addAll(activity.getConfiguration().getLocalDependencies());
 
 		if (!localDependencies.isEmpty()) {
-		String[] jarArray = BeanshellActivity.libDir.list(new FileExtFilter(".jar"));
+		String[] jarArray = activity.libDir.list(new FileExtFilter(".jar"));
 		if (jarArray != null) {
-		    List<String> jarFiles = Arrays.asList(jarArray); // URLs of all jars found in the lib directory 
+		    List<String> jarFiles = Arrays.asList(jarArray); // URLs of all jars found in the lib directory
 		    for (String jar : localDependencies) {
 			if (jarFiles.contains(jar)){
 			    localDependencies.remove(jar);
@@ -86,10 +86,10 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		else{
 			VisitReport vr = new VisitReport(HealthCheck.getInstance(), subject, "Beanshell dependencies missing", HealthCheck.MISSING_DEPENDENCY, Status.SEVERE);
 			vr.setProperty("dependencies", localDependencies);
-			vr.setProperty("directory", BeanshellActivity.libDir);
+			vr.setProperty("directory", activity.libDir);
 			reports.add(vr);
 		}
-		
+
 		}
 		Status status = VisitReport.getWorstStatus(reports);
 		VisitReport report = new VisitReport(HealthCheck.getInstance(), subject, "Beanshell report", HealthCheck.NO_PROBLEM,
