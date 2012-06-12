@@ -91,7 +91,6 @@ public class InteractionVelocity {
 					String templatePath = line + TEMPLATE_SUFFIX;
 					StringResourceRepository repo = StringResourceLoader.getRepository();
 				    repo.putStringResource(line, getTemplateFromResource(templatePath));
-				    logger.error("Registered " + templatePath + " as " + line);
 				    Template t = Velocity.getTemplate(line);
 				    if (t == null) {
 				    	logger.error("Registration failed");
@@ -129,7 +128,6 @@ public class InteractionVelocity {
 	    try {
 	        InputStream stream = InteractionVelocity.class.getResourceAsStream("/" + templatePath);
 	        String result = IOUtils.toString(stream, "UTF-8");
-	        logger.error("Read template " + result);
 	        return result;
 	    } catch (IOException ex) {
 	        throw new RuntimeException(ex);

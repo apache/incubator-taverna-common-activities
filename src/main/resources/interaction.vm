@@ -23,6 +23,14 @@
          var communicationFrameReady = false;
 
        function registerCalls() {
+           pmrpc.register( {
+             publicProcedureName : "getInputData",
+             procedure : function() {
+               alert("Request for input data before communication frame is loaded");
+             }
+           });
+         
+ 
          pmrpc.register( {
          	publicProcedureName : "setTitle",
          	procedure : function(title) {
@@ -35,7 +43,7 @@
 			publicProcedureName : "communicationFrameLoaded",
          	procedure : function() {
          	   log("Communication frame loaded");
-         	   communicationFrameReady = true;
+     		   pmrpc.unregister("getInputData");
          	   document.getElementById('presentationFrame').src = "$presentationUrl";
          	   return "OK";
          	}

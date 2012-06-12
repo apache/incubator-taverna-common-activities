@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 
 import net.sf.taverna.t2.activities.interaction.InteractionActivity;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
@@ -16,6 +18,8 @@ import net.sf.webdav.WebdavServlet;
 import org.apache.abdera.protocol.server.ServiceManager;
 import org.apache.abdera.protocol.server.provider.basic.BasicProvider;
 import org.apache.abdera.protocol.server.servlet.AbderaServlet;
+import org.apache.abdera.protocol.server.adapters.filesystem.FilesystemAdapter;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Handler;
@@ -38,12 +42,12 @@ public class InteractionJetty {
 	private static Logger logger = Logger.getLogger(InteractionJetty.class);
 
 	private static Server server;
-
-
+	
 	public static synchronized void checkJetty() {
 		if (server != null) {
             return;
     }
+		ClassLoader previousContextClassLoader = Thread.currentThread().getContextClassLoader();
     Thread.currentThread().setContextClassLoader(InteractionJetty.class.getClassLoader());
     
     server = new Server();
@@ -80,6 +84,7 @@ public class InteractionJetty {
             } catch (Exception e) {
                     logger.error("Unable to start Jetty");
             }
+            Thread.currentThread().setContextClassLoader(previousContextClassLoader);
 	}
 
 	private static void createDirectory(String dirPath) {

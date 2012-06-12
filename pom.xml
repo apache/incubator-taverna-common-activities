@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>net.sf.taverna.t2</groupId>
 		<artifactId>interaction-service</artifactId>
-		<version>0.1.9</version>
+		<version>0.1.10</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>interaction-activity</artifactId>
@@ -22,24 +22,18 @@
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>${jettyVersion}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jetty-6.1.24.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty-util</artifactId>
 			<version>${jettyVersion}</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/jetty-util-6.1.24.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5-20081211</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/servlet-api-2.5-20081211.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -63,48 +57,42 @@
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-core</artifactId>
 			<version>1.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/abdera-core-1.1.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-client</artifactId>
 			<version>1.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/abdera-client-1.1.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-server</artifactId>
 			<version>1.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/abdera-server-1.1.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-extensions-main</artifactId>
 			<version>1.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/abdera-extensions-main-1.1.2.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-extensions-html</artifactId>
+			<version>1.1.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-extensions-json</artifactId>
 			<version>1.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/abdera-extensions-json-1.1.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-filesystem</artifactId>
 			<version>1.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/abdera-filesystem-1.1.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -117,48 +105,36 @@
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-i18n</artifactId>
 			<version>1.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/abdera-i18n-1.1.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-parser</artifactId>
 			<version>1.1.2</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/abdera-parser-1.1.2.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-api</artifactId>
 			<version>1.2.10</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/axiom-api-1.2.10.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-impl</artifactId>
 			<version>1.2.10</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/axiom-impl-1.2.10.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-dom</artifactId>
 			<version>1.2.10</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/axiom-dom-1.2.10.jar</systemPath>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.4</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/commons-codec-1.4.jar</systemPath>
 		</dependency>
 
 		<dependency>
@@ -196,6 +172,12 @@
 			<artifactId>commons-httpclient</artifactId>
 			<version>3.1</version>
 			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.6.2</version>
 		</dependency>
 
 	</dependencies>

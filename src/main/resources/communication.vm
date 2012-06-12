@@ -7,6 +7,15 @@
   </head>
   <body>
        <script type="text/javascript">
+       
+              var appendError = function(str){
+         throw new Error("DEBUG: "+str)
+       }
+
+       function log(str){
+         setTimeout("appendError('"+str+"')", 1)
+       }
+       
 
          function createReplyContent(status, results) {
            date = new Date();
@@ -56,6 +65,7 @@
            pmrpc.register( {
              publicProcedureName : "getInputData",
              procedure : function() {
+               log("Returning input data");
                return JSON.parse('$inputData');
              }
            });
