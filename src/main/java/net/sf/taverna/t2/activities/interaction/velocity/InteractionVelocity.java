@@ -36,9 +36,6 @@ public class InteractionVelocity {
 	private static Template interactionTemplate = null;
 	private static String INTERACTION_TEMPLATE_NAME = "interaction";
 	
-	private static Template communicationTemplate = null;
-	private static String COMMUNICATION_TEMPLATE_NAME = "communication";
-	
 	private static ArrayList<String> templateNames = new ArrayList<String>();
 
 	public static void checkVelocity () {
@@ -61,11 +58,7 @@ public class InteractionVelocity {
 		velocityInitialized = true;
 		
 		loadTemplates();
-		communicationTemplate = Velocity
-		.getTemplate(COMMUNICATION_TEMPLATE_NAME);
-		if (communicationTemplate == null) {
-			logger.error("Could not open communication template " + COMMUNICATION_TEMPLATE_NAME);
-		}
+
 		interactionTemplate = Velocity.getTemplate(INTERACTION_TEMPLATE_NAME);
 		if (interactionTemplate == null) {
 			logger.error("Could not open interaction template " + INTERACTION_TEMPLATE_NAME);
@@ -95,18 +88,13 @@ public class InteractionVelocity {
 				    if (t == null) {
 				    	logger.error("Registration failed");
 				    }
-				    if (!line.equals(COMMUNICATION_TEMPLATE_NAME) && !line.equals(INTERACTION_TEMPLATE_NAME)) {
+				    if (!line.equals(INTERACTION_TEMPLATE_NAME)) {
 				    	templateNames.add(line);
 				    }
 				}
 			} catch (IOException e) {
 				logger.error(e);
 			}
-	}
-
-	public static Template getCommunicationTemplate() {
-		checkVelocity();
-		return communicationTemplate;
 	}
 
 	public static Template getInteractionTemplate() {
