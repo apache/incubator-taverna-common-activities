@@ -298,11 +298,11 @@ public class URISignatureHandler {
 
 			while (placeholdersIterator.hasNext()) {
 				String placeholder = placeholdersIterator.next();
+				int placeholderStartPos = placeholdersWithPositions
+						.get(placeholder) - 1;
+				int placeholderEndPos = placeholderStartPos
+						+ placeholder.length() + 2;
 				if (parameters.containsKey(placeholder)) {
-					int placeholderStartPos = placeholdersWithPositions
-							.get(placeholder) - 1;
-					int placeholderEndPos = placeholderStartPos
-							+ placeholder.length() + 2;
 					if (escapeParameters) {
 						completeURI.replace(placeholderStartPos,
 								placeholderEndPos, urlEncodeQuery(parameters
@@ -312,9 +312,30 @@ public class URISignatureHandler {
 								placeholderEndPos, parameters.get(placeholder));
 					}
 				} else {
-					throw new URIGenerationFromSignatureException(
-							"Parameter map does not contain a key/value for \""
-									+ placeholder + "\" placeholder");
+					int qnPos = completeURI.lastIndexOf("?", placeholderStartPos);
+ 					int ampPos = completeURI.lastIndexOf("&", placeholderStartPos);
+ 					int slashPos = completeURI.lastIndexOf("/", placeholderStartPos);
+ 					int startParamPos = Math.max(qnPos, ampPos);
+					if (startParamPos > -1 && startParamPos > slashPos) {
+ 						// We found an optional parameter, so delete all of it
+ 						if (qnPos > ampPos) {
+ 							// It might be the first or only parameter so delete carefully
+ 							if (placeholderEndPos >= (completeURI.length() - 1)) {
+ 								// No parameters
+ 								completeURI.replace(startParamPos, placeholderEndPos, "");
+ 							} else {
+ 								// Remove the & from the following parameter, not the ? that starts
+ 								completeURI.replace(startParamPos + 1, placeholderEndPos + 1, "");
+ 							}
+						} else {
+ 							// Just delete the optional parameter in total
+							completeURI.replace(startParamPos, placeholderEndPos, "");
+ 						}
+ 					} else {
+ 						throw new URIGenerationFromSignatureException(
+ 								"Parameter map does not contain a key/value for \""
+ 										+ placeholder + "\" mandatory placeholder");
+ 					}
 				}
 			}
 		}

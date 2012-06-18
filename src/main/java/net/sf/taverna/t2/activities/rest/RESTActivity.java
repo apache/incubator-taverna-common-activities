@@ -208,7 +208,7 @@ public class RESTActivity extends
 	/**
 	 * This method executes pre-configured instance of REST activity. It
 	 * resolves inputs of the activity and registers its outputs; the real
-	 * invocation of the HTTP request is perfomed by
+	 * invocation of the HTTP request is performed by
 	 * {@link HTTPRequestHandler#initiateHTTPRequest(String, RESTActivityConfigurationBean, String)}
 	 * .
 	 */
@@ -230,24 +230,20 @@ public class RESTActivity extends
 				// (just use the configuration that was determined in
 				// configurePorts() - all ports in this set are required)
 				Map<String, String> urlParameters = new HashMap<String, String>();
-				try {
-					for (String inputName : configBean.getActivityInputs()
-							.keySet()) {
-						urlParameters.put(inputName, (String) referenceService
-								.renderIdentifier(inputs.get(inputName),
-										configBean.getActivityInputs().get(
-												inputName), context));
-					}
-				} catch (Exception e) {
-					// problem occurred while resolving the inputs
-					callback
-							.fail(
-									"REST activity was unable to resolve all necessary inputs"
-											+ "that contain values for populating the URI signature placeholders "
-											+ "with values.", e);
+				for (String inputName : configBean.getActivityInputs().keySet()) {
+					try {
+						urlParameters.put(inputName,
+								(String) referenceService.renderIdentifier(inputs.get(inputName),
+										configBean.getActivityInputs().get(inputName),
+										context));
+					} catch (Exception e) {
+						// problem occurred while resolving the inputs
+						callback.fail("REST activity was unable to resolve all necessary inputs"
+							+ "that contain values for populating the URI signature placeholders", e);
 
-					// make sure we don't call callback.receiveResult later
-					return;
+						// make sure we don't call callback.receiveResult later
+						return;
+					}
 				}
 				String completeURL = URISignatureHandler.generateCompleteURI(
 						configBean.getUrlSignature(), urlParameters, configBean
