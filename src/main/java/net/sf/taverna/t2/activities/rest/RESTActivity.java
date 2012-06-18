@@ -232,13 +232,15 @@ public class RESTActivity extends
 				Map<String, String> urlParameters = new HashMap<String, String>();
 				for (String inputName : configBean.getActivityInputs().keySet()) {
 					try {
-						urlParameters.put(inputName,
+						if (inputs.containsKey(inputName)) {
+							urlParameters.put(inputName,
 								(String) referenceService.renderIdentifier(inputs.get(inputName),
 										configBean.getActivityInputs().get(inputName),
 										context));
+						}
 					} catch (Exception e) {
 						// problem occurred while resolving the inputs
-						callback.fail("REST activity was unable to resolve all necessary inputs"
+						callback.fail("REST activity was unable to resolve all necessary inputs "
 							+ "that contain values for populating the URI signature placeholders", e);
 
 						// make sure we don't call callback.receiveResult later
