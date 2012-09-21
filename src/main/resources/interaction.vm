@@ -1,9 +1,11 @@
 <!doctype html>
 <html>
   <head>
+      <meta charset="utf-8" />
       <title></title>
       <style>
-      	html, body { height: 100%; width: 100%; margin: 0; }
+      	html, body { height: 100%; width: 100%; margin: 0; border:0; }
+      	#presentationFrame { height: 95%; width: 95%; margin: 0; border:0; frameborder:0; }
       </style>
        <script type="text/javascript" src="$pmrpcUrl"></script>
        
@@ -40,6 +42,20 @@
            return msg;
          }
 
+       // Copied from http://www.netlobo.com/url_query_string_javascript.html
+       function getParameterValue( name )
+	{
+  	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  	var regexS = "[\\?&]"+name+"=([^&#]*)";
+  	var regex = new RegExp( regexS );
+  	var results = regex.exec( window.location.href );
+  	if( results == null )
+    	return "";
+  	else
+    	return results[1];
+	}
+
+
          function reply(status, results) {
            msg = createReplyContent(status, JSON.stringify(results));
            xmlhttp = new XMLHttpRequest();
@@ -61,6 +77,13 @@
          	  procedure : function(status, results) {
          	     reply(status, results);
          	     return "OK";
+         	  }
+           });
+ 
+ 			pmrpc.register( {
+         	  publicProcedureName : "getParameterValue",
+         	  procedure : function(parameterName) {
+         	     return getParameterValue(parameterName);
          	  }
            });
          
@@ -97,7 +120,7 @@
       
   	   </script>      
  
-     <iframe id="presentationFrame" name="presentationFrame" height="95%" width="100%" frameborder="0" src="">
+     <iframe id="presentationFrame" name="presentationFrame" src="about:blank">
 </iframe>
 
   </body>

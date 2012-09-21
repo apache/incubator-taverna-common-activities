@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>net.sf.taverna.t2</groupId>
 		<artifactId>interaction-service</artifactId>
-		<version>0.1.11</version>
+		<version>0.1.13</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>interaction-activity</artifactId>
@@ -53,6 +53,12 @@
 			<version>${t2.activities.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+		  <groupId>net.sf.taverna.t2.security</groupId>
+		  <artifactId>credential-manager</artifactId>
+		  <version>${t2.core.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-core</artifactId>
@@ -95,11 +101,6 @@
 			<version>1.1.2</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.abdera</groupId>
-			<artifactId>abdera-jcr</artifactId>
-			<version>1.1.2</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
@@ -180,5 +181,10 @@
 			<version>2.6.2</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.scribe</groupId>
+			<artifactId>scribe</artifactId>
+			<version>1.3.2</version>
+		</dependency>
 	</dependencies>
 </project>

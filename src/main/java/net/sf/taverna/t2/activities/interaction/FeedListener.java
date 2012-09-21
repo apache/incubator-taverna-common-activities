@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.taverna.t2.activities.interaction.atom.AtomUtils;
 import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.invocation.InvocationContext;
@@ -53,7 +54,7 @@ public class FeedListener {
 	
 	private static Logger logger = Logger.getLogger(FeedListener.class);
 
-	private static Map<String, AsynchronousActivityCallback> callbackMap = new HashMap<String, AsynchronousActivityCallback>();
+	private static Map<String, InteractionRequestor> requestorMap = new HashMap<String, InteractionRequestor>();
 	
 	public static synchronized FeedListener getInstance() {
 		if (instance == null) {
@@ -61,8 +62,6 @@ public class FeedListener {
 		}
 		return instance;
 	}
-
-	private static Map<String, Set<OutputPort>> outputPortsMap = new HashMap<String, Set<OutputPort>>();
 	
 	private FeedListener() {
 		Thread feeListenerThread = new Thread() {
@@ -126,50 +125,36 @@ public class FeedListener {
 	}
 	
 	private static void considerInReplyTo(Feed feed, Entry entry) {
-		synchronized(callbackMap) {
+		synchronized(requestorMap) {
 		String refString = getReplyTo(entry);
 		if (refString == null) {
 			return;
 		}
-		if (callbackMap.containsKey(refString)) {
-			AsynchronousActivityCallback callback = callbackMap.get(refString);
-			InvocationContext context = callback
-			.getContext();
-			Element statusElement = entry.getExtension(InteractionActivity.getResultStatusQName());
+		if (requestorMap.containsKey(refString)) {
+			InteractionRequestor requestor = requestorMap.get(refString);
+
+			Element statusElement = entry.getExtension(AtomUtils.getResultStatusQName());
 			String statusContent = statusElement.getText().trim();
 			if (!statusContent.equals(STATUS_OK)) {
 				cleanup (refString);
-				callback.fail(statusContent);
+				requestor.fail(statusContent);
 				return;
 			}
-			Element resultElement = entry.getExtension(InteractionActivity.getResultDataQName());
+			Element resultElement = entry.getExtension(AtomUtils.getResultDataQName());
 			String content = resultElement.getText();
-	ReferenceService referenceService = context
-			.getReferenceService();
 			
 			try {
 				content = URLDecoder.decode(content,"UTF-8");
 				ObjectMapper mapper = new ObjectMapper();
-				Map<?,?> rootAsMap = mapper.readValue(content, Map.class);
-				
-				Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-				
-				for (Object key : rootAsMap.keySet()) {
-					String keyString = (String) key;
-					Object value = rootAsMap.get(key);
-					Integer depth = findPortDepth(refString, keyString);
-					if (depth == null) {
-						cleanup (refString);
-						callback.fail("Data sent for unknown port : " + keyString);
-					}
-					outputs.put(keyString, referenceService.register(value, depth, true, context));
-				}
+				Map<String,Object> rootAsMap = mapper.readValue(content, Map.class);
+				requestor.receiveResult(rootAsMap);
 				cleanup (refString);
-				callback.receiveResult(outputs, new int[0]);
 				
 			} catch (JsonParseException e) {
 				logger.error(e);
 			} catch (IOException e) {
+				logger.error(e);
+			} catch (Exception e) {
 				logger.error(e);
 			}
 			
@@ -178,34 +163,24 @@ public class FeedListener {
 	}
 	
 	private static void cleanup (String refString) {
-		outputPortsMap.remove(refString);
-		callbackMap.remove(refString);		
+		requestorMap.remove(refString);		
 	}
 	
 	private static String getReplyTo(Entry entry) {
-	        Element replyTo = entry.getFirstChild(InteractionActivity.getInReplyToQName());
+	        Element replyTo = entry.getFirstChild(AtomUtils.getInReplyToQName());
 	        if (replyTo == null) {
 	        	return null;
 	        }
 	        return replyTo.getText();
 	}
 
-	private static Integer findPortDepth(String refString, String portName) {
-		Set<OutputPort> ports = outputPortsMap.get(refString);
-		for (OutputPort op : ports) {
-			if (op.getName().equals(portName)) {
-				return op.getDepth();
-			}
-		}
-		return null;
-	}
+
 
 	public void registerInteraction(Entry entry,
-			AsynchronousActivityCallback callback, Set<OutputPort> outputPorts) {
-		synchronized(callbackMap) {
+			InteractionRequestor requestor) {
+		synchronized(requestorMap) {
 		String refString = entry.getId().toString();
-		callbackMap.put(refString, callback);
-		outputPortsMap.put(refString, outputPorts);
+		requestorMap.put(refString, requestor);
 		}
 	}
 

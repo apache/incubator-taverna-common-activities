@@ -5,4 +5,10 @@ select
 tell
 warn
 interaction
+Authorize
+UsernamePassword
+MasterPassword
+TruststorePassword
+TrustedCertificate
+
 
