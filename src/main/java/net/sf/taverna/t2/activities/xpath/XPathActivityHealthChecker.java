@@ -98,10 +98,17 @@ public class XPathActivityHealthChecker implements HealthChecker<XPathActivity>
       String[] legFragments = xpathLeg.split(":");
       if (legFragments.length == 2) {
         // two fragments - the first is the prefix; check if it's in the mappings table
-        if (configBean.getXpathNamespaceMap() == null || configBean.getXpathNamespaceMap().isEmpty() ||
-            !configBean.getXpathNamespaceMap().containsKey(legFragments[0]))
+        String fragment = legFragments[0];
+        if (fragment.startsWith("@")) {
+        	if (fragment.length() == 1) {
+        		continue;
+        	}
+        	fragment = fragment.substring(1);
+        }
+		if (configBean.getXpathNamespaceMap() == null || configBean.getXpathNamespaceMap().isEmpty() ||
+            !configBean.getXpathNamespaceMap().containsKey(fragment))
         {
-          missingNamespaces.add(legFragments[0]);
+          missingNamespaces.add(fragment);
         }
       }
     }
