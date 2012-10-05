@@ -23,6 +23,8 @@ public class ExternalToolLocalInvocationMechanism extends
 	
 	private String linkCommand;
 	
+	private boolean retrieveData;
+	
 	/**
 	 * 
 	 */
@@ -57,6 +59,10 @@ public class ExternalToolLocalInvocationMechanism extends
 			Element linkCommandElement = new Element("linkCommand");
 			linkCommandElement.addContent(new Text(linkCommand));
 			result.addContent(linkCommandElement);
+		}
+		if (isRetrieveData()) {
+			Element retrieveDataElement = new Element("retrieveData");
+			result.addContent(retrieveDataElement);
 		}
 		return result;
 	}
@@ -106,6 +112,20 @@ public class ExternalToolLocalInvocationMechanism extends
 		} else {
 			this.linkCommand = linkCommand;
 		}
+	}
+
+	/**
+	 * @return the retrieveData
+	 */
+	public boolean isRetrieveData() {
+		return retrieveData;
+	}
+
+	/**
+	 * @param retrieveData the retrieveData to set
+	 */
+	public void setRetrieveData(boolean retrieveData) {
+		this.retrieveData = retrieveData;
 	}
 
 }

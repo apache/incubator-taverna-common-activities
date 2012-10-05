@@ -11,6 +11,7 @@ import net.sf.taverna.t2.reference.DereferenceException;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.ReferenceContext;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import net.sf.taverna.t2.reference.ReferencedDataNature;
 
 import org.apache.log4j.Logger;
 
@@ -36,6 +37,9 @@ public class SshReference extends AbstractExternalReference implements
 
 	private CredentialManager credentialManager;
 
+	private int dataNatureInteger = ReferencedDataNature.UNKNOWN.ordinal();
+	private String charset = "UTF-8";
+	
 	public SshReference() {
 		super();
 	}
@@ -47,6 +51,8 @@ public class SshReference extends AbstractExternalReference implements
 		this.directory = url.getSshNode().getDirectory();
 		this.subDirectory = url.getSubDirectory();
 		this.fileName = url.getFileName();
+		this.setDataNature(url.getDataNature());
+		this.setCharset(url.getCharset());
 	}
 
 	/* (non-Javadoc)
@@ -152,9 +158,39 @@ public class SshReference extends AbstractExternalReference implements
 	public String getFullPath() {
 		return getDirectory() + "/" + getSubDirectory() + "/" + getFileName();
 	}
+	
+	public ReferencedDataNature getDataNature() {
+		return ReferencedDataNature.values()[dataNatureInteger];
+	}
+
+	public void setDataNature(ReferencedDataNature dataNature) {
+		this.dataNatureInteger = dataNature.ordinal();
+	}
+
+	public String getCharset() {
+		return charset;
+	}
 
 	public void setCredentialManager(CredentialManager credentialManager) {
 		this.credentialManager = credentialManager;
+	}
+
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+
+	/**
+	 * @return the dataNatureInteger
+	 */
+	public int getDataNatureInteger() {
+		return dataNatureInteger;
+	}
+
+	/**
+	 * @param dataNatureInteger the dataNatureInteger to set
+	 */
+	public void setDataNatureInteger(int dataNatureInteger) {
+		this.dataNatureInteger = dataNatureInteger;
 	}
 
 }

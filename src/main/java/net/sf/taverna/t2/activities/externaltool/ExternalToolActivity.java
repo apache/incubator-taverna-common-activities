@@ -49,6 +49,7 @@ import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
+import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshReference;
 
 /**
  * This is the main class of the use case activity plugin. Here we store the
@@ -264,6 +265,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 						// register the result value with taverna
 						T2Reference reference = referenceService.register(
 								value, 0, true, callback.getContext());
+						
 						// store the reference into the activity result
 						// set
 						result.put(cur.getKey(), reference);

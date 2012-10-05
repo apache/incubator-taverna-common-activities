@@ -39,6 +39,9 @@ public class LocalMechanismCreator extends MechanismCreator {
 		if (linkCommandElement != null) {
 			result.setLinkCommand(linkCommandElement.getText());
 		}
+		Element retrieveDataElement = detailsElement.getChild("retrieveData");
+		result.setRetrieveData(retrieveDataElement != null);
+
 		return result;
 	}
 

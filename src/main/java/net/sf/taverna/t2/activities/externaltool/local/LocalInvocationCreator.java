@@ -40,7 +40,7 @@ public final class LocalInvocationCreator implements
 	    ExternalToolLocalInvocationMechanism mechanism = (ExternalToolLocalInvocationMechanism) m;
 		UseCaseInvocation result = null;
 		try {
-		    result = new LocalUseCaseInvocation(description, mechanism.getDirectory(), mechanism.getShellPrefix(), mechanism.getLinkCommand());
+		    result = new LocalUseCaseInvocation(description, mechanism.isRetrieveData(), mechanism.getDirectory(), mechanism.getShellPrefix(), mechanism.getLinkCommand());
 		} catch (IOException e) {
 			logger.error(e);
 		}

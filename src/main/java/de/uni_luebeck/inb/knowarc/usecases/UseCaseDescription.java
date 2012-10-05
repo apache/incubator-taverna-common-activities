@@ -120,6 +120,13 @@ public class UseCaseDescription {
 	private boolean includeStdErr = true;
 
 	private List<Integer> validReturnCodes = new ArrayList<Integer>();
+	
+	/**
+	 * Default constructor to make xstream happy
+	 */
+	public UseCaseDescription() {
+		
+	}
 
 	public UseCaseDescription() {
 	}
@@ -198,7 +205,9 @@ public class UseCaseDescription {
 				staticNode.addContent(replaceNode);
 			}
 			if (si.getUrl() != null) {
-				staticNode.setAttribute("url", si.getUrl());
+				Element contentNode = new Element("content");
+				contentNode.setAttribute("url", si.getUrl());
+				staticNode.addContent(contentNode);
 			} else {
 				Element contentNode = new Element("content");
 				contentNode.addContent((String) si.getContent());

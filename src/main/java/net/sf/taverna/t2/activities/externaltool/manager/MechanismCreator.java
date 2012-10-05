@@ -28,7 +28,9 @@ public abstract class MechanismCreator {
 		
 		Document document;
 		try {
-			document = builder.build(new StringReader(xml));
+			synchronized (builder) {
+				document = builder.build(new StringReader(xml));
+			}
 		} catch (JDOMException e1) {
 			logger.error("Null invocation", e1);
 			return null;

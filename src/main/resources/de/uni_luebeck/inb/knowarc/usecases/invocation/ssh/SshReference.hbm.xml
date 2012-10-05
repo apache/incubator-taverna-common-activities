@@ -15,6 +15,9 @@
 		<property name="directory" type="string" />
 		<property name="subDirectory" type="string" />
 		<property name="fileName" type="string" />
+		<property name="dataNatureInteger" type="integer"/> 
+ 
+		<property name="charset" type="string" />
 	</joined-subclass>
 </hibernate-mapping>
 

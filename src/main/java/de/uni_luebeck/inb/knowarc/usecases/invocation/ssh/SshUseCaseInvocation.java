@@ -44,14 +44,17 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Matcher;
 
 import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
+import net.sf.taverna.t2.reference.AbstractExternalReference;
 import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ErrorDocumentServiceException;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.Identified;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceSet;
+import net.sf.taverna.t2.reference.ReferencedDataNature;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 
@@ -82,9 +85,10 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 
 	private static Logger logger = Logger.getLogger(SshUseCaseInvocation.class);
 
+	private SshUrl location = null;
+	
 	private InputStream stdInputStream = null;
-
-
+	
 	public static final String SSH_USE_CASE_INVOCATION_TYPE = "D0A4CDEB-DD10-4A8E-A49C-8871003083D8";
 	private String tmpname;
 	private final SshNode workerNode;
@@ -97,9 +101,9 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	private final ByteArrayOutputStream stdout_buf = new ByteArrayOutputStream();
 	private final ByteArrayOutputStream stderr_buf = new ByteArrayOutputStream();
 
-    private static HashMap<String, Object> nodeLock = new HashMap<String,Object>();
+	private static Map<String, Object> nodeLock = Collections.synchronizedMap(new HashMap<String,Object>());
 
-	private static Map<String, Set<SshUrl>> runIdToTempDir = new HashMap<String, Set<SshUrl>> ();
+	private static Map<String, Set<SshUrl>> runIdToTempDir = Collections.synchronizedMap(new HashMap<String, Set<SshUrl>> ());
 
 	private static String SSH_INVOCATION_FILE = "sshInvocations";
 
@@ -124,6 +128,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	public SshUseCaseInvocation(UseCaseDescription desc, SshNode workerNodeA, AskUserForPw askUserForPwA)
 			throws JSchException, SftpException {
 		this.workerNode = workerNodeA;
+		setRetrieveData(workerNodeA.isRetrieveData());
 		this.askUserForPw = askUserForPwA;
 		usecase = desc;
 
@@ -165,41 +170,45 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 		sftp.rmdir(path);
 	}
+	
+	private static void deleteDirectory(SshUrl directory) throws InvocationException {
+		URI uri;
+		try {
+			uri = new URI(directory.toString());
+		
+		
+		ChannelSftp sftp;
+		SshNode workerNode;
+		String fullPath = uri.getPath();
+		String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
+		String tempDir = fullPath.substring(fullPath.lastIndexOf("/"));
+		try {
+			workerNode = SshNodeFactory.getInstance().getSshNode(uri.getHost(), uri.getPort(), path);
+			
+			sftp = SshPool.getSftpPutChannel(workerNode, new RetrieveLoginFromTaverna(workerNode.getUrl().toString()));
+		} catch (JSchException e) {
+			throw new InvocationException(e);
+		}
+		synchronized(getNodeLock(workerNode)) {
+		try {
+			sftp.cd(path);
+			recursiveDelete(sftp, path + "/" + tempDir + "/");
+		} catch (SftpException e) {
+			throw new InvocationException(e);
+		} catch (JSchException e) {
+			throw new InvocationException(e);
+		}
+		}
+		} catch (URISyntaxException e1) {
+			throw new InvocationException(e1);
+		}
+	}
 
 	public static void cleanup(String runId, CredentialManager credentialManager) throws InvocationException {
 		Set<SshUrl> tempDirectories = runIdToTempDir.get(runId);
 		if (tempDirectories != null) {
 			for (SshUrl tempUrl : tempDirectories) {
-				URI uri;
-				try {
-					uri = new URI(tempUrl.toString());
-
-
-				ChannelSftp sftp;
-				SshNode workerNode;
-				String fullPath = uri.getPath();
-				String path = fullPath.substring(0, fullPath.lastIndexOf("/"));
-				String tempDir = fullPath.substring(fullPath.lastIndexOf("/"));
-				try {
-					workerNode = SshNodeFactory.getInstance().getSshNode(uri.getHost(), uri.getPort(), path);
-
-					sftp = SshPool.getSftpPutChannel(workerNode, new RetrieveLoginFromTaverna(workerNode.getUrl().toString(), credentialManager));
-				} catch (JSchException e) {
-					throw new InvocationException(e);
-				}
-				synchronized(getNodeLock(workerNode)) {
-				try {
-					sftp.cd(path);
-					recursiveDelete(sftp, path + "/" + tempDir + "/");
-				} catch (SftpException e) {
-					throw new InvocationException(e);
-				} catch (JSchException e) {
-					throw new InvocationException(e);
-				}
-				}
-				} catch (URISyntaxException e1) {
-					throw new InvocationException(e1);
-				}
+				deleteDirectory(tempUrl);
 			}
 			runIdToTempDir.remove(runId);
 		}
@@ -210,7 +219,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		tags.put("uniqueID", "" + getSubmissionID());
 		String command = usecase.getCommand();
 		for (String cur : tags.keySet()) {
-			command = command.replaceAll("\\Q%%" + cur + "%%\\E", tags.get(cur));
+		    command = command.replaceAll("\\Q%%" + cur + "%%\\E", Matcher.quoteReplacement(tags.get(cur)));
 		}
 		String fullCommand = "cd " + workerNode.getDirectory() + tmpname;
 		for (String preceding : precedingCommands) {
@@ -270,13 +279,37 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 			ChannelSftp sftp = SshPool.getSftpPutChannel(workerNode, askUserForPw);
 		synchronized(getNodeLock(workerNode)) {
 		for (Map.Entry<String, ScriptOutput> cur : usecase.getOutputs().entrySet()) {
-			String fullPath = workerNode.getDirectory() + tmpname + "/" + cur.getValue().getPath();
+			ScriptOutput scriptOutput = cur.getValue();
+			String fullPath = workerNode.getDirectory() + tmpname + "/" + scriptOutput.getPath();
 			try {
 				if (sftp.stat(fullPath) != null) {
 					SshUrl url = new SshUrl(workerNode);
 					url.setSubDirectory(tmpname);
-					url.setFileName(cur.getValue().getPath());
-					results.put(cur.getKey(), url);
+					url.setFileName(scriptOutput.getPath());
+					if (scriptOutput.isBinary()) {
+						url.setDataNature(ReferencedDataNature.BINARY);
+					} else {
+						url.setDataNature(ReferencedDataNature.TEXT);
+						url.setCharset("UTF-8");
+					}
+					if (isRetrieveData()) {
+						SshReference urlRef = new SshReference(url);
+						InputStream is = urlRef.openStream(null);
+						AbstractExternalReference ref;
+						if (scriptOutput.isBinary()) {
+							ref = inlineByteArrayReferenceBuilder.createReference(is, null);
+						} else {
+							ref = inlineStringReferenceBuilder.createReference(is, null);
+						}
+						try {
+							is.close();
+						} catch (IOException e) {
+							throw new InvocationException(e);
+						}
+						results.put(cur.getKey(), ref);
+					} else {
+						results.put(cur.getKey(), url);
+					}
 				} else {
 					ErrorDocument ed = referenceService.getErrorDocumentService().registerError("No result for " + cur.getKey(), 0, getContext());
 					results.put(cur.getKey(), ed);
@@ -303,6 +336,11 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 			} catch (IOException e) {
 				throw new InvocationException(e);
 			}
+		}
+		if (isRetrieveData()) {
+			forgetRun();
+			deleteDirectory(location);
+
 		}
 		return results;
 	}
@@ -401,15 +439,20 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 
 	@Override
 	public void rememberRun(String runId) {
+		this.setRunId(runId);
 		Set<SshUrl> directories = runIdToTempDir.get(runId);
 		if (directories == null) {
 			directories = Collections.synchronizedSet(new HashSet<SshUrl> ());
 			runIdToTempDir.put(runId, directories);
 		}
-		SshUrl url;
-			url = new SshUrl(workerNode);
-			url.setSubDirectory(tmpname);
-			directories.add(url);
+			location = new SshUrl(workerNode);
+			location.setSubDirectory(tmpname);
+			directories.add(location);
+	}
+	
+	private void forgetRun() {
+		Set<SshUrl> directories = runIdToTempDir.get(getRunId());
+		directories.remove(location);
 	}
 
 	public static void load(File directory) {
