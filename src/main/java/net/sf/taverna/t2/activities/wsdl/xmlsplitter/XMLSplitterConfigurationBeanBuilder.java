@@ -174,6 +174,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 				outputDefinitions.add(portBean);
 			}
 
+			
 			List<TypeDescriptor> attributes = ((ComplexTypeDescriptor) descriptor).getAttributes();
 			String[] elementNames = Arrays.copyOf(names, names.length);
 			Arrays.sort(elementNames);
@@ -193,7 +194,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 				int depth = depthForDescriptor(desc);
 				portBean.setDepth(depth);
 				portBean.setGranularDepth(depth);
-
+				
 				outputDefinitions.add(portBean);
 			}
 		} else if (descriptor instanceof ArrayTypeDescriptor) {
