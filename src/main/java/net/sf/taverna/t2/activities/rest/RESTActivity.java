@@ -1,6 +1,7 @@
 package net.sf.taverna.t2.activities.rest;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.log4j.Logger;
 
 import net.sf.taverna.t2.activities.rest.HTTPRequestHandler.HTTPRequestResponse;
+import net.sf.taverna.t2.activities.rest.URISignatureHandler.URISignatureParsingException;
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -29,6 +31,8 @@ public class RESTActivity extends
 		AsynchronousActivity<RESTActivityConfigurationBean> {
 
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/rest";
+	
+	private static Logger logger = Logger.getLogger(RESTActivity.class);
 
 	// This generic activity can deal with any of the four HTTP methods
 	public static enum HTTP_METHOD {
@@ -56,6 +60,7 @@ public class RESTActivity extends
 	// URI signature used to configure the activity
 	private static final String IN_BODY = "inputBody";
 	private static final String OUT_RESPONSE_BODY = "responseBody";
+	private static final String OUT_RESPONSE_HEADERS = "responseHeaders";
 	private static final String OUT_STATUS = "status";
 	private static final String OUT_REDIRECTION = "redirection";
 
@@ -126,6 +131,29 @@ public class RESTActivity extends
 		Map<String, Class<?>> activityInputs = new HashMap<String, Class<?>>();
 		List<String> placeholders = URISignatureHandler
 				.extractPlaceholders(configBean.getUrlSignature());
+		String acceptsHeaderValue = configBean.getAcceptsHeaderValue();
+		if (acceptsHeaderValue != null && !acceptsHeaderValue.isEmpty()) {
+			try {
+			List acceptsPlaceHolders = URISignatureHandler
+				.extractPlaceholders(acceptsHeaderValue);
+			acceptsPlaceHolders.removeAll(placeholders);
+			placeholders.addAll(acceptsPlaceHolders);
+			}
+			catch (URISignatureParsingException e) {
+				logger.error(e);
+			}
+		}
+		for (ArrayList<String> httpHeaderNameValuePair : configBean.getOtherHTTPHeaders()) {
+			try {
+				List headerPlaceHolders = URISignatureHandler
+				.extractPlaceholders(httpHeaderNameValuePair.get(1));
+				headerPlaceHolders.removeAll(placeholders);
+				placeholders.addAll(headerPlaceHolders);
+			}
+			catch (URISignatureParsingException e) {
+				logger.error(e);
+			}
+		}
 		for (String placeholder : placeholders) {
 			// these inputs will have a dynamic name each;
 			// the data type is string as they are the values to be
@@ -148,7 +176,12 @@ public class RESTActivity extends
 		// depend on the configuration of the activity;
 		addOutput(OUT_RESPONSE_BODY, 0);
 		addOutput(OUT_STATUS, 0);
-
+		if (configBean.getShowActualUrlPort()) {
+				addOutput(OUT_COMPLETE_URL, 0);
+			}
+			if (configBean.getShowResponseHeadersPort()) {
+				addOutput(OUT_RESPONSE_HEADERS, 1);
+			}
 		// Redirection port may be hidden/shown
 		if (configBean.getShowRedirectionOutputPort()) {
 			addOutput(OUT_REDIRECTION, 0);
@@ -240,7 +273,7 @@ public class RESTActivity extends
 				// ---- DO THE ACTUAL SERVICE INVOCATION ----
 				HTTPRequestResponse requestResponse = HTTPRequestHandler
 						.initiateHTTPRequest(completeURL, configBean,
-								inputMessageBody, credentialsProvider);
+								inputMessageBody, urlParameters, credentialsProvider);
 
 				// test if an internal failure has occurred
 				if (requestResponse.hasException()) {
@@ -317,6 +350,14 @@ public class RESTActivity extends
 						requestResponse.getStatusCode(), 0, true, context);
 				outputs.put(OUT_STATUS, statusRef);
 
+				if (configBean.getShowActualUrlPort()) {
+						T2Reference completeURLRef = referenceService.register(completeURL, 0, true, context);
+						outputs.put(OUT_COMPLETE_URL, completeURLRef);
+				}
+				if (configBean.getShowResponseHeadersPort()) {
+					outputs.put(OUT_RESPONSE_HEADERS,
+							referenceService.register(requestResponse.getHeadersAsStrings(), 1, true, context));
+				}
 				// only put an output to the Redirection port if the processor
 				// is configured to display that port
 				if (configBean.getShowRedirectionOutputPort()) {

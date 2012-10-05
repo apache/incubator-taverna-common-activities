@@ -33,6 +33,9 @@ public class RESTActivityConfigurationBean implements Serializable {
 	private RESTActivity.DATA_FORMAT outgoingDataFormat;
 
 	private boolean showRedirectionOutputPort;
+	private boolean showActualUrlPort;
+	private boolean showResponseHeadersPort;
+	
 	// whether to perform URL escaping of passed parameters, true by default
 	private boolean escapeParameters = true;
 
@@ -60,6 +63,8 @@ public class RESTActivityConfigurationBean implements Serializable {
 		defaultBean.setSendHTTPExpectRequestHeader(false);
 		// not showing the Redirection output port by default to make processor look simpler
 		defaultBean.setShowRedirectionOutputPort(false);
+		defaultBean.setShowActualUrlPort(false);
+		defaultBean.setShowResponseHeadersPort(false);
 		defaultBean.setEscapeParameters(true);
 		defaultBean.setOtherHTTPHeaders(new ArrayList<ArrayList<String>>());
 		return (defaultBean);
@@ -190,6 +195,34 @@ public class RESTActivityConfigurationBean implements Serializable {
 		return otherHTTPHeaders;
 	}
 
+	/**
+		 * @return the showActualUrlPort
+		 */
+		public boolean getShowActualUrlPort() {
+		return showActualUrlPort;
+		}
+	
+		/**
+		 * @param showActualUrlPort the showActualUrlPort to set
+		 */
+		public void setShowActualUrlPort(boolean showActualUrlPort) {
+			this.showActualUrlPort = showActualUrlPort;
+		}
+	
+		/**
+		 * @return the showResponseHeadersPort
+		 */
+		public boolean getShowResponseHeadersPort() {
+			return showResponseHeadersPort;
+		}
+	
+		/**
+		 * @param showResponseHeadersPort the showResponseHeadersPort to set
+		 */
+		public void setShowResponseHeadersPort(boolean showResponseHeadersPort) {
+			this.showResponseHeadersPort = showResponseHeadersPort;
+		}
+		
 	public HTTPRequest getRequest() {
 		return request;
 	}

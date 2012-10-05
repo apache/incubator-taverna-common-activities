@@ -12,6 +12,7 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
@@ -39,6 +40,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
 import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
@@ -56,6 +58,7 @@ import org.apache.log4j.Logger;
  * @author Alex Nenadic
  */
 public class HTTPRequestHandler {
+	private static final int HTTPS_DEFAULT_PORT = 443;
 	private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 	private static final String ACCEPT_HEADER_NAME = "Accept";
 	private static Logger logger = Logger.getLogger(HTTPRequestHandler.class);
@@ -90,7 +93,7 @@ public class HTTPRequestHandler {
 	 */
 	public static HTTPRequestResponse initiateHTTPRequest(String requestURL,
 			RESTActivityConfigurationBean configBean, Object inputMessageBody,
-			CredentialsProvider credentialsProvider) {
+			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		ClientConnectionManager connectionManager = null;
 		if (requestURL.toLowerCase().startsWith("https")) {
 			// Register a protocol scheme for https that uses Taverna's
@@ -100,13 +103,14 @@ public class HTTPRequestHandler {
 				// parse the port out for us
 				int port = url.getPort();
 				if (port == -1) { // no port was defined in the URL
-					port = 433; // default HTTPS port
+					port = HTTPS_DEFAULT_PORT; // default HTTPS port
 				}
 				Scheme https = new Scheme("https", new org.apache.http.conn.ssl.SSLSocketFactory(
 						SSLContext.getDefault()), port);
 				SchemeRegistry schemeRegistry = new SchemeRegistry();
 				schemeRegistry.register(https);
-				connectionManager = new SingleClientConnManager(null, schemeRegistry);
+				connectionManager = new SingleClientConnManager(null,
+						schemeRegistry);
 			} catch (MalformedURLException ex) {
 				logger.error("Failed to extract port from the REST service URL: the URL "
 						+ requestURL + " is malformed.", ex);
@@ -125,13 +129,13 @@ public class HTTPRequestHandler {
 
 		switch (configBean.getHttpMethod()) {
 		case GET:
-			return (doGET(connectionManager, requestURL, configBean, credentialsProvider));
+			return (doGET(connectionManager, requestURL, configBean, urlParameters, credentialsProvider));
 		case POST:
-			return (doPOST(connectionManager, requestURL, configBean, inputMessageBody, credentialsProvider));
+			return (doPOST(connectionManager, requestURL, configBean, inputMessageBody, urlParameters, credentialsProvider));
 		case PUT:
-			return (doPUT(connectionManager, requestURL, configBean, inputMessageBody, credentialsProvider));
+			return (doPUT(connectionManager, requestURL, configBean, inputMessageBody, urlParameters, credentialsProvider));
 		case DELETE:
-			return (doDELETE(connectionManager, requestURL, configBean, credentialsProvider));
+			return (doDELETE(connectionManager, requestURL, configBean, urlParameters, credentialsProvider));
 		default:
 			return (new HTTPRequestResponse(new Exception("Error: something went wrong; "
 					+ "no failure has occurred, but but unexpected HTTP method (\""
@@ -141,14 +145,14 @@ public class HTTPRequestHandler {
 
 	private static HTTPRequestResponse doGET(ClientConnectionManager connectionManager,
 			String requestURL, RESTActivityConfigurationBean configBean,
-			CredentialsProvider credentialsProvider) {
+			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		HttpGet httpGet = new HttpGet(requestURL);
-		return (performHTTPRequest(connectionManager, httpGet, configBean, credentialsProvider));
+		return (performHTTPRequest(connectionManager, httpGet, configBean, urlParameters, credentialsProvider));
 	}
 
 	private static HTTPRequestResponse doPOST(ClientConnectionManager connectionManager,
 			String requestURL, RESTActivityConfigurationBean configBean, Object inputMessageBody,
-			CredentialsProvider credentialsProvider) {
+			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		HttpPost httpPost = new HttpPost(requestURL);
 
 		// TODO - decide whether this is needed for PUT requests, too (or just
@@ -177,12 +181,12 @@ public class HTTPRequestHandler {
 					+ "attach a message body to the POST request. See attached cause of this "
 					+ "exception for details.")));
 		}
-		return (performHTTPRequest(connectionManager, httpPost, configBean, credentialsProvider));
+		return (performHTTPRequest(connectionManager, httpPost, configBean, urlParameters, credentialsProvider));
 	}
 
 	private static HTTPRequestResponse doPUT(ClientConnectionManager connectionManager,
 			String requestURL, RESTActivityConfigurationBean configBean, Object inputMessageBody,
-			CredentialsProvider credentialsProvider) {
+			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		HttpPut httpPut = new HttpPut(requestURL);
 		if (!configBean.getContentTypeForUpdates().equals("")) {
 			httpPut.setHeader(CONTENT_TYPE_HEADER_NAME, configBean.getContentTypeForUpdates());
@@ -202,14 +206,14 @@ public class HTTPRequestHandler {
 					+ "attach a message body to the PUT request. See attached cause of this "
 					+ "exception for details.")));
 		}
-		return (performHTTPRequest(connectionManager, httpPut, configBean, credentialsProvider));
+		return (performHTTPRequest(connectionManager, httpPut, configBean, urlParameters, credentialsProvider));
 	}
 
 	private static HTTPRequestResponse doDELETE(ClientConnectionManager connectionManager,
 			String requestURL, RESTActivityConfigurationBean configBean,
-			CredentialsProvider credentialsProvider) {
+			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		HttpDelete httpDelete = new HttpDelete(requestURL);
-		return (performHTTPRequest(connectionManager, httpDelete, configBean, credentialsProvider));
+		return (performHTTPRequest(connectionManager, httpDelete, configBean, urlParameters, credentialsProvider));
 	}
 
 	/**
@@ -221,14 +225,16 @@ public class HTTPRequestHandler {
 	 */
 	private static HTTPRequestResponse performHTTPRequest(
 			ClientConnectionManager connectionManager, HttpRequestBase httpRequest,
-			RESTActivityConfigurationBean configBean, CredentialsProvider credentialsProvider) {
+			RESTActivityConfigurationBean configBean,
+			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		// headers are set identically for all HTTP methods, therefore can do
 		// centrally - here
 
 		// If the user wants to set MIME type for the 'Accepts' header
 		String acceptsHeaderValue = configBean.getAcceptsHeaderValue();
 		if ((acceptsHeaderValue != null) && !acceptsHeaderValue.isEmpty()) {
-			httpRequest.setHeader(ACCEPT_HEADER_NAME, acceptsHeaderValue);
+			httpRequest.setHeader(ACCEPT_HEADER_NAME,
+					URISignatureHandler.generateCompleteURI(acceptsHeaderValue, urlParameters, configBean.getEscapeParameters()));
 		}
 
 		// See if user wanted to set any other HTTP headers
@@ -237,8 +243,9 @@ public class HTTPRequestHandler {
 			for (ArrayList<String> httpHeaderNameValuePair : otherHTTPHeaders) {
 				if (httpHeaderNameValuePair.get(0) != null
 						&& !httpHeaderNameValuePair.get(0).equals("")) {
-					httpRequest.setHeader(httpHeaderNameValuePair.get(0),
-							httpHeaderNameValuePair.get(1));
+					String headerParameterizedValue = httpHeaderNameValuePair.get(1);
+					String headerValue = URISignatureHandler.generateCompleteURI(headerParameterizedValue, urlParameters, configBean.getEscapeParameters());
+					httpRequest.setHeader(httpHeaderNameValuePair.get(0), headerValue);
 				}
 			}
 		}
@@ -288,6 +295,7 @@ public class HTTPRequestHandler {
 					.getAttribute(ExecutionContext.HTTP_REQUEST);
 			requestResponse.setRedirectionURL("" + targetHost + targetRequest.getURI());
 			requestResponse.setRedirectionHTTPMethod(targetRequest.getMethod());
+			requestResponse.setHeaders(response.getAllHeaders());
 
 			// read and store response body
 			// (check there is some content - negative length of content means
@@ -481,6 +489,7 @@ public class HTTPRequestHandler {
 		private Object responseBody;
 
 		private Exception exception;
+		private Header[] allHeaders;
 
 		/**
 		 * Private default constructor - will only be accessible from
@@ -493,6 +502,22 @@ public class HTTPRequestHandler {
 			 * using private mutator methods
 			 */
 		}
+		
+		   public void setHeaders(Header[] allHeaders) {
+			this.allHeaders = allHeaders;
+		}
+	
+	    public Header[] getHeaders() {
+	    	return allHeaders;
+	    }
+	
+	    public List<String> getHeadersAsStrings() {
+	    	List<String> headerStrings = new ArrayList<String>();
+	    	for (Header h : getHeaders()) {
+	    		headerStrings.add(h.toString());
+	    	}
+	    	return headerStrings;
+	    }
 
 		/**
 		 * Standard public constructor for a regular case, where all values are
