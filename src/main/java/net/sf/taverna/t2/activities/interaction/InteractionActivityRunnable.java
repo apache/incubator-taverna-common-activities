@@ -92,6 +92,23 @@ public final class InteractionActivityRunnable implements Runnable {
 		}
 		synchronized (ABDERA) {
 			Entry interactionNotificationMessage = createBasicInteractionMessage(id, runId);
+			
+			for (String key : inputData.keySet()) {
+				Object value = inputData.get(key);
+				if (value instanceof byte[]) {
+					String replacementUrl = InteractionPreference.getInstance()
+					.getLocationUrl()
+					+ "/interaction" + id + "-" + key;
+					ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) value);
+					try {
+						publishFile(replacementUrl, bais);
+						bais.close();
+						inputData.put(key, replacementUrl);
+					} catch (IOException e) {
+						logger.error(e);
+					}
+				}
+			}
 
 			String inputDataString = addInputDataToMessage(interactionNotificationMessage, inputData);
 

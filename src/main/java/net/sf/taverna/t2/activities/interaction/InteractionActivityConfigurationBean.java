@@ -20,8 +20,6 @@ public class InteractionActivityConfigurationBean extends
 	private String presentationOrigin;
 
 	private InteractionActivityType interactionActivityType;
-
-	private ArrayList<String> publishedList;
 	
 	private boolean progressNotification;
 
@@ -45,26 +43,6 @@ public class InteractionActivityConfigurationBean extends
 
 	public void setPresentationOrigin(String presentationOrigin) {
 		this.presentationOrigin = presentationOrigin;
-	}
-
-	private ArrayList<String> getPublishedList() {
-		if (publishedList == null) {
-			publishedList = new ArrayList<String>();
-		}
-		return publishedList;
-	}
-
-	public boolean isPublished(String portName) {
-		return getPublishedList().contains(portName);
-	}
-
-	public void setPublished(String portName, boolean isPublished) {
-		if (isPublished && !isPublished(portName)) {
-			getPublishedList().add(portName);
-		}
-		if (!isPublished && isPublished(portName)) {
-			getPublishedList().remove(portName);
-		}
 	}
 
 	/**

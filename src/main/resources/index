@@ -5,10 +5,10 @@ select
 tell
 warn
 interaction
-Authorize
-UsernamePassword
-MasterPassword
-TruststorePassword
-TrustedCertificate
+#Authorize
+#UsernamePassword
+#MasterPassword
+#TruststorePassword
+#TrustedCertificate
 
 

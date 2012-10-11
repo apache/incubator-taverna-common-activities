@@ -12,10 +12,12 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,6 +35,8 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationE
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean;
 
 import org.apache.abdera.Abdera;
 import org.apache.commons.io.IOUtils;
@@ -56,7 +60,6 @@ public class InteractionActivity extends
 
 	private Map<String, Integer> inputDepths = new HashMap<String, Integer>();
 	private Map<String, Integer> outputDepths = new HashMap<String, Integer>();
-
 	
 	public InteractionActivity() {
 		configBean = new InteractionActivityConfigurationBean();
@@ -87,26 +90,34 @@ public class InteractionActivity extends
 			produceChecker.visit((ASTprocess) presentationTemplate.getData(),
 					outputDepths);
 			configurePortsFromTemplate();
-		} else {
-			configurePorts(this.configBean);
 		}
+			configurePorts(this.configBean);
 
 	}
 
 	protected void configurePortsFromTemplate() {
-		// In case we are being reconfigured - remove existing ports first
-		// to avoid duplicates
-		removeInputs();
-		removeOutputs();
+		List<ActivityInputPortDefinitionBean> inputs = new ArrayList<ActivityInputPortDefinitionBean>();
 
 		for (String inputName : inputDepths.keySet()) {
-			addInput(inputName, inputDepths.get(inputName), true, null,
-					String.class);
+			ActivityInputPortDefinitionBean inputBean = new ActivityInputPortDefinitionBean();
+			inputBean.setName(inputName);
+			inputBean.setDepth(inputDepths.get(inputName));
+			inputBean.setAllowsLiteralValues(true);
+			inputBean.setHandledReferenceSchemes(null);
+				inputBean.setTranslatedElementType(String.class);
+			inputs.add(inputBean);
 		}
+		this.configBean.setInputPortDefinitions(inputs);
 
+		List<ActivityOutputPortDefinitionBean> outputs = new ArrayList<ActivityOutputPortDefinitionBean>();
 		for (String outputName : outputDepths.keySet()) {
-			addOutput(outputName, outputDepths.get(outputName));
+			ActivityOutputPortDefinitionBean outputBean = new ActivityOutputPortDefinitionBean();
+			outputBean.setName(outputName);
+			outputBean.setDepth(outputDepths.get(outputName));
+			outputBean.setGranularDepth(outputDepths.get(outputName));
+			outputs.add(outputBean);
 		}
+		this.configBean.setOutputPortDefinitions(outputs);
 	}
 
 	@SuppressWarnings("unchecked")
