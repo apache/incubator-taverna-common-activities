@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
@@ -24,10 +26,14 @@ import net.sf.taverna.t2.activities.interaction.atom.AtomUtils;
 import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
+import net.sf.taverna.t2.activities.rest.RESTActivityCredentialsProvider;
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
+import net.sf.taverna.t2.security.credentialmanager.CMException;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
 import net.sf.taverna.t2.security.oauth.OAuthUtils;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
@@ -36,9 +42,12 @@ import org.apache.abdera.i18n.text.Normalizer;
 import org.apache.abdera.i18n.text.Sanitizer;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
+import org.apache.abdera.parser.stax.FOMElement;
 import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
 import org.apache.abdera.protocol.client.RequestOptions;
+import org.apache.abdera.protocol.error.ProtocolException;
+import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -177,18 +186,31 @@ public final class InteractionActivityRunnable implements Runnable {
 	
 	private void postInteractionMessage(String id, Entry entry,
 			String interactionUrlString) {
-		AbderaClient client = new AbderaClient(ABDERA);
-		RequestOptions rOptions = client.getDefaultRequestOptions();
-		rOptions.setSlug(id);
-		String slug = rOptions.getHeader("Slug");
 
 		entry.addLink(StringEscapeUtils.escapeXml(interactionUrlString), "presentation");
 		entry.setContentAsXhtml("<p><a href=\"" + StringEscapeUtils.escapeXml(interactionUrlString)
 				+ "\">Open: " + StringEscapeUtils.escapeXml(interactionUrlString) + "</a></p>");
+		
+		URL feedUrl;
 
-		ClientResponse resp = client.post(InteractionPreference
-				.getInstance().getFeedUrl(), entry, rOptions);
-		client.teardown();
+			try {
+				feedUrl = new URL(InteractionPreference.getInstance().getFeedUrl());
+				String entryContent = ((FOMElement) entry).toFormattedString();
+				HttpURLConnection httpCon = (HttpURLConnection) feedUrl.openConnection();
+				httpCon.setDoOutput(true);
+				httpCon.setRequestProperty("Content-Type", "application/atom+xml;type=entry");
+		           httpCon.setRequestProperty("Content-Length", "" + entryContent.length());
+		           httpCon.setRequestProperty("Slug", id);
+				httpCon.setRequestMethod("POST");
+				OutputStream outputStream = httpCon.getOutputStream();
+				IOUtils.write(entryContent, outputStream);
+				outputStream.close();
+				int respCode = httpCon.getResponseCode();
+			} catch (MalformedURLException e2) {
+				logger.error(e2);
+			} catch (IOException e) {
+				logger.error(e);
+			}
 	}
 	
 	String generateHtml(Map<String, Object> inputData,

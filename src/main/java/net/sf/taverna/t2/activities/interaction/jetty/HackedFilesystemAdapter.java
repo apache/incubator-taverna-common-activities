@@ -57,23 +57,7 @@ public class HackedFilesystemAdapter extends ManagedCollectionAdapter {
 
     public HackedFilesystemAdapter(Abdera abdera, FeedConfiguration config) {
         super(abdera, config);
-        this.root = getRoot();
-    }
-
-    private File getRoot() {
-        try {
-            String root = (String)config.getProperty("fs.root");
-            File file = new File(root);
-            if (!file.exists())
-                file.mkdirs();
-            if (!file.isDirectory())
-                throw new RuntimeException("Root must be a directory");
-            return file;
-        } catch (Exception e) {
-            if (e instanceof RuntimeException)
-                throw (RuntimeException)e;
-            throw new RuntimeException(e);
-        }
+        this.root = InteractionJetty.getFeedDirectory();
     }
 
     private Entry getEntry(File entryFile) {
