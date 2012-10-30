@@ -120,15 +120,12 @@ public class UseCaseDescription {
 	private boolean includeStdErr = true;
 
 	private List<Integer> validReturnCodes = new ArrayList<Integer>();
-	
+
 	/**
 	 * Default constructor to make xstream happy
 	 */
 	public UseCaseDescription() {
-		
-	}
 
-	public UseCaseDescription() {
 	}
 
 	/**
