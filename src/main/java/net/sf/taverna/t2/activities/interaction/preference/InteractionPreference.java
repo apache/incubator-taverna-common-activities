@@ -40,6 +40,14 @@ public class InteractionPreference {
 	private static final String FEED_PATH = "feedPath";
 	
 	private static final String DEFAULT_FEED_PATH = "/feed";
+	
+	private static final String USE_USERNAME = "Secure with username / password";
+	
+	private static final String DEFAULT_USE_USERNAME = "false";
+	
+//	private static final String USE_HTTPS = "Use HTTPS";
+	
+//	private static final String DEFAULT_USE_HTTPS = "false";
 
 	private Logger logger = Logger.getLogger(InteractionPreference.class);
 	
@@ -83,7 +91,7 @@ public class InteractionPreference {
 			String definedHost = System.getProperty("taverna.interaction.host");
 			if (definedHost != null){
 				properties.setProperty(USE_JETTY, "false");
-				logger.error("USE_JETTY set to false");
+				logger.info("USE_JETTY set to false");
 				properties.setProperty(HOST, definedHost);
 			}
 			String definedPort = System.getProperty("taverna.interaction.port");
@@ -108,7 +116,7 @@ public class InteractionPreference {
 	private void fillDefaultProperties() {
 		if (!properties.containsKey(USE_JETTY)) {
 			properties.setProperty(USE_JETTY, DEFAULT_USE_JETTY);
-			logger.error("USE_JETTY set to " + DEFAULT_USE_JETTY);
+			logger.info("USE_JETTY set to " + DEFAULT_USE_JETTY);
 		}
 		if (!properties.containsKey(PORT)) {
 			properties.setProperty(PORT, DEFAULT_PORT);
@@ -122,6 +130,12 @@ public class InteractionPreference {
 		if (!properties.containsKey(FEED_PATH)) {
 			properties.setProperty(FEED_PATH, DEFAULT_FEED_PATH);
 		}
+		if (!properties.containsKey(USE_USERNAME)) {
+			properties.setProperty(USE_USERNAME, DEFAULT_USE_USERNAME);
+		}
+/*		if (!properties.containsKey(USE_HTTPS)) {
+			properties.setProperty(USE_HTTPS, DEFAULT_USE_HTTPS);
+		}*/
 	}
 
 	public String getFilePrefix() {
@@ -204,6 +218,22 @@ public class InteractionPreference {
 		return getHost() + ":" + getPort() + getWebDavPath();
 	}
 	
+	public boolean getUseUsername() {
+		return (Boolean.parseBoolean(properties.getProperty(USE_USERNAME)));
+	}
 	
+	public void setUseUsername(boolean useUsername) {
+		properties.setProperty(USE_USERNAME, Boolean.toString(useUsername));
+		
+	}
 
+/*	public boolean getUseHttps() {
+		return (Boolean.parseBoolean(properties.getProperty(USE_HTTPS)));
+	}
+	
+	public void setUseHttps(boolean useHttps) {
+		properties.setProperty(USE_HTTPS, Boolean.toString(useHttps));
+		
+	}
+*/
 }

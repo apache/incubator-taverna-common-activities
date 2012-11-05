@@ -68,7 +68,7 @@ public class InteractionVelocity {
 	private static void loadTemplates() {
 		InputStream is = InteractionActivity.class.getResourceAsStream("/index");
 		if (is == null) {
-			logger.error("Unable to reading /index");
+			logger.error("Unable to read /index");
 			return;
 		}
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -82,7 +82,7 @@ public class InteractionVelocity {
 						continue;
 					}
 					String templatePath = line + TEMPLATE_SUFFIX;
-					logger.error("Looking for " + templatePath);
+					logger.info("Looking for " + templatePath);
 					StringResourceRepository repo = StringResourceLoader.getRepository();
 					try {
 						repo.putStringResource(line, getTemplateFromResource(templatePath));
