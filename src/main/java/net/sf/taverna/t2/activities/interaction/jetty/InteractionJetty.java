@@ -67,8 +67,6 @@ public class InteractionJetty {
 	
     private static InteractionPreference interactionPreference = InteractionPreference.getInstance();
     
-	private static SPIRegistry<JettyStartupHook> registry = new SPIRegistry<JettyStartupHook> (JettyStartupHook.class);
-	
 	private static String REALM_NAME = "TavernaInteraction";
 
 
@@ -156,11 +154,6 @@ public class InteractionJetty {
 			while (!server.isRunning()) {
 				Thread.sleep(5000);
 			}
-			
-			for (JettyStartupHook h : registry.getInstances()) {
-				h.jettyStarted();
-			}
-			Thread.sleep(5000);
 		} catch (Exception e) {
 			logger.error("Unable to start Jetty");
 		}
