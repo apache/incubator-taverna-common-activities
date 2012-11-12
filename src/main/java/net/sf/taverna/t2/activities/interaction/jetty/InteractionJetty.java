@@ -4,48 +4,25 @@
 package net.sf.taverna.t2.activities.interaction.jetty;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import net.sf.taverna.raven.appconfig.ApplicationRuntime;
-import net.sf.taverna.t2.activities.interaction.InteractionActivity;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
-import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
-import net.sf.taverna.t2.security.oauth.OAuthLoginSite;
-import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.webdav.WebdavServlet;
 
 import org.apache.abdera.protocol.server.ServiceManager;
 import org.apache.abdera.protocol.server.provider.basic.BasicProvider;
 import org.apache.abdera.protocol.server.servlet.AbderaServlet;
-import org.apache.abdera.protocol.server.adapters.filesystem.FilesystemAdapter;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.bouncycastle.jce.X509Principal;
-import org.bouncycastle.x509.X509V3CertificateGenerator;
-
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandler;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
@@ -53,7 +30,6 @@ import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.component.AbstractLifeCycle;
 
 /**
  * @author alanrw
@@ -74,10 +50,10 @@ public class InteractionJetty {
 		if (server != null) {
 			return;
 		}
-		ClassLoader previousContextClassLoader = Thread.currentThread()
-				.getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(
-				InteractionJetty.class.getClassLoader());
+//		ClassLoader previousContextClassLoader = Thread.currentThread()
+//				.getContextClassLoader();
+//		Thread.currentThread().setContextClassLoader(
+//				InteractionJetty.class.getClassLoader());
 
 		server = new Server();
 		server.setStopAtShutdown(true);
@@ -157,8 +133,8 @@ public class InteractionJetty {
 		} catch (Exception e) {
 			logger.error("Unable to start Jetty");
 		}
-		Thread.currentThread()
-				.setContextClassLoader(previousContextClassLoader);
+//		Thread.currentThread()
+//				.setContextClassLoader(previousContextClassLoader);
 	}
 
 	public static URI createServiceURI(String port) throws URISyntaxException {

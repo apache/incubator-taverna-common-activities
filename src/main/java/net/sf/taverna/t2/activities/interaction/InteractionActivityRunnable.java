@@ -34,7 +34,6 @@ import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
-import net.sf.taverna.t2.security.oauth.OAuthUtils;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.abdera.Abdera;
@@ -245,9 +244,6 @@ public final class InteractionActivityRunnable implements Runnable {
 						.getLocationUrl()
 						+ "/presentation" + id + ".html";
 				
-				if (presentationTemplate.getName().contains("Authorize")) {
-					velocityContext.put("loginSites", OAuthUtils.getInstance().getLoginSites());
-				}
 				String presentationString = processTemplate(
 						presentationTemplate, velocityContext);
 				publishFile(presentationUrl, presentationString);
