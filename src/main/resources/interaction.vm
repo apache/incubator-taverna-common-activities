@@ -113,7 +113,7 @@
          });
 
          document.getElementById('presentationFrame').src = "$presentationUrl";
-         document.title = 'fred';
+         document.title = 'Taverna interaction';
        }
        
        window.onload = function() {
