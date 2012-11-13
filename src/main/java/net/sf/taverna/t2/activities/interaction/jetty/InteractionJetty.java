@@ -19,17 +19,22 @@ import org.apache.abdera.protocol.server.ServiceManager;
 import org.apache.abdera.protocol.server.provider.basic.BasicProvider;
 import org.apache.abdera.protocol.server.servlet.AbderaServlet;
 import org.apache.log4j.Logger;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.SecurityHandler;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+//import org.mortbay.jetty.Handler;
+//import org.mortbay.jetty.Server;
+//import org.mortbay.jetty.handler.DefaultHandler;
+//import org.mortbay.jetty.handler.HandlerList;
+//import org.mortbay.jetty.nio.SelectChannelConnector;
+//import org.mortbay.jetty.security.Constraint;
+//import org.mortbay.jetty.security.ConstraintMapping;
+//import org.mortbay.jetty.security.HashUserRealm;
+//import org.mortbay.jetty.security.SecurityHandler;
+//import org.mortbay.jetty.servlet.Context;
+//import org.mortbay.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletContextHandler.Context;
 
 /**
  * @author alanrw
@@ -55,12 +60,10 @@ public class InteractionJetty {
 //		Thread.currentThread().setContextClassLoader(
 //				InteractionJetty.class.getClassLoader());
 
-		server = new Server();
-		server.setStopAtShutdown(true);
-		SelectChannelConnector connector = new SelectChannelConnector();
 		String port = interactionPreference.getPort();
-		connector.setPort(Integer.parseInt(port));
-		server.addConnector(connector);
+
+		server = new Server(Integer.parseInt(port));
+		server.setStopAtShutdown(true);
 
 		WebdavServlet interactionServlet = new WebdavServlet();
 
@@ -73,7 +76,9 @@ public class InteractionJetty {
 		}
 
 		HandlerList handlers = new HandlerList();
-		Context overallContext = new Context(handlers, "/", Context.SESSIONS);
+		ServletContextHandler overallContext = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		overallContext.setContextPath("/");
+		server.setHandler(overallContext);
 
 		AbderaServlet abderaServlet = new AbderaServlet();
 		ServletHolder abderaHolder = new ServletHolder(abderaServlet);
@@ -83,7 +88,7 @@ public class InteractionJetty {
 		overallContext.addServlet(abderaHolder, "/*");
 		overallContext.addServlet(interactionHolder, "/interaction/*");
 
-		if (interactionPreference.getUseUsername()) {
+/*		if (interactionPreference.getUseUsername()) {
 			Constraint constraint = new Constraint();
 			constraint.setName(Constraint.__BASIC_AUTH);
 			;
@@ -117,13 +122,9 @@ public class InteractionJetty {
 			sh.setConstraintMappings(new ConstraintMapping[] { cm });
 			overallContext.addHandler(sh);
 
-		}
+		}*/
 
 		getFeedDirectory();
-
-		handlers.setHandlers(new Handler[] { overallContext,
-				new DefaultHandler() });
-		server.setHandler(handlers);
 
 		try {
 			server.start();
