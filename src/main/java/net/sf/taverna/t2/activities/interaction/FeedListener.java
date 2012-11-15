@@ -3,43 +3,28 @@
  */
 package net.sf.taverna.t2.activities.interaction;
 
-import java.awt.Desktop;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.taverna.t2.activities.interaction.atom.AtomUtils;
 import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.abdera.Abdera;
-import org.apache.abdera.ext.thread.InReplyTo;
-import org.apache.abdera.ext.thread.ThreadConstants;
-import org.apache.abdera.ext.thread.ThreadHelper;
-import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.apache.abdera.model.Link;
 import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.parser.Parser;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
