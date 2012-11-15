@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.servlet.Servlet;
+
 import net.sf.taverna.raven.appconfig.ApplicationRuntime;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
@@ -19,22 +21,18 @@ import org.apache.abdera.protocol.server.ServiceManager;
 import org.apache.abdera.protocol.server.provider.basic.BasicProvider;
 import org.apache.abdera.protocol.server.servlet.AbderaServlet;
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.HandlerList;
-//import org.mortbay.jetty.Handler;
-//import org.mortbay.jetty.Server;
-//import org.mortbay.jetty.handler.DefaultHandler;
-//import org.mortbay.jetty.handler.HandlerList;
-//import org.mortbay.jetty.nio.SelectChannelConnector;
-//import org.mortbay.jetty.security.Constraint;
-//import org.mortbay.jetty.security.ConstraintMapping;
-//import org.mortbay.jetty.security.HashUserRealm;
-//import org.mortbay.jetty.security.SecurityHandler;
-//import org.mortbay.jetty.servlet.Context;
-//import org.mortbay.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletContextHandler.Context;
+
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.DefaultHandler;
+import org.mortbay.jetty.handler.HandlerList;
+import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.security.Constraint;
+import org.mortbay.jetty.security.ConstraintMapping;
+import org.mortbay.jetty.security.HashUserRealm;
+import org.mortbay.jetty.security.SecurityHandler;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
  * @author alanrw
@@ -55,10 +53,11 @@ public class InteractionJetty {
 		if (server != null) {
 			return;
 		}
-//		ClassLoader previousContextClassLoader = Thread.currentThread()
-//				.getContextClassLoader();
-//		Thread.currentThread().setContextClassLoader(
-//				InteractionJetty.class.getClassLoader());
+
+		ClassLoader previousContextClassLoader = Thread.currentThread()
+				.getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(
+				InteractionJetty.class.getClassLoader());
 
 		String port = interactionPreference.getPort();
 
@@ -66,17 +65,50 @@ public class InteractionJetty {
 		server.setStopAtShutdown(true);
 
 		WebdavServlet interactionServlet = new WebdavServlet();
-
-		ServletHolder interactionHolder = new ServletHolder(interactionServlet);
+		
+		Class current;
 		try {
+			current = InteractionJetty.class.getClassLoader().loadClass("javax.servlet.Servlet");
+			logger.error("InteractionJetty sees " + current.hashCode());
+		} catch (ClassNotFoundException e) {
+			logger.error(e);
+		}
+		
+		try {
+			current = ServletHolder.class.getClassLoader().loadClass("javax.servlet.Servlet");
+			logger.error("ServletHolder sees " + current.hashCode());
+		} catch (ClassNotFoundException e) {
+			logger.error(e);
+		}
+		
+		try {
+			current = WebdavServlet.class.getClassLoader().loadClass("javax.servlet.Servlet");
+			logger.error("WebdavServlet sees " + current.hashCode());
+		} catch (ClassNotFoundException e) {
+			logger.error(e);
+		}
+		
+		try {
+			current = AbderaServlet.class.getClassLoader().loadClass("javax.servlet.Servlet");
+			logger.error("AbderaServlet sees " + current.hashCode());
+		} catch (ClassNotFoundException e) {
+			logger.error(e);
+		}
+		
+
+		ServletHolder interactionHolder = new ServletHolder();
+		interactionHolder.setServlet(interactionServlet);
+
+ 		try {
+
 			interactionHolder.setInitParameter("rootpath",
 					getInteractionDirectory().getCanonicalPath());
 		} catch (IOException e1) {
 			logger.error("Unable to set root of interaction", e1);
 		}
 
-		HandlerList handlers = new HandlerList();
-		ServletContextHandler overallContext = new ServletContextHandler(ServletContextHandler.SESSIONS);
+ 		HandlerList handlers = new HandlerList();
+ 		Context overallContext = new Context(handlers, "/", Context.SESSIONS);
 		overallContext.setContextPath("/");
 		server.setHandler(overallContext);
 
@@ -85,10 +117,11 @@ public class InteractionJetty {
 		abderaHolder.setInitParameter(ServiceManager.PROVIDER,
 				BasicProvider.class.getName());
 
+
 		overallContext.addServlet(abderaHolder, "/*");
 		overallContext.addServlet(interactionHolder, "/interaction/*");
 
-/*		if (interactionPreference.getUseUsername()) {
+		if (interactionPreference.getUseUsername()) {
 			Constraint constraint = new Constraint();
 			constraint.setName(Constraint.__BASIC_AUTH);
 			;
@@ -122,7 +155,7 @@ public class InteractionJetty {
 			sh.setConstraintMappings(new ConstraintMapping[] { cm });
 			overallContext.addHandler(sh);
 
-		}*/
+		}
 
 		getFeedDirectory();
 
@@ -134,8 +167,9 @@ public class InteractionJetty {
 		} catch (Exception e) {
 			logger.error("Unable to start Jetty");
 		}
-//		Thread.currentThread()
-//				.setContextClassLoader(previousContextClassLoader);
+		Thread.currentThread()
+				.setContextClassLoader(previousContextClassLoader);
+
 	}
 
 	public static URI createServiceURI(String port) throws URISyntaxException {
