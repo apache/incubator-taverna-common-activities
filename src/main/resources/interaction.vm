@@ -73,6 +73,13 @@
          }
          
 
+	  function getDataFromUrl(url) {
+	      var xmlhttp = new XMLHttpRequest();
+	      xmlhttp.open("GET", url, false);
+	      xmlhttp.send();
+	      return xmlhttp.responseText;
+	  }
+	  
       function registerCalls() {
 			pmrpc.register( {
          	  publicProcedureName : "reply",
@@ -109,6 +116,13 @@
          	procedure : function(title) {
          	   document.title = title;
          	   return "OK";
+         	}
+         });
+         
+         pmrpc.register( {
+         	publicProcedureName : "getDataFromUrl",
+         	procedure : function(url) {
+         		return getDataFromUrl(url);
          	}
          });
 
