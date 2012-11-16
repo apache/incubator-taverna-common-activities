@@ -1,47 +1,46 @@
 package net.sf.taverna.t2.activities.interaction;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
 
 /**
  * Example activity configuration bean.
- * 
+ *
  */
 public class InteractionActivityConfigurationBean extends
 		ActivityPortsDefinitionBean implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1827843116765609367L;
 
 	private String presentationOrigin;
 
 	private InteractionActivityType interactionActivityType;
-	
+
 	private boolean progressNotification;
 
 	public InteractionActivityConfigurationBean() {
 		super();
-		interactionActivityType = InteractionActivityType.LocallyPresentedHtml;
+		this.interactionActivityType = InteractionActivityType.LocallyPresentedHtml;
 	}
 
 	public InteractionActivityType getInteractionActivityType() {
-		return interactionActivityType;
+		return this.interactionActivityType;
 	}
 
 	public void setInteractionActivityType(
-			InteractionActivityType interactionActivityType) {
+			final InteractionActivityType interactionActivityType) {
 		this.interactionActivityType = interactionActivityType;
 	}
 
 	public String getPresentationOrigin() {
-		return presentationOrigin;
+		return this.presentationOrigin;
 	}
 
-	public void setPresentationOrigin(String presentationOrigin) {
+	public void setPresentationOrigin(final String presentationOrigin) {
 		this.presentationOrigin = presentationOrigin;
 	}
 
@@ -49,13 +48,13 @@ public class InteractionActivityConfigurationBean extends
 	 * @return the progressNotification
 	 */
 	public boolean isProgressNotification() {
-		return progressNotification;
+		return this.progressNotification;
 	}
 
 	/**
 	 * @param progressNotification the progressNotification to set
 	 */
-	public void setProgressNotification(boolean progressNotification) {
+	public void setProgressNotification(final boolean progressNotification) {
 		this.progressNotification = progressNotification;
 	}
 

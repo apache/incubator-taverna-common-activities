@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.interaction;
 
@@ -12,7 +12,6 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
@@ -22,44 +21,44 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
  */
 public class InteractionCallbackRequestor implements InteractionRequestor {
 
-	private AsynchronousActivityCallback callback;
-	
-	private  Map<String, T2Reference> inputs;
+	private final AsynchronousActivityCallback callback;
+
+	private final  Map<String, T2Reference> inputs;
 
 	private final InteractionActivity activity;
-	
-	public InteractionCallbackRequestor(InteractionActivity activity, AsynchronousActivityCallback callback, Map<String, T2Reference> inputs) {
+
+	public InteractionCallbackRequestor(final InteractionActivity activity, final AsynchronousActivityCallback callback, final Map<String, T2Reference> inputs) {
 		this.activity = activity;
 		this.callback = callback;
-		this.inputs = inputs;		
+		this.inputs = inputs;
 	}
 
 	@Override
 	public String getRunId() {
-		return callback.getContext().getEntities(
+		return this.callback.getContext().getEntities(
 				WorkflowRunIdEntity.class).get(0).getWorkflowRunId();
 	}
 
 	@Override
 	public Map<String, Object> getInputData() {
-		Map<String, Object> inputData = new HashMap<String, Object>();
-		
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context
+		final Map<String, Object> inputData = new HashMap<String, Object>();
+
+		final InvocationContext context = this.callback.getContext();
+		final ReferenceService referenceService = context
 		.getReferenceService();
-		for (String inputName : inputs.keySet()) {
-			Object input = referenceService
-					.renderIdentifier(inputs.get(inputName),
+		for (final String inputName : this.inputs.keySet()) {
+			final Object input = referenceService
+					.renderIdentifier(this.inputs.get(inputName),
 							getInputPort(inputName)
 									.getTranslatedElementClass(),
-							callback.getContext());
+							this.callback.getContext());
 			inputData.put(inputName, input);
 		}
 		return inputData;
 	}
 
-	public ActivityInputPort getInputPort(String name) {
-		for (ActivityInputPort port : activity.getInputPorts()) {
+	public ActivityInputPort getInputPort(final String name) {
+		for (final ActivityInputPort port : this.activity.getInputPorts()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
@@ -68,25 +67,25 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 	}
 
 	@Override
-	public void fail(String string) {
-		callback.fail(string);
+	public void fail(final String string) {
+		this.callback.fail(string);
 	}
 
 	@Override
 	public void carryOn() {
-		callback.receiveResult(new HashMap<String, T2Reference>(), new int[0]);
+		this.callback.receiveResult(new HashMap<String, T2Reference>(), new int[0]);
 	}
 
 	@Override
 	public String generateId() {
-			String workflowRunId = callback.getContext().getEntities(
+			final String workflowRunId = this.callback.getContext().getEntities(
 					WorkflowRunIdEntity.class).get(0).getWorkflowRunId();
-			return (workflowRunId + ":" + callback.getParentProcessIdentifier());
+			return (workflowRunId + ":" + this.callback.getParentProcessIdentifier());
 	}
 
 	@Override
 	public InteractionType getInteractionType() {
-		if (activity.getConfiguration().isProgressNotification()) {
+		if (this.activity.getConfiguration().isProgressNotification()) {
 			return InteractionType.Notification;
 		}
 		return InteractionType.DataRequest;
@@ -94,37 +93,37 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public InteractionActivityType getPresentationType() {
-		return activity.getConfiguration().getInteractionActivityType();
+		return this.activity.getConfiguration().getInteractionActivityType();
 	}
 
 	@Override
 	public String getPresentationOrigin() {
-		return activity.getConfiguration().getPresentationOrigin();
+		return this.activity.getConfiguration().getPresentationOrigin();
 	}
 
 	@Override
-	public void receiveResult(Map<String, Object> resultMap) {
-		Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
-		
-		InvocationContext context = callback.getContext();
-		ReferenceService referenceService = context
+	public void receiveResult(final Map<String, Object> resultMap) {
+		final Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+
+		final InvocationContext context = this.callback.getContext();
+		final ReferenceService referenceService = context
 		.getReferenceService();
 
-		for (Object key : resultMap.keySet()) {
-			String keyString = (String) key;
-			Object value = resultMap.get(key);
-			Integer depth = findPortDepth(keyString);
+		for (final Object key : resultMap.keySet()) {
+			final String keyString = (String) key;
+			final Object value = resultMap.get(key);
+			final Integer depth = findPortDepth(keyString);
 			if (depth == null) {
-				callback.fail("Data sent for unknown port : " + keyString);
+				this.callback.fail("Data sent for unknown port : " + keyString);
 			}
 			outputs.put(keyString, referenceService.register(value, depth, true, context));
 		}
-		callback.receiveResult(outputs, new int[0]);
+		this.callback.receiveResult(outputs, new int[0]);
 	}
-	
-	private Integer findPortDepth(String portName) {
-		Set<OutputPort> ports = activity.getOutputPorts();
-		for (OutputPort op : ports) {
+
+	private Integer findPortDepth(final String portName) {
+		final Set<OutputPort> ports = this.activity.getOutputPorts();
+		for (final OutputPort op : ports) {
 			if (op.getName().equals(portName)) {
 				return op.getDepth();
 			}

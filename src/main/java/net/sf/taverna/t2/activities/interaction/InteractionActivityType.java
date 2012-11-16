@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.interaction;
 
@@ -9,7 +9,7 @@ package net.sf.taverna.t2.activities.interaction;
  * Should be renamed something like presentation type
  */
 public enum InteractionActivityType {
-	
+
 	VelocityTemplate,
 	LocallyPresentedHtml
 

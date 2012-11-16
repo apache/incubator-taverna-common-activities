@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.interaction;
 
@@ -13,7 +13,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -40,19 +39,19 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 public final class InteractionActivityRunnable implements Runnable {
-	
-	private static Logger logger = Logger.getLogger(InteractionActivityRunnable.class);
-	
-	private static Abdera ABDERA = Abdera.getInstance();
 
-	private static Set<String> publishedUrls = Collections.synchronizedSet(new HashSet<String> ());
+	private static final Logger logger = Logger.getLogger(InteractionActivityRunnable.class);
+
+	private static final Abdera ABDERA = Abdera.getInstance();
+
+	private static final Set<String> publishedUrls = Collections.synchronizedSet(new HashSet<String> ());
 
 	private final Template presentationTemplate;
 
 
 	private final InteractionRequestor requestor;
 
-	public InteractionActivityRunnable(InteractionRequestor requestor, Template presentationTemplate) {
+	public InteractionActivityRunnable(final InteractionRequestor requestor, final Template presentationTemplate) {
 		this.requestor = requestor;
 		this.presentationTemplate = presentationTemplate;
 	}
@@ -60,185 +59,183 @@ public final class InteractionActivityRunnable implements Runnable {
 	public void run() {
 /*		InvocationContext context = callback.getContext();
 				*/
-		String runId = requestor.getRunId();
-		String specifiedId = System.getProperty("taverna.runid");
+		String runId = this.requestor.getRunId();
+		final String specifiedId = System.getProperty("taverna.runid");
 		if (specifiedId != null) {
 			runId = specifiedId;
 		}
 
-		String id = Sanitizer.sanitize(UUID.randomUUID().toString(),
+		final String id = Sanitizer.sanitize(UUID.randomUUID().toString(),
 				"", true, Normalizer.Form.D);
-		
-		Map<String, Object> inputData = new HashMap<String, Object>();
-		inputData = requestor.getInputData();
+
+		final Map<String, Object> inputData = this.requestor.getInputData();
 
 		if (InteractionPreference.getInstance().getUseJetty()) {
 			InteractionJetty.checkJetty();
 		}
 		try {
 			copyJavaScript("pmrpc.js");
-		} catch (IOException e1) {
+		} catch (final IOException e1) {
 			logger.error(e1);
-			requestor.fail("Unable to copy necessary Javascript");
+			this.requestor.fail("Unable to copy necessary Javascript");
 		}
 		synchronized (ABDERA) {
-			Entry interactionNotificationMessage = createBasicInteractionMessage(id, runId);
-			
-			for (String key : inputData.keySet()) {
-				Object value = inputData.get(key);
+			final Entry interactionNotificationMessage = createBasicInteractionMessage(id, runId);
+
+			for (final String key : inputData.keySet()) {
+				final Object value = inputData.get(key);
 				if (value instanceof byte[]) {
-					String replacementUrl = InteractionPreference.getInstance()
+					final String replacementUrl = InteractionPreference.getInstance()
 					.getLocationUrl()
 					+ "/interaction" + id + "-" + key;
-					ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) value);
+					final ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) value);
 					try {
 						publishFile(replacementUrl, bais);
 						bais.close();
 						inputData.put(key, replacementUrl);
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						logger.error(e);
 					}
 				}
 			}
 
-			String inputDataString = addInputDataToMessage(interactionNotificationMessage, inputData);
+			final String inputDataString = addInputDataToMessage(interactionNotificationMessage, inputData);
 
-			String interactionUrlString = generateHtml(inputData, inputDataString,
+			final String interactionUrlString = generateHtml(inputData, inputDataString,
 					runId, id);
 
 			postInteractionMessage(id, interactionNotificationMessage, interactionUrlString);
-			if (!requestor.getInteractionType().equals(InteractionType.Notification)) {
-					FeedListener.getInstance().registerInteraction(interactionNotificationMessage,requestor);
+			if (!this.requestor.getInteractionType().equals(InteractionType.Notification)) {
+					FeedListener.getInstance().registerInteraction(interactionNotificationMessage,this.requestor);
 			} else {
-				requestor.carryOn();
-				
+				this.requestor.carryOn();
+
 			}
 		}
 	}
 
-	private String addInputDataToMessage(Entry interactionNotificationMessage,
-			Map<String, Object> inputData) {
-		Element inputDataElement = interactionNotificationMessage
+	private String addInputDataToMessage(final Entry interactionNotificationMessage,
+			final Map<String, Object> inputData) {
+		final Element inputDataElement = interactionNotificationMessage
 				.addExtension(AtomUtils.getInputDataQName());
-		ObjectMapper mapper = new ObjectMapper();
-		StringWriter sw = new StringWriter();
+		final ObjectMapper mapper = new ObjectMapper();
+		final StringWriter sw = new StringWriter();
 		try {
 			mapper.writeValue(sw, inputData);
-		} catch (JsonGenerationException e) {
+		} catch (final JsonGenerationException e) {
 			logger.error(e);
-			requestor.fail("Unable to generate JSON");
-		} catch (JsonMappingException e) {
+			this.requestor.fail("Unable to generate JSON");
+		} catch (final JsonMappingException e) {
 			logger.error(e);
-			requestor.fail("Unable to generate JSON");
-		} catch (IOException e) {
+			this.requestor.fail("Unable to generate JSON");
+		} catch (final IOException e) {
 			logger.error(e);
-			requestor.fail("Unable to generate JSON");
+			this.requestor.fail("Unable to generate JSON");
 		}
-		String inputDataString = sw.toString();
-		inputDataString = StringEscapeUtils
-				.escapeJavaScript(inputDataString);
+		final String inputDataString = StringEscapeUtils
+				.escapeJavaScript(sw.toString());
 		inputDataElement.setText(inputDataString);
 		return inputDataString;
 	}
 
-	private Entry createBasicInteractionMessage(String id, String runId) {
-		Entry interactionNotificationMessage = ABDERA.newEntry();
+	private Entry createBasicInteractionMessage(final String id, final String runId) {
+		final Entry interactionNotificationMessage = ABDERA.newEntry();
 
 		interactionNotificationMessage.setId(id);
-		Date timestamp = new Date();
+		final Date timestamp = new Date();
 		interactionNotificationMessage.setPublished(timestamp);
 		interactionNotificationMessage.setUpdated(timestamp);
 
 		interactionNotificationMessage.addAuthor("Taverna");
 		interactionNotificationMessage.setTitle("Interaction from Taverna for "
-				+ requestor.generateId());
+				+ this.requestor.generateId());
 
 
-		Element runIdElement = interactionNotificationMessage.addExtension(AtomUtils.getRunIdQName());
+		final Element runIdElement = interactionNotificationMessage.addExtension(AtomUtils.getRunIdQName());
 		runIdElement.setText(StringEscapeUtils
 				.escapeJavaScript(runId));
-		if (requestor.getInteractionType().equals(InteractionType.Notification)) {
+		if (this.requestor.getInteractionType().equals(InteractionType.Notification)) {
 			interactionNotificationMessage.addExtension(AtomUtils.getProgressQName());
 		}
-		Element idElement = interactionNotificationMessage.addExtension(AtomUtils.getIdQName());
+		final Element idElement = interactionNotificationMessage.addExtension(AtomUtils.getIdQName());
 		idElement.setText(id);
 
 		return interactionNotificationMessage;
 	}
-	
-	private void postInteractionMessage(String id, Entry entry,
-			String interactionUrlString) {
+
+	private void postInteractionMessage(final String id, final Entry entry,
+			final String interactionUrlString) {
 
 		entry.addLink(StringEscapeUtils.escapeXml(interactionUrlString), "presentation");
 		entry.setContentAsXhtml("<p><a href=\"" + StringEscapeUtils.escapeXml(interactionUrlString)
 				+ "\">Open: " + StringEscapeUtils.escapeXml(interactionUrlString) + "</a></p>");
-		
+
 		URL feedUrl;
 
 			try {
 				feedUrl = new URL(InteractionPreference.getInstance().getFeedUrl());
-				String entryContent = ((FOMElement) entry).toFormattedString();
-				HttpURLConnection httpCon = (HttpURLConnection) feedUrl.openConnection();
+				final String entryContent = ((FOMElement) entry).toFormattedString();
+				final HttpURLConnection httpCon = (HttpURLConnection) feedUrl.openConnection();
 				httpCon.setDoOutput(true);
 				httpCon.setRequestProperty("Content-Type", "application/atom+xml;type=entry");
 		           httpCon.setRequestProperty("Content-Length", "" + entryContent.length());
 		           httpCon.setRequestProperty("Slug", id);
 				httpCon.setRequestMethod("POST");
-				OutputStream outputStream = httpCon.getOutputStream();
+				final OutputStream outputStream = httpCon.getOutputStream();
 				IOUtils.write(entryContent, outputStream);
 				outputStream.close();
-				int respCode = httpCon.getResponseCode();
-			} catch (MalformedURLException e2) {
+				httpCon.getResponseCode();
+			} catch (final MalformedURLException e2) {
 				logger.error(e2);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				logger.error(e);
 			}
 	}
-	
-	String generateHtml(Map<String, Object> inputData,
-			String inputDataString, String runId, String id) {
 
-		VelocityContext velocityContext = new VelocityContext();
-		for (String inputName : inputData.keySet()) {
-			Object input = inputData.get(inputName);
+	String generateHtml(final Map<String, Object> inputData,
+			final String inputDataString, final String runId, final String id) {
+
+		final VelocityContext velocityContext = new VelocityContext();
+		for (final String inputName : inputData.keySet()) {
+			final Object input = inputData.get(inputName);
 			velocityContext.put(inputName, input);
 		}
 		velocityContext.put("feed", InteractionPreference.getInstance()
 				.getFeedUrl());
 		velocityContext.put("runId", runId);
 		velocityContext.put("entryId", id);
-		String pmrpcUrl = InteractionPreference.getInstance().getLocationUrl()
+		final String pmrpcUrl = InteractionPreference.getInstance().getLocationUrl()
 				+ "/pmrpc.js";
 		velocityContext.put("pmrpcUrl", pmrpcUrl);
 		velocityContext.put("inputData", inputDataString);
-		String interactionUrl = InteractionPreference.getInstance()
+		final String interactionUrl = InteractionPreference.getInstance()
 		.getLocationUrl()
 		+ "/interaction" + id + ".html";
 
 		velocityContext.put("interactionUrl", interactionUrl);
-		
+
 		String presentationUrl = "";
-		String authorizeUrl = "";
+		final String authorizeUrl = "";
 		try {
-			if (requestor.getPresentationType().equals(
+			if (this.requestor.getPresentationType().equals(
 					InteractionActivityType.VelocityTemplate)) {
 
 				presentationUrl = InteractionPreference.getInstance()
 						.getLocationUrl()
 						+ "/presentation" + id + ".html";
-				
-				String presentationString = processTemplate(
-						presentationTemplate, velocityContext);
+
+				final String presentationString = processTemplate(
+						this.presentationTemplate, velocityContext);
 				publishFile(presentationUrl, presentationString);
 
-			} else if (requestor.getPresentationType().equals(
+			} else if (this.requestor.getPresentationType().equals(
 					InteractionActivityType.LocallyPresentedHtml)) {
-				presentationUrl = requestor.getPresentationOrigin();
+				presentationUrl = this.requestor.getPresentationOrigin();
 			}
 
 			velocityContext.put("presentationUrl", presentationUrl);
 
-				String interactionString = processTemplate(InteractionVelocity
+				final String interactionString = processTemplate(InteractionVelocity
 						.getInteractionTemplate(), velocityContext);
 				publishFile(interactionUrl, interactionString);
 
@@ -246,50 +243,50 @@ public final class InteractionActivityRunnable implements Runnable {
 					return authorizeUrl;
 				}
 				return interactionUrl;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			logger.error(e);
 			return null;
 		}
 	}
-	
-	private String processTemplate(Template template, VelocityContext context)
+
+	private String processTemplate(final Template template, final VelocityContext context)
 			throws IOException {
-		StringWriter resultWriter = new StringWriter();
+		final StringWriter resultWriter = new StringWriter();
 		template.merge(context, resultWriter);
 		resultWriter.close();
 		return resultWriter.toString();
 	}
 
-	private void publishFile(String urlString, String contents)
+	private void publishFile(final String urlString, final String contents)
 			throws IOException {
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
+		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
 				contents.getBytes());
 		publishFile(urlString, byteArrayInputStream);
 	}
 
-	private void publishFile(String urlString, InputStream is)
+	private void publishFile(final String urlString, final InputStream is)
 			throws IOException {
 		if (publishedUrls.contains(urlString)) {
 			return;
 		}
 		publishedUrls.add(urlString);
-		URL url = new URL(urlString);
-		HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
+		final URL url = new URL(urlString);
+		final HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
 		httpCon.setDoOutput(true);
 		httpCon.setRequestMethod("PUT");
-		OutputStream outputStream = httpCon.getOutputStream();
+		final OutputStream outputStream = httpCon.getOutputStream();
 		IOUtils.copy(is, outputStream);
 		is.close();
 		outputStream.close();
-		int respCode = httpCon.getResponseCode();
+		httpCon.getResponseCode();
 	}
-	
-	protected void copyJavaScript(String javascriptFileName) throws IOException {
-		String targetUrl = InteractionPreference.getInstance().getLocationUrl()
+
+	protected void copyJavaScript(final String javascriptFileName) throws IOException {
+		final String targetUrl = InteractionPreference.getInstance().getLocationUrl()
 				+ "/" + javascriptFileName;
 		publishFile(targetUrl, InteractionActivity.class.getResourceAsStream("/" + javascriptFileName));
 	}
 
-	
+
 
 }

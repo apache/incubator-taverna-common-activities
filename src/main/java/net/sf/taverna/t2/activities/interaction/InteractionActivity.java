@@ -23,49 +23,49 @@ import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.parser.node.ASTprocess;
 
-public class InteractionActivity extends
+public final class InteractionActivity extends
 		AbstractAsynchronousActivity<InteractionActivityConfigurationBean>
 		implements AsynchronousActivity<InteractionActivityConfigurationBean> {
 
-	private static Logger logger = Logger.getLogger(InteractionActivity.class);
+	private static final Logger logger = Logger.getLogger(InteractionActivity.class);
 
 	InteractionActivityConfigurationBean configBean;
 
-	static Abdera ABDERA = Abdera.getInstance();
+	private static final Abdera ABDERA = Abdera.getInstance();
 
 	private Template presentationTemplate;
 
-	private Map<String, Integer> inputDepths = new HashMap<String, Integer>();
-	private Map<String, Integer> outputDepths = new HashMap<String, Integer>();
-	
+	private final Map<String, Integer> inputDepths = new HashMap<String, Integer>();
+	private final Map<String, Integer> outputDepths = new HashMap<String, Integer>();
+
 	public InteractionActivity() {
-		configBean = new InteractionActivityConfigurationBean();
+		this.configBean = new InteractionActivityConfigurationBean();
 	}
 
 	@Override
-	public void configure(InteractionActivityConfigurationBean configBean)
+	public void configure(final InteractionActivityConfigurationBean configBean)
 			throws ActivityConfigurationException {
 
 		// Store for getConfiguration(), but you could also make
 		// getConfiguration() return a new bean from other sources
 		this.configBean = configBean;
 
-		inputDepths.clear();
-		outputDepths.clear();
+		this.inputDepths.clear();
+		this.outputDepths.clear();
 
 		InteractionVelocity.checkVelocity();
 
 		if (this.configBean.getInteractionActivityType().equals(
 				InteractionActivityType.VelocityTemplate)) {
-			presentationTemplate = Velocity.getTemplate(configBean
+			this.presentationTemplate = Velocity.getTemplate(configBean
 					.getPresentationOrigin());
-			RequireChecker requireChecker = new RequireChecker();
-			requireChecker.visit((ASTprocess) presentationTemplate.getData(),
-					inputDepths);
+			final RequireChecker requireChecker = new RequireChecker();
+			requireChecker.visit((ASTprocess) this.presentationTemplate.getData(),
+					this.inputDepths);
 
-			ProduceChecker produceChecker = new ProduceChecker();
-			produceChecker.visit((ASTprocess) presentationTemplate.getData(),
-					outputDepths);
+			final ProduceChecker produceChecker = new ProduceChecker();
+			produceChecker.visit((ASTprocess) this.presentationTemplate.getData(),
+					this.outputDepths);
 			configurePortsFromTemplate();
 		}
 			configurePorts(this.configBean);
@@ -73,12 +73,12 @@ public class InteractionActivity extends
 	}
 
 	protected void configurePortsFromTemplate() {
-		List<ActivityInputPortDefinitionBean> inputs = new ArrayList<ActivityInputPortDefinitionBean>();
+		final List<ActivityInputPortDefinitionBean> inputs = new ArrayList<ActivityInputPortDefinitionBean>();
 
-		for (String inputName : inputDepths.keySet()) {
-			ActivityInputPortDefinitionBean inputBean = new ActivityInputPortDefinitionBean();
+		for (final String inputName : this.inputDepths.keySet()) {
+			final ActivityInputPortDefinitionBean inputBean = new ActivityInputPortDefinitionBean();
 			inputBean.setName(inputName);
-			inputBean.setDepth(inputDepths.get(inputName));
+			inputBean.setDepth(this.inputDepths.get(inputName));
 			inputBean.setAllowsLiteralValues(true);
 			inputBean.setHandledReferenceSchemes(null);
 				inputBean.setTranslatedElementType(String.class);
@@ -86,12 +86,12 @@ public class InteractionActivity extends
 		}
 		this.configBean.setInputPortDefinitions(inputs);
 
-		List<ActivityOutputPortDefinitionBean> outputs = new ArrayList<ActivityOutputPortDefinitionBean>();
-		for (String outputName : outputDepths.keySet()) {
-			ActivityOutputPortDefinitionBean outputBean = new ActivityOutputPortDefinitionBean();
+		final List<ActivityOutputPortDefinitionBean> outputs = new ArrayList<ActivityOutputPortDefinitionBean>();
+		for (final String outputName : this.outputDepths.keySet()) {
+			final ActivityOutputPortDefinitionBean outputBean = new ActivityOutputPortDefinitionBean();
 			outputBean.setName(outputName);
-			outputBean.setDepth(outputDepths.get(outputName));
-			outputBean.setGranularDepth(outputDepths.get(outputName));
+			outputBean.setDepth(this.outputDepths.get(outputName));
+			outputBean.setGranularDepth(this.outputDepths.get(outputName));
 			outputs.add(outputBean);
 		}
 		this.configBean.setOutputPortDefinitions(outputs);
@@ -103,8 +103,8 @@ public class InteractionActivity extends
 			final AsynchronousActivityCallback callback) {
 		// Don't execute service directly now, request to be run ask to be run
 		// from thread pool and return asynchronously
-		InteractionRequestor requestor = new InteractionCallbackRequestor(this, callback, inputs);
-		callback.requestRun(new InteractionActivityRunnable(requestor, presentationTemplate));
+		final InteractionRequestor requestor = new InteractionCallbackRequestor(this, callback, inputs);
+		callback.requestRun(new InteractionActivityRunnable(requestor, this.presentationTemplate));
 	}
 
 	@Override
@@ -112,8 +112,8 @@ public class InteractionActivity extends
 		return this.configBean;
 	}
 
-	public ActivityInputPort getInputPort(String name) {
-		for (ActivityInputPort port : getInputPorts()) {
+	public ActivityInputPort getInputPort(final String name) {
+		for (final ActivityInputPort port : getInputPorts()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}

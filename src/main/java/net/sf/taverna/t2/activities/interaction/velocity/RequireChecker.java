@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.interaction.velocity;
 
@@ -13,13 +13,14 @@ import org.apache.velocity.runtime.visitor.BaseVisitor;
  *
  */
 public class RequireChecker extends BaseVisitor {
-	
-	public Object visit(ASTDirective node, Object data) {
-		Map<String, Integer> map = (Map<String, Integer>) data;
+
+	@Override
+	public Object visit(final ASTDirective node, final Object data) {
+		final Map<String, Integer> map = (Map<String, Integer>) data;
 		if (node.getDirectiveName().equals("require")) {
-			String key = String.valueOf(node.jjtGetChild(0).value(context));
+			final String key = String.valueOf(node.jjtGetChild(0).value(this.context));
 			if (node.jjtGetNumChildren() > 1) {
-				Integer depth = (Integer) node.jjtGetChild(1).value(context);
+				final Integer depth = (Integer) node.jjtGetChild(1).value(this.context);
 				map.put(key, depth);
 			} else {
 				map.put(key, 0);

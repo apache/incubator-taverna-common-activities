@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.interaction.atom;
 
@@ -10,7 +10,7 @@ import javax.xml.namespace.QName;
  *
  */
 public class AtomUtils {
-	
+
 	private static QName inputDataQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "input-data",
 			"interaction");

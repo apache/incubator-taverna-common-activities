@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.interaction;
 
@@ -8,7 +8,7 @@ package net.sf.taverna.t2.activities.interaction;
  *
  */
 public enum InteractionType {
-	
+
 	DataRequest,
 	Notification,
 	SecurityRequest,

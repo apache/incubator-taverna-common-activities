@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.interaction;
 
@@ -31,49 +31,49 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author alanrw
  *
  */
-public class FeedListener {
-	
+public final class FeedListener {
+
 	private static final String STATUS_OK = "OK";
 
-	private static FeedListener instance = null;
-	
-	private static Logger logger = Logger.getLogger(FeedListener.class);
+	private static FeedListener instance;
 
-	private static Map<String, InteractionRequestor> requestorMap = new HashMap<String, InteractionRequestor>();
-	
+	private static final Logger logger = Logger.getLogger(FeedListener.class);
+
+	private static final Map<String, InteractionRequestor> requestorMap = new HashMap<String, InteractionRequestor>();
+
 	public static synchronized FeedListener getInstance() {
 		if (instance == null) {
 			instance = new FeedListener();
 		}
 		return instance;
 	}
-	
+
 	private FeedListener() {
-		Thread feeListenerThread = new Thread() {
+		final Thread feeListenerThread = new Thread() {
 
 			@Override
 			public void run() {
 				if (InteractionPreference.getInstance().getUseJetty()) {
 					InteractionJetty.checkJetty();
 				}
-				Parser parser = Abdera.getNewParser();
+				final Parser parser = Abdera.getNewParser();
 				Date lastCheckedDate = new Date();
 				while (true) {
 					try {
 						sleep(5000);
-					} catch (InterruptedException e1) {
+					} catch (final InterruptedException e1) {
 						logger.error(e1);
 					}
 					InputStream openStream = null;
 					try {
-						Date newLastCheckedDate = new Date();
-						URL url = new URL(InteractionPreference.getInstance().getFeedUrl());
+						final Date newLastCheckedDate = new Date();
+						final URL url = new URL(InteractionPreference.getInstance().getFeedUrl());
 						openStream = url.openStream();
-						Document<Feed> doc = parser.parse(openStream, url
+						final Document<Feed> doc = parser.parse(openStream, url
 								.toString());
-						Feed feed = doc.getRoot().sortEntriesByEdited(true);
+						final Feed feed = doc.getRoot().sortEntriesByEdited(true);
 
-						for (Entry entry : feed.getEntries()) {
+						for (final Entry entry : feed.getEntries()) {
 							Date d = entry.getEdited();
 							if (d == null) {
 								d = entry.getUpdated();
@@ -87,18 +87,18 @@ public class FeedListener {
 							considerInReplyTo(feed, entry);
 						}
 						lastCheckedDate = newLastCheckedDate;
-					} catch (MalformedURLException e) {
+					} catch (final MalformedURLException e) {
 						logger.error(e);
-					} catch (ParseException e) {
+					} catch (final ParseException e) {
 						logger.error(e);
-					} catch (IOException e) {
+					} catch (final IOException e) {
 						logger.error(e);
 					} finally {
 						try {
 							if (openStream != null) {
 								openStream.close();
 							}
-						} catch (IOException e) {
+						} catch (final IOException e) {
 							logger.error(e);
 						}
 					}
@@ -108,51 +108,51 @@ public class FeedListener {
 		};
 		feeListenerThread.start();
 	}
-	
-	private static void considerInReplyTo(Feed feed, Entry entry) {
+
+	private static void considerInReplyTo(final Feed feed, final Entry entry) {
 		synchronized(requestorMap) {
-		String refString = getReplyTo(entry);
+		final String refString = getReplyTo(entry);
 		if (refString == null) {
 			return;
 		}
 		if (requestorMap.containsKey(refString)) {
-			InteractionRequestor requestor = requestorMap.get(refString);
+			final InteractionRequestor requestor = requestorMap.get(refString);
 
-			Element statusElement = entry.getExtension(AtomUtils.getResultStatusQName());
-			String statusContent = statusElement.getText().trim();
+			final Element statusElement = entry.getExtension(AtomUtils.getResultStatusQName());
+			final String statusContent = statusElement.getText().trim();
 			if (!statusContent.equals(STATUS_OK)) {
 				cleanup (refString);
 				requestor.fail(statusContent);
 				return;
 			}
-			Element resultElement = entry.getExtension(AtomUtils.getResultDataQName());
+			final Element resultElement = entry.getExtension(AtomUtils.getResultDataQName());
 			String content = resultElement.getText();
-			
+
 			try {
 				content = URLDecoder.decode(content,"UTF-8");
-				ObjectMapper mapper = new ObjectMapper();
-				Map<String,Object> rootAsMap = mapper.readValue(content, Map.class);
+				final ObjectMapper mapper = new ObjectMapper();
+				final Map<String,Object> rootAsMap = mapper.readValue(content, Map.class);
 				requestor.receiveResult(rootAsMap);
 				cleanup (refString);
-				
-			} catch (JsonParseException e) {
+
+			} catch (final JsonParseException e) {
 				logger.error(e);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				logger.error(e);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				logger.error(e);
 			}
-			
+
 		}
 		}
 	}
-	
-	private static void cleanup (String refString) {
-		requestorMap.remove(refString);		
+
+	private static void cleanup (final String refString) {
+		requestorMap.remove(refString);
 	}
-	
-	private static String getReplyTo(Entry entry) {
-	        Element replyTo = entry.getFirstChild(AtomUtils.getInReplyToQName());
+
+	private static String getReplyTo(final Entry entry) {
+	        final Element replyTo = entry.getFirstChild(AtomUtils.getInReplyToQName());
 	        if (replyTo == null) {
 	        	return null;
 	        }
@@ -161,10 +161,10 @@ public class FeedListener {
 
 
 
-	public void registerInteraction(Entry entry,
-			InteractionRequestor requestor) {
+	public void registerInteraction(final Entry entry,
+			final InteractionRequestor requestor) {
 		synchronized(requestorMap) {
-		String refString = entry.getId().toString();
+		final String refString = entry.getId().toString();
 		requestorMap.put(refString, requestor);
 		}
 	}

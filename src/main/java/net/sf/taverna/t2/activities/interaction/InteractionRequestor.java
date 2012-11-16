@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.taverna.t2.activities.interaction;
 
@@ -20,9 +20,9 @@ public interface InteractionRequestor {
 	void carryOn();
 
 	String generateId();
-	
+
 	InteractionActivityType getPresentationType();
-	
+
 	InteractionType getInteractionType();
 
 	String getPresentationOrigin();
