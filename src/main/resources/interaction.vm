@@ -73,10 +73,16 @@
          }
          
 
-	  function getDataFromUrl(url) {
+	  function getDataFromUrl(url, type) {
 	      var xmlhttp = new XMLHttpRequest();
 	      xmlhttp.open("GET", url, false);
+	      if (type != null) {
+	      	xmlhttp.overrideMimeType(type);
+	      }
 	      xmlhttp.send();
+	      if (xmlhttp.status != 200) {
+	      	return '';
+	      }
 	      return xmlhttp.responseText;
 	  }
 	  
