@@ -127,8 +127,8 @@
          
          pmrpc.register( {
          	publicProcedureName : "getDataFromUrl",
-         	procedure : function(url) {
-         		return getDataFromUrl(url);
+         	procedure : function(url, type) {
+         		return getDataFromUrl(url, type);
          	}
          });
 
