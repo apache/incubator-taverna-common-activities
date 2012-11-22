@@ -88,7 +88,7 @@ public class InteractionJetty {
 		if (interactionPreference.getUseUsername()) {
 			final Constraint constraint = new Constraint();
 			constraint.setName(Constraint.__BASIC_AUTH);
-			;
+
 			constraint.setRoles(new String[] { "user", "admin", "moderator" });
 			constraint.setAuthenticate(true);
 
