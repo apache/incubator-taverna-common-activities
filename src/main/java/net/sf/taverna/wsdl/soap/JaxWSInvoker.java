@@ -88,7 +88,7 @@ public class JaxWSInvoker {
                 // found the port in this service
                 Service service = Service.create(service_name);
                 String endpoint = parser.getOperationEndpointLocation(port_qname.getLocalPart());
-                service.addPort(port_qname, SOAPBinding.SOAP11HTTP_MTOM_BINDING, endpoint); // TODO: SOAP version
+                service.addPort(port_qname, SOAPBinding.SOAP11HTTP_BINDING, endpoint); // TODO: SOAP version
                 dispatch = service.createDispatch(port_qname, SOAPMessage.class, javax.xml.ws.Service.Mode.MESSAGE);
                 
                 List<Handler> chain = new ArrayList<Handler>();//Arrays.asList(new InvokerHandler());
