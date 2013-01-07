@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://vo.imcce.fr/webservices/ssodnet"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                  xmlns:tns="http://vo.imcce.fr/webservices/ssodnet">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://vo.imcce.fr/webservices/ssodnet">
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <xsd:import namespace="http://schemas.xmlsoap.org/wsdl/" />
+      
+      <xsd:complexType name="clientID">
+        <xsd:sequence>
+          <xsd:element name="from" type="xsd:string" minOccurs="1" maxOccurs="1" />
+          <xsd:element name="hostip" type="xsd:string" minOccurs="1" maxOccurs="1" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="resolverRequest">
+        <xsd:annotation>
+          <xsd:documentation>Complex type of the resolver method of SsoDNet Web service</xsd:documentation>
+        </xsd:annotation>
+        <xsd:all>
+          <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+          <xsd:element name="mime" type="xsd:string" minOccurs="0" maxOccurs="1" default="votable"/>
+          <xsd:element name="epoch" type="xsd:string" minOccurs="0" maxOccurs="1" default="now"/>
+          <xsd:element name="maxrec" type="xsd:int" minOccurs="0" maxOccurs="1" default="0"/>
+          <xsd:element name="ephem" type="xsd:int" minOccurs="0" maxOccurs="1" default="1"/>
+        </xsd:all>
+      </xsd:complexType>
+
+      <xsd:complexType name="ssodnetResponse">
+        <xsd:all>
+          <xsd:element name="output" type="xsd:string"/>
+        </xsd:all>
+      </xsd:complexType>
+
+      <xsd:element name="clientID" type="tns:clientID"></xsd:element>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name='header'>
+    <wsdl:documentation>Client's ID parameters which are transmitted to the SsoDNet web services</wsdl:documentation>
+    <wsdl:part name='clientID' element='tns:clientID'/>
+  </wsdl:message>
+  
+  <wsdl:message name="resolverRequest">
+    <wsdl:documentation>Input parameters of the SsoDNet resolver method</wsdl:documentation>
+    <wsdl:part name="inputArray" type="tns:resolverRequest"/>
+  </wsdl:message>
+  <wsdl:message name="resolverResponse">
+    <wsdl:documentation>Output parameters of the SsoDNet resolver method</wsdl:documentation>
+    <wsdl:part name="result" type="tns:ssodnetResponse"/>
+  </wsdl:message>
+
+  <wsdl:message name="getAvailabilityRequest">
+    <wsdl:documentation>Input parameter of the SsoDNet getAvailability method</wsdl:documentation>
+    <wsdl:part name="mime" type="xsd:string" />
+  </wsdl:message>
+  <wsdl:message name="getAvailabilityResponse">
+    <wsdl:documentation>Output parameters of the SsoDNet getAvailability method</wsdl:documentation>
+    <wsdl:part name="result" type="tns:ssodnetResponse" />
+  </wsdl:message>
+
+  <wsdl:portType name="ssodnetPortType">
+
+    <wsdl:operation name="resolver">
+      <wsdl:documentation>Resolve any name or designation of Solar system objects.</wsdl:documentation>
+      <wsdl:input message="tns:resolverRequest"/>
+      <wsdl:output message="tns:resolverResponse"/>
+    </wsdl:operation>
+    
+    <wsdl:operation name="getAvailability">
+      <wsdl:documentation>Availability of the SsoDNet web-service</wsdl:documentation>
+      <wsdl:input message="tns:getAvailabilityRequest" />
+      <wsdl:output message="tns:getAvailabilityResponse" />
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+  <wsdl:binding name="ssodnetBinding" type="tns:ssodnetPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <wsdl:operation name="resolver">
+      <soap:operation soapAction="http://vo.imcce.fr/webservices/ssodnet#resolver" style="rpc"/>
+      <wsdl:input>
+        <soap:header use="encoded" part="clientID" message="tns:header" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+        <soap:body use="encoded" namespace="http://vo.imcce.fr/webservices/ssodnet"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://vo.imcce.fr/webservices/ssodnet"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="getAvailability">
+      <soap:operation soapAction="http://vo.imcce.fr/webservices/ssodnet#getAvailability" style="rpc" />
+      <wsdl:input>
+        <soap:header use="literal" part="clientID" message="tns:header"/>
+        <soap:body use="encoded" namespace="http://vo.imcce.fr/webservices/ssodnet"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="encoded" namespace="http://vo.imcce.fr/webservices/ssodnet"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <wsdl:service name="ssodnet">
+    <wsdl:port binding="tns:ssodnetBinding" name="ssodnetPort">
+      <soap:address location="http://vo.imcce.fr/webservices/ssodnet/ssodnet.php"/>
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>

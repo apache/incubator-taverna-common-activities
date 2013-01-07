@@ -247,6 +247,15 @@ public class WSDLParserTest {
 		assertEquals("use should be encoded", "encoded", use);
 	}
 
+    /** Test for T3-782 **/
+	@Test
+	public void testGetUseNotSoapHeader() throws Exception {
+		WSDLParser parser = new WSDLParser(wsdlResourcePath("ssodnet.wsdl"));
+		String use = parser.getUse("getAvailability");
+        // Should not pick up <soap:header use="literal">
+		assertEquals("use should be encoded", "encoded", use);
+	}
+
 	@Test
 	public void testGetUseLiteral() throws Exception {
 		WSDLParser parser = new WSDLParser(wsdlResourcePath("eutils/eutils_lite.wsdl"));
