@@ -23,6 +23,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.parser.Parser;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -34,6 +35,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 public final class FeedListener {
 
 	private static final String STATUS_OK = "OK";
+
+	private static final String DATA_READ_FAILED = "Data read failed";
 
 	private static FeedListener instance;
 
@@ -67,7 +70,7 @@ public final class FeedListener {
 					InputStream openStream = null;
 					try {
 						final Date newLastCheckedDate = new Date();
-						final URL url = new URL(InteractionPreference.getInstance().getFeedUrl());
+						final URL url = InteractionPreference.getFeedUrl();
 						openStream = url.openStream();
 						final Document<Feed> doc = parser.parse(openStream, url
 								.toString());
@@ -125,11 +128,24 @@ public final class FeedListener {
 				requestor.fail(statusContent);
 				return;
 			}
-			final Element resultElement = entry.getExtension(AtomUtils.getResultDataQName());
-			String content = resultElement.getText();
+			final String outputDataUrl = InteractionPreference.getOutputDataUrlString(refString);
+			String content = null;
+			InputStream iStream;
+			try {
+				iStream = new URL(outputDataUrl).openStream();
+				content = IOUtils.toString(iStream);
+				iStream.close();
+			} catch (MalformedURLException e1) {
+				logger.error(e1);
+				requestor.fail(DATA_READ_FAILED);
+				return;
+			} catch (IOException e1) {
+				logger.error(e1);
+				requestor.fail(DATA_READ_FAILED);
+				return;
+			}
 
 			try {
-				content = URLDecoder.decode(content,"UTF-8");
 				final ObjectMapper mapper = new ObjectMapper();
 				final Map<String,Object> rootAsMap = mapper.readValue(content, Map.class);
 				requestor.receiveResult(rootAsMap);
