@@ -85,9 +85,7 @@ public final class InteractionActivityRunnable implements Runnable {
 			for (final String key : inputData.keySet()) {
 				final Object value = inputData.get(key);
 				if (value instanceof byte[]) {
-					final String replacementUrl = InteractionPreference.getInstance()
-					.getLocationUrl()
-					+ "/interaction" + id + "-" + key;
+					final String replacementUrl = InteractionPreference.getPublicationUrlString(id, key);
 					final ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) value);
 					try {
 						publishFile(replacementUrl, bais);
@@ -99,9 +97,17 @@ public final class InteractionActivityRunnable implements Runnable {
 				}
 			}
 
-			final String inputDataString = addInputDataToMessage(interactionNotificationMessage, inputData);
+			final String inputDataString = createInputDataJson(inputData);
+			final String inputDataUrl = InteractionPreference.getInputDataUrlString(id);
+			try {
+				publishFile(inputDataUrl, inputDataString);
+			} catch (IOException e) {
+				logger.error(e);
+			}
 
-			final String interactionUrlString = generateHtml(inputData, inputDataString,
+			final String outputDataUrl = InteractionPreference.getOutputDataUrlString(id);
+			final String interactionUrlString = generateHtml(inputDataUrl,
+					outputDataUrl, inputData,
 					runId, id);
 
 			postInteractionMessage(id, interactionNotificationMessage, interactionUrlString);
@@ -114,10 +120,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		}
 	}
 
-	private String addInputDataToMessage(final Entry interactionNotificationMessage,
-			final Map<String, Object> inputData) {
-		final Element inputDataElement = interactionNotificationMessage
-				.addExtension(AtomUtils.getInputDataQName());
+	private String createInputDataJson(final Map<String, Object> inputData) {
 		final ObjectMapper mapper = new ObjectMapper();
 		final StringWriter sw = new StringWriter();
 		try {
@@ -132,9 +135,7 @@ public final class InteractionActivityRunnable implements Runnable {
 			logger.error(e);
 			this.requestor.fail("Unable to generate JSON");
 		}
-		final String inputDataString = StringEscapeUtils
-				.escapeJavaScript(sw.toString());
-		inputDataElement.setText(inputDataString);
+		final String inputDataString = sw.toString();
 		return inputDataString;
 	}
 
@@ -173,7 +174,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		URL feedUrl;
 
 			try {
-				feedUrl = new URL(InteractionPreference.getInstance().getFeedUrl());
+				feedUrl = new URL(InteractionPreference.getInstance().getFeedUrlString());
 				final String entryContent = ((FOMElement) entry).toFormattedString();
 				final HttpURLConnection httpCon = (HttpURLConnection) feedUrl.openConnection();
 				httpCon.setDoOutput(true);
@@ -192,25 +193,25 @@ public final class InteractionActivityRunnable implements Runnable {
 			}
 	}
 
-	String generateHtml(final Map<String, Object> inputData,
-			final String inputDataString, final String runId, final String id) {
+	String generateHtml(final String inputDataUrl, final String outputDataUrl, final Map<String, Object> inputData, final String runId, final String id) {
 
 		final VelocityContext velocityContext = new VelocityContext();
+		
 		for (final String inputName : inputData.keySet()) {
-			final Object input = inputData.get(inputName);
-			velocityContext.put(inputName, input);
-		}
+            final Object input = inputData.get(inputName);
+            velocityContext.put(inputName, input);
+    }
+
 		velocityContext.put("feed", InteractionPreference.getInstance()
-				.getFeedUrl());
+				.getFeedUrlString());
 		velocityContext.put("runId", runId);
 		velocityContext.put("entryId", id);
 		final String pmrpcUrl = InteractionPreference.getInstance().getLocationUrl()
 				+ "/pmrpc.js";
 		velocityContext.put("pmrpcUrl", pmrpcUrl);
-		velocityContext.put("inputData", inputDataString);
-		final String interactionUrl = InteractionPreference.getInstance()
-		.getLocationUrl()
-		+ "/interaction" + id + ".html";
+		velocityContext.put("inputDataUrl", inputDataUrl);
+		velocityContext.put("outputDataUrl", outputDataUrl);
+		final String interactionUrl = InteractionPreference.getInteractionUrlString(id);
 
 		velocityContext.put("interactionUrl", interactionUrl);
 
@@ -220,9 +221,7 @@ public final class InteractionActivityRunnable implements Runnable {
 			if (this.requestor.getPresentationType().equals(
 					InteractionActivityType.VelocityTemplate)) {
 
-				presentationUrl = InteractionPreference.getInstance()
-						.getLocationUrl()
-						+ "/presentation" + id + ".html";
+				presentationUrl = InteractionPreference.getPresentationUrlString(id);
 
 				final String presentationString = processTemplate(
 						this.presentationTemplate, velocityContext);
