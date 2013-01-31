@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import net.sf.taverna.raven.appconfig.ApplicationRuntime;
@@ -210,7 +212,7 @@ public class InteractionPreference {
 		return DEFAULT_WEBDAV_PATH;
 	}
 
-	public String getFeedUrl() {
+	public String getFeedUrlString() {
 		return getHost() + ":" + getPort() + getFeedPath();
 	}
 
@@ -224,7 +226,40 @@ public class InteractionPreference {
 
 	public void setUseUsername(final boolean useUsername) {
 		this.properties.setProperty(USE_USERNAME, Boolean.toString(useUsername));
+	}
+	
+	public static String getOutputDataUrlString(final String interactionId) {
+		return InteractionPreference.getInstance()
+		.getLocationUrl()
+		+ "/interaction" + interactionId + "-outputData.json";
+	}
+	
+	public static String getInputDataUrlString(final String interactionId) {
+		return InteractionPreference.getInstance()
+		.getLocationUrl()
+		+ "/interaction" + interactionId + "-inputData.json";
+	}
+	
+	public static URL getFeedUrl() throws MalformedURLException {
+		return new URL(InteractionPreference.getInstance().getFeedUrlString());
+	}
 
+	public static String getInteractionUrlString(final String interactionId) {
+		return InteractionPreference.getInstance()
+		.getLocationUrl()
+		+ "/interaction" + interactionId + ".html";
+	}
+
+	public static String getPresentationUrlString(final String interactionId) {
+		return InteractionPreference.getInstance()
+		.getLocationUrl()
+		+ "/presentation" + interactionId + ".html";
+	}
+
+	public static String getPublicationUrlString(final String interactionId, final String key) {
+		return InteractionPreference.getInstance()
+		.getLocationUrl()
+		+ "/interaction" + interactionId + "-" + key;
 	}
 
 /*	public boolean getUseHttps() {
