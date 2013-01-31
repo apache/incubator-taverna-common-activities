@@ -24,7 +24,7 @@
          setTimeout("appendError('"+str+"')", 1)
        }
        
-         function createReplyContent(status, results) {
+         function createReplyContent(status) {
            date = new Date();
            msg = "";
            msg += "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
@@ -37,10 +37,7 @@
            msg += "<interaction:result-status xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">";
            msg += escape(status);
            msg += "</interaction:result-status>";
-           msg += "<interaction:result-data xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">\n";
-		   msg += escape(results);
-           msg += "</interaction:result-data>\n";
-           msg += "</entry>\n";
+          msg += "</entry>\n";
            return msg;
          }
 
@@ -59,12 +56,16 @@
 
 
          function reply(status, results) {
-           msg = createReplyContent(status, JSON.stringify(results));
-           xmlhttp = new XMLHttpRequest();
-           xmlhttp.open("POST", "$feed", true);
-           xmlhttp.onreadystatechange=function() {
-//               alert(xmlhttp.responseText);
-           }
+           var outputData = JSON.stringify(results);
+           var dataRequest = new XMLHttpRequest();
+           dataRequest.open("PUT", "$outputDataUrl", false);
+//           xmlhttp.setRequestHeader("Content-Type", "text/plain");
+           dataRequest.setRequestHeader("Content-Length", outputData.length);
+           dataRequest.send(outputData);
+           
+           var msg = createReplyContent(status, JSON.stringify(results));
+           var xmlhttp = new XMLHttpRequest();
+           xmlhttp.open("POST", "$feed", false);
            xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
            xmlhttp.setRequestHeader("Content-Length", msg.length);
            xmlhttp.setRequestHeader("Slug", "$entryId" + "-reply");
@@ -106,7 +107,7 @@
              publicProcedureName : "getInputData",
              procedure : function() {
                log("Returning input data");
-               return JSON.parse('$inputData');
+               return JSON.parse(getDataFromUrl('$inputDataUrl', "application/json"));
              }
            });
          
