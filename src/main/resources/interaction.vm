@@ -87,6 +87,8 @@
 	      return xmlhttp.responseText;
 	  }
 	  
+	  var inputData = null;
+	  
       function registerCalls() {
 			pmrpc.register( {
          	  publicProcedureName : "reply",
@@ -102,12 +104,14 @@
          	     return getParameterValue(parameterName);
          	  }
            });
+           
+           inputData = JSON.parse(getDataFromUrl('$inputDataUrl', "application/json"));
          
            pmrpc.register( {
              publicProcedureName : "getInputData",
              procedure : function() {
                log("Returning input data");
-               return JSON.parse(getDataFromUrl('$inputDataUrl', "application/json"));
+               return inputData;
              }
            });
          
