@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +51,7 @@ public final class FeedListener {
 	}
 
 	private FeedListener() {
-		final Thread feeListenerThread = new Thread() {
+		final Thread feedListenerThread = new Thread("FeedListener") {
 
 			@Override
 			public void run() {
@@ -77,6 +76,7 @@ public final class FeedListener {
 						final Feed feed = doc.getRoot().sortEntriesByEdited(true);
 
 						for (final Entry entry : feed.getEntries()) {
+							
 							Date d = entry.getEdited();
 							if (d == null) {
 								d = entry.getUpdated();
@@ -87,7 +87,7 @@ public final class FeedListener {
 							if (d.before(lastCheckedDate)) {
 								break;
 							}
-							considerInReplyTo(feed, entry);
+							considerInReplyTo(entry);
 						}
 						lastCheckedDate = newLastCheckedDate;
 					} catch (final MalformedURLException e) {
@@ -109,16 +109,22 @@ public final class FeedListener {
 			}
 
 		};
-		feeListenerThread.start();
+		feedListenerThread.start();
 	}
 
-	private static void considerInReplyTo(final Feed feed, final Entry entry) {
+	private static void considerInReplyTo(final Entry entry) {
 		synchronized(requestorMap) {
 		final String refString = getReplyTo(entry);
 		if (refString == null) {
 			return;
 		}
+		String runId = getRunId(entry);
+		
+		String entryUrl = InteractionPreference.getInstance().getFeedUrlString() + "/" + entry.getId().toASCIIString();
+		InteractionRecorder.addResource(runId, refString, entryUrl);
+		
 		if (requestorMap.containsKey(refString)) {
+			
 			final InteractionRequestor requestor = requestorMap.get(refString);
 
 			final Element statusElement = entry.getExtension(AtomUtils.getResultStatusQName());
@@ -129,6 +135,8 @@ public final class FeedListener {
 				return;
 			}
 			final String outputDataUrl = InteractionPreference.getOutputDataUrlString(refString);
+			// Note that this may not really exist
+			InteractionRecorder.addResource(runId, refString, outputDataUrl);
 			String content = null;
 			InputStream iStream;
 			try {
@@ -174,6 +182,14 @@ public final class FeedListener {
 	        }
 	        return replyTo.getText();
 	}
+
+	private static String getRunId(final Entry entry) {
+        final Element runIdElement = entry.getFirstChild(AtomUtils.getRunIdQName());
+        if (runIdElement == null) {
+        	return null;
+        }
+        return runIdElement.getText();
+}
 
 
 
