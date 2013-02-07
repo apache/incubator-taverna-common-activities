@@ -11,11 +11,8 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import net.sf.taverna.t2.activities.interaction.atom.AtomUtils;
@@ -44,11 +41,8 @@ public final class InteractionActivityRunnable implements Runnable {
 
 	private static final Abdera ABDERA = Abdera.getInstance();
 
-	private static final Set<String> publishedUrls = Collections.synchronizedSet(new HashSet<String> ());
-
 	private final Template presentationTemplate;
-
-
+	
 	private final InteractionRequestor requestor;
 
 	public InteractionActivityRunnable(final InteractionRequestor requestor, final Template presentationTemplate) {
@@ -59,12 +53,8 @@ public final class InteractionActivityRunnable implements Runnable {
 	public void run() {
 /*		InvocationContext context = callback.getContext();
 				*/
-		String runId = this.requestor.getRunId();
-		final String specifiedId = System.getProperty("taverna.runid");
-		if (specifiedId != null) {
-			runId = specifiedId;
-		}
-
+		String runId = InteractionUtils.getUsedRunId(this.requestor.getRunId());
+		
 		final String id = Sanitizer.sanitize(UUID.randomUUID().toString(),
 				"", true, Normalizer.Form.D);
 
@@ -74,7 +64,7 @@ public final class InteractionActivityRunnable implements Runnable {
 			InteractionJetty.checkJetty();
 		}
 		try {
-			copyJavaScript("pmrpc.js");
+			InteractionUtils.copyJavaScript("pmrpc.js");
 		} catch (final IOException e1) {
 			logger.error(e1);
 			this.requestor.fail("Unable to copy necessary Javascript");
@@ -88,7 +78,7 @@ public final class InteractionActivityRunnable implements Runnable {
 					final String replacementUrl = InteractionPreference.getPublicationUrlString(id, key);
 					final ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) value);
 					try {
-						publishFile(replacementUrl, bais);
+						InteractionUtils.publishFile(replacementUrl, bais, runId, id);
 						bais.close();
 						inputData.put(key, replacementUrl);
 					} catch (final IOException e) {
@@ -100,17 +90,21 @@ public final class InteractionActivityRunnable implements Runnable {
 			final String inputDataString = createInputDataJson(inputData);
 			final String inputDataUrl = InteractionPreference.getInputDataUrlString(id);
 			try {
-				publishFile(inputDataUrl, inputDataString);
+				InteractionUtils.publishFile(inputDataUrl, inputDataString, runId, id);
 			} catch (IOException e) {
 				logger.error(e);
 			}
 
-			final String outputDataUrl = InteractionPreference.getOutputDataUrlString(id);
+			String outputDataUrl = null;
+			
+			if (!this.requestor.getInteractionType().equals(InteractionType.Notification)) {
+				outputDataUrl = InteractionPreference.getOutputDataUrlString(id);
+			}		
 			final String interactionUrlString = generateHtml(inputDataUrl,
 					outputDataUrl, inputData,
 					runId, id);
 
-			postInteractionMessage(id, interactionNotificationMessage, interactionUrlString);
+			postInteractionMessage(id, interactionNotificationMessage, interactionUrlString, runId);
 			if (!this.requestor.getInteractionType().equals(InteractionType.Notification)) {
 					FeedListener.getInstance().registerInteraction(interactionNotificationMessage,this.requestor);
 			} else {
@@ -121,22 +115,13 @@ public final class InteractionActivityRunnable implements Runnable {
 	}
 
 	private String createInputDataJson(final Map<String, Object> inputData) {
-		final ObjectMapper mapper = new ObjectMapper();
-		final StringWriter sw = new StringWriter();
 		try {
-			mapper.writeValue(sw, inputData);
-		} catch (final JsonGenerationException e) {
-			logger.error(e);
-			this.requestor.fail("Unable to generate JSON");
-		} catch (final JsonMappingException e) {
-			logger.error(e);
-			this.requestor.fail("Unable to generate JSON");
+			return InteractionUtils.objectToJson(inputData);
 		} catch (final IOException e) {
 			logger.error(e);
 			this.requestor.fail("Unable to generate JSON");
 		}
-		final String inputDataString = sw.toString();
-		return inputDataString;
+		return null;
 	}
 
 	private Entry createBasicInteractionMessage(final String id, final String runId) {
@@ -165,7 +150,7 @@ public final class InteractionActivityRunnable implements Runnable {
 	}
 
 	private void postInteractionMessage(final String id, final Entry entry,
-			final String interactionUrlString) {
+			final String interactionUrlString, String runId) {
 
 		entry.addLink(StringEscapeUtils.escapeXml(interactionUrlString), "presentation");
 		entry.setContentAsXhtml("<p><a href=\"" + StringEscapeUtils.escapeXml(interactionUrlString)
@@ -185,7 +170,13 @@ public final class InteractionActivityRunnable implements Runnable {
 				final OutputStream outputStream = httpCon.getOutputStream();
 				IOUtils.write(entryContent, outputStream);
 				outputStream.close();
-				httpCon.getResponseCode();
+				int response = httpCon.getResponseCode();
+				if (response >= 400) {
+					logger.error("Received response code" + response);
+				}
+				if (response == HttpURLConnection.HTTP_CREATED) {
+					InteractionRecorder.addResource(runId, id, httpCon.getHeaderField("Location"));
+				}
 			} catch (final MalformedURLException e2) {
 				logger.error(e2);
 			} catch (final IOException e) {
@@ -225,7 +216,7 @@ public final class InteractionActivityRunnable implements Runnable {
 
 				final String presentationString = processTemplate(
 						this.presentationTemplate, velocityContext);
-				publishFile(presentationUrl, presentationString);
+				InteractionUtils.publishFile(presentationUrl, presentationString, runId, id);
 
 			} else if (this.requestor.getPresentationType().equals(
 					InteractionActivityType.LocallyPresentedHtml)) {
@@ -236,7 +227,7 @@ public final class InteractionActivityRunnable implements Runnable {
 
 				final String interactionString = processTemplate(InteractionVelocity
 						.getInteractionTemplate(), velocityContext);
-				publishFile(interactionUrl, interactionString);
+				InteractionUtils.publishFile(interactionUrl, interactionString, runId, id);
 
 				if (!authorizeUrl.isEmpty()) {
 					return authorizeUrl;
@@ -254,36 +245,6 @@ public final class InteractionActivityRunnable implements Runnable {
 		template.merge(context, resultWriter);
 		resultWriter.close();
 		return resultWriter.toString();
-	}
-
-	private void publishFile(final String urlString, final String contents)
-			throws IOException {
-		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
-				contents.getBytes());
-		publishFile(urlString, byteArrayInputStream);
-	}
-
-	private void publishFile(final String urlString, final InputStream is)
-			throws IOException {
-		if (publishedUrls.contains(urlString)) {
-			return;
-		}
-		publishedUrls.add(urlString);
-		final URL url = new URL(urlString);
-		final HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
-		httpCon.setDoOutput(true);
-		httpCon.setRequestMethod("PUT");
-		final OutputStream outputStream = httpCon.getOutputStream();
-		IOUtils.copy(is, outputStream);
-		is.close();
-		outputStream.close();
-		httpCon.getResponseCode();
-	}
-
-	protected void copyJavaScript(final String javascriptFileName) throws IOException {
-		final String targetUrl = InteractionPreference.getInstance().getLocationUrl()
-				+ "/" + javascriptFileName;
-		publishFile(targetUrl, InteractionActivity.class.getResourceAsStream("/" + javascriptFileName));
 	}
 
 
