@@ -108,8 +108,13 @@ public class HackedFilesystemAdapter extends ManagedCollectionAdapter {
             return;
         for (int n = offset; n < offset + length && n < files.length; n++) {
             File file = files[n];
-            Entry entry = getEntry(file);
-            feed.addEntry((Entry)entry.clone());
+            try {
+            	Entry entry = getEntry(file);
+                feed.addEntry((Entry)entry.clone());
+            } catch (Exception e) {
+            	Object f = e;
+            	// ignore strange files
+            }
         }
     }
 
