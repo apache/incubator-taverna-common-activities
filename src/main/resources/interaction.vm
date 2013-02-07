@@ -30,7 +30,7 @@
            msg += "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
            msg += "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:thr=\"http://purl.org/syndication/thread/1.0\">\n";
            msg += "<title>\"A reply to " + "$entryId" + "\"</title>\n";
-           msg += "<id>" + "$entryId" + "-reply" + "</id>\n";
+           msg += "<id>" + "$entryId" + "reply" + "</id>\n";
            msg += "<content/>\n";
            msg += "<interaction:run-id xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$runId" + "</interaction:run-id>\n";
            msg += "<interaction:in-reply-to  xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$entryId" + "</interaction:in-reply-to>\n";
@@ -56,14 +56,15 @@
 
 
          function reply(status, results) {
+#if ($outputDataUrl)
            var outputData = JSON.stringify(results);
            var dataRequest = new XMLHttpRequest();
            dataRequest.open("PUT", "$outputDataUrl", false);
 //           xmlhttp.setRequestHeader("Content-Type", "text/plain");
            dataRequest.setRequestHeader("Content-Length", outputData.length);
            dataRequest.send(outputData);
-           
-           var msg = createReplyContent(status, JSON.stringify(results));
+#end           
+           var msg = createReplyContent(status);
            var xmlhttp = new XMLHttpRequest();
            xmlhttp.open("POST", "$feed", false);
            xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
@@ -111,6 +112,9 @@
              publicProcedureName : "getInputData",
              procedure : function() {
                log("Returning input data");
+#if (!$outputDataUrl)
+               reply("OK", {});
+#end
                return inputData;
              }
            });
@@ -152,7 +156,7 @@
 </iframe>
 
      <div id="acknowledgment">
-       <p>The interaction service was developed in the <a href="http://www.biovel.eu">BioVeL project</a></p>
+       <p>The interaction service was developed in the <a href="http://www.biovel.eu" target="_blank">BioVeL project</a></p>
      </div>
   </body>
 </html>
