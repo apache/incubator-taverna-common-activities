@@ -26,6 +26,8 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 	private final  Map<String, T2Reference> inputs;
 
 	private final InteractionActivity activity;
+	
+	private boolean answered = false;
 
 	public InteractionCallbackRequestor(final InteractionActivity activity, final AsynchronousActivityCallback callback, final Map<String, T2Reference> inputs) {
 		this.activity = activity;
@@ -68,12 +70,20 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public void fail(final String string) {
-		this.callback.fail(string);
+		if (answered) {
+			return;
+		}
+			this.callback.fail(string);
+		answered = true;
 	}
 
 	@Override
 	public void carryOn() {
-		this.callback.receiveResult(new HashMap<String, T2Reference>(), new int[0]);
+		if (answered) {
+			return;
+		}
+			this.callback.receiveResult(new HashMap<String, T2Reference>(), new int[0]);
+		answered = true;
 	}
 
 	@Override
@@ -103,6 +113,9 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public void receiveResult(final Map<String, Object> resultMap) {
+		if (answered) {
+			return;
+		}
 		final Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 
 		final InvocationContext context = this.callback.getContext();
@@ -119,6 +132,7 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 			outputs.put(keyString, referenceService.register(value, depth, true, context));
 		}
 		this.callback.receiveResult(outputs, new int[0]);
+		answered = true;
 	}
 
 	private Integer findPortDepth(final String portName) {
