@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.sf.taverna.raven.appconfig.ApplicationRuntime;
+import net.sf.taverna.t2.activities.interaction.InteractionUtils;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
@@ -142,7 +143,7 @@ public class InteractionJetty {
 	}
 
 	public static File getJettySubdirectory(final String subdirectoryName) {
-		final File workingDir = ApplicationRuntime.getInstance().getApplicationHomeDir();
+		final File workingDir = InteractionUtils.getInteractionServiceDirectory();
 		final File subDir = new File(workingDir, "jetty/" + subdirectoryName);
 		subDir.mkdirs();
 		return subDir;
