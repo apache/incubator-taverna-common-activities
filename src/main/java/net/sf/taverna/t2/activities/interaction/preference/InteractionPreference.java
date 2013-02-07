@@ -231,13 +231,13 @@ public class InteractionPreference {
 	public static String getOutputDataUrlString(final String interactionId) {
 		return InteractionPreference.getInstance()
 		.getLocationUrl()
-		+ "/interaction" + interactionId + "-outputData.json";
+		+ "/interaction" + interactionId + "OutputData.json";
 	}
 	
 	public static String getInputDataUrlString(final String interactionId) {
 		return InteractionPreference.getInstance()
 		.getLocationUrl()
-		+ "/interaction" + interactionId + "-inputData.json";
+		+ "/interaction" + interactionId + "InputData.json";
 	}
 	
 	public static URL getFeedUrl() throws MalformedURLException {
@@ -259,9 +259,13 @@ public class InteractionPreference {
 	public static String getPublicationUrlString(final String interactionId, final String key) {
 		return InteractionPreference.getInstance()
 		.getLocationUrl()
-		+ "/interaction" + interactionId + "-" + key;
+		+ "/interaction" + interactionId + "_" + key;
 	}
 
+/*	public static String getRunFolderUrlString(final String runId) {
+		return InteractionPreference.getInstance().getLocationUrl() + "/" + runId;
+	}*/
+	
 /*	public boolean getUseHttps() {
 		return (Boolean.parseBoolean(properties.getProperty(USE_HTTPS)));
 	}
