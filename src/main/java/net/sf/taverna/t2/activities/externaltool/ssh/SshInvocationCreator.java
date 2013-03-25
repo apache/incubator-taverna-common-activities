@@ -56,7 +56,7 @@ public final class SshInvocationCreator implements InvocationCreator {
 		SshUseCaseInvocation result = null;
 		try {
 		    SshNode chosenNode = chooseNode(mechanism.getNodes(), data, referenceService);
-		    result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString(), credentialManager));
+		    result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString(), credentialManager), credentialManager);
 		} catch (JSchException e) {
 			logger.error("Null invocation", e);
 		} catch (SftpException e) {

@@ -86,9 +86,9 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	private static Logger logger = Logger.getLogger(SshUseCaseInvocation.class);
 
 	private SshUrl location = null;
-	
+
 	private InputStream stdInputStream = null;
-	
+
 	public static final String SSH_USE_CASE_INVOCATION_TYPE = "D0A4CDEB-DD10-4A8E-A49C-8871003083D8";
 	private String tmpname;
 	private final SshNode workerNode;
@@ -106,6 +106,8 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 	private static Map<String, Set<SshUrl>> runIdToTempDir = Collections.synchronizedMap(new HashMap<String, Set<SshUrl>> ());
 
 	private static String SSH_INVOCATION_FILE = "sshInvocations";
+
+	private final CredentialManager credentialManager;
 
 
 	public static String test(final SshNode workerNode, final AskUserForPw askUserForPw) {
@@ -125,9 +127,10 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		return null;
 	}
 
-	public SshUseCaseInvocation(UseCaseDescription desc, SshNode workerNodeA, AskUserForPw askUserForPwA)
+	public SshUseCaseInvocation(UseCaseDescription desc, SshNode workerNodeA, AskUserForPw askUserForPwA, CredentialManager credentialManager)
 			throws JSchException, SftpException {
 		this.workerNode = workerNodeA;
+		this.credentialManager = credentialManager;
 		setRetrieveData(workerNodeA.isRetrieveData());
 		this.askUserForPw = askUserForPwA;
 		usecase = desc;
@@ -170,13 +173,13 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 		sftp.rmdir(path);
 	}
-	
-	private static void deleteDirectory(SshUrl directory) throws InvocationException {
+
+	private static void deleteDirectory(SshUrl directory, CredentialManager credentialManager) throws InvocationException {
 		URI uri;
 		try {
 			uri = new URI(directory.toString());
-		
-		
+
+
 		ChannelSftp sftp;
 		SshNode workerNode;
 		String fullPath = uri.getPath();
@@ -184,8 +187,8 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		String tempDir = fullPath.substring(fullPath.lastIndexOf("/"));
 		try {
 			workerNode = SshNodeFactory.getInstance().getSshNode(uri.getHost(), uri.getPort(), path);
-			
-			sftp = SshPool.getSftpPutChannel(workerNode, new RetrieveLoginFromTaverna(workerNode.getUrl().toString()));
+
+			sftp = SshPool.getSftpPutChannel(workerNode, new RetrieveLoginFromTaverna(workerNode.getUrl().toString(), credentialManager));
 		} catch (JSchException e) {
 			throw new InvocationException(e);
 		}
@@ -208,7 +211,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		Set<SshUrl> tempDirectories = runIdToTempDir.get(runId);
 		if (tempDirectories != null) {
 			for (SshUrl tempUrl : tempDirectories) {
-				deleteDirectory(tempUrl);
+				deleteDirectory(tempUrl, credentialManager);
 			}
 			runIdToTempDir.remove(runId);
 		}
@@ -339,7 +342,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		}
 		if (isRetrieveData()) {
 			forgetRun();
-			deleteDirectory(location);
+			deleteDirectory(location, credentialManager);
 
 		}
 		return results;
@@ -449,7 +452,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 			location.setSubDirectory(tmpname);
 			directories.add(location);
 	}
-	
+
 	private void forgetRun() {
 		Set<SshUrl> directories = runIdToTempDir.get(getRunId());
 		directories.remove(location);
