@@ -7,21 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.taverna.t2.activities.interaction.atom.AtomUtils;
-import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 
-import org.apache.abdera.Abdera;
-import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
-import org.apache.abdera.model.Feed;
-import org.apache.abdera.parser.ParseException;
-import org.apache.abdera.parser.Parser;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParseException;
@@ -39,7 +32,7 @@ public final class FeedListener {
 
 	private static FeedListener instance;
 
-	private static final Logger logger = Logger.getLogger(FeedListener.class);
+	static final Logger logger = Logger.getLogger(FeedListener.class);
 
 	private static final Map<String, InteractionRequestor> requestorMap = new HashMap<String, InteractionRequestor>();
 
@@ -51,68 +44,20 @@ public final class FeedListener {
 	}
 
 	private FeedListener() {
-		final Thread feedListenerThread = new Thread("FeedListener") {
+		final Thread feedListenerThread = new FeedReader("FeedListener") {
 
 			@Override
-			public void run() {
-				if (InteractionPreference.getInstance().getUseJetty()) {
-					InteractionJetty.checkJetty();
-				}
-				final Parser parser = Abdera.getNewParser();
-				Date lastCheckedDate = new Date();
-				while (true) {
-					try {
-						sleep(5000);
-					} catch (final InterruptedException e1) {
-						logger.error(e1);
-					}
-					InputStream openStream = null;
-					try {
-						final Date newLastCheckedDate = new Date();
-						final URL url = InteractionPreference.getFeedUrl();
-						openStream = url.openStream();
-						final Document<Feed> doc = parser.parse(openStream, url
-								.toString());
-						final Feed feed = doc.getRoot().sortEntriesByEdited(true);
-
-						for (final Entry entry : feed.getEntries()) {
-							
-							Date d = entry.getEdited();
-							if (d == null) {
-								d = entry.getUpdated();
-							}
-							if (d == null) {
-								d = entry.getPublished();
-							}
-							if (d.before(lastCheckedDate)) {
-								break;
-							}
-							considerInReplyTo(entry);
-						}
-						lastCheckedDate = newLastCheckedDate;
-					} catch (final MalformedURLException e) {
-						logger.error(e);
-					} catch (final ParseException e) {
-						logger.error(e);
-					} catch (final IOException e) {
-						logger.error(e);
-					} finally {
-						try {
-							if (openStream != null) {
-								openStream.close();
-							}
-						} catch (final IOException e) {
-							logger.error(e);
-						}
-					}
-				}
+			protected void setClassLoader() {
 			}
 
-		};
+			@Override
+			protected void considerEntry(Entry entry) {
+				considerInReplyTo(entry);
+			}};
 		feedListenerThread.start();
 	}
 
-	private static void considerInReplyTo(final Entry entry) {
+	static void considerInReplyTo(final Entry entry) {
 		synchronized(requestorMap) {
 		final String refString = getReplyTo(entry);
 		if (refString == null) {
@@ -158,6 +103,7 @@ public final class FeedListener {
 				final Map<String,Object> rootAsMap = mapper.readValue(content, Map.class);
 				requestor.receiveResult(rootAsMap);
 				cleanup (refString);
+				InteractionRecorder.deleteInteraction(runId, refString);
 
 			} catch (final JsonParseException e) {
 				logger.error(e);
