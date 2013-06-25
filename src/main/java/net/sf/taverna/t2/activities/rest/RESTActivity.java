@@ -63,6 +63,7 @@ public class RESTActivity extends
 	private static final String OUT_RESPONSE_HEADERS = "responseHeaders";
 	private static final String OUT_STATUS = "status";
 	private static final String OUT_REDIRECTION = "redirection";
+    private static final String OUT_COMPLETE_URL = "actualURL";
 
 	// Configuration bean for this activity - essentially defines a particular
 	// instance
