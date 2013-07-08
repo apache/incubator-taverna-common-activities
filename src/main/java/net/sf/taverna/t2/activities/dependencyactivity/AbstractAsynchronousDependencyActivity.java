@@ -39,6 +39,8 @@ import org.apache.log4j.Logger;
 
 import uk.org.taverna.configuration.app.ApplicationConfiguration;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * A parent abstract class for activities that require dependency management, such as
  * API Consumer and Beanshell. Defines dependencies on local JAR files
@@ -47,11 +49,8 @@ import uk.org.taverna.configuration.app.ApplicationConfiguration;
  * @author Alex Nenadic
  * @author Tom Oinn
  * @author Stian Soiland-Reyes
- *
- * @param <ConfigType> the configuration type used for this activity
- *
  */
-public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends AbstractAsynchronousActivity<ConfigType>{
+public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsynchronousActivity<JsonNode> {
 
 	private static final String LOCAL_JARS = "Local jars";
 
@@ -78,13 +77,10 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 	 */
 	protected ClassLoader classLoader = null;
 
-	private ApplicationConfiguration applicationConfiguration;
-
 	/**
 	 * The location of the <code>lib</code> directory in TAVERNA_HOME,
 	 * where local JAR files the activity depends on should be located.
 	 */
-//	public static File libDir = new File(ApplicationRuntime.getInstance().getApplicationHomeDir(), "lib");
 	public File libDir;
 
 	/**
@@ -131,15 +127,14 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 	 * @return A new or existing {@link ClassLoader} according to the
 	 *         classloader sharing policy
 	 */
-	protected ClassLoader findClassLoader(DependencyActivityConfigurationBean configurationBean, String workflowRunID) throws RuntimeException{
-
-		ClassLoaderSharing classLoaderSharing = configurationBean.getClassLoaderSharing();
+	protected ClassLoader findClassLoader(JsonNode json, String workflowRunID) throws RuntimeException{
+		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.valueOf(json.get("classLoaderSharing").textValue());
 
 		if (classLoaderSharing == ClassLoaderSharing.workflow) {
 			synchronized (workflowClassLoaders) {
 				ClassLoader cl = workflowClassLoaders.get(workflowRunID);
 				if (cl == null) {
-					cl = makeClassLoader(configurationBean, workflowRunID);
+					cl = makeClassLoader(json, workflowRunID);
 					workflowClassLoaders.put(workflowRunID, cl);
 				}
 				return cl;
@@ -176,15 +171,12 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 	 *
 	 * @return A {@link ClassLoader} capable of accessing all the dependencies (both local jar and artifact)
 	 */
-	private ClassLoader makeClassLoader(
-			DependencyActivityConfigurationBean configurationBean,
-			String workflowID) {
-
+	private ClassLoader makeClassLoader(JsonNode json, String workflowID) {
 		// Find all artifact dependencies
 //		HashSet<URL> urls = findDependencies(ARTIFACTS, configurationBean, workflowID);
 
 		// Add all local jar dependencies
-		HashSet<URL> urls = findDependencies(LOCAL_JARS, configurationBean, workflowID);
+		HashSet<URL> urls = findDependencies(LOCAL_JARS, json, workflowID);
 
 		// Create the classloader capable of loading both local jar and artifact dependencies
 		ClassLoader parent = this.getClass().getClassLoader(); // this will be a LocalArtifactClassLoader
@@ -236,11 +228,8 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 	 * sharing policy (passed inside configuration bean) and a workflowRunID (used to
 	 * retrieve the workflow) that will be added to this activity classloader's list of URLs.
 	 */
-	private HashSet<URL> findDependencies(String dependencyType,
-			DependencyActivityConfigurationBean configurationBean,
-			String workflowRunID) {
-
-		ClassLoaderSharing classLoaderSharing = configurationBean.getClassLoaderSharing();
+	private HashSet<URL> findDependencies(String dependencyType, JsonNode json, String workflowRunID) {
+		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.valueOf(json.get("classLoaderSharing").textValue());
  		// Get the WorkflowInstanceFacade which contains the current workflow
 		WeakReference<WorkflowInstanceFacade> wfFacadeRef = WorkflowInstanceFacade.workflowRunFacades.get(workflowRunID);
 		WorkflowInstanceFacade wfFacade = null;
@@ -265,23 +254,25 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 				if (!proc.getActivityList().isEmpty() && proc.getActivityList().get(0) instanceof NestedDataflow){
 					// Get the nested workflow
 					Dataflow nestedWorkflow = ((NestedDataflow) proc.getActivityList().get(0)).getNestedDataflow();
-					dependenciesURLs.addAll(findNestedDependencies(dependencyType, configurationBean, nestedWorkflow));
+					dependenciesURLs.addAll(findNestedDependencies(dependencyType, json, nestedWorkflow));
 				}
 				else{ // Not nested - go through all of the processor's activities
 					Activity<?> activity = proc.getActivityList().get(0);
 					if (activity instanceof AbstractAsynchronousDependencyActivity){
-						if (((DependencyActivityConfigurationBean) activity
-								.getConfiguration()).getClassLoaderSharing() == classLoaderSharing) {
+						AbstractAsynchronousDependencyActivity dependencyActivity = (AbstractAsynchronousDependencyActivity) activity;
+						if (ClassLoaderSharing.valueOf(dependencyActivity.getConfiguration().get("classLoaderSharing").textValue()) == classLoaderSharing) {
 //							if (dependencyType.equals(LOCAL_JARS)){
 								// Collect the files of all found local dependencies
-								for (String jar : ((DependencyActivityConfigurationBean)activity.getConfiguration()).getLocalDependencies()) {
+							if (dependencyActivity.getConfiguration().has("localDependency")) {
+								for (JsonNode jar : dependencyActivity.getConfiguration().get("localDependency")) {
 									try {
-										dependencies.add(new File(libDir, jar));
+										dependencies.add(new File(libDir, jar.textValue()));
 									} catch (Exception ex) {
 										logger.warn("Invalid URL for " + jar, ex);
 										continue;
 									}
 								}
+							}
 //							} else if (dependencyType.equals(ARTIFACTS) && this.getClass().getClassLoader() instanceof LocalArtifactClassLoader){
 //								LocalArtifactClassLoader cl = (LocalArtifactClassLoader) this.getClass().getClassLoader(); // this class is always loaded with LocalArtifactClassLoader
 //								// Get the LocalReposotpry capable of finding artifact jar files
@@ -298,14 +289,16 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 			}
 		} else { // Just add dependencies for this activity since we can't get hold of the whole workflow
 //			if (dependencyType.equals(LOCAL_JARS)){
-				for (String jar : configurationBean.getLocalDependencies()) {
+			if (json.has("localDependency")) {
+				for (JsonNode jar : json.get("localDependency")) {
 					try {
-						dependencies.add(new File(libDir, jar));
+						dependencies.add(new File(libDir, jar.textValue()));
 					} catch (Exception ex) {
 						logger.warn("Invalid URL for " + jar, ex);
 						continue;
 					}
 				}
+			}
 //			}
 //			else if (dependencyType.equals(ARTIFACTS)){
 //				if (this.getClass().getClassLoader() instanceof LocalArtifactClassLoader){ // This should normally be the case
@@ -341,11 +334,8 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 	/**
 	 * Finds dependencies for a nested workflow.
 	 */
-	private HashSet<URL> findNestedDependencies(String dependencyType,
-			DependencyActivityConfigurationBean configurationBean,
-			Dataflow nestedWorkflow) {
-
- 		ClassLoaderSharing classLoaderSharing = configurationBean.getClassLoaderSharing();
+	private HashSet<URL> findNestedDependencies(String dependencyType, JsonNode json, Dataflow nestedWorkflow) {
+ 		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.valueOf(json.get("classLoaderSharing").textValue());
 
 		// Files of dependencies for all activities in the nested workflow that share the classloading policy
 		HashSet<File> dependencies = new HashSet<File>();
@@ -357,20 +347,19 @@ public abstract class AbstractAsynchronousDependencyActivity<ConfigType> extends
 			if (!proc.getActivityList().isEmpty() && proc.getActivityList().get(0) instanceof NestedDataflow){
 				// Get the nested workflow
 				Dataflow nestedNestedWorkflow = ((NestedDataflow) proc.getActivityList().get(0)).getNestedDataflow();
-				dependenciesURLs.addAll(findNestedDependencies(dependencyType, configurationBean, nestedNestedWorkflow));
+				dependenciesURLs.addAll(findNestedDependencies(dependencyType, json, nestedNestedWorkflow));
 			}
 			else{ // Not nested - go through all of the processor's activities
 				Activity<?> activity = proc.getActivityList().get(0);
 				if (activity instanceof AbstractAsynchronousDependencyActivity){
-
-					if (((DependencyActivityConfigurationBean) activity
-							.getConfiguration()).getClassLoaderSharing() == classLoaderSharing) {
+					AbstractAsynchronousDependencyActivity dependencyActivity = (AbstractAsynchronousDependencyActivity) activity;
+					if (ClassLoaderSharing.valueOf(dependencyActivity.getConfiguration().get("classLoaderSharing").textValue()) == classLoaderSharing) {
 
 //						if (dependencyType.equals(LOCAL_JARS)){
 							// Collect the files of all found local dependencies
-							for (String jar : ((DependencyActivityConfigurationBean)activity.getConfiguration()).getLocalDependencies()) {
+							for (JsonNode jar : dependencyActivity.getConfiguration().get("localDependency")) {
 								try {
-									dependencies.add(new File(libDir, jar));
+									dependencies.add(new File(libDir, jar.textValue()));
 								} catch (Exception ex) {
 									logger.warn("Invalid URL for " + jar, ex);
 									continue;

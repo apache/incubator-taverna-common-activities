@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "id": "http://ns.taverna.org.uk/2010/activity/dependency.schema.json",
+    "title": "Dependency activity configuration",
+    "type": "object",
+    "properties": {
+        "@context": {
+            "description": "JSON-LD context for interpreting the configuration as RDF",
+            "required": true,
+            "enum": ["http://ns.taverna.org.uk/2010/activity/dependency.context.json"]
+        },
+        "classLoaderSharing": {
+            "title": "ClassLoader Sharing Policy",
+            "description": "Policy for sharing class loaders across multiple beanshell activities",
+            "default": "workflow",
+            "enum": ["workflow", "system"]
+        },
+        "localDependency": {
+            "title": "Local Dependencies",
+            "description": "Location of jar files to be added to the beanshell class loader",
+            "type": "array",
+            "items": { "type" : "string" }
+        }
+    }
+}
