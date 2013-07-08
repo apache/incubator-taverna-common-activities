@@ -20,8 +20,12 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.externaltool;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
@@ -45,15 +49,18 @@ public class ExternalToolActivityFactory implements ActivityFactory {
 	}
 
 	@Override
-	public URI getActivityURI() {
+	public URI getActivityType() {
 		return URI.create(ExternalToolActivity.URI);
 	}
 
 	@Override
-	public Object createActivityConfiguration() {
-		ExternalToolActivityConfigurationBean activityConfiguration = new ExternalToolActivityConfigurationBean();
-		activityConfiguration.setMechanismCreators(mechanismCreators);
-		return activityConfiguration;
+	public JsonNode getActivityConfigurationSchema() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+ 			return objectMapper.readTree(getClass().getResource("/schema.json"));
+		} catch (IOException e) {
+			return objectMapper.createObjectNode();
+		}
 	}
 
 	public void setInvocationCreators(List<InvocationCreator> invocationCreators) {

@@ -35,10 +35,10 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
 import net.sf.taverna.t2.workflowmodel.EditException;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.log4j.Logger;
@@ -49,7 +49,6 @@ import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshReference;
 
 /**
  * This is the main class of the use case activity plugin. Here we store the
@@ -129,7 +128,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	 *            Accepted mime types for this port
 	 */
 	private void addOutputWithMime(String portName, int portDepth, List<String> mimeTypes) {
-		OutputPort outputPort = edits.createActivityOutputPort(portName, portDepth, portDepth);
+		ActivityOutputPort outputPort = edits.createActivityOutputPort(portName, portDepth, portDepth);
 		outputPorts.add(outputPort);
 		addMimeTypes(outputPort, mimeTypes);
 	}
@@ -265,7 +264,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 						// register the result value with taverna
 						T2Reference reference = referenceService.register(
 								value, 0, true, callback.getContext());
-						
+
 						// store the reference into the activity result
 						// set
 						result.put(cur.getKey(), reference);
