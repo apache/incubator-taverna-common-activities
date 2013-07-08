@@ -52,6 +52,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import org.apache.log4j.Logger;
 
 import com.csvreader.CsvWriter;
+import com.fasterxml.jackson.databind.JsonNode;
 
 
 /**
@@ -60,24 +61,21 @@ import com.csvreader.CsvWriter;
  *
  * @author David Withers
  */
-public class SpreadsheetImportActivity extends
-		AbstractAsynchronousActivity<SpreadsheetImportConfiguration> {
+public class SpreadsheetImportActivity extends AbstractAsynchronousActivity<JsonNode> {
 
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/spreadsheet-import";
 
-	private static final String INPUT_PORT_NAME = "fileurl";
+	public static final String INPUT_PORT_NAME = "fileurl";
 
-	private static final String OUTPUT_PORT_NAME = "output";
+	public static final String OUTPUT_PORT_NAME = "output";
 
 	private static Logger logger = Logger.getLogger(SpreadsheetImportActivity.class);
 
-	private SpreadsheetImportConfiguration configurationBean;
+	private JsonNode configurationBean;
 
 	private Range rowRange, columnRange;
 
 	private boolean ignoreBlankRows;
-
-	private Map<String, String> columnNames;
 
 	private String missingCellValue;
 
@@ -94,24 +92,23 @@ public class SpreadsheetImportActivity extends
 	}
 
 	@Override
-	public void configure(SpreadsheetImportConfiguration configurationBean)
+	public void configure(JsonNode configurationBean)
 			throws ActivityConfigurationException {
 		this.configurationBean = configurationBean;
-		rowRange = configurationBean.getRowRange();
+		rowRange = SpreadsheetUtils.getRange(configurationBean.get("rowRange"));
 		logger.debug("Setting row range to " + rowRange);
-		columnRange = configurationBean.getColumnRange();
+		columnRange = SpreadsheetUtils.getRange(configurationBean.get("columnRange"));
 		logger.debug("Setting column range to " + columnRange);
-		ignoreBlankRows = configurationBean.isIgnoreBlankRows();
-		columnNames = configurationBean.getColumnNames();
-		missingCellValue = configurationBean.getEmptyCellValue();
+		ignoreBlankRows = configurationBean.get("ignoreBlankRows").booleanValue();
+		missingCellValue = configurationBean.get("emptyCellValue").textValue();
 		logger.debug("Setting empty cell value to '" + missingCellValue + "'");
-		emptyCellPolicy = configurationBean.getEmptyCellPolicy();
+		emptyCellPolicy = SpreadsheetEmptyCellPolicy.valueOf(configurationBean.get("emptyCellPolicy").textValue());
 		logger.debug("Setting empty cell policy to " + emptyCellPolicy);
-		outputFormat = configurationBean.getOutputFormat();
+		outputFormat = SpreadsheetOutputFormat.valueOf(configurationBean.get("outputFormat").textValue());
 		logger.debug("Setting output format to " + outputFormat);
-		csvDelimiter = configurationBean.getCsvDelimiter();
+		csvDelimiter = configurationBean.get("csvDelimiter").textValue();
 		logger.debug("Setting csv delimiter to '" + csvDelimiter + "'");
-		configurePorts();
+//		configurePorts();
 	}
 
 	private void configurePorts() {
@@ -122,7 +119,7 @@ public class SpreadsheetImportActivity extends
 		if (outputFormat.equals(SpreadsheetOutputFormat.PORT_PER_COLUMN)) {
 			for (int column = columnRange.getStart(); column <= columnRange.getEnd(); column++) {
 				if (columnRange.contains(column)) {
-					addOutput(SpreadsheetUtils.getPortName(column, columnNames), 1, 1);
+					addOutput(SpreadsheetUtils.getPortName(column, configurationBean), 1, 1);
 				}
 			}
 		} else {
@@ -131,7 +128,7 @@ public class SpreadsheetImportActivity extends
 	}
 
 	@Override
-	public SpreadsheetImportConfiguration getConfiguration() {
+	public JsonNode getConfiguration() {
 		return configurationBean;
 	}
 
@@ -336,7 +333,7 @@ public class SpreadsheetImportActivity extends
 		public void processRow(int rowIndex, SortedMap<Integer, String> row) {
 			for (Entry<Integer, String> entry : row.entrySet()) {
 				String column = SpreadsheetUtils.getPortName(entry.getKey(),
-						columnNames);
+						configurationBean);
 				Object value = entry.getValue();
 				if (value == null) {
 					if (emptyCellPolicy

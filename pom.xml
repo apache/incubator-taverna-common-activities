@@ -93,10 +93,18 @@
 	<repositories>
 		<!-- This repository is down (2012-03-19) and as the project has moved
 			to apache it's unclear if it will return. odfdom-java-0.7 artifact has been
-			deployed to the mygrid repository. <repository> <id>odftoolkit</id> <name>Odftoolkit
-			Repository</name> <url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url>
-			<releases> <checksumPolicy>fail</checksumPolicy> </releases> <snapshots>
-			<checksumPolicy>fail</checksumPolicy> </snapshots> </repository> -->
+			deployed to the mygrid repository. -->
+		<!-- <repository>
+			<id>odftoolkit</id>
+			<name>Odftoolkit Repository</name>
+			<url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url>
+			<releases>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository> -->
 	</repositories>
 
 </project>

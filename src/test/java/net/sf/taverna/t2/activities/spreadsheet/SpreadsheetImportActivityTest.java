@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2009 The University of Manchester   
- * 
+ * Copyright (C) 2009 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -33,29 +33,41 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.Port;
 import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * Unit tests for {@link net.sf.taverna.t2.activities.spreadsheet.SpreadsheetImportActivityTest}.
- * 
+ *
  * @author David Withers
  */
 public class SpreadsheetImportActivityTest {
 
 	private SpreadsheetImportActivity activity;
-	private SpreadsheetImportConfiguration configuration;
+	private ObjectNode configuration;
 
 	@Before
 	public void setUp() throws Exception {
 		activity = new SpreadsheetImportActivity();
 		activity.setEdits(new EditsImpl());
-		configuration = new SpreadsheetImportConfiguration();
+		configuration = JsonNodeFactory.instance.objectNode();
+		configuration.put("columnRange", configuration.objectNode().put("start", 0).put("end", 1));
+		configuration.put("rowRange", configuration.objectNode().put("start", 0).put("end", -1));
+		configuration.put("emptyCellValue", "");
+		configuration.put("allRows", true);
+		configuration.put("excludeFirstRow", false);
+		configuration.put("ignoreBlankRows", false);
+		configuration.put("emptyCellPolicy", "EMPTY_STRING");
+		configuration.put("outputFormat", "PORT_PER_COLUMN");
+		configuration.put("csvDelimiter", ",");
 	}
 
 	@Test
@@ -68,17 +80,16 @@ public class SpreadsheetImportActivityTest {
 	public void testConfigureSpreadsheetImportConfiguration() throws ActivityConfigurationException {
 		assertEquals(0, activity.getInputPorts().size());
 		assertEquals(0, activity.getOutputPorts().size());
-		configuration.setColumnRange(new Range(0, 10));
-		configuration.setColumnNames(Collections.singletonMap("C", "test"));
+		configuration.put("columnRange", configuration.objectNode().put("start", 0).put("end", 10));
+		configuration.put("columnNames", configuration.arrayNode().addObject().put("column", "C").put("port", "test"));
 		activity.configure(configuration);
 		assertEquals(configuration, activity.getConfiguration());
 		assertEquals(1, activity.getInputPorts().size());
-		Set<OutputPort> outputPorts = activity.getOutputPorts();
-		int[] rangeValues = configuration.getColumnRange().getRangeValues();
+		Set<ActivityOutputPort> outputPorts = activity.getOutputPorts();
+		int[] rangeValues = SpreadsheetUtils.getRange(configuration.get("columnRange")).getRangeValues();
 		assertEquals(rangeValues.length, activity.getOutputPorts().size());
 		for (int i = 0; i < rangeValues.length; i++) {
-			String portName = SpreadsheetUtils.getPortName(rangeValues[i], configuration
-					.getColumnNames());
+			String portName = SpreadsheetUtils.getPortName(rangeValues[i], configuration);
 			Port port = null;
 			for (Port outputPort : outputPorts) {
 				if (outputPort.getName().equals(portName)) {
@@ -90,8 +101,8 @@ public class SpreadsheetImportActivityTest {
 			outputPorts.remove(port);
 		}
 		assertEquals(0, outputPorts.size());
-		
-		configuration.setOutputFormat(SpreadsheetOutputFormat.SINGLE_PORT);
+
+		configuration.put("outputFormat", SpreadsheetOutputFormat.SINGLE_PORT.name());
 		activity.configure(configuration);
 		assertEquals(1, activity.getOutputPorts().size());
 	}
@@ -106,7 +117,7 @@ public class SpreadsheetImportActivityTest {
 
 	@Test
 	public void testExecuteAsynchMapOfStringT2ReferenceAsynchronousActivityCallback() throws InterruptedException, IOException, ActivityConfigurationException {
-		configuration.setColumnRange(new Range(0,3));
+		configuration.put("columnRange", configuration.objectNode().put("start", 0).put("end", 3));
 		activity.configure(configuration);
 		Map<String, Class<?>> outputs = new HashMap<String, Class<?>>();
 		outputs.put("A", String.class);
@@ -130,7 +141,7 @@ public class SpreadsheetImportActivityTest {
 		assertEquals(15, ((List<?>) results.get("A")).size());
 
 		// CSV output
-		configuration.setOutputFormat(SpreadsheetOutputFormat.SINGLE_PORT);
+		configuration.put("outputFormat", SpreadsheetOutputFormat.SINGLE_PORT.name());
 		activity.configure(configuration);
 		outputs = new HashMap<String, Class<?>>();
 		outputs.put("output", String.class);
@@ -141,7 +152,7 @@ public class SpreadsheetImportActivityTest {
 		assertEquals(15, ((String) results.get("output")).split(System.getProperty("line.separator")).length);
 
 		// TSV output
-		configuration.setCsvDelimiter("\t");
+		configuration.put("csvDelimiter", "\t");
 		activity.configure(configuration);
 		results = ActivityInvoker.invokeAsyncActivity(activity, Collections.singletonMap("fileurl",
 				(Object) "src/test/resources/test-spreadsheet.csv"), outputs);
