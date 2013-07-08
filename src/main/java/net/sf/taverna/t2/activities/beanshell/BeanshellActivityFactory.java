@@ -20,11 +20,18 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.beanshell;
 
+import java.io.IOException;
 import java.net.URI;
-
-import uk.org.taverna.configuration.app.ApplicationConfiguration;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
+import uk.org.taverna.configuration.app.ApplicationConfiguration;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * An {@link ActivityFactory} for creating <code>BeanshellActivity</code>.
@@ -41,17 +48,32 @@ public class BeanshellActivityFactory implements ActivityFactory {
 	}
 
 	@Override
-	public URI getActivityURI() {
+	public URI getActivityType() {
 		return URI.create(BeanshellActivity.URI);
 	}
 
 	@Override
-	public Object createActivityConfiguration() {
-		return new BeanshellActivityConfigurationBean();
+	public JsonNode getActivityConfigurationSchema() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+ 			return objectMapper.readTree(getClass().getResource("/schema.json"));
+		} catch (IOException e) {
+			return objectMapper.createObjectNode();
+		}
 	}
 
 	public void setApplicationConfiguration(ApplicationConfiguration applicationConfiguration) {
 		this.applicationConfiguration = applicationConfiguration;
+	}
+
+	@Override
+	public Set<ActivityInputPort> getInputPorts(JsonNode configuration) {
+		return new HashSet<>();
+	}
+
+	@Override
+	public Set<ActivityOutputPort> getOutputPorts(JsonNode configuration) {
+		return new HashSet<>();
 	}
 
 }

@@ -23,19 +23,21 @@ package net.sf.taverna.t2.activities.beanshell;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.workflowmodel.AbstractPort;
+import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean;
+import net.sf.taverna.t2.workflowmodel.processor.activity.impl.ActivityInputPortImpl;
+import net.sf.taverna.t2.workflowmodel.processor.activity.impl.ActivityOutputPortImpl;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Beanshell Activity Tests
@@ -44,6 +46,14 @@ import org.junit.Test;
  */
 public class BeanshellActivityTest {
 
+	private ObjectNode configuration;
+
+	@Before
+	public void setup() throws Exception {
+		configuration = JsonNodeFactory.instance.objectNode();
+		configuration.put("classLoaderSharing", "workflow");
+	}
+
 	/**
 	 * Tests a simple script (String output = input + "_returned") to ensure the script is invoked correctly.
 	 * @throws Exception
@@ -51,26 +61,13 @@ public class BeanshellActivityTest {
 	@Test
 	public void simpleScript() throws Exception {
 		BeanshellActivity activity = new BeanshellActivity(null);
-		activity.setEdits(new EditsImpl());
-		BeanshellActivityConfigurationBean bean = new BeanshellActivityConfigurationBean();
+		Edits edits = new EditsImpl();
+		edits.getAddActivityInputPortEdit(activity, new ActivityInputPortImpl("input", 0, false, null, String.class)).doEdit();
+		edits.getAddActivityOutputPortEdit(activity, new ActivityOutputPortImpl("output", 0, 0)).doEdit();
 
-		ActivityInputPortDefinitionBean inputPortBean = new ActivityInputPortDefinitionBean();
-		inputPortBean.setDepth(0);
-		inputPortBean.setName("input");
-		inputPortBean.setMimeTypes(new ArrayList<String>());
-		inputPortBean.setHandledReferenceSchemes(new ArrayList<Class<? extends ExternalReferenceSPI>>());
-		inputPortBean.setTranslatedElementType(String.class);
-		inputPortBean.setAllowsLiteralValues(true);
-		bean.setInputPortDefinitions(Collections.singletonList(inputPortBean));
+		configuration.put("script", "String output = input + \"_returned\";");
 
-		ActivityOutputPortDefinitionBean outputPortBean = new ActivityOutputPortDefinitionBean();
-		outputPortBean.setDepth(0);
-		outputPortBean.setName("output");
-		outputPortBean.setMimeTypes(new ArrayList<String>());
-		bean.setOutputPortDefinitions(Collections.singletonList(outputPortBean));
-		bean.setScript("String output = input + \"_returned\";");
-
-		activity.configure(bean);
+		activity.configure(configuration);
 		assertEquals("There should be 1 input port",1,activity.getInputPorts().size());
 		assertEquals("There should be 1 output port",1,activity.getOutputPorts().size());
 

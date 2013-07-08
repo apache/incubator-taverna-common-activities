@@ -30,29 +30,25 @@ import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean;
 
 import org.apache.log4j.Logger;
 
 import uk.org.taverna.configuration.app.ApplicationConfiguration;
-
 import bsh.EvalError;
 import bsh.Interpreter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
- * <p>
  * An Activity providing Beanshell functionality.
- * </p>
  *
  * @author David Withers
  * @author Stuart Owen
  * @author Alex Nenadic
  */
-public class BeanshellActivity extends
-	AbstractAsynchronousDependencyActivity<BeanshellActivityConfigurationBean> {
+public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/beanshell";
 
@@ -64,27 +60,31 @@ public class BeanshellActivity extends
 
 	private static String CLEAR_COMMAND = "clear();";
 
+	private JsonNode json;
+
 	public BeanshellActivity(ApplicationConfiguration applicationConfiguration) {
 		super(applicationConfiguration);
-	}
-
-	@Override
-	public void configure(BeanshellActivityConfigurationBean configurationBean)
-			throws ActivityConfigurationException {
-		this.configurationBean = configurationBean;
-		checkGranularDepths();
-		configurePorts(configurationBean);
 		createInterpreter();
 	}
 
+	@Override
+	public JsonNode getConfiguration() {
+		return json;
+	}
+
+	@Override
+	public void configure(JsonNode json) {
+		this.json = json;
+		checkGranularDepths();
+	}
+
 	/**
-	 * Creates the interpreter required to run the beanshell script, and assigns the correct classloader
+	 * Creates the interpreter required to run the beanshell script, and assigns the correct
+	 * classloader
 	 * setting according to the
 	 */
 	private void createInterpreter() {
 		interpreter = new Interpreter();
-
-
 	}
 
 	/**
@@ -92,26 +92,18 @@ public class BeanshellActivity extends
 	 * specified depth, the granular depths should always be equal to the actual
 	 * depth.
 	 * <p>
-	 * Workflow definitions created with Taverna 2.0b1 would not honour this and
-	 * always set the granular depth to 0.
+	 * Workflow definitions created with Taverna 2.0b1 would not honour this and always set the
+	 * granular depth to 0.
 	 * <p>
 	 * This method modifies the granular depths to be equal to the depths.
-	 *
 	 */
 	protected void checkGranularDepths() {
-		for (ActivityOutputPortDefinitionBean outputPortDef : configurationBean
-				.getOutputPortDefinitions()) {
-			if (outputPortDef.getGranularDepth() != outputPortDef.getDepth()) {
-				logger.warn("Replacing granular depth of port "
-						+ outputPortDef.getName());
-				outputPortDef.setGranularDepth(outputPortDef.getDepth());
+		for (OutputPort outputPort : getOutputPorts()) {
+			if (outputPort.getGranularDepth() != outputPort.getDepth()) {
+				logger.warn("Replacing granular depth of port " + outputPort.getName());
+//				outputPort.setGranularDepth(outputPort.getDepth());
 			}
 		}
-	}
-
-	@Override
-	public BeanshellActivityConfigurationBean getConfiguration() {
-		return configurationBean;
 	}
 
 	public ActivityInputPort getInputPort(String name) {
@@ -124,12 +116,11 @@ public class BeanshellActivity extends
 	}
 
 	private void clearInterpreter() {
-	    try {
-		interpreter.eval(CLEAR_COMMAND);
-	    }
-            catch (EvalError e) {
-		logger.error("Could not clear the interpreter", e);
-	    }
+		try {
+			interpreter.eval(CLEAR_COMMAND);
+		} catch (EvalError e) {
+			logger.error("Could not clear the interpreter", e);
+		}
 	}
 
 	@Override
@@ -142,17 +133,15 @@ public class BeanshellActivity extends
 				// Workflow run identifier (needed when classloader sharing is set to 'workflow').
 				String procID = callback.getParentProcessIdentifier();
 				String workflowRunID;
-				if (procID.contains(":")){
+				if (procID.contains(":")) {
 					workflowRunID = procID.substring(0, procID.indexOf(':'));
-				}
-				else
+				} else
 					workflowRunID = procID; // for tests, will be an empty string
 
 				// Configure the classloader for executing the Beanshell
 				if (classLoader == null) {
 					try {
-						classLoader = findClassLoader(configurationBean,
-								workflowRunID);
+						classLoader = findClassLoader(json, workflowRunID);
 						interpreter.setClassLoader(classLoader);
 					} catch (RuntimeException rex) {
 						String message = "Unable to obtain the classloader for Beanshell service";
@@ -173,34 +162,32 @@ public class BeanshellActivity extends
 						// set inputs
 						for (String inputName : data.keySet()) {
 							ActivityInputPort inputPort = getInputPort(inputName);
-							Object input = referenceService.renderIdentifier(data
-									.get(inputName), inputPort
-									.getTranslatedElementClass(), callback
-									.getContext());
+							Object input = referenceService.renderIdentifier(data.get(inputName),
+									inputPort.getTranslatedElementClass(), callback.getContext());
 							inputName = sanatisePortName(inputName);
 							interpreter.set(inputName, input);
 						}
 						// run
-						interpreter.eval(configurationBean.getScript());
+						interpreter.eval(json.get("script").asText());
 						// get outputs
 						for (OutputPort outputPort : getOutputPorts()) {
 							String name = outputPort.getName();
 							Object value = interpreter.get(name);
 							if (value == null) {
-								ErrorDocumentService errorDocService = referenceService.getErrorDocumentService();
-								value = errorDocService.registerError("No value produced for output variable " + name,
+								ErrorDocumentService errorDocService = referenceService
+										.getErrorDocumentService();
+								value = errorDocService.registerError(
+										"No value produced for output variable " + name,
 										outputPort.getDepth(), callback.getContext());
 							}
 							outputData.put(name, referenceService.register(value,
-									outputPort.getDepth(), true, callback
-											.getContext()));
+									outputPort.getDepth(), true, callback.getContext()));
 						}
 						callback.receiveResult(outputData, new int[0]);
 					} catch (EvalError e) {
 						callback.fail("Error evaluating the beanshell script " + this, e);
 					} catch (ReferenceServiceException e) {
-						callback.fail(
-								"Error accessing beanshell input/output data for " + this, e);
+						callback.fail("Error accessing beanshell input/output data for " + this, e);
 					}
 					clearInterpreter();
 				}
@@ -210,17 +197,16 @@ public class BeanshellActivity extends
 			 * Removes any invalid characters from the port name.
 			 * For example, xml-text would become xmltext.
 			 *
-			 *
 			 * @param name
 			 * @return
 			 */
 			private String sanatisePortName(String name) {
-				String result=name;
+				String result = name;
 				if (Pattern.matches("\\w++", name) == false) {
-					result="";
+					result = "";
 					for (char c : name.toCharArray()) {
-						if (Character.isLetterOrDigit(c) || c=='_') {
-							result+=c;
+						if (Character.isLetterOrDigit(c) || c == '_') {
+							result += c;
 						}
 					}
 				}

@@ -34,7 +34,11 @@ import net.sf.taverna.t2.visit.VisitReport.Status;
 import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * BeanshellActivityHealthChecker tests
@@ -46,13 +50,20 @@ public class BeanshellActivityHealthCheckerTest {
 
 	private Edits edits = new EditsImpl();
 
+	private ObjectNode configuration;
+
+	@Before
+	public void setup() throws Exception {
+		configuration = JsonNodeFactory.instance.objectNode();
+		configuration.put("classLoaderSharing", "workflow");
+	}
+
 	@Test
 	public void oneLinerNoSemicolon() throws Exception {
 		BeanshellActivity activity = new BeanshellActivity(null);
-		BeanshellActivityConfigurationBean bean = new BeanshellActivityConfigurationBean();
-		bean.setScript("a = 5+3");
+		configuration.put("script", "a = 5+3");
 		// Notice lack of ;
-		activity.configure(bean);
+		activity.configure(configuration);
 
 		Map<String,Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
@@ -70,9 +81,8 @@ public class BeanshellActivityHealthCheckerTest {
 	@Test
 	public void oneLiner() throws Exception {
 		BeanshellActivity activity = new BeanshellActivity(null);
-		BeanshellActivityConfigurationBean bean = new BeanshellActivityConfigurationBean();
-		bean.setScript("System.out.println(\"Hello\");");
-		activity.configure(bean);
+		configuration.put("script", "System.out.println(\"Hello\");");
+		activity.configure(configuration);
 
 		Map<String,Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
@@ -90,11 +100,10 @@ public class BeanshellActivityHealthCheckerTest {
 	@Test
 	public void threeLines() throws Exception {
 		BeanshellActivity activity = new BeanshellActivity(null);
-		BeanshellActivityConfigurationBean bean = new BeanshellActivityConfigurationBean();
-		bean.setScript("if (2>1) {\n" +
+		configuration.put("script", "if (2>1) {\n" +
 				"  new Integer(4);\n" +
 				"}");
-		activity.configure(bean);
+		activity.configure(configuration);
 
 		Map<String,Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
@@ -112,14 +121,11 @@ public class BeanshellActivityHealthCheckerTest {
 
 	}
 
-
-
 	@Test
 	public void invalidScript() throws Exception {
 		BeanshellActivity activity = new BeanshellActivity(null);
-		BeanshellActivityConfigurationBean bean = new BeanshellActivityConfigurationBean();
-		bean.setScript("invalid script 5 +");
-		activity.configure(bean);
+		configuration.put("script", "invalid script 5 +");
+		activity.configure(configuration);
 
 		Map<String,Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
@@ -143,14 +149,13 @@ public class BeanshellActivityHealthCheckerTest {
 	@Test
 	public void strangeWhitespace() throws Exception {
 		BeanshellActivity activity = new BeanshellActivity(null);
-		BeanshellActivityConfigurationBean bean = new BeanshellActivityConfigurationBean();
-		bean.setScript("b = \"fish\";\n" +
+		configuration.put("script", "b = \"fish\";\n" +
 				"a = 2+3\n" +
 				"\n" +
 				"\n" +
 				"  +5   ");
 		// Notice lots of whitespace, but still valid
-		activity.configure(bean);
+		activity.configure(configuration);
 
 		Map<String,Object> inputs = new HashMap<String, Object>();
 		Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();

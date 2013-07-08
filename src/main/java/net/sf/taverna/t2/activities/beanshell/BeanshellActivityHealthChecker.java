@@ -35,6 +35,8 @@ import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
 import bsh.ParseException;
 import bsh.Parser;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellActivity> {
 
 	public boolean canVisit(Object subject) {
@@ -49,7 +51,7 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		}
 		List<VisitReport> reports = new ArrayList<VisitReport>();
 
-		String script = activity.getConfiguration().getScript();
+		String script = activity.getConfiguration().get("script").textValue();
 		if (! script.trim().endsWith(";")) {
 			/** Missing ; on last line is not allowed by Parser,
 			 * but is allowed by Interpreter.eval() used at runtime
@@ -67,10 +69,12 @@ public class BeanshellActivityHealthChecker implements HealthChecker<BeanshellAc
 		}
 
 		// Check if we can find all the Beanshell's dependencies
-		LinkedHashSet<String> localDependencies = new LinkedHashSet<String>();
-		localDependencies.addAll(activity.getConfiguration().getLocalDependencies());
+		if (activity.getConfiguration().has("localDependency")) {
+		LinkedHashSet<String> localDependencies = new LinkedHashSet<>();
+		for (JsonNode localDependency : activity.getConfiguration().get("localDependency")) {
+			localDependencies.add(localDependency.textValue());
+		}
 
-		if (!localDependencies.isEmpty()) {
 		String[] jarArray = activity.libDir.list(new FileExtFilter(".jar"));
 		if (jarArray != null) {
 		    List<String> jarFiles = Arrays.asList(jarArray); // URLs of all jars found in the lib directory
