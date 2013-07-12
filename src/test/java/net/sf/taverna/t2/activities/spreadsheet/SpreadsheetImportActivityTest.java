@@ -33,14 +33,18 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
+import net.sf.taverna.t2.workflowmodel.EditException;
+import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.Port;
 import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -52,12 +56,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class SpreadsheetImportActivityTest {
 
 	private SpreadsheetImportActivity activity;
+	private SpreadsheetImportActivityFactory activityFactory;
+	private Edits edits;
 	private ObjectNode configuration;
 
 	@Before
 	public void setUp() throws Exception {
 		activity = new SpreadsheetImportActivity();
-		activity.setEdits(new EditsImpl());
+		activityFactory = new SpreadsheetImportActivityFactory();
+		edits = new EditsImpl();
+		activityFactory.setEdits(edits);
 		configuration = JsonNodeFactory.instance.objectNode();
 		configuration.put("columnRange", configuration.objectNode().put("start", 0).put("end", 1));
 		configuration.put("rowRange", configuration.objectNode().put("start", 0).put("end", -1));
@@ -77,17 +85,25 @@ public class SpreadsheetImportActivityTest {
 	}
 
 	@Test
-	public void testConfigureSpreadsheetImportConfiguration() throws ActivityConfigurationException {
+	public void testConfigureSpreadsheetImportConfiguration() throws Exception {
 		assertEquals(0, activity.getInputPorts().size());
 		assertEquals(0, activity.getOutputPorts().size());
 		configuration.put("columnRange", configuration.objectNode().put("start", 0).put("end", 10));
-		configuration.put("columnNames", configuration.arrayNode().addObject().put("column", "C").put("port", "test"));
+		ArrayNode columnNames = configuration.arrayNode();
+		columnNames.addObject().put("column", "C").put("port", "test");
+		configuration.put("columnNames", columnNames);
 		activity.configure(configuration);
+		for (ActivityInputPort activityInputPort : activityFactory.getInputPorts(configuration)) {
+			edits.getAddActivityInputPortEdit(activity, activityInputPort).doEdit();
+		}
+		for (ActivityOutputPort activityOutputPort : activityFactory.getOutputPorts(configuration)) {
+			edits.getAddActivityOutputPortEdit(activity, activityOutputPort).doEdit();
+		}
 		assertEquals(configuration, activity.getConfiguration());
 		assertEquals(1, activity.getInputPorts().size());
 		Set<ActivityOutputPort> outputPorts = activity.getOutputPorts();
 		int[] rangeValues = SpreadsheetUtils.getRange(configuration.get("columnRange")).getRangeValues();
-		assertEquals(rangeValues.length, activity.getOutputPorts().size());
+		assertEquals(rangeValues.length, outputPorts.size());
 		for (int i = 0; i < rangeValues.length; i++) {
 			String portName = SpreadsheetUtils.getPortName(rangeValues[i], configuration);
 			Port port = null;
@@ -104,7 +120,7 @@ public class SpreadsheetImportActivityTest {
 
 		configuration.put("outputFormat", SpreadsheetOutputFormat.SINGLE_PORT.name());
 		activity.configure(configuration);
-		assertEquals(1, activity.getOutputPorts().size());
+		assertEquals(1, activityFactory.getOutputPorts(configuration).size());
 	}
 
 	@Test
@@ -116,9 +132,15 @@ public class SpreadsheetImportActivityTest {
 	}
 
 	@Test
-	public void testExecuteAsynchMapOfStringT2ReferenceAsynchronousActivityCallback() throws InterruptedException, IOException, ActivityConfigurationException {
+	public void testExecuteAsynchMapOfStringT2ReferenceAsynchronousActivityCallback() throws Exception {
 		configuration.put("columnRange", configuration.objectNode().put("start", 0).put("end", 3));
 		activity.configure(configuration);
+		for (ActivityInputPort activityInputPort : activityFactory.getInputPorts(configuration)) {
+			edits.getAddActivityInputPortEdit(activity, activityInputPort).doEdit();
+		}
+		for (ActivityOutputPort activityOutputPort : activityFactory.getOutputPorts(configuration)) {
+			edits.getAddActivityOutputPortEdit(activity, activityOutputPort).doEdit();
+		}
 		Map<String, Class<?>> outputs = new HashMap<String, Class<?>>();
 		outputs.put("A", String.class);
 		outputs.put("B", String.class);
