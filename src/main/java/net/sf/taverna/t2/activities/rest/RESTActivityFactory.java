@@ -20,12 +20,20 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.rest;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.Set;
+
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 
 import org.apache.http.client.CredentialsProvider;
 
-import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * An {@link ActivityFactory} for creating <code>RESTActivity</code>.
@@ -42,17 +50,36 @@ public class RESTActivityFactory implements ActivityFactory {
 	}
 
 	@Override
-	public URI getActivityURI() {
+	public URI getActivityType() {
 		return URI.create(RESTActivity.URI);
 	}
 
 	@Override
-	public Object createActivityConfiguration() {
-		return RESTActivityConfigurationBean.getDefaultInstance();
+	public JsonNode getActivityConfigurationSchema() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+ 			return objectMapper.readTree(getClass().getResource("/schema.json"));
+		} catch (IOException e) {
+			return objectMapper.createObjectNode();
+		}
 	}
 
 	public void setCredentialManager(CredentialManager credentialManager) {
 		credentialsProvider = new RESTActivityCredentialsProvider(credentialManager);
+	}
+
+	@Override
+	public Set<ActivityInputPort> getInputPorts(JsonNode configuration)
+			throws ActivityConfigurationException {
+		// TODO Move port genertion code from the Activity
+		return null;
+	}
+
+	@Override
+	public Set<ActivityOutputPort> getOutputPorts(JsonNode configuration)
+			throws ActivityConfigurationException {
+		// TODO Move port genertion code from the Activity
+		return null;
 	}
 
 }
