@@ -54,7 +54,7 @@ public class DependencyActivityConfigurationBean extends
 	 * Constructor.
 	 */
 	public DependencyActivityConfigurationBean(){
-		classLoaderSharing = ClassLoaderSharing.workflow;
+		classLoaderSharing = ClassLoaderSharing.DEFAULT;
 		localDependencies = new LinkedHashSet<String>();
 	}
 	
@@ -65,7 +65,7 @@ public class DependencyActivityConfigurationBean extends
 	 */
 	private Object readResolve(){
 		if (classLoaderSharing == null)
-			classLoaderSharing = ClassLoaderSharing.workflow;
+			classLoaderSharing = ClassLoaderSharing.DEFAULT;
 
 		if (localDependencies == null) 
 			localDependencies = new LinkedHashSet<String>();

@@ -236,7 +236,7 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 	 * retrieve the workflow) that will be added to this activity classloader's list of URLs.
 	 */
 	private HashSet<URL> findDependencies(String dependencyType, JsonNode json, String workflowRunID) {
-		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.valueOf(json.get("classLoaderSharing").textValue());
+		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
  		// Get the WorkflowInstanceFacade which contains the current workflow
 		WeakReference<WorkflowInstanceFacade> wfFacadeRef = WorkflowInstanceFacade.workflowRunFacades.get(workflowRunID);
 		WorkflowInstanceFacade wfFacade = null;
@@ -267,7 +267,6 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 					Activity<?> activity = proc.getActivityList().get(0);
 					if (activity instanceof AbstractAsynchronousDependencyActivity){
 						AbstractAsynchronousDependencyActivity dependencyActivity = (AbstractAsynchronousDependencyActivity) activity;
-						if (ClassLoaderSharing.valueOf(dependencyActivity.getConfiguration().get("classLoaderSharing").textValue()) == classLoaderSharing) {
 //							if (dependencyType.equals(LOCAL_JARS)){
 								// Collect the files of all found local dependencies
 							if (dependencyActivity.getConfiguration().has("localDependency")) {
@@ -290,7 +289,6 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 //									dependencies.add(rep.jarFile(art));
 //								}
 //							}
-						}
 					}
 				}
 			}
@@ -342,7 +340,7 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 	 * Finds dependencies for a nested workflow.
 	 */
 	private HashSet<URL> findNestedDependencies(String dependencyType, JsonNode json, Dataflow nestedWorkflow) {
- 		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.valueOf(json.get("classLoaderSharing").textValue());
+ 		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
 
 		// Files of dependencies for all activities in the nested workflow that share the classloading policy
 		HashSet<File> dependencies = new HashSet<File>();
@@ -360,8 +358,6 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 				Activity<?> activity = proc.getActivityList().get(0);
 				if (activity instanceof AbstractAsynchronousDependencyActivity){
 					AbstractAsynchronousDependencyActivity dependencyActivity = (AbstractAsynchronousDependencyActivity) activity;
-					if (ClassLoaderSharing.valueOf(dependencyActivity.getConfiguration().get("classLoaderSharing").textValue()) == classLoaderSharing) {
-
 //						if (dependencyType.equals(LOCAL_JARS)){
 							// Collect the files of all found local dependencies
 							for (JsonNode jar : dependencyActivity.getConfiguration().get("localDependency")) {
@@ -381,7 +377,6 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 //								dependencies.add(rep.jarFile(art));
 //							}
 //						}
-					}
 				}
 			}
 		}
