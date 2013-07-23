@@ -95,7 +95,14 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 	 *
 	 */
 	public static enum ClassLoaderSharing {
-		workflow, system
+	    workflow, system;
+	    public static final ClassLoaderSharing DEFAULT = workflow;
+	    public static ClassLoaderSharing fromString(String str) {
+	        if (str == null || str.isEmpty()) {
+	            return DEFAULT;
+	        }
+	        return valueOf(str.toLowerCase());
+	    }
 	}
 
 	public AbstractAsynchronousDependencyActivity(ApplicationConfiguration applicationConfiguration) {
@@ -128,7 +135,7 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 	 *         classloader sharing policy
 	 */
 	protected ClassLoader findClassLoader(JsonNode json, String workflowRunID) throws RuntimeException{
-		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.valueOf(json.get("classLoaderSharing").textValue());
+		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
 
 		if (classLoaderSharing == ClassLoaderSharing.workflow) {
 			synchronized (workflowClassLoaders) {
