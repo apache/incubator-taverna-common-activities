@@ -31,13 +31,13 @@
                  		"title": "Port Depth",
              			"description": "The depth of the port",
                         "type": "integer",
-                        "required": true,
+                        "required": true
            			},
                     "mimeType": {
                  		"title": "Mime Type",
              			"description": "The mime type of the port",
                         "type": "string",
-                        "required": true,
+                        "required": true
                     }
                 }
              }
@@ -59,19 +59,19 @@
                  		"title": "Port Depth",
              			"description": "The depth of the port",
                         "type": "integer",
-                        "required": true,
+                        "required": true
                     }
                     "granularDepth": {
                  		"title": "Port Granular Depth",
              			"description": "The granular depth of the port",
                         "type": "integer",
-                        "required": true,
+                        "required": true
            			},
                     "mimeType": {
                  		"title": "Mime Type",
              			"description": "The mime type of the port",
                         "type": "string",
-                        "required": true,
+                        "required": true
                     }
                 }
              }
