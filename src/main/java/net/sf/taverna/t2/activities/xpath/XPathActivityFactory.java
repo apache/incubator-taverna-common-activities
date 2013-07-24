@@ -20,9 +20,19 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.xpath;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
+import net.sf.taverna.t2.workflowmodel.Edits;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * An {@link ActivityFactory} for creating <code>XPathActivity</code>.
@@ -31,19 +41,48 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
  */
 public class XPathActivityFactory implements ActivityFactory {
 
+	private Edits edits;
+
 	@Override
 	public XPathActivity createActivity() {
 		return new XPathActivity();
 	}
 
 	@Override
-	public URI getActivityURI() {
+	public URI getActivityType() {
 		return URI.create(XPathActivity.URI);
 	}
 
 	@Override
-	public Object createActivityConfiguration() {
-		return XPathActivityConfigurationBean.getDefaultInstance();
+	public JsonNode getActivityConfigurationSchema() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			return objectMapper.readTree(getClass().getResource("/schema.json"));
+		} catch (IOException e) {
+			return objectMapper.createObjectNode();
+		}
+	}
+
+	@Override
+	public Set<ActivityInputPort> getInputPorts(JsonNode configuration)
+			throws ActivityConfigurationException {
+		Set<ActivityInputPort> outputPorts = new HashSet<>();
+		outputPorts.add(edits.createActivityInputPort(XPathActivity.IN_XML, 0, true, null,
+				String.class));
+		return outputPorts;
+	}
+
+	@Override
+	public Set<ActivityOutputPort> getOutputPorts(JsonNode configuration)
+			throws ActivityConfigurationException {
+		Set<ActivityOutputPort> outputPorts = new HashSet<>();
+		outputPorts.add(edits.createActivityOutputPort(XPathActivity.OUT_TEXT, 1, 1));
+		outputPorts.add(edits.createActivityOutputPort(XPathActivity.OUT_XML, 1, 1));
+		return outputPorts;
+	}
+
+	public void setEdits(Edits edits) {
+		this.edits = edits;
 	}
 
 }

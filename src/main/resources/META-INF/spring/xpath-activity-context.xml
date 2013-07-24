@@ -5,6 +5,8 @@
 
 	<bean id="XPathActivityHealthChecker" class="net.sf.taverna.t2.activities.xpath.XPathActivityHealthChecker" />
 
-	<bean id="xPathActivityFactory" class="net.sf.taverna.t2.activities.xpath.XPathActivityFactory" />
+	<bean id="xPathActivityFactory" class="net.sf.taverna.t2.activities.xpath.XPathActivityFactory">
+		<property name="edits" ref="edits" />
+	</bean>
 
 </beans>
