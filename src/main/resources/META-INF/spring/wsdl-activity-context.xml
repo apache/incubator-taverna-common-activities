@@ -9,8 +9,13 @@
 
 	<bean id="wsdlActivityFactory" class="net.sf.taverna.t2.activities.wsdl.WSDLActivityFactory">
 		<property name="credentialManager" ref="credentialManager" />
+		<property name="edits" ref="edits" />
 	</bean>
-	<bean id="xmlInputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterActivityFactory" />
-	<bean id="xmlOutputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterActivityFactory" />
+	<bean id="xmlInputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterActivityFactory">
+		<property name="edits" ref="edits" />
+	</bean>
+	<bean id="xmlOutputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterActivityFactory">
+		<property name="edits" ref="edits" />
+	</bean>
 
 </beans>

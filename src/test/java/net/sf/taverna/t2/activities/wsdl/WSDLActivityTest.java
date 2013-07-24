@@ -26,7 +26,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,11 +39,16 @@ import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class WSDLActivityTest implements LocationConstants {
 
+	private static final JsonNodeFactory JSON_NODE_FACTORY = JsonNodeFactory.instance;
+
 	private static WSDLActivity activity;
-	private static WSDLActivityConfigurationBean configBean;
-	private static WSDLOperationConfigurationBean operationConfigBean;
+	private static ObjectNode configBean;
+	private static ObjectNode operationConfigBean;
 	private static String wsdlLocation = WSDL_TEST_BASE
 			+ "eutils/eutils_lite.wsdl";
 
@@ -52,11 +56,11 @@ public class WSDLActivityTest implements LocationConstants {
     @Ignore("Integration test")
 	public static void setUp() throws Exception {
 		activity = new WSDLActivity(null);
-		configBean = new WSDLActivityConfigurationBean();
-		operationConfigBean = new WSDLOperationConfigurationBean();
-		operationConfigBean.setOperationName("run_eInfo");
-		operationConfigBean.setWsdl(URI.create(wsdlLocation));
-		configBean.setOperation(operationConfigBean);
+		configBean = JSON_NODE_FACTORY.objectNode();
+		operationConfigBean = configBean.objectNode();
+		configBean.put("operation", operationConfigBean);
+		operationConfigBean.put("name", "run_eInfo");
+		operationConfigBean.put("wsdl", wsdlLocation);
 		activity.configure(configBean);
 	}
 

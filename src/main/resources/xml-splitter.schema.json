@@ -13,6 +13,68 @@
             "title": "Wrapped Type XML",
             "type": "string",
             "required": true
-        }
+        },
+        "inputPorts": {
+            "title": "Input Ports",
+            "type": "array",
+            "required": false,
+            "items": {
+                "type": "object",
+                "properties": {
+           		    "name": {
+                		"title": "Port Name",
+            			"description": "The name of the port",
+            			"type": "string",
+		          		"required": true
+           			},
+                    "depth": {
+                 		"title": "Port Depth",
+             			"description": "The depth of the port",
+                        "type": "integer",
+                        "required": true,
+           			},
+                    "mimeType": {
+                 		"title": "Mime Type",
+             			"description": "The mime type of the port",
+                        "type": "string",
+                        "required": true,
+                    }
+                }
+             }
+        },
+        "outputPorts": {
+            "title": "Output Ports",
+            "type": "array",
+            "required": false,
+            "items": {
+                "type": "object",
+                "properties": {
+           		    "name": {
+                		"title": "Port Name",
+            			"description": "The name of the port",
+            			"type": "string",
+		          		"required": true
+           			},
+                    "depth": {
+                 		"title": "Port Depth",
+             			"description": "The depth of the port",
+                        "type": "integer",
+                        "required": true,
+                    }
+                    "granularDepth": {
+                 		"title": "Port Granular Depth",
+             			"description": "The granular depth of the port",
+                        "type": "integer",
+                        "required": true,
+           			},
+                    "mimeType": {
+                 		"title": "Mime Type",
+             			"description": "The mime type of the port",
+                        "type": "string",
+                        "required": true,
+                    }
+                }
+             }
+         }
     }
 }

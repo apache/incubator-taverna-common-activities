@@ -22,13 +22,8 @@ package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import java.net.URI;
-
 import net.sf.taverna.t2.activities.testutils.LocationConstants;
 import net.sf.taverna.t2.activities.wsdl.WSDLActivity;
-import net.sf.taverna.t2.activities.wsdl.WSDLActivityConfigurationBean;
-import net.sf.taverna.t2.activities.wsdl.WSDLOperationConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.Processor;
 import net.sf.taverna.t2.workflowmodel.impl.DataflowImpl;
@@ -39,12 +34,17 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class AddXMLSplitterEditTest implements LocationConstants {
+
+	private static final JsonNodeFactory JSON_NODE_FACTORY = JsonNodeFactory.instance;
 
 	private WSDLActivity activity;
 	private DataflowImpl dataflow;
-	private WSDLActivityConfigurationBean configBean;
-	private static WSDLOperationConfigurationBean operationConfigBean;
+	private ObjectNode configBean;
+	private static ObjectNode operationConfigBean;
 	private String wsdlLocation = WSDL_TEST_BASE
 	+ "eutils/eutils_lite.wsdl";
 	private Edits edits;
@@ -53,11 +53,11 @@ public class AddXMLSplitterEditTest implements LocationConstants {
 	@Before
 	public void setUp() throws Exception {
 		activity = new WSDLActivity(null);
-		configBean = new WSDLActivityConfigurationBean();
-		operationConfigBean = new WSDLOperationConfigurationBean();
-		operationConfigBean.setOperationName("run_eInfo");
-		operationConfigBean.setWsdl(URI.create(wsdlLocation));
-		configBean.setOperation(operationConfigBean);
+		configBean = JSON_NODE_FACTORY.objectNode();
+		operationConfigBean = configBean.objectNode();
+		configBean.put("operation", operationConfigBean);
+		operationConfigBean.put("name", "run_eInfo");
+		operationConfigBean.put("wsdl", wsdlLocation);
 		activity.configure(configBean);
 		edits = new EditsImpl();
 

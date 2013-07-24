@@ -27,8 +27,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,17 +40,19 @@ import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
+import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
-import net.sf.taverna.t2.workflowmodel.utils.Tools;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * An asynchronous Activity that is concerned with WSDL based web-services.
@@ -64,17 +68,17 @@ import org.xml.sax.SAXException;
  * @author Stian Soiland-Reyes
  */
 public class WSDLActivity extends
-		AbstractAsynchronousActivity<WSDLActivityConfigurationBean> implements
+		AbstractAsynchronousActivity<JsonNode> implements
 		InputPortTypeDescriptorActivity, OutputPortTypeDescriptorActivity {
 
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/wsdl";
 
-	private static final String ENDPOINT_REFERENCE = "EndpointReference";
-	private WSDLActivityConfigurationBean configurationBean;
+	public static final String ENDPOINT_REFERENCE = "EndpointReference";
+	private JsonNode configurationBean;
 	private WSDLParser parser;
-	private Map<String, Integer> outputDepth = new HashMap<String, Integer>();
+//	private Map<String, Integer> outputDepth = new HashMap<String, Integer>();
 	private boolean isWsrfService = false;
-	private String endpointReferenceInputPortName;
+//	private String endpointReferenceInputPortName;
 	private CredentialManager credentialManager;
 
 	public WSDLActivity(CredentialManager credentialManager) {
@@ -97,7 +101,7 @@ public class WSDLActivity extends
 	 *            the {@link WSDLActivityConfigurationBean} configuration bean
 	 */
 	@Override
-	public void configure(WSDLActivityConfigurationBean bean)
+	public void configure(JsonNode bean)
 			throws ActivityConfigurationException {
 		if (this.configurationBean != null) {
 //			throw new IllegalStateException(
@@ -108,20 +112,16 @@ public class WSDLActivity extends
 			this.configurationBean = bean;
 			try {
 				parseWSDL();
-				configurePorts();
+//				configurePorts();
 			} catch (Exception ex) {
 				throw new ActivityConfigurationException(
-						"Unable to parse the WSDL " + bean.getOperation().getWsdl(), ex);
+						"Unable to parse the WSDL " + bean.get("operation").get("wsdl").textValue(), ex);
 			}
 		}
 	}
 
-	/**
-	 * @return a {@link WSDLActivityConfigurationBean} representing the
-	 *         WSDLActivity configuration
-	 */
 	@Override
-	public WSDLActivityConfigurationBean getConfiguration() {
+	public JsonNode getConfiguration() {
 		return configurationBean;
 	}
 
@@ -134,7 +134,7 @@ public class WSDLActivity extends
 	public TypeDescriptor getTypeDescriptorForInputPort(String portName)
 			throws UnknownOperationException, IOException {
 		List<TypeDescriptor> inputDescriptors = parser
-				.getOperationInputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationInputParameters(configurationBean.get("operation").get("name").textValue());
 		TypeDescriptor result = null;
 		for (TypeDescriptor descriptor : inputDescriptors) {
 			if (descriptor.getName().equals(portName)) {
@@ -155,7 +155,7 @@ public class WSDLActivity extends
 			throws UnknownOperationException, IOException {
 		Map<String, TypeDescriptor> descriptors = new HashMap<String, TypeDescriptor>();
 		List<TypeDescriptor> inputDescriptors = parser
-				.getOperationInputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationInputParameters(configurationBean.get("operation").get("name").textValue());
 		for (TypeDescriptor descriptor : inputDescriptors) {
 			descriptors.put(descriptor.getName(), descriptor);
 		}
@@ -172,7 +172,7 @@ public class WSDLActivity extends
 			throws UnknownOperationException, IOException {
 		TypeDescriptor result = null;
 		List<TypeDescriptor> outputDescriptors = parser
-				.getOperationOutputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationOutputParameters(configurationBean.get("operation").get("name").textValue());
 		for (TypeDescriptor descriptor : outputDescriptors) {
 			if (descriptor.getName().equals(portName)) {
 				result = descriptor;
@@ -192,7 +192,7 @@ public class WSDLActivity extends
 			throws UnknownOperationException, IOException {
 		Map<String, TypeDescriptor> descriptors = new HashMap<String, TypeDescriptor>();
 		List<TypeDescriptor> inputDescriptors = parser
-				.getOperationOutputParameters(configurationBean.getOperation().getOperationName());
+				.getOperationOutputParameters(configurationBean.get("operation").get("name").textValue());
 		for (TypeDescriptor descriptor : inputDescriptors) {
 			descriptors.put(descriptor.getName(), descriptor);
 		}
@@ -201,58 +201,60 @@ public class WSDLActivity extends
 
 	private void parseWSDL() throws ParserConfigurationException,
 			WSDLException, IOException, SAXException, UnknownOperationException {
-	    URLConnection connection = null;
-	    try {
-		URL wsdlURL = configurationBean.getOperation().getWsdl().toURL();
-		connection = wsdlURL.openConnection();
-		connection.setConnectTimeout(RemoteHealthChecker.getTimeoutInSeconds() * 1000);
-		connection.connect();
-	    } catch (MalformedURLException e) {
-		throw new IOException("Malformed URL", e);
-	    } catch (SocketTimeoutException e) {
-		throw new IOException("Timeout", e);
-	    } catch (IOException e) {
-		throw e;
-	    } finally {
-		if ((connection != null) && (connection.getInputStream() != null)) {
-		    connection.getInputStream().close();
-		}
-	    }
-	    parser = new WSDLParser(configurationBean.getOperation().getWsdl().toString());
-	}
-
-	private void configurePorts() throws UnknownOperationException, IOException {
-		List<TypeDescriptor> inputDescriptors = parser
-				.getOperationInputParameters(configurationBean.getOperation().getOperationName());
-		List<TypeDescriptor> outputDescriptors = parser
-				.getOperationOutputParameters(configurationBean.getOperation().getOperationName());
-		for (TypeDescriptor descriptor : inputDescriptors) {
-			addInput(descriptor.getName(), descriptor.getDepth(), true, null,
-					String.class);
-		}
-		isWsrfService = parser.isWsrfService();
-		if (isWsrfService) {
-			// Make sure the port name is unique
-			endpointReferenceInputPortName = ENDPOINT_REFERENCE;
-			int counter = 0;
-			while (Tools.getActivityInputPort(this,
-					endpointReferenceInputPortName) != null) {
-				endpointReferenceInputPortName = ENDPOINT_REFERENCE + counter++;
+		String wsdlLocation = configurationBean.get("operation").get("wsdl").textValue();
+		URLConnection connection = null;
+		try {
+			URL wsdlURL = new URL(wsdlLocation);
+			connection = wsdlURL.openConnection();
+			connection.setConnectTimeout(RemoteHealthChecker.getTimeoutInSeconds() * 1000);
+			connection.connect();
+		} catch (MalformedURLException e) {
+			throw new IOException("Malformed URL", e);
+		} catch (SocketTimeoutException e) {
+			throw new IOException("Timeout", e);
+		} catch (IOException e) {
+			throw e;
+		} finally {
+			if ((connection != null) && (connection.getInputStream() != null)) {
+				connection.getInputStream().close();
 			}
-			addInput(endpointReferenceInputPortName, 0, true, null,
-					String.class);
 		}
-
-		for (TypeDescriptor descriptor : outputDescriptors) {
-			addOutput(descriptor.getName(), descriptor.getDepth());
-			outputDepth.put(descriptor.getName(), Integer.valueOf(descriptor
-					.getDepth()));
-		}
-
-		// add output for attachment list
-		addOutput("attachmentList", 1);
-		outputDepth.put("attachmentList", Integer.valueOf(1));
+		parser = new WSDLParser(wsdlLocation);
+		isWsrfService = parser.isWsrfService();
 	}
+
+//	private void configurePorts() throws UnknownOperationException, IOException {
+//		List<TypeDescriptor> inputDescriptors = parser
+//				.getOperationInputParameters(configurationBean.get("operation").get("name").textValue());
+//		List<TypeDescriptor> outputDescriptors = parser
+//				.getOperationOutputParameters(configurationBean.get("operation").get("name").textValue());
+//		for (TypeDescriptor descriptor : inputDescriptors) {
+//			addInput(descriptor.getName(), descriptor.getDepth(), true, null,
+//					String.class);
+//		}
+//		isWsrfService = parser.isWsrfService();
+//		if (isWsrfService) {
+//			// Make sure the port name is unique
+//			endpointReferenceInputPortName = ENDPOINT_REFERENCE;
+//			int counter = 0;
+//			while (Tools.getActivityInputPort(this,
+//					endpointReferenceInputPortName) != null) {
+//				endpointReferenceInputPortName = ENDPOINT_REFERENCE + counter++;
+//			}
+//			addInput(endpointReferenceInputPortName, 0, true, null,
+//					String.class);
+//		}
+//
+//		for (TypeDescriptor descriptor : outputDescriptors) {
+//			addOutput(descriptor.getName(), descriptor.getDepth());
+//			outputDepth.put(descriptor.getName(), Integer.valueOf(descriptor
+//					.getDepth()));
+//		}
+//
+//		// add output for attachment list
+//		addOutput("attachmentList", 1);
+//		outputDepth.put("attachmentList", Integer.valueOf(1));
+//	}
 
 	/**
 	 * {@inheritDoc}
@@ -270,6 +272,7 @@ public class WSDLActivity extends
 
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 				Map<String, Object> invokerInputMap = new HashMap<String, Object>();
+				String endpointReferenceInputPortName = getEndpointReferenceInputPortName();
 
 				try {
 					String endpointReference = null;
@@ -290,18 +293,17 @@ public class WSDLActivity extends
 					}
 
 					T2WSDLSOAPInvoker invoker = new T2WSDLSOAPInvoker(parser,
-							configurationBean.getOperation().getOperationName(), outputNames,
+							configurationBean.get("operation").get("name").textValue(), outputNames,
 							endpointReference, credentialManager);
-					WSDLActivityConfigurationBean bean = getConfiguration();
 
 					Map<String, Object> invokerOutputMap = invoker.invoke(
-							invokerInputMap, bean);
+							invokerInputMap, configurationBean);
 
 					for (String outputName : invokerOutputMap.keySet()) {
 						Object value = invokerOutputMap.get(outputName);
 
 						if (value != null) {
-							Integer depth = outputDepth.get(outputName);
+							Integer depth = getOutputPortDepth(outputName);
 							if (depth != null) {
 								outputData.put(outputName, referenceService
 										.register(value, depth, true, callback
@@ -319,12 +321,12 @@ public class WSDLActivity extends
 					callback.receiveResult(outputData, new int[0]);
 				} catch (ReferenceServiceException e) {
 					logger.error("Error finding the input data for "
-							+ getConfiguration().getOperation(), e);
+							+ getConfiguration().get("operation"), e);
 					callback.fail("Unable to find input data", e);
 					return;
 				} catch (Exception e) {
 					logger.error("Error invoking WSDL service "
-							+ getConfiguration().getOperation(), e);
+							+ getConfiguration().get("operation"), e);
 					callback.fail(
 							"An error occurred invoking the WSDL service", e);
 					return;
@@ -335,4 +337,36 @@ public class WSDLActivity extends
 		});
 
 	}
+
+	private Integer getOutputPortDepth(String portName) {
+		for (ActivityOutputPort outputPort : getOutputPorts()) {
+			if (outputPort.getName().equals(portName)) {
+				return outputPort.getDepth();
+			}
+		}
+		return null;
+	}
+
+	private String getEndpointReferenceInputPortName() {
+		String endpointReferenceInputPortName = null;
+		if (parser.isWsrfService()) {
+			Set<String> inputPorts = new HashSet<>();
+			try {
+				List<TypeDescriptor> inputDescriptors = parser.getOperationInputParameters(configurationBean
+						.get("operation").get("name").textValue());
+				for (TypeDescriptor descriptor : inputDescriptors) {
+					inputPorts.add(descriptor.getName());
+				}
+			} catch (UnknownOperationException | IOException e) {
+			}
+			// Make sure the port name is unique
+			endpointReferenceInputPortName = WSDLActivity.ENDPOINT_REFERENCE;
+			int counter = 0;
+			while (inputPorts.contains(endpointReferenceInputPortName)) {
+				endpointReferenceInputPortName = WSDLActivity.ENDPOINT_REFERENCE + counter++;
+			}
+		}
+		return endpointReferenceInputPortName;
+	}
+
 }

@@ -1,19 +1,19 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester   
- * 
+ * Copyright (C) 2007 The University of Manchester
+ *
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- * 
+ *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *    
+ *
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *    
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
@@ -41,6 +41,8 @@ import net.sf.taverna.t2.workflowmodel.utils.Tools;
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class AddXMLSplitterEdit implements Edit<Dataflow> {
 
 	private final Edits edits;
@@ -66,7 +68,7 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 		if (applied) throw new EditException("Edit has already been applied!");
 		List<Edit<?>> editList = new ArrayList<Edit<?>>();
 
-		Activity<XMLSplitterConfigurationBean> splitter = null;
+		Activity<JsonNode> splitter = null;
 		String sourcePortName = "";
 		Processor sourceProcessor = null;
 		Activity<?> sourceActivity = null;
@@ -83,12 +85,12 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 					"Cannot find the processor that the activity belongs to");
 		}
 
-		
+
 		String displayName = portName;
 		if (portName.equals("parameters")) {
 			displayName = isInput ? "input" : "output";
 		}
-		String processorName = activityProcessor.getLocalName();		
+		String processorName = activityProcessor.getLocalName();
 		String candidateName;
 		if (displayName.startsWith(processorName)) {
 			// No need to make GetRequest_GetRequestResponse
@@ -104,10 +106,10 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 				displayProcessorName = activityProcessor.getLocalName();
 			}
 			candidateName = displayProcessorName + "_" + displayName;
-		}		
+		}
 		String name = Tools.uniqueProcessorName(candidateName, dataflow);
 		Processor splitterProcessor = edits.createProcessor(name);
-		
+
 		try {
 			if (activity instanceof XMLInputSplitterActivity) {
 				if (!isInput) {
@@ -116,15 +118,15 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 				}
 				TypeDescriptor descriptor = ((XMLInputSplitterActivity) activity)
 						.getTypeDescriptorForInputPort(portName);
-				if (descriptor instanceof ArrayTypeDescriptor && !((ArrayTypeDescriptor)descriptor).isWrapped()) {									
+				if (descriptor instanceof ArrayTypeDescriptor && !((ArrayTypeDescriptor)descriptor).isWrapped()) {
 					descriptor=((ArrayTypeDescriptor)descriptor).getElementType();
 				}
-				
-				XMLSplitterConfigurationBean bean = XMLSplitterConfigurationBeanBuilder
+
+				JsonNode bean = XMLSplitterConfigurationBeanBuilder
 						.buildBeanForInput(descriptor);
 				splitter = new XMLInputSplitterActivity();
 				editList.add(edits.getConfigureActivityEdit(splitter, bean));
-				
+
 			} else if (activity instanceof XMLOutputSplitterActivity) {
 				if (isInput) {
 					throw new EditException(
@@ -132,21 +134,21 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 				}
 				TypeDescriptor descriptor = ((XMLOutputSplitterActivity) activity)
 						.getTypeDescriptorForOutputPort(portName);
-				
-				if (descriptor instanceof ArrayTypeDescriptor && !((ArrayTypeDescriptor)descriptor).isWrapped()) {									
+
+				if (descriptor instanceof ArrayTypeDescriptor && !((ArrayTypeDescriptor)descriptor).isWrapped()) {
 					descriptor=((ArrayTypeDescriptor)descriptor).getElementType();
 				}
-				
-				XMLSplitterConfigurationBean bean = XMLSplitterConfigurationBeanBuilder
+
+				JsonNode bean = XMLSplitterConfigurationBeanBuilder
 						.buildBeanForOutput(descriptor);
 				splitter = new XMLOutputSplitterActivity();
 				editList.add(edits.getConfigureActivityEdit(splitter, bean));
-				
+
 			} else if (activity instanceof WSDLActivity) {
 				if (isInput) {
 					TypeDescriptor descriptor = ((WSDLActivity) activity)
 							.getTypeDescriptorForInputPort(portName);
-					XMLSplitterConfigurationBean bean = XMLSplitterConfigurationBeanBuilder
+					JsonNode bean = XMLSplitterConfigurationBeanBuilder
 							.buildBeanForInput(descriptor);
 					splitter = new XMLInputSplitterActivity();
 					editList
@@ -154,7 +156,7 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 				} else {
 					TypeDescriptor descriptor = ((WSDLActivity) activity)
 							.getTypeDescriptorForOutputPort(portName);
-					XMLSplitterConfigurationBean bean = XMLSplitterConfigurationBeanBuilder
+					JsonNode bean = XMLSplitterConfigurationBeanBuilder
 							.buildBeanForOutput(descriptor);
 					splitter = new XMLOutputSplitterActivity();
 					editList
@@ -169,7 +171,7 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 					"An error occured whilst tyring to add an XMLSplitter to the activity:"
 							+ activity, e);
 		}
-		
+
 		if (isInput) {
 			sourcePortName = "output";
 			sinkPortName = portName;
@@ -263,7 +265,7 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 			compoundEdit1.undo();
 		applied = false;
 	}
-	
+
 	@Override
 	public boolean isApplied() {
 		return applied;

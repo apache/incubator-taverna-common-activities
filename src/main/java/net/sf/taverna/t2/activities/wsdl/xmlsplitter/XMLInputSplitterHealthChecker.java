@@ -20,6 +20,8 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.List;
 
 import net.sf.taverna.t2.visit.VisitReport;
@@ -30,6 +32,8 @@ import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.xmlsplitter.XMLSplitterSerialisationHelper;
 
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 public class XMLInputSplitterHealthChecker implements HealthChecker<XMLInputSplitterActivity> {
 
@@ -38,7 +42,13 @@ public class XMLInputSplitterHealthChecker implements HealthChecker<XMLInputSpli
 	}
 
 	public VisitReport visit(XMLInputSplitterActivity activity, List<Object> ancestors) {
-		Element element = activity.getConfiguration().getWrappedTypeXML();
+		Element element;
+		try {
+			String wrappedType = activity.getConfiguration().get("wrappedType").textValue();
+			element = new SAXBuilder().build(new StringReader(wrappedType)).getRootElement();
+		} catch (JDOMException | IOException e) {
+			return new VisitReport(HealthCheck.getInstance(), activity, "Error reading wrapped type", HealthCheck.INVALID_CONFIGURATION, Status.SEVERE);
+		}
 		TypeDescriptor typeDescriptor = XMLSplitterSerialisationHelper.extensionXMLToTypeDescriptor(element);
 		if (typeDescriptor==null) {
 			return new VisitReport(HealthCheck.getInstance(), activity, "Unknown datatype for port", HealthCheck.NULL_DATATYPE, Status.SEVERE);

@@ -28,9 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-
 import net.sf.taverna.t2.activities.wsdl.security.SecurityProfiles;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
@@ -51,6 +48,8 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.DOMOutputter;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Invokes SOAP based Web Services from T2.
@@ -160,12 +159,11 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		// .getDocumentElement()));
 	}
 
-	protected void configureSecurity(Call call,
-			WSDLActivityConfigurationBean bean) throws Exception {
+	protected void configureSecurity(Call call, JsonNode bean) throws Exception {
 
 		// If security settings require WS-Security - configure the axis call
 		// with appropriate properties
-		URI securityProfile = bean.getSecurityProfile();
+		URI securityProfile = new URI(bean.get("securityProfile").textValue());
 		if (securityProfile
 				.equals(SecurityProfiles.WSSECURITY_USERNAMETOKEN_PLAINTEXTPASSWORD)
 				|| securityProfile
@@ -198,11 +196,11 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 	 * password is the second.
 	 */
 	protected UsernamePassword getUsernameAndPasswordForService(
-			WSDLActivityConfigurationBean bean, boolean usePathRecursion) throws CMException {
+			JsonNode bean, boolean usePathRecursion) throws CMException {
 
 		// Try to get username and password for this service from Credential
 		// Manager (which should pop up UI if needed)
-		URI serviceUri = bean.getOperation().getWsdl();
+		URI serviceUri = URI.create(bean.get("operation").get("wsdl").textValue());
 		UsernamePassword username_password = credentialManager.getUsernameAndPasswordForService(serviceUri, usePathRecursion, null);
 		if (username_password == null) {
 			throw new CMException("No username/password provided for service " + serviceUri);
@@ -227,11 +225,11 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 	}
 
 	public Map<String, Object> invoke(Map<String, Object> inputMap,
-			WSDLActivityConfigurationBean bean) throws Exception {
+			JsonNode bean) throws Exception {
 
-		URI securityProfile = bean.getSecurityProfile();
 		EngineConfiguration wssEngineConfiguration = null;
-		if (securityProfile != null) {
+		if (bean.has("securityProfile")) {
+			URI securityProfile = new URI(bean.get("securityProfile").textValue());
 			// If security settings require WS-Security and not just e.g. Basic HTTP
 			// AuthN - configure the axis engine from the appropriate config strings
 			if (securityProfile
@@ -273,7 +271,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		// security properties on it (or its message context or its Transport
 		// handler),
 		// such as WS-Security UsernameToken or HTTP Basic AuthN
-		if (securityProfile != null) {
+		if (bean.has("securityProfile")) {
 			configureSecurity(call, bean);
 		}
 

@@ -54,11 +54,11 @@ public class WSDLActivityFactoryTest {
 	}
 
 	/**
-	 * Test method for {@link net.sf.taverna.t2.activities.beanshell.BeanshellActivityFactory#getActivityURI()}.
+	 * Test method for {@link net.sf.taverna.t2.activities.beanshell.BeanshellActivityFactory#getActivityType()}.
 	 */
 	@Test
 	public void testGetActivityURI() {
-		assertEquals(URI.create(WSDLActivity.URI), factory.getActivityURI());
+		assertEquals(URI.create(WSDLActivity.URI), factory.getActivityType());
 	}
 
 }

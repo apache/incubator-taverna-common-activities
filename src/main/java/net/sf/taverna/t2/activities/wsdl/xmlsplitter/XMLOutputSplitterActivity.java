@@ -21,6 +21,7 @@
 package net.sf.taverna.t2.activities.wsdl.xmlsplitter;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,6 @@ import net.sf.taverna.t2.workflowmodel.InputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean;
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
@@ -43,6 +43,10 @@ import net.sf.taverna.wsdl.xmlsplitter.XMLOutputSplitter;
 import net.sf.taverna.wsdl.xmlsplitter.XMLSplitterSerialisationHelper;
 
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * An activity that replicates the behaviour of the Taverna 1 XMLOutputSplitter.
@@ -51,22 +55,26 @@ import org.jdom.Element;
  *
  */
 public class XMLOutputSplitterActivity extends
-		AbstractAsynchronousActivity<XMLSplitterConfigurationBean> implements
+		AbstractAsynchronousActivity<JsonNode> implements
 		OutputPortTypeDescriptorActivity {
 
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/xml-splitter/out";
 
-	XMLSplitterConfigurationBean configBean;
+	JsonNode configBean;
 	TypeDescriptor typeDescriptor;
 
 	@Override
-	public void configure(XMLSplitterConfigurationBean configBean)
+	public void configure(JsonNode configBean)
 			throws ActivityConfigurationException {
 		this.configBean = configBean;
-		configurePorts(configBean);
-		Element element = configBean.getWrappedTypeXML();
-		typeDescriptor = XMLSplitterSerialisationHelper
-				.extensionXMLToTypeDescriptor(element);
+
+		try {
+			String wrappedType = configBean.get("wrappedType").textValue();
+			Element element = new SAXBuilder().build(new StringReader(wrappedType)).getRootElement();
+			typeDescriptor = XMLSplitterSerialisationHelper.extensionXMLToTypeDescriptor(element);
+		} catch (JDOMException | IOException e) {
+			throw new ActivityConfigurationException(e);
+		}
 	}
 
 	@Override
@@ -117,10 +125,11 @@ public class XMLOutputSplitterActivity extends
 				// FIXME: need to use the definition beans for now to get the
 				// mimetype. Need to use the actual InputPort once the mimetype
 				// becomes available again.
-				for (ActivityOutputPortDefinitionBean defBean : getConfiguration()
-						.getOutputPortDefinitions()) {
-					outputNames.add(defBean.getName());
-					outputTypes.add(defBean.getMimeTypes().get(0));
+				if (configBean.has("outputPorts")) {
+					for (JsonNode outputPort : configBean.get("outputPorts")) {
+						outputNames.add(outputPort.get("name").textValue());
+						outputTypes.add(outputPort.get("mimeType").textValue());
+					}
 				}
 
 				for (InputPort outputPorts : getInputPorts()) {
@@ -151,7 +160,7 @@ public class XMLOutputSplitterActivity extends
 	}
 
 	@Override
-	public XMLSplitterConfigurationBean getConfiguration() {
+	public JsonNode getConfiguration() {
 		return configBean;
 	}
 

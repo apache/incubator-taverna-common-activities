@@ -9,15 +9,17 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class HTTPSConnectionsTest {
-	
+
 	@Test()
+	@Ignore("https://rpc103.cs.man.ac.uk:8443/wsrf/services no available")
 	public void testHTTPSConnections(){
-		
+
 		String serviceURL = "https://rpc103.cs.man.ac.uk:8443/wsrf/services";
-		
+
 			URL url;
 			try {
 				url = new URL(serviceURL);
@@ -26,7 +28,7 @@ public class HTTPSConnectionsTest {
 				httpsConnection.connect();
 				Certificate[] certificates = httpsConnection.getServerCertificates();
 				Assert.assertFalse(certificates.length == 0);
-				
+
 				SSLUtilities.stopTrustingAllHttpsCertificates();
 				HttpsURLConnection httpsConnection2 = (HttpsURLConnection) url.openConnection();
 				httpsConnection2.connect(); // This should now throw an SSLHandshakeException which is a subclass of IOException
@@ -34,7 +36,7 @@ public class HTTPSConnectionsTest {
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			
+
 			} catch(SSLHandshakeException e){
 				// This is what we are expecting
 				e.printStackTrace();

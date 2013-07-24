@@ -11,12 +11,11 @@ import net.sf.taverna.wsdl.parser.UnknownOperationException;
  * Interface for an activity such as {@link WSDLActivity} and
  * {@link XMLInputSplitterActivity} that can provide {@link TypeDescriptor}s for
  * its inputs.
- * 
+ *
  * @author Stian Soiland-Reyes
- * 
+ *
  * @param <ActivityBeanType> The configuration bean type of the activity
  */
-@SuppressWarnings("unchecked")
 public interface InputPortTypeDescriptorActivity {
 
 	/**
@@ -24,12 +23,12 @@ public interface InputPortTypeDescriptorActivity {
 	 * <br>
 	 * This TypeDescriptor represents the Type defined in the schema for this Activities
 	 * WSDL.
-	 * 
+	 *
 	 * @param portName
 	 * @return the TypeDescriptor, or null if the portName is not recognised.
 	 * @throws UnknownOperationException if the operation this Activity is associated with doesn't exist.
 	 * @throws IOException
-	 * 
+	 *
 	 * @see TypeDescriptor
 	 * @see #getTypeDescriptorsForInputPorts()
 	 * @see #getTypeDescriptorForOutputPort(String)
@@ -42,12 +41,12 @@ public interface InputPortTypeDescriptorActivity {
 	 * <p>
 	 * This TypeDescriptor represents the Type defined in the schema for this Activities
 	 * WSDL.
-	 * 
+	 *
 	 * @param portName
 	 * @return A {@link Map} from portname to {@link TypeDescriptor}
 	 * @throws UnknownOperationException if the operation this Activity is associated with doesn't exist.
 	 * @throws IOException If the WSDL or some of its dependencies could not be read
-	 * 
+	 *
 	 * @see TypeDescriptor
 	 * @see #getTypeDescriptorForInputPort(String)
 	 * @see #getTypeDescriptorsForOutputPorts()
