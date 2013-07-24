@@ -23,12 +23,16 @@ package net.sf.taverna.t2.activities.externaltool;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 
 /**
  * An {@link ActivityFactory} for creating <code>ExternalToolActivity</code>.
@@ -69,6 +73,20 @@ public class ExternalToolActivityFactory implements ActivityFactory {
 
 	public void setMechanismCreators(List<MechanismCreator> mechanismCreators) {
 		this.mechanismCreators = mechanismCreators;
+	}
+
+	@Override
+	public Set<ActivityInputPort> getInputPorts(JsonNode configuration)
+			throws ActivityConfigurationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<ActivityOutputPort> getOutputPorts(JsonNode configuration)
+			throws ActivityConfigurationException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
