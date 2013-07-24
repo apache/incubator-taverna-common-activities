@@ -38,6 +38,8 @@ import net.sf.taverna.wsdl.parser.WSDLParser;
 
 import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 
 	private Activity<?> activity;
@@ -62,29 +64,29 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 
 		WSDLParser parser;
 		try {
-			WSDLActivityConfigurationBean configuration = null;
+			JsonNode configuration = null;
 			if (activity instanceof WSDLActivity) {
-				configuration = (WSDLActivityConfigurationBean) activity.getConfiguration();
+				configuration = ((WSDLActivity)activity).getConfiguration();
 			} else if (activity instanceof DisabledActivity) {
-				configuration = (WSDLActivityConfigurationBean) ((DisabledActivity) activity).getActivityConfiguration();
+				configuration = (JsonNode) ((DisabledActivity) activity).getActivityConfiguration();
 			}
-			endpoint = configuration.getOperation().getWsdl().toASCIIString();
+			endpoint = configuration.get("operation").get("wsdl").asText();
 			VisitReport wsdlEndpointReport = RemoteHealthChecker.contactEndpoint(activity, endpoint);
 			reports.add(wsdlEndpointReport);
 			if (!wsdlEndpointReport.getStatus().equals(Status.SEVERE)) {
 			    parser = new WSDLParser(endpoint);
 
+			    String operationName = configuration.get("operation").get("name").asText();
 			    try {
-				reports.add(testStyleAndUse(endpoint,
+                reports.add(testStyleAndUse(endpoint,
 							    parser,
-							    configuration.getOperation().getOperationName()));
-				reports.add(testEndpoint(parser, configuration
-							 .getOperation().getOperationName()));
+							    operationName));
+				reports.add(testEndpoint(parser, operationName));
 			    } catch (UnknownOperationException e) {
 				VisitReport vr = new VisitReport(HealthCheck.getInstance(), activity,
 							 "Operation not found", HealthCheck.UNKNOWN_OPERATION,
 							 Status.SEVERE);
-				vr.setProperty("operationName", configuration.getOperation());
+				vr.setProperty("operationName", operationName);
 				vr.setProperty("endpoint", endpoint);
 				reports.add(vr);
 			    }
