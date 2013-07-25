@@ -135,7 +135,12 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 	 *         classloader sharing policy
 	 */
 	protected ClassLoader findClassLoader(JsonNode json, String workflowRunID) throws RuntimeException{
-		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
+		ClassLoaderSharing classLoaderSharing;
+		if (json.has("classLoaderSharing")) {
+			classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
+		} else {
+			classLoaderSharing = ClassLoaderSharing.workflow;
+		}
 
 		if (classLoaderSharing == ClassLoaderSharing.workflow) {
 			synchronized (workflowClassLoaders) {
@@ -236,7 +241,12 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 	 * retrieve the workflow) that will be added to this activity classloader's list of URLs.
 	 */
 	private HashSet<URL> findDependencies(String dependencyType, JsonNode json, String workflowRunID) {
-		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
+		ClassLoaderSharing classLoaderSharing;
+		if (json.has("classLoaderSharing")) {
+			classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
+		} else {
+			classLoaderSharing = ClassLoaderSharing.workflow;
+		}
  		// Get the WorkflowInstanceFacade which contains the current workflow
 		WeakReference<WorkflowInstanceFacade> wfFacadeRef = WorkflowInstanceFacade.workflowRunFacades.get(workflowRunID);
 		WorkflowInstanceFacade wfFacade = null;
@@ -340,7 +350,12 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 	 * Finds dependencies for a nested workflow.
 	 */
 	private HashSet<URL> findNestedDependencies(String dependencyType, JsonNode json, Dataflow nestedWorkflow) {
- 		ClassLoaderSharing classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
+		ClassLoaderSharing classLoaderSharing;
+		if (json.has("classLoaderSharing")) {
+			classLoaderSharing = ClassLoaderSharing.fromString(json.get("classLoaderSharing").textValue());
+		} else {
+			classLoaderSharing = ClassLoaderSharing.workflow;
+		}
 
 		// Files of dependencies for all activities in the nested workflow that share the classloading policy
 		HashSet<File> dependencies = new HashSet<File>();
