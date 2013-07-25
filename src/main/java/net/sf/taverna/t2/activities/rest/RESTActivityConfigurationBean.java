@@ -6,6 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import net.sf.taverna.t2.activities.rest.RESTActivity.DATA_FORMAT;
+import net.sf.taverna.t2.activities.rest.RESTActivity.HTTP_METHOD;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 
@@ -35,7 +39,7 @@ public class RESTActivityConfigurationBean implements Serializable {
 	private boolean showRedirectionOutputPort;
 	private boolean showActualUrlPort;
 	private boolean showResponseHeadersPort;
-	
+
 	// whether to perform URL escaping of passed parameters, true by default
 	private boolean escapeParameters = true;
 
@@ -68,6 +72,28 @@ public class RESTActivityConfigurationBean implements Serializable {
 		defaultBean.setEscapeParameters(true);
 		defaultBean.setOtherHTTPHeaders(new ArrayList<ArrayList<String>>());
 		return (defaultBean);
+	}
+
+	public RESTActivityConfigurationBean() {
+
+	}
+
+	public RESTActivityConfigurationBean(JsonNode json) {
+		JsonNode requestNode = json.get("request");
+		HTTPRequest request = new HTTPRequest();
+		request.setMethod(HTTP_METHOD.valueOf(requestNode.get("httpMethod").textValue()));
+		request.setAbsoluteURITemplate(requestNode.get("absoluteURITemplate").textValue());
+		List<HTTPRequestHeader> headers = new ArrayList<>();
+		for (JsonNode headerNode : requestNode.get("headers")) {
+			HTTPRequestHeader header = new HTTPRequestHeader();
+			header.setFieldName(headerNode.get("header").textValue());
+			header.setFieldValue(headerNode.get("value").textValue());
+			headers.add(header);
+		}
+		setRequest(request);
+		setOutgoingDataFormat(DATA_FORMAT.valueOf(json.get("outgoingDataFormat").textValue()));
+		setShowRedirectionOutputPort(json.get("showRedirectionOutputPort").booleanValue());
+		setEscapeParameters(json.get("escapeParameters").booleanValue());
 	}
 
 	/**
@@ -201,28 +227,28 @@ public class RESTActivityConfigurationBean implements Serializable {
 		public boolean getShowActualUrlPort() {
 		return showActualUrlPort;
 		}
-	
+
 		/**
 		 * @param showActualUrlPort the showActualUrlPort to set
 		 */
 		public void setShowActualUrlPort(boolean showActualUrlPort) {
 			this.showActualUrlPort = showActualUrlPort;
 		}
-	
+
 		/**
 		 * @return the showResponseHeadersPort
 		 */
 		public boolean getShowResponseHeadersPort() {
 			return showResponseHeadersPort;
 		}
-	
+
 		/**
 		 * @param showResponseHeadersPort the showResponseHeadersPort to set
 		 */
 		public void setShowResponseHeadersPort(boolean showResponseHeadersPort) {
 			this.showResponseHeadersPort = showResponseHeadersPort;
 		}
-		
+
 	public HTTPRequest getRequest() {
 		return request;
 	}
