@@ -55,10 +55,21 @@
             "default": false,
             "description": "If set, the output port 'redirection' is added, showing the URL of the requested body. This is particularly useful for following redirection. "
         },
+        "showActualURLPort": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the output port 'actualURL' is added to show the requested URL after expanding the template."
+        },
+        "showResponseHeadersPort": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the output port 'responseHeaders' is added to show the response header from the HTTP server."
+        },
         "escapeParameters": {
             "type": "boolean",
             "default": true,
             "description": "If true (default), input port values are URI-escaped (RFC 2396) before expanding variables in the URI template."
         }
+        
     }
 }
