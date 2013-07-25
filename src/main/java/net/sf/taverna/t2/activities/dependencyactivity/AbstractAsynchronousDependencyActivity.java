@@ -375,12 +375,14 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 					AbstractAsynchronousDependencyActivity dependencyActivity = (AbstractAsynchronousDependencyActivity) activity;
 //						if (dependencyType.equals(LOCAL_JARS)){
 							// Collect the files of all found local dependencies
-							for (JsonNode jar : dependencyActivity.getConfiguration().get("localDependency")) {
-								try {
-									dependencies.add(new File(libDir, jar.textValue()));
-								} catch (Exception ex) {
-									logger.warn("Invalid URL for " + jar, ex);
-									continue;
+							if (dependencyActivity.getConfiguration().has("localDependency")) {
+								for (JsonNode jar : dependencyActivity.getConfiguration().get("localDependency")) {
+									try {
+										dependencies.add(new File(libDir, jar.textValue()));
+									} catch (Exception ex) {
+										logger.warn("Invalid URL for " + jar, ex);
+										continue;
+									}
 								}
 							}
 //						} else if (dependencyType.equals(ARTIFACTS) && this.getClass().getClassLoader() instanceof LocalArtifactClassLoader){
