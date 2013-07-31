@@ -94,12 +94,31 @@ public class RESTActivityConfigurationBean implements Serializable {
 		setOutgoingDataFormat(DATA_FORMAT.valueOf(json.get("outgoingDataFormat").textValue()));
 		setShowRedirectionOutputPort(json.get("showRedirectionOutputPort").booleanValue());
 		setEscapeParameters(json.get("escapeParameters").booleanValue());
+		if (json.has("outgoingDataFormat")) {
+			setOutgoingDataFormat(DATA_FORMAT.valueOf(json.get("outgoingDataFormat").textValue()));
+		} else {
+			setOutgoingDataFormat(DATA_FORMAT.String);
+		}
+		if (json.has("showRedirectionOutputPort")) {
+			setShowRedirectionOutputPort(json.get("showRedirectionOutputPort").booleanValue());
+		} else {
+			setShowRedirectionOutputPort(false);
+		}
 		if (json.has("showActualURLPort")) {
 		    setShowActualUrlPort(json.get("showActualURLPort").booleanValue());
+		} else {
+			setShowActualUrlPort(false);
 		}
 		if (json.has("showResponseHeadersPort")) {
             setShowResponseHeadersPort(json.get("showResponseHeadersPort").booleanValue());
+        } else {
+        	setShowResponseHeadersPort(false);
         }
+		if (json.has("escapeParameters")) {
+			setEscapeParameters(json.get("escapeParameters").booleanValue());
+		} else {
+			setEscapeParameters(true);
+		}
 	}
 
 	/**

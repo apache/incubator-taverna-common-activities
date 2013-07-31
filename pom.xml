@@ -38,6 +38,16 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>com.springsource.org.apache.httpcomponents.httpclient</artifactId>
 			<version>${apache.httpclient.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>com.springsource.org.apache.httpcomponents.httpclient-cache</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.httpcomponents</groupId>
+					<artifactId>com.springsource.org.apache.httpcomponents.httpmime</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
