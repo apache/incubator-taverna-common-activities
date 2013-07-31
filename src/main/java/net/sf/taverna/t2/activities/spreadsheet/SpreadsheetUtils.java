@@ -108,8 +108,12 @@ public class SpreadsheetUtils {
 	public static Range getRange(JsonNode jsonNode) {
 		Range range = new Range();
 		if (jsonNode != null) {
-			range.setStart(jsonNode.get("start").intValue());
-			range.setEnd(jsonNode.get("end").intValue());
+			if (jsonNode.has("start")) {
+				range.setStart(jsonNode.get("start").intValue());
+			}
+			if (jsonNode.has("end")) {
+				range.setEnd(jsonNode.get("end").intValue());
+			}
 			if (jsonNode.has("excludes")) {
 				List<Range> excludes = new ArrayList<>();
 				for (JsonNode rangeNode : jsonNode.get("excludes")) {
