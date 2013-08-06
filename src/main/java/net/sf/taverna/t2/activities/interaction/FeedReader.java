@@ -36,7 +36,7 @@ public abstract class FeedReader extends Thread {
 				InteractionJetty.checkJetty();
 			}
 			final Parser parser = Abdera.getNewParser();
-			new Date();
+			Date lastCheckedDate = new Date();
 			while (true) {
 				try {
 					sleep(5000);
@@ -61,11 +61,12 @@ public abstract class FeedReader extends Thread {
 						if (d == null) {
 							d = entry.getPublished();
 						}
-						// if (d.before(lastCheckedDate)) {
-						// break;
-						// }
+						 if (d.before(lastCheckedDate)) {
+						 break;
+						 }
 						this.considerEntry(entry);
 					}
+					lastCheckedDate = newLastCheckedDate;
 				} catch (final MalformedURLException e) {
 					logger.error(e);
 				} catch (final ParseException e) {
