@@ -6,7 +6,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDe
 
 /**
  * Example activity configuration bean.
- *
+ * 
  */
 public class InteractionActivityConfigurationBean extends
 		ActivityPortsDefinitionBean implements Serializable {
@@ -52,7 +52,8 @@ public class InteractionActivityConfigurationBean extends
 	}
 
 	/**
-	 * @param progressNotification the progressNotification to set
+	 * @param progressNotification
+	 *            the progressNotification to set
 	 */
 	public void setProgressNotification(final boolean progressNotification) {
 		this.progressNotification = progressNotification;

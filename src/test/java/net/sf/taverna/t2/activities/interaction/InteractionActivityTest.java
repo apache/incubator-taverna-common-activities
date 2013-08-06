@@ -3,15 +3,12 @@ package net.sf.taverna.t2.activities.interaction;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.taverna.t2.activities.interaction.InteractionActivity;
-import net.sf.taverna.t2.activities.interaction.InteractionActivityConfigurationBean;
 import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
@@ -25,96 +22,104 @@ public class InteractionActivityTest {
 
 	private InteractionActivityConfigurationBean configBean;
 
-	private InteractionActivity activity = new InteractionActivity();
+	private final InteractionActivity activity = new InteractionActivity();
 
 	@Before
 	public void makeConfigBean() throws Exception {
-		configBean = new InteractionActivityConfigurationBean();
-		configBean.setPresentationOrigin("test.vm");
+		this.configBean = new InteractionActivityConfigurationBean();
+		this.configBean.setPresentationOrigin("test.vm");
 	}
 
 	@Ignore
 	@Test(expected = ActivityConfigurationException.class)
 	public void invalidConfiguration() throws ActivityConfigurationException {
-		InteractionActivityConfigurationBean invalidBean = new InteractionActivityConfigurationBean();
+		final InteractionActivityConfigurationBean invalidBean = new InteractionActivityConfigurationBean();
 		invalidBean.setPresentationOrigin("nothing.vm");
 		// Should throw ActivityConfigurationException
-		activity.configure(invalidBean);
+		this.activity.configure(invalidBean);
 	}
 
 	@Ignore
 	@Test
 	public void executeAsynch() throws Exception {
-		activity.configure(configBean);
+		this.activity.configure(this.configBean);
 
-		Map<String, Object> inputs = new HashMap<String, Object>();
+		final Map<String, Object> inputs = new HashMap<String, Object>();
 		inputs.put("firstInput", "hello");
 
-		Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
+		final Map<String, Class<?>> expectedOutputTypes = new HashMap<String, Class<?>>();
 		expectedOutputTypes.put("simpleOutput", String.class);
 		expectedOutputTypes.put("moreOutputs", String.class);
 
-		Map<String, Object> outputs = ActivityInvoker.invokeAsyncActivity(
-				activity, inputs, expectedOutputTypes);
+		final Map<String, Object> outputs = ActivityInvoker
+				.invokeAsyncActivity(this.activity, inputs, expectedOutputTypes);
 
 		assertEquals("Unexpected outputs", 2, outputs.size());
 		assertEquals("simple", outputs.get("simpleOutput"));
-		assertEquals(Arrays.asList("Value 1", "Value 2"), outputs
-				.get("moreOutputs"));
+		assertEquals(Arrays.asList("Value 1", "Value 2"),
+				outputs.get("moreOutputs"));
 
 	}
 
 	@Ignore
 	@Test
 	public void reConfiguredActivity() throws Exception {
-		assertEquals("Unexpected inputs", 0, activity.getInputPorts().size());
-		assertEquals("Unexpected outputs", 0, activity.getOutputPorts().size());
+		assertEquals("Unexpected inputs", 0, this.activity.getInputPorts()
+				.size());
+		assertEquals("Unexpected outputs", 0, this.activity.getOutputPorts()
+				.size());
 
-		activity.configure(configBean);
-		assertEquals("Unexpected inputs", 1, activity.getInputPorts().size());
-		assertEquals("Unexpected outputs", 2, activity.getOutputPorts().size());
+		this.activity.configure(this.configBean);
+		assertEquals("Unexpected inputs", 1, this.activity.getInputPorts()
+				.size());
+		assertEquals("Unexpected outputs", 2, this.activity.getOutputPorts()
+				.size());
 
-		activity.configure(configBean);
+		this.activity.configure(this.configBean);
 		// Should not change on reconfigure
-		assertEquals("Unexpected inputs", 1, activity.getInputPorts().size());
-		assertEquals("Unexpected outputs", 2, activity.getOutputPorts().size());
+		assertEquals("Unexpected inputs", 1, this.activity.getInputPorts()
+				.size());
+		assertEquals("Unexpected outputs", 2, this.activity.getOutputPorts()
+				.size());
 	}
 
 	@Ignore
 	@Test
 	public void reConfiguredSpecialPorts() throws Exception {
-		activity.configure(configBean);
+		this.activity.configure(this.configBean);
 
-		InteractionActivityConfigurationBean specialBean = new InteractionActivityConfigurationBean();
+		final InteractionActivityConfigurationBean specialBean = new InteractionActivityConfigurationBean();
 		specialBean.setPresentationOrigin("test.vm");
-		activity.configure(specialBean);		
+		this.activity.configure(specialBean);
 		// Should now have added the optional ports
-		assertEquals("Unexpected inputs", 2, activity.getInputPorts().size());
-		assertEquals("Unexpected outputs", 3, activity.getOutputPorts().size());
+		assertEquals("Unexpected inputs", 2, this.activity.getInputPorts()
+				.size());
+		assertEquals("Unexpected outputs", 3, this.activity.getOutputPorts()
+				.size());
 	}
 
 	@Ignore
 	@Test
 	public void configureActivity() throws Exception {
-		Set<String> expectedInputs = new HashSet<String>();
+		final Set<String> expectedInputs = new HashSet<String>();
 		expectedInputs.add("firstInput");
 
-		Set<String> expectedOutputs = new HashSet<String>();
+		final Set<String> expectedOutputs = new HashSet<String>();
 		expectedOutputs.add("simpleOutput");
 		expectedOutputs.add("moreOutputs");
 
-		activity.configure(configBean);
+		this.activity.configure(this.configBean);
 
-		Set<ActivityInputPort> inputPorts = activity.getInputPorts();
+		final Set<ActivityInputPort> inputPorts = this.activity.getInputPorts();
 		assertEquals(expectedInputs.size(), inputPorts.size());
-		for (ActivityInputPort inputPort : inputPorts) {
-			assertTrue("Wrong input : " + inputPort.getName(), expectedInputs
-					.remove(inputPort.getName()));
+		for (final ActivityInputPort inputPort : inputPorts) {
+			assertTrue("Wrong input : " + inputPort.getName(),
+					expectedInputs.remove(inputPort.getName()));
 		}
 
-		Set<OutputPort> outputPorts = activity.getOutputPorts();
+		final Set<OutputPort> outputPorts = this.activity.getOutputPorts();
 		assertEquals(expectedOutputs.size(), outputPorts.size());
-		for (OutputPort outputPort : outputPorts) {
+		for (final OutputPort outputPort : outputPorts) {
 			assertTrue("Wrong output : " + outputPort.getName(),
 					expectedOutputs.remove(outputPort.getName()));
 		}

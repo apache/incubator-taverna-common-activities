@@ -79,8 +79,13 @@
 	      var xmlhttp = new XMLHttpRequest();
 	      xmlhttp.open("GET", url, false);
 	      if (type != null) {
-	      	xmlhttp.overrideMimeType(type);
-	      }
+			if (xmlhttp.overrideMimeType){
+				xmlhttp.overrideMimeType(type);
+			}
+			else{
+				xmlhttp.setRequestHeader("Content-Type",type);
+			}
+		  }
 	      xmlhttp.send();
 	      if (xmlhttp.status != 200) {
 	      	return '';

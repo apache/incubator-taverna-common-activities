@@ -15,35 +15,44 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 /**
  * @author alanrw
- *
+ * 
  */
 public class RequireDirective extends Directive {
 
-    /* (non-Javadoc)
-     * @see org.apache.velocity.runtime.directive.Directive#getName()
-     */
-    @Override
-    public String getName() {
-            return "require";
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.velocity.runtime.directive.Directive#getName()
+	 */
+	@Override
+	public String getName() {
+		return "require";
+	}
 
-    /* (non-Javadoc)
-     * @see org.apache.velocity.runtime.directive.Directive#getType()
-     */
-    @Override
-    public int getType() {
-            return LINE;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.velocity.runtime.directive.Directive#getType()
+	 */
+	@Override
+	public int getType() {
+		return LINE;
+	}
 
-    /* (non-Javadoc)
-     * @see org.apache.velocity.runtime.directive.Directive#render(org.apache.velocity.context.InternalContextAdapter, java.io.Write\
-r, org.apache.velocity.runtime.parser.node.Node)
-     */
-    @Override
-    public boolean render(final InternalContextAdapter context, final Writer writer,
-                    final Node node) throws IOException, ResourceNotFoundException,
-                    ParseErrorException, MethodInvocationException {
-            return true;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.velocity.runtime.directive.Directive#render(org.apache.velocity
+	 * .context.InternalContextAdapter, java.io.Write\ r,
+	 * org.apache.velocity.runtime.parser.node.Node)
+	 */
+	@Override
+	public boolean render(final InternalContextAdapter context,
+			final Writer writer, final Node node) throws IOException,
+			ResourceNotFoundException, ParseErrorException,
+			MethodInvocationException {
+		return true;
+	}
 
 }

@@ -7,7 +7,7 @@ import javax.xml.namespace.QName;
 
 /**
  * @author alanrw
- *
+ * 
  */
 public class AtomUtils {
 
@@ -23,7 +23,8 @@ public class AtomUtils {
 	private static QName idQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "id", "interaction");
 	private static QName runIdQName = new QName(
-			"http://ns.taverna.org.uk/2012/interaction", "run-id", "interaction");
+			"http://ns.taverna.org.uk/2012/interaction", "run-id",
+			"interaction");
 	private static QName inReplyToQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "in-reply-to",
 			"interaction");

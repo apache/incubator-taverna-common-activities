@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author alanrw
- *
+ * 
  */
 public class InteractionPreference {
 
@@ -47,9 +47,9 @@ public class InteractionPreference {
 
 	private static final String DEFAULT_USE_USERNAME = "false";
 
-//	private static final String USE_HTTPS = "Use HTTPS";
+	// private static final String USE_HTTPS = "Use HTTPS";
 
-//	private static final String DEFAULT_USE_HTTPS = "false";
+	// private static final String DEFAULT_USE_HTTPS = "false";
 
 	private final Logger logger = Logger.getLogger(InteractionPreference.class);
 
@@ -65,18 +65,19 @@ public class InteractionPreference {
 	}
 
 	private File getConfigFile() {
-		final File home = ApplicationRuntime.getInstance().getApplicationHomeDir();
-		final File config = new File(home,"conf");
+		final File home = ApplicationRuntime.getInstance()
+				.getApplicationHomeDir();
+		final File config = new File(home, "conf");
 		if (!config.exists()) {
 			config.mkdir();
 		}
-		final File configFile = new File(config,
-				this.getFilePrefix()+"-"+this.getUUID() + ".config");
+		final File configFile = new File(config, this.getFilePrefix() + "-"
+				+ this.getUUID() + ".config");
 		return configFile;
 	}
 
 	private InteractionPreference() {
-		final File configFile = getConfigFile();
+		final File configFile = this.getConfigFile();
 		this.properties = new Properties();
 		if (configFile.exists()) {
 			try {
@@ -89,30 +90,35 @@ public class InteractionPreference {
 				this.logger.error(e);
 			}
 		}
-		if (GraphicsEnvironment.isHeadless() || ((System.getProperty("java.awt.headless") != null) && System.getProperty("java.awt.headless").equals("true"))) {
-			final String definedHost = System.getProperty("taverna.interaction.host");
-			if (definedHost != null){
+		if (GraphicsEnvironment.isHeadless()
+				|| ((System.getProperty("java.awt.headless") != null) && System
+						.getProperty("java.awt.headless").equals("true"))) {
+			final String definedHost = System
+					.getProperty("taverna.interaction.host");
+			if (definedHost != null) {
 				this.properties.setProperty(USE_JETTY, "false");
 				this.logger.info("USE_JETTY set to false");
 				this.properties.setProperty(HOST, definedHost);
 			}
-			final String definedPort = System.getProperty("taverna.interaction.port");
+			final String definedPort = System
+					.getProperty("taverna.interaction.port");
 			if (definedPort != null) {
 				this.properties.setProperty(PORT, definedPort);
 			}
-			final String definedWebDavPath = System.getProperty("taverna.interaction.webdav_path");
+			final String definedWebDavPath = System
+					.getProperty("taverna.interaction.webdav_path");
 			if (definedWebDavPath != null) {
 				this.properties.setProperty(WEBDAV_PATH, definedWebDavPath);
 			}
-			final String definedFeedPath = System.getProperty("taverna.interaction.feed_path");
+			final String definedFeedPath = System
+					.getProperty("taverna.interaction.feed_path");
 			if (definedFeedPath != null) {
 				this.properties.setProperty(FEED_PATH, definedFeedPath);
 			}
-		}
-		else {
+		} else {
 			this.logger.error("Running non-headless");
 		}
-		fillDefaultProperties();
+		this.fillDefaultProperties();
 	}
 
 	private void fillDefaultProperties() {
@@ -135,9 +141,10 @@ public class InteractionPreference {
 		if (!this.properties.containsKey(USE_USERNAME)) {
 			this.properties.setProperty(USE_USERNAME, DEFAULT_USE_USERNAME);
 		}
-/*		if (!properties.containsKey(USE_HTTPS)) {
-			properties.setProperty(USE_HTTPS, DEFAULT_USE_HTTPS);
-		}*/
+		/*
+		 * if (!properties.containsKey(USE_HTTPS)) {
+		 * properties.setProperty(USE_HTTPS, DEFAULT_USE_HTTPS); }
+		 */
 	}
 
 	public String getFilePrefix() {
@@ -146,7 +153,8 @@ public class InteractionPreference {
 
 	public void store() {
 		try {
-			final FileOutputStream out = new FileOutputStream(getConfigFile());
+			final FileOutputStream out = new FileOutputStream(
+					this.getConfigFile());
 			this.properties.store(out, "");
 			out.close();
 		} catch (final FileNotFoundException e) {
@@ -213,11 +221,11 @@ public class InteractionPreference {
 	}
 
 	public String getFeedUrlString() {
-		return getHost() + ":" + getPort() + getFeedPath();
+		return this.getHost() + ":" + this.getPort() + this.getFeedPath();
 	}
 
 	public String getLocationUrl() {
-		return getHost() + ":" + getPort() + getWebDavPath();
+		return this.getHost() + ":" + this.getPort() + this.getWebDavPath();
 	}
 
 	public boolean getUseUsername() {
@@ -225,54 +233,52 @@ public class InteractionPreference {
 	}
 
 	public void setUseUsername(final boolean useUsername) {
-		this.properties.setProperty(USE_USERNAME, Boolean.toString(useUsername));
+		this.properties
+				.setProperty(USE_USERNAME, Boolean.toString(useUsername));
 	}
-	
+
 	public static String getOutputDataUrlString(final String interactionId) {
-		return InteractionPreference.getInstance()
-		.getLocationUrl()
-		+ "/interaction" + interactionId + "OutputData.json";
+		return InteractionPreference.getInstance().getLocationUrl()
+				+ "/interaction" + interactionId + "OutputData.json";
 	}
-	
+
 	public static String getInputDataUrlString(final String interactionId) {
-		return InteractionPreference.getInstance()
-		.getLocationUrl()
-		+ "/interaction" + interactionId + "InputData.json";
+		return InteractionPreference.getInstance().getLocationUrl()
+				+ "/interaction" + interactionId + "InputData.json";
 	}
-	
+
 	public static URL getFeedUrl() throws MalformedURLException {
 		return new URL(InteractionPreference.getInstance().getFeedUrlString());
 	}
 
 	public static String getInteractionUrlString(final String interactionId) {
-		return InteractionPreference.getInstance()
-		.getLocationUrl()
-		+ "/interaction" + interactionId + ".html";
+		return InteractionPreference.getInstance().getLocationUrl()
+				+ "/interaction" + interactionId + ".html";
 	}
 
 	public static String getPresentationUrlString(final String interactionId) {
-		return InteractionPreference.getInstance()
-		.getLocationUrl()
-		+ "/presentation" + interactionId + ".html";
+		return InteractionPreference.getInstance().getLocationUrl()
+				+ "/presentation" + interactionId + ".html";
 	}
 
-	public static String getPublicationUrlString(final String interactionId, final String key) {
-		return InteractionPreference.getInstance()
-		.getLocationUrl()
-		+ "/interaction" + interactionId + "_" + key;
+	public static String getPublicationUrlString(final String interactionId,
+			final String key) {
+		return InteractionPreference.getInstance().getLocationUrl()
+				+ "/interaction" + interactionId + "_" + key;
 	}
 
-/*	public static String getRunFolderUrlString(final String runId) {
-		return InteractionPreference.getInstance().getLocationUrl() + "/" + runId;
-	}*/
-	
-/*	public boolean getUseHttps() {
-		return (Boolean.parseBoolean(properties.getProperty(USE_HTTPS)));
-	}
+	/*
+	 * public static String getRunFolderUrlString(final String runId) { return
+	 * InteractionPreference.getInstance().getLocationUrl() + "/" + runId; }
+	 */
 
-	public void setUseHttps(boolean useHttps) {
-		properties.setProperty(USE_HTTPS, Boolean.toString(useHttps));
-
-	}
-*/
+	/*
+	 * public boolean getUseHttps() { return
+	 * (Boolean.parseBoolean(properties.getProperty(USE_HTTPS))); }
+	 * 
+	 * public void setUseHttps(boolean useHttps) {
+	 * properties.setProperty(USE_HTTPS, Boolean.toString(useHttps));
+	 * 
+	 * }
+	 */
 }

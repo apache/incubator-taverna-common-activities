@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * @author alanrw
- *
+ * 
  */
 public interface InteractionRequestor {
 

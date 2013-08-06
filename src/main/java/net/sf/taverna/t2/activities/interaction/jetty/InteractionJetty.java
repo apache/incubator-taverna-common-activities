@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import net.sf.taverna.raven.appconfig.ApplicationRuntime;
 import net.sf.taverna.t2.activities.interaction.InteractionUtils;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
@@ -31,7 +30,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
  * @author alanrw
- *
+ * 
  */
 public class InteractionJetty {
 
@@ -39,10 +38,10 @@ public class InteractionJetty {
 
 	private static Server server;
 
-    private static InteractionPreference interactionPreference = InteractionPreference.getInstance();
+	private static InteractionPreference interactionPreference = InteractionPreference
+			.getInstance();
 
 	private static String REALM_NAME = "TavernaInteraction";
-
 
 	public static synchronized void checkJetty() {
 		if (server != null) {
@@ -64,7 +63,7 @@ public class InteractionJetty {
 		final ServletHolder interactionHolder = new ServletHolder();
 		interactionHolder.setServlet(interactionServlet);
 
- 		try {
+		try {
 
 			interactionHolder.setInitParameter("rootpath",
 					getInteractionDirectory().getCanonicalPath());
@@ -72,8 +71,9 @@ public class InteractionJetty {
 			logger.error("Unable to set root of interaction", e1);
 		}
 
- 		final HandlerList handlers = new HandlerList();
- 		final Context overallContext = new Context(handlers, "/", Context.SESSIONS);
+		final HandlerList handlers = new HandlerList();
+		final Context overallContext = new Context(handlers, "/",
+				Context.SESSIONS);
 		overallContext.setContextPath("/");
 		server.setHandler(overallContext);
 
@@ -81,7 +81,6 @@ public class InteractionJetty {
 		final ServletHolder abderaHolder = new ServletHolder(abderaServlet);
 		abderaHolder.setInitParameter(ServiceManager.PROVIDER,
 				BasicProvider.class.getName());
-
 
 		overallContext.addServlet(abderaHolder, "/*");
 		overallContext.addServlet(interactionHolder, "/interaction/*");
@@ -103,8 +102,7 @@ public class InteractionJetty {
 				final URI serviceURI = createServiceURI(port);
 				final UsernamePassword up = CredentialManager
 						.getInstance()
-						.getUsernameAndPasswordForService(
-								serviceURI, true,
+						.getUsernameAndPasswordForService(serviceURI, true,
 								"Please specify the username and password to secure your interactions");
 				if (up != null) {
 					final String username = up.getUsername();
@@ -137,13 +135,14 @@ public class InteractionJetty {
 
 	}
 
-	public static URI createServiceURI(final String port) throws URISyntaxException {
-		return new URI("http://localhost:" + port + "/#"
-				+ REALM_NAME);
+	public static URI createServiceURI(final String port)
+			throws URISyntaxException {
+		return new URI("http://localhost:" + port + "/#" + REALM_NAME);
 	}
 
 	public static File getJettySubdirectory(final String subdirectoryName) {
-		final File workingDir = InteractionUtils.getInteractionServiceDirectory();
+		final File workingDir = InteractionUtils
+				.getInteractionServiceDirectory();
 		final File subDir = new File(workingDir, "jetty/" + subdirectoryName);
 		subDir.mkdirs();
 		return subDir;

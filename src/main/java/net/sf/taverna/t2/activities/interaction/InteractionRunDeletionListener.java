@@ -9,16 +9,17 @@ import org.apache.log4j.Logger;
 
 /**
  * @author alanrw
- *
+ * 
  */
 public class InteractionRunDeletionListener implements RunDeletionListener {
-	
-	private static final Logger logger = Logger.getLogger(InteractionRunDeletionListener.class);
+
+	@SuppressWarnings("unused")
+	private static final Logger logger = Logger
+			.getLogger(InteractionRunDeletionListener.class);
 
 	@Override
-	public void deleteRun(String runToDelete) {
+	public void deleteRun(final String runToDelete) {
 		InteractionRecorder.deleteRun(runToDelete);
 	}
-
 
 }

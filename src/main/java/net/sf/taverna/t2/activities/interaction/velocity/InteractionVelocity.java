@@ -22,7 +22,7 @@ import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 
 /**
  * @author alanrw
- *
+ * 
  */
 public class InteractionVelocity {
 
@@ -37,18 +37,18 @@ public class InteractionVelocity {
 
 	private static ArrayList<String> templateNames = new ArrayList<String>();
 
-	public static void checkVelocity () {
+	@SuppressWarnings("deprecation")
+	public static void checkVelocity() {
 		if (velocityInitialized) {
 			return;
 		}
 		Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "string");
-		Velocity
-				.setProperty("resource.loader.class",
-						"org.apache.velocity.runtime.resource.loader.StringResourceLoader");
+		Velocity.setProperty("resource.loader.class",
+				"org.apache.velocity.runtime.resource.loader.StringResourceLoader");
 		Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-			      "org.apache.velocity.runtime.log.Log4JLogChute");
+				"org.apache.velocity.runtime.log.Log4JLogChute");
 		Velocity.setProperty("runtime.log.logsystem.log4j.logger",
-                "net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity");
+				"net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity");
 		Velocity.init();
 		RuntimeSingleton.getRuntimeInstance().addDirective(
 				new RequireDirective());
@@ -60,46 +60,51 @@ public class InteractionVelocity {
 
 		interactionTemplate = Velocity.getTemplate(INTERACTION_TEMPLATE_NAME);
 		if (interactionTemplate == null) {
-			logger.error("Could not open interaction template " + INTERACTION_TEMPLATE_NAME);
+			logger.error("Could not open interaction template "
+					+ INTERACTION_TEMPLATE_NAME);
 		}
 	}
 
 	private static void loadTemplates() {
-		final InputStream is = InteractionActivity.class.getResourceAsStream("/index");
+		final InputStream is = InteractionActivity.class
+				.getResourceAsStream("/index");
 		if (is == null) {
 			logger.error("Unable to read /index");
 			return;
 		}
 		final BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			try {
-				for (String line = br.readLine(); line != null; line = br.readLine()) {
-					if (line.startsWith("#")) {
-						continue;
-					}
-					line = line.trim();
-					if (line.isEmpty()) {
-						continue;
-					}
-					final String templatePath = line + TEMPLATE_SUFFIX;
-					logger.info("Looking for " + templatePath);
-					final StringResourceRepository repo = StringResourceLoader.getRepository();
-					try {
-						repo.putStringResource(line, getTemplateFromResource(templatePath));
-					}
-					catch (final IOException e) {
-						logger.error("Failed reading template from " + templatePath, e);
-					}
-				    final Template t = Velocity.getTemplate(line);
-				    if (t == null) {
-				    	logger.error("Registration failed");
-				    }
-				    if (!line.equals(INTERACTION_TEMPLATE_NAME)) {
-				    	templateNames.add(line);
-				    }
+		try {
+			for (String line = br.readLine(); line != null; line = br
+					.readLine()) {
+				if (line.startsWith("#")) {
+					continue;
 				}
-			} catch (final IOException e) {
-				logger.error("Failed reading template index", e);
+				line = line.trim();
+				if (line.isEmpty()) {
+					continue;
+				}
+				final String templatePath = line + TEMPLATE_SUFFIX;
+				logger.info("Looking for " + templatePath);
+				final StringResourceRepository repo = StringResourceLoader
+						.getRepository();
+				try {
+					repo.putStringResource(line,
+							getTemplateFromResource(templatePath));
+				} catch (final IOException e) {
+					logger.error(
+							"Failed reading template from " + templatePath, e);
+				}
+				final Template t = Velocity.getTemplate(line);
+				if (t == null) {
+					logger.error("Registration failed");
+				}
+				if (!line.equals(INTERACTION_TEMPLATE_NAME)) {
+					templateNames.add(line);
+				}
 			}
+		} catch (final IOException e) {
+			logger.error("Failed reading template index", e);
+		}
 	}
 
 	public static Template getInteractionTemplate() {
@@ -107,11 +112,13 @@ public class InteractionVelocity {
 		return interactionTemplate;
 	}
 
-	private static String getTemplateFromResource(final String templatePath) throws IOException {
+	private static String getTemplateFromResource(final String templatePath)
+			throws IOException {
 		checkVelocity();
-	        final InputStream stream = InteractionVelocity.class.getResourceAsStream("/" + templatePath);
-	        final String result = IOUtils.toString(stream, "UTF-8");
-	        return result;
+		final InputStream stream = InteractionVelocity.class
+				.getResourceAsStream("/" + templatePath);
+		final String result = IOUtils.toString(stream, "UTF-8");
+		return result;
 	}
 
 	public static ArrayList<String> getTemplateNames() {

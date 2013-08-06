@@ -17,7 +17,6 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean;
 
-import org.apache.abdera.Abdera;
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
@@ -27,11 +26,11 @@ public final class InteractionActivity extends
 		AbstractAsynchronousActivity<InteractionActivityConfigurationBean>
 		implements AsynchronousActivity<InteractionActivityConfigurationBean> {
 
-	private static final Logger logger = Logger.getLogger(InteractionActivity.class);
+	@SuppressWarnings("unused")
+	private static final Logger logger = Logger
+			.getLogger(InteractionActivity.class);
 
 	InteractionActivityConfigurationBean configBean;
-
-	private static final Abdera ABDERA = Abdera.getInstance();
 
 	private Template presentationTemplate;
 
@@ -60,15 +59,17 @@ public final class InteractionActivity extends
 			this.presentationTemplate = Velocity.getTemplate(configBean
 					.getPresentationOrigin());
 			final RequireChecker requireChecker = new RequireChecker();
-			requireChecker.visit((ASTprocess) this.presentationTemplate.getData(),
+			requireChecker.visit(
+					(ASTprocess) this.presentationTemplate.getData(),
 					this.inputDepths);
 
 			final ProduceChecker produceChecker = new ProduceChecker();
-			produceChecker.visit((ASTprocess) this.presentationTemplate.getData(),
+			produceChecker.visit(
+					(ASTprocess) this.presentationTemplate.getData(),
 					this.outputDepths);
-			configurePortsFromTemplate();
+			this.configurePortsFromTemplate();
 		}
-			configurePorts(this.configBean);
+		this.configurePorts(this.configBean);
 
 	}
 
@@ -81,7 +82,7 @@ public final class InteractionActivity extends
 			inputBean.setDepth(this.inputDepths.get(inputName));
 			inputBean.setAllowsLiteralValues(true);
 			inputBean.setHandledReferenceSchemes(null);
-				inputBean.setTranslatedElementType(String.class);
+			inputBean.setTranslatedElementType(String.class);
 			inputs.add(inputBean);
 		}
 		this.configBean.setInputPortDefinitions(inputs);
@@ -97,14 +98,15 @@ public final class InteractionActivity extends
 		this.configBean.setOutputPortDefinitions(outputs);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void executeAsynch(final Map<String, T2Reference> inputs,
 			final AsynchronousActivityCallback callback) {
 		// Don't execute service directly now, request to be run ask to be run
 		// from thread pool and return asynchronously
-		final InteractionRequestor requestor = new InteractionCallbackRequestor(this, callback, inputs);
-		callback.requestRun(new InteractionActivityRunnable(requestor, this.presentationTemplate));
+		final InteractionRequestor requestor = new InteractionCallbackRequestor(
+				this, callback, inputs);
+		callback.requestRun(new InteractionActivityRunnable(requestor,
+				this.presentationTemplate));
 	}
 
 	@Override
@@ -113,14 +115,12 @@ public final class InteractionActivity extends
 	}
 
 	public ActivityInputPort getInputPort(final String name) {
-		for (final ActivityInputPort port : getInputPorts()) {
+		for (final ActivityInputPort port : this.getInputPorts()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
 		}
 		return null;
 	}
-
-
 
 }

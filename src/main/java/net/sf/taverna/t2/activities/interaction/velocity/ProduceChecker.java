@@ -10,17 +10,20 @@ import org.apache.velocity.runtime.visitor.BaseVisitor;
 
 /**
  * @author alanrw
- *
+ * 
  */
 public class ProduceChecker extends BaseVisitor {
 
 	@Override
 	public Object visit(final ASTDirective node, final Object data) {
-		final Map<String, Integer> map = (Map<String, Integer>) data;
+		@SuppressWarnings("unchecked")
+		final Map<String, Integer> map = ((Map<String, Integer>) data);
 		if (node.getDirectiveName().equals("produce")) {
-			final String key = String.valueOf(node.jjtGetChild(0).value(this.context));
+			final String key = String.valueOf(node.jjtGetChild(0).value(
+					this.context));
 			if (node.jjtGetNumChildren() > 1) {
-				final Integer depth = (Integer) node.jjtGetChild(1).value(this.context);
+				final Integer depth = (Integer) node.jjtGetChild(1).value(
+						this.context);
 				map.put(key, depth);
 			} else {
 				map.put(key, 0);
@@ -28,6 +31,5 @@ public class ProduceChecker extends BaseVisitor {
 		}
 		return map;
 	}
-
 
 }

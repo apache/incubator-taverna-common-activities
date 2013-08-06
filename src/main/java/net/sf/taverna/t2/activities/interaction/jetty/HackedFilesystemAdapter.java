@@ -44,189 +44,214 @@ import org.apache.abdera.protocol.server.provider.managed.FeedConfiguration;
 import org.apache.abdera.protocol.server.provider.managed.ManagedCollectionAdapter;
 
 /**
- * Simple Filesystem Adapter that uses a local directory to store Atompub collection entries. As an extension of the
- * ManagedCollectionAdapter class, the Adapter is intended to be used with implementations of the ManagedProvider and
- * are configured using /abdera/adapter/*.properties files. The *.properties file MUST specify the fs.root property to
- * specify the root directory used by the Adapter.
+ * Simple Filesystem Adapter that uses a local directory to store Atompub
+ * collection entries. As an extension of the ManagedCollectionAdapter class,
+ * the Adapter is intended to be used with implementations of the
+ * ManagedProvider and are configured using /abdera/adapter/*.properties files.
+ * The *.properties file MUST specify the fs.root property to specify the root
+ * directory used by the Adapter.
  */
 public class HackedFilesystemAdapter extends ManagedCollectionAdapter {
 
-    private final File root;
-    private final static FileSorter sorter = new FileSorter();
-    private final static Template paging_template = new Template("?{-join|&|count,page}");
+	private final File root;
+	private final static FileSorter sorter = new FileSorter();
+	private final static Template paging_template = new Template(
+			"?{-join|&|count,page}");
 
-    public HackedFilesystemAdapter(Abdera abdera, FeedConfiguration config) {
-        super(abdera, config);
-        this.root = getRoot();
-    }
+	public HackedFilesystemAdapter(final Abdera abdera,
+			final FeedConfiguration config) {
+		super(abdera, config);
+		this.root = this.getRoot();
+	}
 
-    private File getRoot() {
-        return InteractionJetty.getFeedDirectory();
-    }
+	private File getRoot() {
+		return InteractionJetty.getFeedDirectory();
+	}
 
-    private Entry getEntry(File entryFile) {
-        if (!entryFile.exists() || !entryFile.isFile())
-            throw new RuntimeException();
-        try {
-            FileInputStream fis = new FileInputStream(entryFile);
-            Document<Entry> doc = abdera.getParser().parse(fis);
-            Entry entry = doc.getRoot();
-            return entry;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+	private Entry getEntry(final File entryFile) {
+		if (!entryFile.exists() || !entryFile.isFile()) {
+			throw new RuntimeException();
+		}
+		try {
+			final FileInputStream fis = new FileInputStream(entryFile);
+			final Document<Entry> doc = this.abdera.getParser().parse(fis);
+			final Entry entry = doc.getRoot();
+			return entry;
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    private void addPagingLinks(RequestContext request, Feed feed, int currentpage, int count) {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("count", count);
-        params.put("page", currentpage + 1);
-        String next = paging_template.expand(params);
-        next = request.getResolvedUri().resolve(next).toString();
-        feed.addLink(next, "next");
-        if (currentpage > 0) {
-            params.put("page", currentpage - 1);
-            String prev = paging_template.expand(params);
-            prev = request.getResolvedUri().resolve(prev).toString();
-            feed.addLink(prev, "previous");
-        }
-        params.put("page", 0);
-        String current = paging_template.expand(params);
-        current = request.getResolvedUri().resolve(current).toString();
-        feed.addLink(current, "current");
-    }
+	private void addPagingLinks(final RequestContext request, final Feed feed,
+			final int currentpage, final int count) {
+		final Map<String, Object> params = new HashMap<String, Object>();
+		params.put("count", count);
+		params.put("page", currentpage + 1);
+		String next = paging_template.expand(params);
+		next = request.getResolvedUri().resolve(next).toString();
+		feed.addLink(next, "next");
+		if (currentpage > 0) {
+			params.put("page", currentpage - 1);
+			String prev = paging_template.expand(params);
+			prev = request.getResolvedUri().resolve(prev).toString();
+			feed.addLink(prev, "previous");
+		}
+		params.put("page", 0);
+		String current = paging_template.expand(params);
+		current = request.getResolvedUri().resolve(current).toString();
+		feed.addLink(current, "current");
+	}
 
-    private void getEntries(RequestContext request, Feed feed, File root) {
-        File[] files = root.listFiles();
-        Arrays.sort(files, sorter);
-        int length = ProviderHelper.getPageSize(request, "count", 25);
-        int offset = ProviderHelper.getOffset(request, "page", length);
-        String _page = request.getParameter("page");
-        int page = (_page != null) ? Integer.parseInt(_page) : 0;
-        addPagingLinks(request, feed, page, length);
-        if (offset > files.length)
-            return;
-        for (int n = offset; n < offset + length && n < files.length; n++) {
-            File file = files[n];
-            try {
-            	Entry entry = getEntry(file);
-                feed.addEntry((Entry)entry.clone());
-            } catch (Exception e) {
-            	Object f = e;
-            	// ignore strange files
-            }
-        }
-    }
+	private void getEntries(final RequestContext request, final Feed feed,
+			final File root) {
+		final File[] files = root.listFiles();
+		Arrays.sort(files, sorter);
+		final int length = ProviderHelper.getPageSize(request, "count", 25);
+		final int offset = ProviderHelper.getOffset(request, "page", length);
+		final String _page = request.getParameter("page");
+		final int page = (_page != null) ? Integer.parseInt(_page) : 0;
+		this.addPagingLinks(request, feed, page, length);
+		if (offset > files.length) {
+			return;
+		}
+		for (int n = offset; (n < (offset + length)) && (n < files.length); n++) {
+			final File file = files[n];
+			try {
+				final Entry entry = this.getEntry(file);
+				feed.addEntry((Entry) entry.clone());
+			} catch (final Exception e) {
+				// Do nothing
+			}
+		}
+	}
 
-    public ResponseContext getFeed(RequestContext request) {
-        Feed feed = abdera.newFeed();
-        feed.setId(config.getServerConfiguration().getServerUri() + "/" + config.getFeedId());
-        feed.setTitle(config.getFeedTitle());
-        feed.addAuthor(config.getFeedAuthor());
-        feed.addLink(config.getFeedUri());
-        feed.addLink(config.getFeedUri(), "self");
-        feed.setUpdated(new Date());
-        getEntries(request, feed, root);
-        return ProviderHelper.returnBase(feed.getDocument(), 200, null);
-    }
+	@Override
+	public ResponseContext getFeed(final RequestContext request) {
+		final Feed feed = this.abdera.newFeed();
+		feed.setId(this.config.getServerConfiguration().getServerUri() + "/"
+				+ this.config.getFeedId());
+		feed.setTitle(this.config.getFeedTitle());
+		feed.addAuthor(this.config.getFeedAuthor());
+		feed.addLink(this.config.getFeedUri());
+		feed.addLink(this.config.getFeedUri(), "self");
+		feed.setUpdated(new Date());
+		this.getEntries(request, feed, this.root);
+		return ProviderHelper.returnBase(feed.getDocument(), 200, null);
+	}
 
-    public ResponseContext deleteEntry(RequestContext request) {
-        Target target = request.getTarget();
-        String key = target.getParameter("entry");
-        File file = getFile(key, false);
-        if (file.exists())
-            file.delete();
-        return ProviderHelper.nocontent();
-    }
+	@Override
+	public ResponseContext deleteEntry(final RequestContext request) {
+		final Target target = request.getTarget();
+		final String key = target.getParameter("entry");
+		final File file = this.getFile(key, false);
+		if (file.exists()) {
+			file.delete();
+		}
+		return ProviderHelper.nocontent();
+	}
 
-    public ResponseContext getEntry(RequestContext request) {
-        Target target = request.getTarget();
-        String key = target.getParameter("entry");
-        File file = getFile(key, false);
-        Entry entry = getEntry(file);
-        if (entry != null)
-            return ProviderHelper.returnBase(entry.getDocument(), 200, null);
-        else
-            return ProviderHelper.notfound(request);
-    }
+	@Override
+	public ResponseContext getEntry(final RequestContext request) {
+		final Target target = request.getTarget();
+		final String key = target.getParameter("entry");
+		final File file = this.getFile(key, false);
+		final Entry entry = this.getEntry(file);
+		if (entry != null) {
+			return ProviderHelper.returnBase(entry.getDocument(), 200, null);
+		} else {
+			return ProviderHelper.notfound(request);
+		}
+	}
 
-    public ResponseContext postEntry(RequestContext request) {
-        if (request.isAtom()) {
-            try {
-                Entry entry = (Entry)request.getDocument().getRoot().clone();
-                String key = createKey(request);
-                setEditDetail(request, entry, key);
-                File file = getFile(key);
-                FileOutputStream out = new FileOutputStream(file);
-                entry.writeTo(out);
-                String edit = entry.getEditLinkResolvedHref().toString();
-                return ProviderHelper.returnBase(entry.getDocument(), 201, null).setLocation(edit);
-            } catch (Exception e) {
-                return ProviderHelper.badrequest(request);
-            }
-        } else {
-            return ProviderHelper.notsupported(request);
-        }
-    }
+	@Override
+	public ResponseContext postEntry(final RequestContext request) {
+		if (request.isAtom()) {
+			try {
+				final Entry entry = (Entry) request.getDocument().getRoot()
+						.clone();
+				final String key = this.createKey(request);
+				this.setEditDetail(request, entry, key);
+				final File file = this.getFile(key);
+				final FileOutputStream out = new FileOutputStream(file);
+				entry.writeTo(out);
+				final String edit = entry.getEditLinkResolvedHref().toString();
+				return ProviderHelper
+						.returnBase(entry.getDocument(), 201, null)
+						.setLocation(edit);
+			} catch (final Exception e) {
+				return ProviderHelper.badrequest(request);
+			}
+		} else {
+			return ProviderHelper.notsupported(request);
+		}
+	}
 
-    private void setEditDetail(RequestContext request, Entry entry, String key) throws IOException {
-        Target target = request.getTarget();
-        String feed = target.getParameter("feed");
-        String id = key;
-        entry.setEdited(new Date());
-        Link link = entry.getEditLink();
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("feed", feed);
-        params.put("entry", id);
-        String href = request.absoluteUrlFor("entry", params);
-        if (link == null) {
-            entry.addLink(href, "edit");
-        } else {
-            link.setHref(href);
-        }
-    }
+	private void setEditDetail(final RequestContext request, final Entry entry,
+			final String key) throws IOException {
+		final Target target = request.getTarget();
+		final String feed = target.getParameter("feed");
+		final String id = key;
+		entry.setEdited(new Date());
+		final Link link = entry.getEditLink();
+		final Map<String, Object> params = new HashMap<String, Object>();
+		params.put("feed", feed);
+		params.put("entry", id);
+		final String href = request.absoluteUrlFor("entry", params);
+		if (link == null) {
+			entry.addLink(href, "edit");
+		} else {
+			link.setHref(href);
+		}
+	}
 
-    private File getFile(String key) {
-        return getFile(key, true);
-    }
+	private File getFile(final String key) {
+		return this.getFile(key, true);
+	}
 
-    private File getFile(String key, boolean post) {
-        File file = new File(root, key);
-        if (post && file.exists())
-            throw new RuntimeException("File exists");
-        return file;
-    }
+	private File getFile(final String key, final boolean post) {
+		final File file = new File(this.root, key);
+		if (post && file.exists()) {
+			throw new RuntimeException("File exists");
+		}
+		return file;
+	}
 
-    private String createKey(RequestContext request) throws IOException {
-        String slug = request.getSlug();
-        if (slug == null) {
-            slug = ((Entry)request.getDocument().getRoot()).getTitle();
-        }
-        return Sanitizer.sanitize(slug, "", true, Normalizer.Form.D);
-    }
+	private String createKey(final RequestContext request) throws IOException {
+		String slug = request.getSlug();
+		if (slug == null) {
+			slug = ((Entry) request.getDocument().getRoot()).getTitle();
+		}
+		return Sanitizer.sanitize(slug, "", true, Normalizer.Form.D);
+	}
 
-    public ResponseContext putEntry(RequestContext request) {
-        if (request.isAtom()) {
-            try {
-                Entry entry = (Entry)request.getDocument().getRoot().clone();
-                String key = request.getTarget().getParameter("entry");
-                setEditDetail(request, entry, key);
-                File file = getFile(key, false);
-                FileOutputStream out = new FileOutputStream(file);
-                entry.writeTo(out);
-                String edit = entry.getEditLinkResolvedHref().toString();
-                return ProviderHelper.returnBase(entry.getDocument(), 200, null).setLocation(edit);
-            } catch (Exception e) {
-                return ProviderHelper.badrequest(request);
-            }
-        } else {
-            return ProviderHelper.notsupported(request);
-        }
-    }
+	@Override
+	public ResponseContext putEntry(final RequestContext request) {
+		if (request.isAtom()) {
+			try {
+				final Entry entry = (Entry) request.getDocument().getRoot()
+						.clone();
+				final String key = request.getTarget().getParameter("entry");
+				this.setEditDetail(request, entry, key);
+				final File file = this.getFile(key, false);
+				final FileOutputStream out = new FileOutputStream(file);
+				entry.writeTo(out);
+				final String edit = entry.getEditLinkResolvedHref().toString();
+				return ProviderHelper
+						.returnBase(entry.getDocument(), 200, null)
+						.setLocation(edit);
+			} catch (final Exception e) {
+				return ProviderHelper.badrequest(request);
+			}
+		} else {
+			return ProviderHelper.notsupported(request);
+		}
+	}
 
-    private static class FileSorter implements Comparator<File> {
-        public int compare(File o1, File o2) {
-            return o1.lastModified() > o2.lastModified() ? -1 : o1.lastModified() < o2.lastModified() ? 1 : 0;
-        }
-    }
+	private static class FileSorter implements Comparator<File> {
+		@Override
+		public int compare(final File o1, final File o2) {
+			return o1.lastModified() > o2.lastModified() ? -1 : o1
+					.lastModified() < o2.lastModified() ? 1 : 0;
+		}
+	}
 }

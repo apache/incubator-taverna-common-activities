@@ -17,19 +17,21 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
 
 /**
  * @author alanrw
- *
+ * 
  */
 public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	private final AsynchronousActivityCallback callback;
 
-	private final  Map<String, T2Reference> inputs;
+	private final Map<String, T2Reference> inputs;
 
 	private final InteractionActivity activity;
-	
+
 	private boolean answered = false;
 
-	public InteractionCallbackRequestor(final InteractionActivity activity, final AsynchronousActivityCallback callback, final Map<String, T2Reference> inputs) {
+	public InteractionCallbackRequestor(final InteractionActivity activity,
+			final AsynchronousActivityCallback callback,
+			final Map<String, T2Reference> inputs) {
 		this.activity = activity;
 		this.callback = callback;
 		this.inputs = inputs;
@@ -37,8 +39,9 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public String getRunId() {
-		return this.callback.getContext().getEntities(
-				WorkflowRunIdEntity.class).get(0).getWorkflowRunId();
+		return this.callback.getContext()
+				.getEntities(WorkflowRunIdEntity.class).get(0)
+				.getWorkflowRunId();
 	}
 
 	@Override
@@ -46,14 +49,11 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 		final Map<String, Object> inputData = new HashMap<String, Object>();
 
 		final InvocationContext context = this.callback.getContext();
-		final ReferenceService referenceService = context
-		.getReferenceService();
+		final ReferenceService referenceService = context.getReferenceService();
 		for (final String inputName : this.inputs.keySet()) {
-			final Object input = referenceService
-					.renderIdentifier(this.inputs.get(inputName),
-							getInputPort(inputName)
-									.getTranslatedElementClass(),
-							this.callback.getContext());
+			final Object input = referenceService.renderIdentifier(this.inputs
+					.get(inputName), this.getInputPort(inputName)
+					.getTranslatedElementClass(), this.callback.getContext());
 			inputData.put(inputName, input);
 		}
 		return inputData;
@@ -70,27 +70,30 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public void fail(final String string) {
-		if (answered) {
+		if (this.answered) {
 			return;
 		}
-			this.callback.fail(string);
-		answered = true;
+		this.callback.fail(string);
+		this.answered = true;
 	}
 
 	@Override
 	public void carryOn() {
-		if (answered) {
+		if (this.answered) {
 			return;
 		}
-			this.callback.receiveResult(new HashMap<String, T2Reference>(), new int[0]);
-		answered = true;
+		this.callback.receiveResult(new HashMap<String, T2Reference>(),
+				new int[0]);
+		this.answered = true;
 	}
 
 	@Override
 	public String generateId() {
-			final String workflowRunId = this.callback.getContext().getEntities(
-					WorkflowRunIdEntity.class).get(0).getWorkflowRunId();
-			return (workflowRunId + ":" + this.callback.getParentProcessIdentifier());
+		final String workflowRunId = this.callback.getContext()
+				.getEntities(WorkflowRunIdEntity.class).get(0)
+				.getWorkflowRunId();
+		return (workflowRunId + ":" + this.callback
+				.getParentProcessIdentifier());
 	}
 
 	@Override
@@ -113,26 +116,26 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public void receiveResult(final Map<String, Object> resultMap) {
-		if (answered) {
+		if (this.answered) {
 			return;
 		}
 		final Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 
 		final InvocationContext context = this.callback.getContext();
-		final ReferenceService referenceService = context
-		.getReferenceService();
+		final ReferenceService referenceService = context.getReferenceService();
 
 		for (final Object key : resultMap.keySet()) {
 			final String keyString = (String) key;
 			final Object value = resultMap.get(key);
-			final Integer depth = findPortDepth(keyString);
+			final Integer depth = this.findPortDepth(keyString);
 			if (depth == null) {
 				this.callback.fail("Data sent for unknown port : " + keyString);
 			}
-			outputs.put(keyString, referenceService.register(value, depth, true, context));
+			outputs.put(keyString,
+					referenceService.register(value, depth, true, context));
 		}
 		this.callback.receiveResult(outputs, new int[0]);
-		answered = true;
+		this.answered = true;
 	}
 
 	private Integer findPortDepth(final String portName) {
