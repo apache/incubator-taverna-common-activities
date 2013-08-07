@@ -60,7 +60,7 @@
            var outputData = JSON.stringify(results);
            var dataRequest = new XMLHttpRequest();
            dataRequest.open("PUT", "$outputDataUrl", false);
-//           xmlhttp.setRequestHeader("Content-Type", "text/plain");
+           dataRequest.setRequestHeader("Content-Type", "application/json");
            dataRequest.setRequestHeader("Content-Length", outputData.length);
            dataRequest.send(outputData);
 #end           
