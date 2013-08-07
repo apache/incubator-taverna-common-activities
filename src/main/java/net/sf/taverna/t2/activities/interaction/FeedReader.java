@@ -15,6 +15,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.ParseException;
 import org.apache.abdera.parser.Parser;
+import org.apache.abdera.parser.stax.FOMParser;
 import org.apache.log4j.Logger;
 
 public abstract class FeedReader extends Thread {
@@ -35,7 +36,7 @@ public abstract class FeedReader extends Thread {
 			if (InteractionPreference.getInstance().getUseJetty()) {
 				InteractionJetty.checkJetty();
 			}
-			final Parser parser = Abdera.getNewParser();
+			final Parser parser = new FOMParser();
 			Date lastCheckedDate = new Date();
 			while (true) {
 				try {
