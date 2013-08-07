@@ -26,8 +26,6 @@ public abstract class FeedReader extends Thread {
 		super(name);
 	}
 
-	protected abstract void setClassLoader();
-
 	protected abstract void considerEntry(Entry entry);
 
 	@Override

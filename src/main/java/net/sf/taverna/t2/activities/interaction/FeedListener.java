@@ -47,10 +47,6 @@ public final class FeedListener {
 		final Thread feedListenerThread = new FeedReader("FeedListener") {
 
 			@Override
-			protected void setClassLoader() {
-			}
-
-			@Override
 			protected void considerEntry(final Entry entry) {
 				considerInReplyTo(entry);
 			}
