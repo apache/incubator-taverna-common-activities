@@ -1,0 +1,70 @@
+#require("selectionValues",1)
+#require("message")
+#require("title")
+#produce("answer")
+<!doctype html>
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <title></title>
+      <style>
+      	html, body { height: 100%; width: 100%; margin: 0; }
+      </style>
+  </head>
+  <body>
+
+       <script type="text/javascript" src="$pmrpcUrl"></script>
+
+       <script type="text/javascript">
+
+         function reply() {
+           pmrpc.call({
+             destination : "publish",
+             publicProcedureName : "reply",
+             params : ["OK", {"answer" : getSelectedItem()}],
+             onSuccess : function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Data submitted</h1>';},
+             onFailure: function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Data submission failed</h1>';}
+           });
+	       return true;
+         }
+         
+         function getSelectedItem() {
+           chosen = "";
+           theForm = document.myform;
+           buttons = document.getElementsByTagName('input');
+           for (i = 0; i <buttons.length; i++) {
+             if ((buttons[i].type == 'radio') && buttons[i].checked) {
+               chosen = buttons[i].value
+             }
+           }
+
+           if (chosen == "") {
+             alert("No Location Chosen")
+           }
+           return chosen;
+         }
+         
+         function cancel() {
+           pmrpc.call({
+             destination : "publish",
+             publicProcedureName : "reply",
+             params : ["Cancelled", {}],
+             onSuccess : function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Cancelled</h1>';},
+             onFailure: function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Cancellation failed</h1>';}
+           });
+	       return true;
+         }
+
+       </script>
+  
+  <h2>$!message</h2>
+    <form name="myform">
+#foreach( $value in $selectionValues )
+      <label>$value<input type="radio" name="group" value="$value" /></label><br />  
+#end
+      <input type="button" value="Cancel" onClick = "cancel()"/>
+      <input type="button" value="Submit" onClick = "reply()"/>
+    </form> 
+  </body>
+</html>
+

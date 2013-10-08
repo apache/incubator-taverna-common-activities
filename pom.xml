@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>net.sf.taverna.t2</groupId>
+		<artifactId>interaction-service</artifactId>
+		<version>1.0.4</version>
+	</parent>
+	<groupId>net.sf.taverna.t2.activities</groupId>
+	<artifactId>interaction-activity</artifactId>
+	<name>Interaction activity</name>
+
+	<properties>
+		<jetty.version>6.1.24</jetty.version>
+		<abdera.version>1.0</abdera.version>
+	</properties>
+
+
+
+	<dependencies>
+	
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+			<version>${jetty.version}</version>
+
+		</dependency>
+
+		
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty-util</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5-20081211</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.webdav-servlet</groupId>
+			<artifactId>webdav-servlet</artifactId>
+			<version>2.0</version>
+		</dependency>
+
+		
+		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>workflowmodel-api</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.activities</groupId>
+			<artifactId>activity-test-utils</artifactId>
+			<version>${t2.activities.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+  			<artifactId>commons-io</artifactId>
+  			<version>2.4</version>
+		</dependency>
+				
+		<dependency>
+		  <groupId>net.sf.taverna.t2.security</groupId>
+		  <artifactId>credential-manager</artifactId>
+		  <version>${t2.core.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-core</artifactId>
+			<version>${abdera.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-client</artifactId>
+			<version>${abdera.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-server</artifactId>
+			<version>${abdera.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-extensions-main</artifactId>
+			<version>${abdera.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-extensions-html</artifactId>
+			<version>${abdera.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-extensions-json</artifactId>
+			<version>${abdera.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-i18n</artifactId>
+			<version>${abdera.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.abdera</groupId>
+			<artifactId>abdera-parser</artifactId>
+			<version>${abdera.version}</version>
+		</dependency>
+		
+			<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>velocity-tools</groupId>
+			<artifactId>velocity-tools-generic</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-lgpl</artifactId>
+			<version>1.9.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-lgpl</artifactId>
+			<version>1.9.4</version>
+		</dependency>
+
+	</dependencies>
+</project>

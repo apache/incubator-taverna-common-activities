@@ -1,0 +1,57 @@
+#require("serviceURI")
+#require("requestingPrompt")
+#produce("username")
+#produce("password")
+#produce("shouldSave")
+<!doctype html>
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <title></title>
+   </head>
+  <body>
+
+       <script type="text/javascript" src="$pmrpcUrl"></script>
+
+       <script type="text/javascript">
+
+         function reply() {
+           pmrpc.call({
+             destination : "publish",
+             publicProcedureName : "reply",
+             params : ["OK", {"username" : document.myform.username.value,
+                              "password" : document.myform.password.value,
+                              "shouldsave" : document.myform.shouldsave.checked}],
+             onSuccess : function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Data submitted</h1>';},
+             onFailure: function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Data submission failed</h1>';}
+           });
+	       return true;
+         }
+         
+         function cancel() {
+           pmrpc.call({
+             destination : "publish",
+             publicProcedureName : "reply",
+             params : ["Cancelled", {}],
+             onSuccess : function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Cancelled</h1>';},
+             onFailure: function() {document.getElementsByTagName('body')[0].innerHTML='<h1>Cancellation failed</h1>';}
+           });
+	       return true;
+         }
+
+       </script>
+  
+  <h2>Credential Manager request</h2>
+    <p>The credential manager could not find a username and password for the service at <code>$!serviceURI</code></p>
+    <p>$!requestingPrompt</p>
+    <p>Please provide a username and password</p>
+    <form name="myform">
+      <label>User name<input type="text" name="username"/></label><br />
+      <label>Password<input type="password" name="password"/></label><br />
+      <label>Save in credental manager<input type="checkbox" name="shouldsave"/></label><br />
+      <input type="button" value="Cancel" onClick = "cancel()"/>
+      <input type="button" value="Submit" onClick = "reply()"/>
+    </form> 
+  </body>
+</html>
+
