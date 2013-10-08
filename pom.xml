@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>net.sf.taverna.t2</groupId>
-		<artifactId>interaction-service</artifactId>
-		<version>1.0.4</version>
+		<artifactId>activities</artifactId>
+		<version>1.5-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>interaction-activity</artifactId>
