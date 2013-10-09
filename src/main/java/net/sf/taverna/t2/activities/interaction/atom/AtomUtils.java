@@ -27,6 +27,9 @@ public class AtomUtils {
 	private static QName pathIdQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "path",
 			"interaction");
+	private static QName countQName = new QName(
+			"http://ns.taverna.org.uk/2012/interaction", "count",
+			"interaction");
 	private static QName runIdQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "run-id",
 			"interaction");
@@ -73,6 +76,10 @@ public class AtomUtils {
 
 	public static QName getPathIdQName() {
 		return pathIdQName;
+	}
+
+	public static QName getCountQName() {
+		return countQName;
 	}
 
 }

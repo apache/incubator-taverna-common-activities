@@ -155,6 +155,9 @@ public final class InteractionActivityRunnable implements Runnable {
 		final Element pathIdElement = interactionNotificationMessage.addExtension(AtomUtils.getPathIdQName());
 		pathIdElement.setText(StringEscapeUtils.escapeJavaScript(this.requestor.getPath()));
 		
+		final Element countElement = interactionNotificationMessage.addExtension(AtomUtils.getCountQName());
+		countElement.setText(StringEscapeUtils.escapeJavaScript(this.requestor.getInvocationCount().toString()));
+		
 		if (this.requestor.getInteractionType().equals(
 				InteractionType.Notification)) {
 			interactionNotificationMessage.addExtension(AtomUtils

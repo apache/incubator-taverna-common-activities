@@ -29,12 +29,20 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	private boolean answered = false;
 
+	private String path;
+
+	private Integer count;
+	
+	private static Map<String, Integer> invocationCount = new HashMap<String, Integer> ();
+
 	public InteractionCallbackRequestor(final InteractionActivity activity,
 			final AsynchronousActivityCallback callback,
 			final Map<String, T2Reference> inputs) {
 		this.activity = activity;
 		this.callback = callback;
 		this.inputs = inputs;
+		this.path = calculatePath();
+		this.count = calculateInvocationCount(path);
 	}
 
 	@Override
@@ -147,18 +155,34 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 		return null;
 	}
 
-	@Override
-	public String getPath() {
+	private String calculatePath() {
 		final String parentProcessIdentifier = this.callback
 				.getParentProcessIdentifier();
 		String result = "";
 		String parts[] = parentProcessIdentifier.split(":");
-		if (parts.length > 2) {
-			result += parts[1];
-		}
-		for (int i = 2; i < parts.length; i += 2) {
+
+		for (int i = 2; i < parts.length; i += 4) {
 			result += ":" + parts[i];
 		}
 		return result;
+	}
+
+	@Override
+	public String getPath() {
+		return this.path;
+	}
+	
+	private synchronized static Integer calculateInvocationCount(String path) {
+		Integer currentCount = Integer.valueOf(0);
+		if (invocationCount.containsKey(path)) {
+			currentCount = currentCount + 1;
+		}
+		invocationCount.put(path, currentCount);
+		return currentCount;
+	}
+
+	@Override
+	public Integer getInvocationCount() {
+		return count;
 	}
 }

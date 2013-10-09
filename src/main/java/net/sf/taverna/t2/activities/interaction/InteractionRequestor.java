@@ -23,6 +23,9 @@ public interface InteractionRequestor {
 	
 	// The path to whatever requested the interaction
 	String getPath();
+	
+	// The number of times whatever requested the interaction has requested one
+	Integer getInvocationCount();
 
 	InteractionActivityType getPresentationType();
 
