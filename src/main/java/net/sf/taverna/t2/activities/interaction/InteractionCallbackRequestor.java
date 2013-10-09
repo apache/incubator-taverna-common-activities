@@ -89,11 +89,10 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public String generateId() {
-		final String workflowRunId = this.callback.getContext()
-				.getEntities(WorkflowRunIdEntity.class).get(0)
-				.getWorkflowRunId();
-		return (workflowRunId + ":" + this.callback
-				.getParentProcessIdentifier());
+		final String workflowRunId = getRunId();
+		final String parentProcessIdentifier = this.callback
+				.getParentProcessIdentifier();
+		return (workflowRunId + ":" + parentProcessIdentifier);
 	}
 
 	@Override
@@ -146,5 +145,20 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public String getPath() {
+		final String parentProcessIdentifier = this.callback
+				.getParentProcessIdentifier();
+		String result = "";
+		String parts[] = parentProcessIdentifier.split(":");
+		if (parts.length > 2) {
+			result += parts[1];
+		}
+		for (int i = 2; i < parts.length; i += 2) {
+			result += ":" + parts[i];
+		}
+		return result;
 	}
 }

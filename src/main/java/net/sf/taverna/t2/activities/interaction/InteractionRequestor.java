@@ -20,6 +20,9 @@ public interface InteractionRequestor {
 	void carryOn();
 
 	String generateId();
+	
+	// The path to whatever requested the interaction
+	String getPath();
 
 	InteractionActivityType getPresentationType();
 

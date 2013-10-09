@@ -5,6 +5,8 @@ package net.sf.taverna.t2.activities.interaction.atom;
 
 import javax.xml.namespace.QName;
 
+import org.apache.abdera.model.Element;
+
 /**
  * @author alanrw
  * 
@@ -22,6 +24,9 @@ public class AtomUtils {
 			"interaction");
 	private static QName idQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "id", "interaction");
+	private static QName pathIdQName = new QName(
+			"http://ns.taverna.org.uk/2012/interaction", "path",
+			"interaction");
 	private static QName runIdQName = new QName(
 			"http://ns.taverna.org.uk/2012/interaction", "run-id",
 			"interaction");
@@ -64,6 +69,10 @@ public class AtomUtils {
 	 */
 	public static QName getProgressQName() {
 		return progressQName;
+	}
+
+	public static QName getPathIdQName() {
+		return pathIdQName;
 	}
 
 }
