@@ -162,7 +162,10 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 		String parts[] = parentProcessIdentifier.split(":");
 
 		for (int i = 2; i < parts.length; i += 4) {
-			result += ":" + parts[i];
+			if (!result.isEmpty()) {
+				result += ":";
+			}
+			result += parts[i];
 		}
 		return result;
 	}
