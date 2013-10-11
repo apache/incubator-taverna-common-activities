@@ -298,10 +298,10 @@ public class WSDLActivity extends
 
 					Map<String, Object> invokerOutputMap = invoker.invoke(
 							invokerInputMap, configurationBean);
-
+					
 					for (String outputName : invokerOutputMap.keySet()) {
-						Object value = invokerOutputMap.get(outputName);
-
+					    Object value = invokerOutputMap.get(outputName);
+						
 						if (value != null) {
 							Integer depth = getOutputPortDepth(outputName);
 							if (depth != null) {
@@ -309,12 +309,12 @@ public class WSDLActivity extends
 										.register(value, depth, true, callback
 												.getContext()));
 							} else {
-								logger.info("Depth not recorded for output:"
+								logger.info("Skipping unknown output port :"
 												+ outputName);
-								// TODO what should the depth be in this case?
-								outputData.put(outputName, referenceService
-										.register(value, 0, true, callback
-												.getContext()));
+//								// TODO what should the depth be in this case?
+//								outputData.put(outputName, referenceService
+//										.register(value, 0, true, callback
+//												.getContext()));
 							}
 						}
 					}
