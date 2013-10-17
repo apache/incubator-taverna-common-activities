@@ -71,7 +71,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 				.extensionXMLToTypeDescriptor(element);
 		ObjectNode outBean = outputDefinitions.addObject();
 		outBean.put("name", "output");
-		outBean.put("mimeTypes", "'text/xml'");
+		outBean.put("mimeType", "'text/xml'");
 		outBean.put("depth", 0);
 		outBean.put("granularDepth", 0);
 
@@ -83,7 +83,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 			for (int i = 0; i < names.length; i++) {
 				ObjectNode portBean = inputDefinitions.addObject();
 				portBean.put("name", names[i]);
-				portBean.put("mimeTypes", TypeDescriptor.translateJavaType(types[i]));
+				portBean.put("mimeType", TypeDescriptor.translateJavaType(types[i]));
 				portBean.put("depth", depthForDescriptor(elements.get(i)));
 			}
 
@@ -100,7 +100,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 				} else {
 					portBean.put("name", "1" + attributeNames[i]);
 				}
-				portBean.put("mimeTypes", TypeDescriptor.translateJavaType(attributeTypes[i]));
+				portBean.put("mimeType", TypeDescriptor.translateJavaType(attributeTypes[i]));
 				portBean.put("depth", depthForDescriptor(attributes.get(i)));
 			}
 		} else if (descriptor instanceof ArrayTypeDescriptor) {
@@ -108,9 +108,9 @@ public class XMLSplitterConfigurationBeanBuilder {
 			portBean.put("name", descriptor.getName());
 
 			if (((ArrayTypeDescriptor) descriptor).getElementType() instanceof BaseTypeDescriptor) {
-				portBean.put("mimeTypes", "l('text/plain')");
+				portBean.put("mimeType", "l('text/plain')");
 			} else {
-				portBean.put("mimeTypes", "l('text/xml')");
+				portBean.put("mimeType", "l('text/xml')");
 			}
 			portBean.put("depth", 1);
 		}
@@ -144,7 +144,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 
 		ObjectNode inBean = inputDefinitions.addObject();
 		inBean.put("name", "input");
-		inBean.put("mimeTypes", "'text/xml'");
+		inBean.put("mimeType", "'text/xml'");
 		inBean.put("depth", 0);
 
 		if (descriptor instanceof ComplexTypeDescriptor) {
@@ -155,7 +155,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 			for (int i = 0; i < names.length; i++) {
 				ObjectNode portBean = outputDefinitions.addObject();
 				portBean.put("name", names[i]);
-				portBean.put("mimeTypes", TypeDescriptor.translateJavaType(types[i]));
+				portBean.put("mimeType", TypeDescriptor.translateJavaType(types[i]));
 				int depth = depthForDescriptor(elements.get(i));
 				portBean.put("depth", depth);
 				portBean.put("granularDepth", depth);
@@ -175,7 +175,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 				} else {
 					portBean.put("name", "1" + attributeNames[i]);
 				}
-				portBean.put("mimeTypes", TypeDescriptor
+				portBean.put("mimeType", TypeDescriptor
 						.translateJavaType(attributeTypes[i]));
 				int depth = depthForDescriptor(attributes.get(i));
 				portBean.put("depth", depth);
@@ -188,9 +188,9 @@ public class XMLSplitterConfigurationBeanBuilder {
 			portBean.put("depth", 1);
 			portBean.put("granularDepth", 1);
 			if (((ArrayTypeDescriptor) descriptor).getElementType() instanceof BaseTypeDescriptor) {
-				portBean.put("mimeTypes", "l('text/plain')");
+				portBean.put("mimeType", "l('text/plain')");
 			} else {
-				portBean.put("mimeTypes", "l('text/xml')");
+				portBean.put("mimeType", "l('text/xml')");
 			}
 		}
 

@@ -103,20 +103,12 @@ public class WSDLActivity extends
 	@Override
 	public void configure(JsonNode bean)
 			throws ActivityConfigurationException {
-		if (this.configurationBean != null) {
-//			throw new IllegalStateException(
-//					"Reconfiguring WSDL activity not yet implemented");
-			this.configurationBean = bean;
-		}
-		else{
-			this.configurationBean = bean;
-			try {
-				parseWSDL();
-//				configurePorts();
-			} catch (Exception ex) {
-				throw new ActivityConfigurationException(
-						"Unable to parse the WSDL " + bean.get("operation").get("wsdl").textValue(), ex);
-			}
+		this.configurationBean = bean;
+		try {
+			parseWSDL();
+		} catch (Exception ex) {
+			throw new ActivityConfigurationException(
+					"Unable to parse the WSDL " + bean.get("operation").get("wsdl").textValue(), ex);
 		}
 	}
 
@@ -223,42 +215,6 @@ public class WSDLActivity extends
 		isWsrfService = parser.isWsrfService();
 	}
 
-//	private void configurePorts() throws UnknownOperationException, IOException {
-//		List<TypeDescriptor> inputDescriptors = parser
-//				.getOperationInputParameters(configurationBean.get("operation").get("name").textValue());
-//		List<TypeDescriptor> outputDescriptors = parser
-//				.getOperationOutputParameters(configurationBean.get("operation").get("name").textValue());
-//		for (TypeDescriptor descriptor : inputDescriptors) {
-//			addInput(descriptor.getName(), descriptor.getDepth(), true, null,
-//					String.class);
-//		}
-//		isWsrfService = parser.isWsrfService();
-//		if (isWsrfService) {
-//			// Make sure the port name is unique
-//			endpointReferenceInputPortName = ENDPOINT_REFERENCE;
-//			int counter = 0;
-//			while (Tools.getActivityInputPort(this,
-//					endpointReferenceInputPortName) != null) {
-//				endpointReferenceInputPortName = ENDPOINT_REFERENCE + counter++;
-//			}
-//			addInput(endpointReferenceInputPortName, 0, true, null,
-//					String.class);
-//		}
-//
-//		for (TypeDescriptor descriptor : outputDescriptors) {
-//			addOutput(descriptor.getName(), descriptor.getDepth());
-//			outputDepth.put(descriptor.getName(), Integer.valueOf(descriptor
-//					.getDepth()));
-//		}
-//
-//		// add output for attachment list
-//		addOutput("attachmentList", 1);
-//		outputDepth.put("attachmentList", Integer.valueOf(1));
-//	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public void executeAsynch(final Map<String, T2Reference> data,
 			final AsynchronousActivityCallback callback) {
