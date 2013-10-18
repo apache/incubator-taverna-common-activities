@@ -192,13 +192,13 @@ public final class InteractionActivityRunnable implements Runnable {
 					.openConnection();
 			httpCon.setDoOutput(true);
 			httpCon.setRequestProperty("Content-Type",
-					"application/atom+xml;type=entry");
+					"application/atom+xml;type=entry;charset=utf-8");
 			httpCon.setRequestProperty("Content-Length",
 					"" + entryContent.length());
 			httpCon.setRequestProperty("Slug", id);
 			httpCon.setRequestMethod("POST");
 			final OutputStream outputStream = httpCon.getOutputStream();
-			IOUtils.write(entryContent, outputStream);
+			IOUtils.write(entryContent, outputStream, "utf-8");
 			outputStream.close();
 			final int response = httpCon.getResponseCode();
 			if (response >= 400) {
