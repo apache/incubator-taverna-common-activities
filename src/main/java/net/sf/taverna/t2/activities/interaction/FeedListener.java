@@ -51,6 +51,7 @@ public final class FeedListener {
 				considerInReplyTo(entry);
 			}
 		};
+		feedListenerThread.setDaemon(true);
 		feedListenerThread.start();
 	}
 

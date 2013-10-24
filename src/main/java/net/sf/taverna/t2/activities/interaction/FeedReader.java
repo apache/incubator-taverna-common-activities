@@ -24,6 +24,7 @@ public abstract class FeedReader extends Thread {
 
 	public FeedReader(final String name) {
 		super(name);
+		this.setDaemon(true);
 	}
 
 	protected abstract void considerEntry(Entry entry);
