@@ -116,7 +116,7 @@ public class InteractionPreference {
 				this.properties.setProperty(FEED_PATH, definedFeedPath);
 			}
 		} else {
-			this.logger.error("Running non-headless");
+			this.logger.info("Running non-headless");
 		}
 		this.fillDefaultProperties();
 	}
