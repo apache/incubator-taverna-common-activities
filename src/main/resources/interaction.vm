@@ -3,12 +3,7 @@
   <head>
       <meta charset="utf-8" />
       <title></title>
-      <style>
-      	html, body { height: 100%; width: 100%; margin: 0; border:0; }
-      	#presentationFrame { height: 90%; width: 95%; margin: 0; border:0; frameborder:0; }
-     	#acknowledgment { width: 95%; margin: 0; border:0; frameborder:0; background-color: #eeeb99; color: #555555; text-align:center; }
-     	#acknowledgment p {padding: 10px;}
-      </style>
+      <link rel="stylesheet" type="text/css" href="interaction.css">
        <script type="text/javascript" src="$pmrpcUrl"></script>
        
   </head>

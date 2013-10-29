@@ -34,21 +34,21 @@ public class InteractionUtils {
 		super();
 	}
 
-	protected static void copyJavaScript(final String javascriptFileName)
+	protected static void copyFixedFile(final String fixedFileName)
 			throws IOException {
 		final String targetUrl = InteractionPreference.getInstance()
-				.getLocationUrl() + "/" + javascriptFileName;
+				.getLocationUrl() + "/" + fixedFileName;
 		InteractionUtils.publishFile(
 				targetUrl,
 				InteractionActivity.class.getResourceAsStream("/"
-						+ javascriptFileName), null, null);
+						+ fixedFileName), null, null);
 	}
 
 	public static void publishFile(final String urlString,
 			final String contents, final String runId,
 			final String interactionId) throws IOException {
 		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
-				contents.getBytes());
+				contents.getBytes("utf-8"));
 		InteractionUtils.publishFile(urlString, byteArrayInputStream, runId,
 				interactionId);
 	}

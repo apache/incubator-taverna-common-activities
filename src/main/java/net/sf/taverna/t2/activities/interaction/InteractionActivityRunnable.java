@@ -65,10 +65,11 @@ public final class InteractionActivityRunnable implements Runnable {
 			InteractionJetty.checkJetty();
 		}
 		try {
-			InteractionUtils.copyJavaScript("pmrpc.js");
+			InteractionUtils.copyFixedFile("pmrpc.js");
+			InteractionUtils.copyFixedFile("interaction.css");
 		} catch (final IOException e1) {
 			logger.error(e1);
-			this.requestor.fail("Unable to copy necessary Javascript");
+			this.requestor.fail("Unable to copy necessary fixed file");
 		}
 		synchronized (ABDERA) {
 			final Entry interactionNotificationMessage = this
