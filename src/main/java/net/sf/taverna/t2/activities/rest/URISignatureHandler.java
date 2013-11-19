@@ -263,7 +263,7 @@ public class URISignatureHandler {
 	 *             the placeholders found in <code>uriSignature</code>.
 	 */
 	public static String generateCompleteURI(String uriSignature,
-			Map<String, String> parameters, boolean escapeParameters)
+			Map<String, String> specifiedParameters, boolean escapeParameters)
 			throws URISignatureParsingException,
 			URIGenerationFromSignatureException {
 		StringBuilder completeURI = new StringBuilder(uriSignature);
@@ -276,12 +276,14 @@ public class URISignatureHandler {
 
 		// check that the URI signature contains some placeholders
 		if (placeholdersWithPositions.keySet().size() > 0) {
+			Map<String, String> parameters;
 			// some work will actually have to be done to replace placeholders
 			// with real values;
 			// check that the parameter map contains some values
-			if (parameters == null || parameters.isEmpty()) {
-				throw new URIGenerationFromSignatureException(
-						"Parameter map is null or empty");
+			if (specifiedParameters == null || specifiedParameters.isEmpty()) {
+				parameters = Collections.EMPTY_MAP;
+			} else {
+				parameters = specifiedParameters;
 			}
 
 			// the 'placeholders' linked list is guaranteed to be in the order
