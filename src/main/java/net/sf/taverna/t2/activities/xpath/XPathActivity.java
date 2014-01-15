@@ -14,6 +14,7 @@ import org.dom4j.XPath;
 import org.dom4j.XPathException;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
+import net.sf.taverna.t2.reference.ErrorDocumentService;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
@@ -35,6 +36,8 @@ public class XPathActivity extends
   private static final String IN_XML = "xml_text";
   private static final String OUT_TEXT = "nodelist";
 	private static final String OUT_XML = "nodelistAsXML";
+	  private static final String SINGLE_VALUE_TEXT = "firstNode";
+		private static final String SINGLE_VALUE_XML = "firstNodeAsXML";
 	
 	// Configuration bean for this activity - essentially defines a particular instance
 	// of the activity through the values of its parameters
@@ -79,9 +82,12 @@ public class XPathActivity extends
 		// single input port: the input XML text will be treated as String for now
 	  addInput(IN_XML, 0, true, null, String.class);
 		
-		// all outputs are of depth 1 - lists of strings / XML nodes
+
+	  addOutput(SINGLE_VALUE_TEXT, 0);
+	  addOutput(SINGLE_VALUE_XML, 0);
 		addOutput(OUT_TEXT, 1);
 		addOutput(OUT_XML, 1);
+
 	}
 	
 	
@@ -158,24 +164,58 @@ public class XPathActivity extends
 				
 		    List<String> outNodesText = new ArrayList<String>();
 		    List<String> outNodesXML = new ArrayList<String>();
-		    for (Node n : matchingNodes) {
-		      if (n.getStringValue() != null && n.getStringValue().length() > 0) {
-		        outNodesText.add(n.getStringValue());
-		      }
-		      outNodesXML.add(n.asXML());
-		    }
+		    
+			for (Object o : matchingNodes) {
+				if (o instanceof Node) {
+					Node n = (Node) o;
+					if (n.getStringValue() != null
+							&& n.getStringValue().length() > 0) {
+						outNodesText.add(n.getStringValue());
+					}
+					outNodesXML.add(n.asXML());
+				}
+				else {
+					outNodesText.add(o.toString());
+				}
+			}
 		    
 				
 				// ---- REGISTER OUTPUTS ----
 		    
 				Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
 				
-				T2Reference outNodesAsText = referenceService.register(outNodesText, 1, true, context);
-				outputs.put(OUT_TEXT, outNodesAsText);
+				Object textValue;
+				Object xmlValue;
+				if (outNodesText.isEmpty()) {
+					ErrorDocumentService errorDocService = referenceService.getErrorDocumentService();
+	
+					textValue = errorDocService.registerError("No value produced" , 
+							0, callback.getContext());
+				} else {
+					textValue = outNodesText.get(0);
+				}
 				
-				T2Reference outNodesAsXML = referenceService.register(outNodesXML, 1, true, context);
-        outputs.put(OUT_XML, outNodesAsXML);
+				if (outNodesXML.isEmpty()) {
+					ErrorDocumentService errorDocService = referenceService.getErrorDocumentService();
+	
+					xmlValue = errorDocService.registerError("No value produced" , 
+							0, callback.getContext());
+				} else {
+					xmlValue = outNodesXML.get(0);
+				}
 				
+				T2Reference firstNodeAsText = referenceService.register(textValue, 0, true, context);
+				T2Reference firstNodeAsXml = referenceService.register(xmlValue, 0, true, context);
+				outputs.put(SINGLE_VALUE_TEXT, firstNodeAsText);
+				outputs.put(SINGLE_VALUE_XML, firstNodeAsXml);
+				
+
+					T2Reference outNodesAsText = referenceService.register(outNodesText, 1, true, context);
+					outputs.put(OUT_TEXT, outNodesAsText);
+				
+					T2Reference outNodesAsXML = referenceService.register(outNodesXML, 1, true, context);
+					outputs.put(OUT_XML, outNodesAsXML);
+
 				// return map of output data, with empty index array as this is
 				// the only and final result (this index parameter is used if
 				// pipelining output)
