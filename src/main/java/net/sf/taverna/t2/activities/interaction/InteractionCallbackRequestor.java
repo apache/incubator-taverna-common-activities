@@ -176,8 +176,10 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 	}
 	
 	private synchronized static Integer calculateInvocationCount(String path) {
-		Integer currentCount = Integer.valueOf(0);
-		if (invocationCount.containsKey(path)) {
+		Integer currentCount = invocationCount.get(path);
+		if (currentCount == null) {
+			currentCount = Integer.valueOf(0);
+		} else {
 			currentCount = currentCount + 1;
 		}
 		invocationCount.put(path, currentCount);
