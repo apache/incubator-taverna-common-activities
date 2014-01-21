@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import net.sf.taverna.t2.activities.interaction.FeedReader;
 import net.sf.taverna.t2.activities.interaction.InteractionUtils;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
+import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.webdav.WebdavServlet;
 
 import org.apache.abdera.protocol.server.ServiceManager;
@@ -42,16 +44,20 @@ public class InteractionJetty {
 			.getInstance();
 
 	private static String REALM_NAME = "TavernaInteraction";
+	
+	private static boolean listenersStarted = false;
+	
+	private static SPIRegistry<FeedReader> feedReaderRegistry = new SPIRegistry(FeedReader.class);
 
-	public static synchronized void checkJetty() {
+	public static synchronized void startJettyIfNecessary() {
 		if (server != null) {
 			return;
 		}
-
-		final ClassLoader previousContextClassLoader = Thread.currentThread()
-				.getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(
-				InteractionJetty.class.getClassLoader());
+		
+//		final ClassLoader previousContextClassLoader = Thread.currentThread()
+//				.getContextClassLoader();
+//		Thread.currentThread().setContextClassLoader(
+//				InteractionJetty.class.getClassLoader());
 
 		final String port = interactionPreference.getPort();
 
@@ -130,9 +136,8 @@ public class InteractionJetty {
 		} catch (final Exception e) {
 			logger.error("Unable to start Jetty");
 		}
-		Thread.currentThread()
-				.setContextClassLoader(previousContextClassLoader);
-
+//		Thread.currentThread()
+//				.setContextClassLoader(previousContextClassLoader);
 	}
 
 	public static URI createServiceURI(final String port)
@@ -154,6 +159,23 @@ public class InteractionJetty {
 
 	public static File getInteractionDirectory() {
 		return getJettySubdirectory("interaction");
+	}
+	
+	public static synchronized void startListenersIfNecessary() {
+		if (listenersStarted) {
+			return;
+		}
+		for (FeedReader fr : feedReaderRegistry.getInstances()) {
+			if (fr != null) {
+			try {
+				fr.start();
+			}
+			catch (Exception e) {
+				logger.error("Failed to start " + fr.getClass().getCanonicalName(), e);
+			}
+			}
+		}
+		listenersStarted = true;
 	}
 
 }

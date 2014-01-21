@@ -32,9 +32,6 @@ public abstract class FeedReader extends Thread {
 	@Override
 	public void run() {
 		try {
-			if (InteractionPreference.getInstance().getUseJetty()) {
-				InteractionJetty.checkJetty();
-			}
 			final Parser parser = new FOMParser();
 			Date lastCheckedDate = new Date();
 			while (true) {

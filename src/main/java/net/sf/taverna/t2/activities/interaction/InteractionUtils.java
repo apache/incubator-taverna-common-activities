@@ -48,7 +48,7 @@ public class InteractionUtils {
 			final String contents, final String runId,
 			final String interactionId) throws IOException {
 		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
-				contents.getBytes("utf-8"));
+				contents.getBytes("UTF-8"));
 		InteractionUtils.publishFile(urlString, byteArrayInputStream, runId,
 				interactionId);
 	}

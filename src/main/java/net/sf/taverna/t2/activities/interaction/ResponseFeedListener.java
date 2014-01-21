@@ -24,35 +24,32 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author alanrw
  * 
  */
-public final class FeedListener {
+public final class ResponseFeedListener extends FeedReader {
 
 	private static final String STATUS_OK = "OK";
 
 	private static final String DATA_READ_FAILED = "Data read failed";
 
-	private static FeedListener instance;
+	private static ResponseFeedListener instance;
 
-	private static final Logger logger = Logger.getLogger(FeedListener.class);
+	private static final Logger logger = Logger.getLogger(ResponseFeedListener.class);
 
 	private static final Map<String, InteractionRequestor> requestorMap = new HashMap<String, InteractionRequestor>();
 
-	public static synchronized FeedListener getInstance() {
+	public static synchronized ResponseFeedListener getInstance() {
 		if (instance == null) {
-			instance = new FeedListener();
+			instance = new ResponseFeedListener();
 		}
 		return instance;
 	}
 
-	private FeedListener() {
-		final Thread feedListenerThread = new FeedReader("FeedListener") {
-
-			@Override
-			protected void considerEntry(final Entry entry) {
-				considerInReplyTo(entry);
-			}
-		};
-		feedListenerThread.setDaemon(true);
-		feedListenerThread.start();
+	private ResponseFeedListener() {
+		super("ResponseFeedListener");
+	}
+	
+	@Override
+	protected void considerEntry(final Entry entry) {
+		considerInReplyTo(entry);
 	}
 
 	static void considerInReplyTo(final Entry entry) {

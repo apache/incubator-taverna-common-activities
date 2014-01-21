@@ -62,8 +62,9 @@ public final class InteractionActivityRunnable implements Runnable {
 		final Map<String, Object> inputData = this.requestor.getInputData();
 
 		if (InteractionPreference.getInstance().getUseJetty()) {
-			InteractionJetty.checkJetty();
+			InteractionJetty.startJettyIfNecessary();
 		}
+		InteractionJetty.startListenersIfNecessary();
 		try {
 			InteractionUtils.copyFixedFile("pmrpc.js");
 			InteractionUtils.copyFixedFile("interaction.css");
@@ -117,7 +118,7 @@ public final class InteractionActivityRunnable implements Runnable {
 					interactionUrlString, runId);
 			if (!this.requestor.getInteractionType().equals(
 					InteractionType.Notification)) {
-				FeedListener.getInstance().registerInteraction(
+				ResponseFeedListener.getInstance().registerInteraction(
 						interactionNotificationMessage, this.requestor);
 			} else {
 				this.requestor.carryOn();
@@ -193,13 +194,14 @@ public final class InteractionActivityRunnable implements Runnable {
 					.openConnection();
 			httpCon.setDoOutput(true);
 			httpCon.setRequestProperty("Content-Type",
-					"application/atom+xml;type=entry;charset=utf-8");
+					"application/atom+xml;type=entry;charset=UTF-8");
 			httpCon.setRequestProperty("Content-Length",
 					"" + entryContent.length());
 			httpCon.setRequestProperty("Slug", id);
 			httpCon.setRequestMethod("POST");
+			httpCon.setConnectTimeout(5000);
 			final OutputStream outputStream = httpCon.getOutputStream();
-			IOUtils.write(entryContent, outputStream, "utf-8");
+			IOUtils.write(entryContent, outputStream, "UTF-8");
 			outputStream.close();
 			final int response = httpCon.getResponseCode();
 			if (response >= 400) {

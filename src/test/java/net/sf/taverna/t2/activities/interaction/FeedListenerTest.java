@@ -15,10 +15,10 @@ public class FeedListenerTest {
 
 	@Test
 	public void checkGetInstance() {
-		final FeedListener listener1 = FeedListener.getInstance();
-		final FeedListener listener2 = FeedListener.getInstance();
+		final ResponseFeedListener listener1 = ResponseFeedListener.getInstance();
+		final ResponseFeedListener listener2 = ResponseFeedListener.getInstance();
 
-		assertEquals("FeedListener should have one instance", listener1,
+		assertEquals("ResponseFeedListener should have one instance", listener1,
 				listener2);
 	}
 }
