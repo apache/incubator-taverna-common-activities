@@ -57,6 +57,17 @@
             <name>myGrid Repository</name>
             <url>http://www.mygrid.org.uk/maven/repository</url>
         </repository>
+                <repository>
+                        <id>akathist-repository</id>
+                        <!-- disable broken http://9stmaryrd.com/maven/ referenced by raven 1.9 -->
+                        <url>http://build.mygrid.org.uk/maven/404</url>
+                        <releases>
+                                <enabled>false</enabled>
+                        </releases>
+                        <snapshots>
+                                <enabled>false</enabled>
+                        </snapshots>
+                </repository>
     </repositories>
     <scm>
         <connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.7/</connection>
