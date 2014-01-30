@@ -11,7 +11,7 @@
     <version>1.9-SNAPSHOT</version>
 
     <packaging>jar</packaging>
-    <name>wsdl-generic</name>
+    <name>WSDL generic library</name>
     <description>
         WSDL handling classes that are shared between Taverna 1 and 2
     </description>
