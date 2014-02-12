@@ -64,8 +64,8 @@ public class SpreadsheetImportConfiguration {
 	 * @param configuration
 	 */
 	public SpreadsheetImportConfiguration(SpreadsheetImportConfiguration configuration) {
-		columnRange = configuration.columnRange;
-		rowRange = configuration.rowRange;
+		columnRange = new Range(configuration.columnRange);
+		rowRange = new Range(configuration.rowRange);
 		emptyCellValue = configuration.emptyCellValue;
 		columnNames = new HashMap<String, String>(configuration.columnNames);
 		allRows = configuration.allRows;
