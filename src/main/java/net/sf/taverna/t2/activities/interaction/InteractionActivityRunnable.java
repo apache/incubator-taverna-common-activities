@@ -71,6 +71,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		} catch (final IOException e1) {
 			logger.error(e1);
 			this.requestor.fail("Unable to copy necessary fixed file");
+			return;
 		}
 		synchronized (ABDERA) {
 			final Entry interactionNotificationMessage = this
@@ -90,11 +91,16 @@ public final class InteractionActivityRunnable implements Runnable {
 						inputData.put(key, replacementUrl);
 					} catch (final IOException e) {
 						logger.error(e);
+						this.requestor.fail("Unable to publish to " + replacementUrl);
+						return;
 					}
 				}
 			}
 
 			final String inputDataString = this.createInputDataJson(inputData);
+			if (inputDataString == null) {
+				return;
+			}
 			final String inputDataUrl = InteractionPreference
 					.getInputDataUrlString(id);
 			try {
@@ -102,6 +108,8 @@ public final class InteractionActivityRunnable implements Runnable {
 						runId, id);
 			} catch (final IOException e) {
 				logger.error(e);
+				this.requestor.fail("Unable to publish to " + inputDataUrl);
+				return;
 			}
 
 			String outputDataUrl = null;
@@ -114,8 +122,14 @@ public final class InteractionActivityRunnable implements Runnable {
 			final String interactionUrlString = this.generateHtml(inputDataUrl,
 					outputDataUrl, inputData, runId, id);
 
-			this.postInteractionMessage(id, interactionNotificationMessage,
-					interactionUrlString, runId);
+			try {
+				this.postInteractionMessage(id, interactionNotificationMessage,
+						interactionUrlString, runId);
+			} catch (IOException e) {
+				logger.error(e);
+				this.requestor.fail("Unable to post message");
+				return;
+			}
 			if (!this.requestor.getInteractionType().equals(
 					InteractionType.Notification)) {
 				ResponseFeedListener.getInstance().registerInteraction(
@@ -173,7 +187,7 @@ public final class InteractionActivityRunnable implements Runnable {
 	}
 
 	private void postInteractionMessage(final String id, final Entry entry,
-			final String interactionUrlString, final String runId) {
+			final String interactionUrlString, final String runId) throws IOException {
 
 		entry.addLink(StringEscapeUtils.escapeXml(interactionUrlString),
 				"presentation");
@@ -185,7 +199,6 @@ public final class InteractionActivityRunnable implements Runnable {
 
 		URL feedUrl;
 
-		try {
 			feedUrl = new URL(InteractionPreference.getInstance()
 					.getFeedUrlString());
 			final String entryContent = ((FOMElement) entry)
@@ -204,18 +217,14 @@ public final class InteractionActivityRunnable implements Runnable {
 			IOUtils.write(entryContent, outputStream, "UTF-8");
 			outputStream.close();
 			final int response = httpCon.getResponseCode();
-			if (response >= 400) {
+			if ((response < 0) || (response >= 400)) {
 				logger.error("Received response code" + response);
+				throw (new IOException ("Received response code " + response));
 			}
 			if (response == HttpURLConnection.HTTP_CREATED) {
 				InteractionRecorder.addResource(runId, id,
 						httpCon.getHeaderField("Location"));
 			}
-		} catch (final MalformedURLException e2) {
-			logger.error(e2);
-		} catch (final IOException e) {
-			logger.error(e);
-		}
 	}
 
 	String generateHtml(final String inputDataUrl, final String outputDataUrl,
@@ -276,6 +285,7 @@ public final class InteractionActivityRunnable implements Runnable {
 			return interactionUrl;
 		} catch (final IOException e) {
 			logger.error(e);
+			this.requestor.fail("Unable to generate HTML");
 			return null;
 		}
 	}

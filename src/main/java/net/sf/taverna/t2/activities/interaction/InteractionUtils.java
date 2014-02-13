@@ -72,7 +72,10 @@ public class InteractionUtils {
 		IOUtils.copy(is, outputStream);
 		is.close();
 		outputStream.close();
-		httpCon.getResponseCode();
+		int code = httpCon.getResponseCode();
+		if ((code >= 400) || (code < 0)){
+			throw new IOException ("Received code " + code);
+		}
 	}
 
 	public static String getUsedRunId(final String engineRunId) {
