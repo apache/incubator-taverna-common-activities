@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import bsh.TargetError;
 
 /**
  * <p>
@@ -192,7 +193,9 @@ public class BeanshellActivity extends
 						}
 						callback.receiveResult(outputData, new int[0]);
 					} catch (EvalError e) {
-						callback.fail("Error evaluating the beanshell script " + this, e);
+						int lineNumber = e.getErrorLineNumber();
+						
+						callback.fail("Line " + lineNumber+": "+determineMessage(e));
 					} catch (ReferenceServiceException e) {
 						callback.fail(
 								"Error accessing beanshell input/output data for " + this, e);
@@ -223,5 +226,19 @@ public class BeanshellActivity extends
 			}
 		});
 
+	}
+	
+	private static String determineMessage(Throwable e) {
+		if (e instanceof TargetError) {
+			Throwable t = ((TargetError) e).getTarget();
+			if (t != null) {
+				return t.getClass().getCanonicalName() + ": " + determineMessage(t);
+			}
+		}
+		Throwable cause = e.getCause();
+		if (cause != null) {
+			return determineMessage(cause);
+		}
+		return e.getMessage();
 	}
 }
