@@ -193,9 +193,14 @@ public class BeanshellActivity extends
 						}
 						callback.receiveResult(outputData, new int[0]);
 					} catch (EvalError e) {
-						int lineNumber = e.getErrorLineNumber();
+						try {
+							int lineNumber = e.getErrorLineNumber();
 						
-						callback.fail("Line " + lineNumber+": "+determineMessage(e));
+							callback.fail("Line " + lineNumber+": "+determineMessage(e));
+						}
+						catch (NullPointerException e2) {
+							callback.fail(determineMessage(e));
+						}
 					} catch (ReferenceServiceException e) {
 						callback.fail(
 								"Error accessing beanshell input/output data for " + this, e);
