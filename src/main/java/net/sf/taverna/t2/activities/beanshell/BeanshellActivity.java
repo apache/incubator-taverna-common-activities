@@ -151,8 +151,9 @@ public class BeanshellActivity extends
 								workflowRunID);
 						interpreter.setClassLoader(classLoader);
 					} catch (RuntimeException rex) {
+						logger.error(rex);
 						String message = "Unable to obtain the classloader for Beanshell service";
-						callback.fail(message, rex);
+						callback.fail(message);
 						return;
 					}
 					
@@ -193,6 +194,7 @@ public class BeanshellActivity extends
 						}
 						callback.receiveResult(outputData, new int[0]);
 					} catch (EvalError e) {
+						logger.error(e);
 						try {
 							int lineNumber = e.getErrorLineNumber();
 						
@@ -202,8 +204,9 @@ public class BeanshellActivity extends
 							callback.fail(determineMessage(e));
 						}
 					} catch (ReferenceServiceException e) {
+						logger.error(e);
 						callback.fail(
-								"Error accessing beanshell input/output data for " + this, e);
+								"Error accessing beanshell input/output data for " + this);
 					}
 					clearInterpreter();
 				}
