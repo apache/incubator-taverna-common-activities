@@ -36,31 +36,23 @@ package net.sf.taverna.wsdl.soap;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.activation.DataHandler;
 import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.rpc.ServiceException;
+import javax.xml.soap.AttachmentPart;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
-
+import javax.xml.soap.SOAPMessage;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
-
-import org.apache.axis.AxisFault;
-import org.apache.axis.EngineConfiguration;
-import org.apache.axis.attachments.AttachmentPart;
-import org.apache.axis.client.Call;
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.SOAPHeaderElement;
-import org.apache.axis.transport.http.HTTPTransport;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -74,30 +66,44 @@ import org.xml.sax.SAXException;
 public class WSDLSOAPInvoker {
 
 	private static final String ATTACHMENT_LIST = "attachmentList";
+	
+	private static Logger logger = Logger.getLogger(WSDLSOAPInvoker.class);
+
 	private BodyBuilderFactory bodyBuilderFactory = BodyBuilderFactory.instance();
 	private WSDLParser parser;
 	private String operationName;
 	private List<String> outputNames;
-	
-	private static Logger logger = Logger.getLogger(WSDLSOAPInvoker.class);
-
+        
+        private JaxWSInvoker invoker;
+        
 	public WSDLSOAPInvoker(WSDLParser parser, String operationName,
 			List<String> outputNames) {
-		this.parser = parser;
-		this.operationName = operationName;
-		this.outputNames = outputNames;
+            this.parser = parser;
+            this.operationName = operationName;
+            this.outputNames = outputNames;
+    
+            invoker = new JaxWSInvoker(parser, null, operationName);
+            invoker.setTimeout(getTimeout());
 	}
 	
+        public void setCredentials(String username, String password) {
+            invoker.setCredentials(username, password);
+        }
+        
+        public void setWSSSecurity(WSSTokenProfile token) {
+            invoker.setWSSSecurity(token);
+        }
+        
 	protected String getOperationName() {
-		return operationName;
+            return operationName;
 	}
 	
 	protected WSDLParser getParser() {
-		return parser;
+            return parser;
 	}
 
 	protected List<String> getOutputNames() {
-		return outputNames;
+            return outputNames;
 	}
 	
 
@@ -110,38 +116,52 @@ public class WSDLSOAPInvoker {
 	 * @throws Exception
 	 */
 	public Map<String, Object> invoke(Map inputMap) throws Exception {
-		return invoke(inputMap, (EngineConfiguration)null);
+
+            SOAPMessage message = makeRequestEnvelope(inputMap);
+                
+            return invoke(message);
 	}
 
-	/**
-	 * Invokes the webservice with the supplied input Map and axis engine configuration, 
-	 * and returns a Map containing the outputs, mapped against their output names.
-	 */
-	public Map<String, Object> invoke(Map inputMap, EngineConfiguration config)
-			throws Exception {
-		
-		Call call = getCall(config);
-		return invoke(inputMap, call);
-	}
-	
+	public SOAPMessage call(SOAPMessage message) throws Exception
+        {
+            return invoker.call(message);
+            
+//            String endpoint = parser.getOperationEndpointLocations(operationName).get(0);
+//            URL endpointURL = new URL(endpoint);
+//
+//            String soapAction = parser.getSOAPActionURI(operationName);
+//            if (soapAction != null) {
+//                MimeHeaders headers = message.getMimeHeaders();
+//                headers.setHeader("SOAPAction", soapAction);
+//            }
+//
+//            logger.info("Invoking service with SOAP envelope:\n" + message.getSOAPPart().getEnvelope());
+//            
+//            SOAPConnectionFactory factory = SOAPConnectionFactory.newInstance();
+//            SOAPConnection connection = factory.createConnection();  
+//
+////		call.setTimeout(getTimeout());
+//            return connection.call(message, endpointURL);
+        }
+        
 	/**
 	 * Invokes the webservice with the supplied input Map and preconfigured axis call, 
 	 * and returns a Map containing the outputs, mapped against their output names.
 	 */
-	public Map<String, Object> invoke(Map inputMap, Call call)
+	public Map<String, Object> invoke(SOAPMessage message)
 			throws Exception {
-			
-		call.setTimeout(getTimeout());
 
-		SOAPEnvelope requestEnv = makeRequestEnvelope(inputMap);
-		logger.info("Invoking service with SOAP envelope:\n"+requestEnv);
+                SOAPMessage response = call(message);
 		
-		SOAPEnvelope responseEnv = invokeCall(call, requestEnv);
-		
-		logger.info("Received SOAP response:\n"+responseEnv);
-
-		Map<String, Object> result;
-		if (responseEnv == null) {
+                List<SOAPElement> responseElements = new ArrayList();
+                for (Iterator<SOAPElement> iter = response.getSOAPBody().getChildElements(); iter.hasNext();)
+                {
+                    responseElements.add(iter.next());
+                }
+		logger.info("Received SOAP response:\n"+response);
+                
+                Map<String, Object> result;
+                if (responseElements.isEmpty()) {
 			if (outputNames.size() == 1
 					&& outputNames.get(0).equals(ATTACHMENT_LIST)) {
 				// Could be axis 2 service with no output (TAV-617)
@@ -149,53 +169,63 @@ public class WSDLSOAPInvoker {
 			} else {
 				throw new IllegalStateException(
 						"Missing expected outputs from service");
-			}
+			}                    
 		} else {
-			List response = responseEnv.getBodyElements();
 			logger.info("SOAP response was:" + response);
-			SOAPResponseParser parser = SOAPResponseParserFactory
-					.instance()
-					.create(
-							response,
-							getUse(),
-							getStyle(),
-							this.parser
-									.getOperationOutputParameters(operationName));
-			result = parser.parse(response);
+			SOAPResponseParser responseParser = 
+                                SOAPResponseParserFactory.instance().create(responseElements,
+                                                                            getUse(),
+							                    getStyle(),
+							                    parser.getOperationOutputParameters(operationName));
+			result = responseParser.parse(responseElements);
 		}
 
-		result.put(ATTACHMENT_LIST, extractAttachments(call));
+		result.put(ATTACHMENT_LIST, extractAttachments(message));
 
 		return result;
 	}
 
-	protected SOAPEnvelope makeRequestEnvelope(Map inputMap)
+	protected SOAPMessage makeRequestEnvelope(Map inputMap)
 			throws UnknownOperationException, IOException, WSDLException,
 			ParserConfigurationException, SOAPException, SAXException {
 	
-		SOAPEnvelope requestEnv = new SOAPEnvelope();
-		for (SOAPHeaderElement headerElement : makeSoapHeaders()) {
-			requestEnv.addHeader(headerElement);
-		}
-		requestEnv.addBodyElement(makeSoapBody(inputMap));
-		return requestEnv;
+            MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL); // TODO: SOAP version
+            SOAPMessage message = factory.createMessage();
+//            
+//            String soapAction = parser.getSOAPActionURI(operationName);
+//            if (soapAction != null) {
+//                MimeHeaders headers = message.getMimeHeaders();
+//                headers.addHeader("SOAPAction", soapAction);
+//            }
+//
+//            if (username != null && username.length() > 0 && 
+//                password != null && password.length() > 0) {
+//                String authorization = DatatypeConverter.printBase64Binary((username+":"+password).getBytes());
+//                MimeHeaders headers = message.getMimeHeaders();
+//                headers.addHeader("Authorization", "Basic " + authorization);
+//            }
+            
+            SOAPEnvelope requestEnv = message.getSOAPPart().getEnvelope();
+                
+            addSoapHeader(requestEnv);
+                
+            requestEnv.getBody().addChildElement(makeSoapBody(inputMap));
+
+            return message;
 	}
 
-	protected List<SOAPHeaderElement> makeSoapHeaders() {
-		return Collections.emptyList();
-	}
+        protected void addSoapHeader(SOAPEnvelope envelope) throws SOAPException
+        {
+        }
 
-	protected SOAPBodyElement makeSoapBody(Map inputMap)
+	protected SOAPElement makeSoapBody(Map inputMap)
 			throws UnknownOperationException, IOException, WSDLException,
 			ParserConfigurationException, SOAPException, SAXException {
-		BodyBuilder builder = bodyBuilderFactory.create(parser,
-				operationName,
-				parser.getOperationInputParameters(operationName));
-		return builder.build(inputMap);
-	}
-
-	protected SOAPEnvelope invokeCall(Call call, SOAPEnvelope requestEnv) throws AxisFault {
-		return call.invoke(requestEnv);
+		
+            BodyBuilder builder = 
+                    bodyBuilderFactory.create(parser, operationName, parser.getOperationInputParameters(operationName));
+                
+            return builder.build(inputMap);
 	}
 
 	/**
@@ -221,77 +251,28 @@ public class WSDLSOAPInvoker {
 		return result;
 	}
 
-	protected String getStyle() {
-		return parser.getStyle();
+	protected String getStyle() throws UnknownOperationException {
+		return parser.getStyle(operationName);
 	}
 
 	protected String getUse() throws UnknownOperationException {
 		return parser.getUse(operationName);
-	}
-
-	/**
-	 * Returns an axis based Call, initialised for the operation that needs to
-	 * be invoked
-	 * 
-	 * @return
-	 * @throws ServiceException
-	 * @throws UnknownOperationException
-	 * @throws MalformedURLException 
-	 * @throws WSDLException
-	 * @throws WSIFException
-	 */
-	protected Call getCall(EngineConfiguration config)  throws ServiceException, UnknownOperationException, MalformedURLException {
-		
-		org.apache.axis.client.Service service;
-		if (config==null) {
-			service = new org.apache.axis.client.Service();
-		}
-		else {
-			service = new org.apache.axis.client.Service(config);
-		}
-		
-		Call call = new Call(service);
-		
-		call.setTransport(new HTTPTransport());
-		call.setTargetEndpointAddress(parser.getOperationEndpointLocations(operationName).get(0));
-		//result.setPortName(parser.getPortType(operationName).getQName());
-		//result.setOperation(operationName);
-		
-		String use = parser.getUse(operationName);
-		call.setUseSOAPAction(true);
-		call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR,
-				Boolean.FALSE);
-		call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS,
-				Boolean.FALSE);
-		call
-				.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-		
-		if (parser.getSOAPActionURI(operationName)!=null) {
-			call.setSOAPActionURI(parser.getSOAPActionURI(operationName));
-		}
-		
-		if (use.equalsIgnoreCase("literal")) {
-			call.setEncodingStyle(null);
-		}
-		return call;
-	}
-	
+	}	
 
 	/**
 	 * Exctracts any attachments that result from invoking the service, and
 	 * returns them as a List wrapped within a DataThing
 	 * 
-	 * @param axisCall
+	 * @param message
 	 * @return
 	 * @throws SOAPException
 	 * @throws IOException
 	 */
-	protected List extractAttachments(Call axisCall)
+	protected List extractAttachments(SOAPMessage message)
 			throws SOAPException, IOException {
 		List attachmentList = new ArrayList();
-		if (axisCall.getResponseMessage() != null
-				&& axisCall.getResponseMessage().getAttachments() != null) {
-			for (Iterator i = axisCall.getResponseMessage().getAttachments(); i
+		if (message.countAttachments() > 0) {
+			for (Iterator i = message.getAttachments(); i
 					.hasNext();) {
 				AttachmentPart ap = (AttachmentPart) i.next();
 				DataHandler dh = ap.getDataHandler();
@@ -318,6 +299,4 @@ public class WSDLSOAPInvoker {
 
 		return attachmentList;
 	}
-
-	
 }

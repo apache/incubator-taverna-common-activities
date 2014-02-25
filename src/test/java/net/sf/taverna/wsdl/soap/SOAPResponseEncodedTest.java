@@ -33,24 +33,22 @@
  *****************************************************************/
 package net.sf.taverna.wsdl.soap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPFactory;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.testutils.LocationConstants;
 import net.sf.taverna.wsdl.testutils.WSDLTestHelper;
-
-import org.apache.axis.message.SOAPBodyElement;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 public class SOAPResponseEncodedTest  implements LocationConstants {
 	private String wsdlResourcePath(String wsdlName) throws Exception {
@@ -65,12 +63,13 @@ public class SOAPResponseEncodedTest  implements LocationConstants {
 
 		String xml1 = "<ns1:whatGeneInStageResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:ns1=\"urn:hgu.webservice.services\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"><whatGeneInStageReturn soapenc:arrayType=\"ns2:GeneExpressedQueryShortDetails[0]\" xsi:type=\"soapenc:Array\" xmlns:ns2=\"http://SubmissionQuery.WSDLGenerated.hgu\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><agene xsi:type=\"string\">a gene</agene></whatGeneInStageReturn></ns1:whatGeneInStageResponse>";
 
-		List<SOAPBodyElement> response = new ArrayList<SOAPBodyElement>();
+		List<SOAPElement> response = new ArrayList<SOAPElement>();
 
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml1.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(new InputSource(new StringReader(xml1)));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
 		SOAPResponseEncodedParser parser = new SOAPResponseEncodedParser(wsdlParser.getOperationOutputParameters("whatGeneInStage"));
 		parser.setStripAttributes(true);

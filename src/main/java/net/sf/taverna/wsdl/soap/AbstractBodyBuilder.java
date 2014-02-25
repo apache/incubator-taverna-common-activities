@@ -27,23 +27,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.wsdl.WSDLException;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
-
+import javax.xml.soap.SOAPFactory;
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
 import net.sf.taverna.wsdl.parser.BaseTypeDescriptor;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
-
-import org.apache.axis.encoding.Base64;
-import org.apache.axis.message.SOAPBodyElement;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -104,21 +102,25 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 		return parser.getOperationQname(operationName);	
 	}
 
-	public SOAPBodyElement build(Map inputMap) throws WSDLException,
+    @Override
+	public SOAPElement build(Map inputMap) throws WSDLException,
 			ParserConfigurationException, SOAPException, IOException,
 			SAXException, UnknownOperationException {
 
-		List inputs = parser.getOperationInputParameters(operationName);
+		List<TypeDescriptor> inputs = parser.getOperationInputParameters(operationName);
 
 		namespaceMappings = generateNamespaceMappings(inputs);
 
 		QName operationQname = getOperationQname();
 		
-		SOAPBodyElement body = new SOAPBodyElement(operationQname);
+                String ns = namespaceMappings.get(operationQname.getNamespaceURI());
+                
+		SOAPElement body = ns == null ? SOAPFactory.newInstance().createElement(operationQname) :
+                                                SOAPFactory.newInstance().createElement(operationQname.getLocalPart(), ns, operationQname.getNamespaceURI());
 
 		// its important to preserve the order of the inputs!
-		for (Iterator iterator = inputs.iterator(); iterator.hasNext();) {
-			TypeDescriptor descriptor = (TypeDescriptor) iterator.next();
+		for (Iterator<TypeDescriptor> iterator = inputs.iterator(); iterator.hasNext();) {
+			TypeDescriptor descriptor = iterator.next();
 			String inputName = descriptor.getName();
 			Object dataValue = inputMap.get(inputName);
 
@@ -131,17 +133,16 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 
 
 
-	protected SOAPBodyElement createBodyElementForData(String operationName,
+	protected SOAPElement createBodyElementForData(String operationName,
 			Map<String, String> namespaceMappings, String operationNamespace,
-			SOAPBodyElement body, TypeDescriptor descriptor, String inputName,
+			SOAPElement body, TypeDescriptor descriptor, String inputName,
 			Object dataValue) throws ParserConfigurationException,
 			SAXException, IOException, UnknownOperationException, SOAPException {
 		if (dataValue != null) {
 			String mimeType = getMimeTypeForInputName(inputName);
 			String typeName = descriptor.getType();
 
-			Element el = null;
-
+			Element el;
 			if (descriptor instanceof ArrayTypeDescriptor) {
 				el = createElementForArrayType(namespaceMappings, inputName,
 						dataValue, descriptor, mimeType, typeName);
@@ -157,8 +158,8 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 		return body;
 	}
 
-	protected abstract SOAPBodyElement addElementToBody(
-			String operationNamespace, SOAPBodyElement body, Element el)
+	protected abstract SOAPElement addElementToBody(
+			String operationNamespace, SOAPElement body, Element el)
 			throws SOAPException;
 
 	protected abstract Element createSkeletonElementForSingleItem(
@@ -268,7 +269,7 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 			}
 		} else if (mimeType.equals("'application/octet-stream'")
 				&& dataValue instanceof byte[]) {
-			String encoded = Base64.encode((byte[]) dataValue);
+                        String encoded = DatatypeConverter.printBase64Binary((byte[]) dataValue);
 			element.appendChild(element.getOwnerDocument().createTextNode(
 					encoded));
 		} else {
@@ -359,4 +360,15 @@ public abstract class AbstractBodyBuilder implements BodyBuilder {
 
 		return nsCount;
 	}
+        
+        protected Element createElementNS(String namespace, String name) {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            try {
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                return builder.newDocument().createElementNS(namespace, name);
+            } catch (ParserConfigurationException e) {
+                return null;
+            }
+        }
 }

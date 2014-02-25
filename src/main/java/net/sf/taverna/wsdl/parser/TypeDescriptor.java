@@ -43,6 +43,8 @@ public class TypeDescriptor {
 	private QName qname;
 
 	private boolean nillable = false;
+	
+	private String documentation;
 
 	public boolean isNillable() {
 		return nillable;
@@ -283,5 +285,13 @@ public class TypeDescriptor {
 		this.nillable  = nillable;
 		
 		
+	}
+
+	public String getDocumentation() {
+		return documentation;
+	}
+
+	public void setDocumentation(String documentation) {
+		this.documentation = documentation;
 	}
 }

@@ -22,14 +22,11 @@ package net.sf.taverna.wsdl.soap;
 
 import java.io.IOException;
 import java.util.Map;
-
 import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
-
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
-
-import org.apache.axis.message.SOAPBodyElement;
 import org.xml.sax.SAXException;
 
 /**
@@ -41,7 +38,7 @@ import org.xml.sax.SAXException;
 @SuppressWarnings("unchecked")
 public interface BodyBuilder {
 	
-	public SOAPBodyElement build(Map inputMap)
+	public SOAPElement build(Map inputMap)
 			throws WSDLException, ParserConfigurationException, SOAPException,
 			IOException, SAXException, UnknownOperationException;
 	

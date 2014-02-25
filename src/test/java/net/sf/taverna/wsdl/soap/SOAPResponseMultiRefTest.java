@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +45,7 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.soap.SOAPFactory;
 
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
@@ -52,9 +53,9 @@ import net.sf.taverna.wsdl.parser.WSDLParser;
 import net.sf.taverna.wsdl.testutils.LocationConstants;
 import net.sf.taverna.wsdl.testutils.WSDLTestHelper;
 
-import org.apache.axis.message.SOAPBodyElement;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 public class SOAPResponseMultiRefTest  implements LocationConstants {
 	
@@ -72,14 +73,15 @@ public class SOAPResponseMultiRefTest  implements LocationConstants {
 		String xml1 = "<ns1:getPersonResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:ns1=\"urn:testing\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"><getPersonReturn href=\"#id0\"/></ns1:getPersonResponse>";
 		String xml2 = "<multiRef id=\"id0\" soapenc:root=\"0\" soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><age xsi:type=\"soapenc:string\">5</age><name xsi:type=\"soapenc:string\">bob</name></multiRef>";
 
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml1.getBytes()));
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(new InputSource(new StringReader(xml1)));
 
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
-		doc = builder.parse(new ByteArrayInputStream(xml2.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                doc = builder.parse(new InputSource(new StringReader(xml2)));
+                response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
 		SOAPResponseEncodedMultiRefParser parser = new SOAPResponseEncodedMultiRefParser(
 				wsdlParser.getOperationOutputParameters("getPerson"));
@@ -117,14 +119,15 @@ public class SOAPResponseMultiRefTest  implements LocationConstants {
 		String xml1 = "<ns1:getPersonResponse soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:ns1=\"urn:testing\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"><ns1:getPersonReturn xmlns:ns1=\"urn:testing\" href=\"#id0\"/></ns1:getPersonResponse>";
 		String xml2 = "<multiRef id=\"id0\" soapenc:root=\"0\" soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><age xsi:type=\"soapenc:string\">5</age><name xsi:type=\"soapenc:string\">bob</name></multiRef>";
 
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml1.getBytes()));
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(new InputSource(new StringReader(xml1)));
 
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
-		doc = builder.parse(new ByteArrayInputStream(xml2.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                doc = builder.parse(new InputSource(new StringReader(xml2)));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
 		SOAPResponseEncodedMultiRefParser parser = new SOAPResponseEncodedMultiRefParser(
 				wsdlParser.getOperationOutputParameters("getPerson"));
@@ -169,19 +172,21 @@ public class SOAPResponseMultiRefTest  implements LocationConstants {
 
 		List response = new ArrayList();
 
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml1.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(new InputSource(new StringReader(xml1)));
 
-		doc = builder.parse(new ByteArrayInputStream(xml2.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
-		doc = builder.parse(new ByteArrayInputStream(xml3.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                doc = builder.parse(new InputSource(new StringReader(xml2)));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
-		doc = builder.parse(new ByteArrayInputStream(xml4.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                doc = builder.parse(new InputSource(new StringReader(xml3)));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
+
+                doc = builder.parse(new InputSource(new StringReader(xml4)));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
 		
 		parser.setStripAttributes(true);
@@ -220,16 +225,17 @@ public class SOAPResponseMultiRefTest  implements LocationConstants {
 
 		List response = new ArrayList();
 
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-				.newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(xml1.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document doc = builder.parse(new InputSource(new StringReader(xml1)));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
-		doc = builder.parse(new ByteArrayInputStream(xml2.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+		doc = builder.parse(new InputSource(new StringReader(xml2)));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
-		doc = builder.parse(new ByteArrayInputStream(xml3.getBytes()));
-		response.add(new SOAPBodyElement(doc.getDocumentElement()));
+		doc = builder.parse(new InputSource(new StringReader(xml3)));
+		response.add(SOAPFactory.newInstance().createElement(doc.getDocumentElement()));
 
 		SOAPResponseEncodedMultiRefParser parser = new SOAPResponseEncodedMultiRefParser(
 				outputNames);

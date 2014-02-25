@@ -26,13 +26,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
+import javax.xml.bind.DatatypeConverter;
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
 import net.sf.taverna.wsdl.parser.BaseTypeDescriptor;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
-
-import org.apache.axis.encoding.Base64;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -164,7 +162,7 @@ public class XMLInputSplitter {
 			}
 			if (dataObject != null) {
 				outputElement.setAttribute(key, dataObject.toString(), Namespace
-						.getNamespace(attribute.getNamespaceURI()));
+						.getNamespace(attribute.getQname().getPrefix(), attribute.getNamespaceURI()));
 			}
 		}
 		
@@ -198,8 +196,7 @@ public class XMLInputSplitter {
 									"type",
 									"xsd:base64Binary",
 									xsiNs);
-					dataObject = Base64
-							.encode(((byte[]) dataObject));
+					dataObject = DatatypeConverter.printBase64Binary((byte[]) dataObject);
 				}
 				dataElement.setText(dataObject.toString());
 			}
@@ -269,10 +266,10 @@ public class XMLInputSplitter {
 			Object descendantObject = iterator.next();
 			if (descendantObject instanceof Element) {
 				Element childElement = (Element) descendantObject;
-				if (childElement.getNamespaceURI() == null
-						|| childElement.getNamespaceURI().length() == 0)
+				if (childElement.getNamespaceURI() == null) {
 					childElement.setNamespace(Namespace
 							.getNamespace(namespaceURI));
+				}
 			}
 		}
 	}

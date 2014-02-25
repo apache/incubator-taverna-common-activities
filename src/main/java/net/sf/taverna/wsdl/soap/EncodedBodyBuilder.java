@@ -25,21 +25,20 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.wsdl.WSDLException;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
-
+import javax.xml.soap.SOAPFactory;
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
 import net.sf.taverna.wsdl.parser.BaseTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
-
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.utils.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -56,19 +55,20 @@ public class EncodedBodyBuilder extends AbstractBodyBuilder {
 	}
 
 	@Override
-	public SOAPBodyElement build(Map inputMap) throws WSDLException,
+	public SOAPElement build(Map inputMap) throws WSDLException,
 			ParserConfigurationException, SOAPException, IOException,
 			SAXException, UnknownOperationException {
 
-		SOAPBodyElement result = super.build(inputMap);
-		for (Iterator iterator = namespaceMappings.keySet().iterator(); iterator
-				.hasNext();) {
+		SOAPElement result = super.build(inputMap);
+                
+		for (Iterator iterator = namespaceMappings.keySet().iterator(); iterator.hasNext();) {
 			String namespaceURI = (String) iterator.next();
 			String ns = namespaceMappings.get(namespaceURI);
 			result.addNamespaceDeclaration(ns, namespaceURI);
 		}
-		result.setAttribute("soapenv:encodingStyle",
-				"http://schemas.xmlsoap.org/soap/encoding/");
+                
+                result.setAttributeNS(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, "soapenv:encodingStyle", SOAPConstants.URI_NS_SOAP_ENCODING);
+
 		return result;
 	}
 
@@ -76,13 +76,14 @@ public class EncodedBodyBuilder extends AbstractBodyBuilder {
 	protected Element createSkeletonElementForSingleItem(
 			Map<String, String> namespaceMappings, TypeDescriptor descriptor,
 			String inputName, String typeName) {
-		Element el = XMLUtils.StringToElement("", inputName, "");
+            
+                Element el = createElementNS(null, inputName);
 
-		String ns = namespaceMappings.get(descriptor.getNamespaceURI());
-		if (ns != null) {
-			el.setAttribute("xsi:type", ns + ":" + descriptor.getType());
-		}
-		return el;
+                String ns = namespaceMappings.get(descriptor.getNamespaceURI());
+                if (ns != null) {
+                        el.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "xsi:type", ns + ":" + descriptor.getType());
+                }
+                return el;
 	}
 
 	@Override
@@ -96,13 +97,12 @@ public class EncodedBodyBuilder extends AbstractBodyBuilder {
 		builderFactory.setNamespaceAware(true);
 		DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
 
-		Element el;
 		ArrayTypeDescriptor arrayDescriptor = (ArrayTypeDescriptor) descriptor;
 		TypeDescriptor elementType = arrayDescriptor.getElementType();
 		int size = 0;
 
-		el = XMLUtils.StringToElement("", inputName, "");
-
+                Element el = createElementNS(null, inputName);
+                
 		if (dataValue instanceof List) {
 			List dataValues = (List) dataValue;
 			size = dataValues.size();
@@ -138,22 +138,20 @@ public class EncodedBodyBuilder extends AbstractBodyBuilder {
 
 		String ns = namespaceMappings.get(elementType.getNamespaceURI());
 		if (ns != null) {
-			String elementNS = ns + ":" + elementType.getType() + "[" + size
-					+ "]";
-			el.setAttribute("soapenc:arrayType", elementNS);
-			el.setAttribute("xmlns:soapenc",
-					"http://schemas.xmlsoap.org/soap/encoding/");
+			String elementNS = ns + ":" + elementType.getType() + "[" + size + "]";
+			el.setAttributeNS(SOAPConstants.URI_NS_SOAP_ENCODING, "soapenc:arrayType", elementNS);
 		}
 
-		el.setAttribute("xsi:type", "soapenc:Array");
+		el.setAttributeNS(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "xsi:type", "soapenc:Array");
 
 		return el;
 	}
 
 	@Override
-	protected SOAPBodyElement addElementToBody(String operationNamespace, SOAPBodyElement body, Element el) throws SOAPException {
-		body.addChildElement(new SOAPBodyElement(el));
-		return body;
+	protected SOAPElement addElementToBody(String operationNamespace, SOAPElement body, Element el) throws SOAPException {
+            SOAPElement child = SOAPFactory.newInstance().createElement(el);
+            body.addChildElement(child);
+            return body;
 	}
 
 	

@@ -41,7 +41,7 @@ public class BodyBuilderFactory {
 	
 	public BodyBuilder create(WSDLParser parser, String operationName, List<TypeDescriptor> inputDescriptors) throws UnknownOperationException {
 		String use = parser.getUse(operationName);
-		String style = parser.getStyle();
+		String style = parser.getStyle(operationName);
 		if (use.equals("encoded")) {
 			return new EncodedBodyBuilder(style, parser,operationName, inputDescriptors);
 		}

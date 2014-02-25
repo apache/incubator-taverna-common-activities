@@ -35,6 +35,7 @@ package net.sf.taverna.wsdl.soap;
 
 import java.util.List;
 import java.util.Map;
+import javax.xml.soap.SOAPElement;
 
 /**
  * Inteface that defines all parsers responsible for parsing SOAP responses from
@@ -56,6 +57,6 @@ public interface SOAPResponseParser {
 	 * @return Map of output DataThing's mapped to their output name
 	 * @throws Exception
 	 */
-	public Map parse(List response) throws Exception;
+	public Map parse(List<SOAPElement> response) throws Exception;
 
 }

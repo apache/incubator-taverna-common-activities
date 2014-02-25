@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import java.net.URL;
 import java.util.List;
 
-import javax.wsdl.Operation;
 import javax.xml.namespace.QName;
 
 import net.sf.taverna.wsdl.testutils.WSDLTestHelper;
@@ -39,13 +38,12 @@ public class WSDLParserTest {
 	@Test
 	public void testGetOperations() throws Exception {
 		WSDLParser parser = new WSDLParser(wsdlResourcePath("eutils/eutils_lite.wsdl"));
-		List<Operation> operations = parser.getOperations();
+                List<String> operations = parser.getOperations("eUtilsServiceSoap");
+
 		assertEquals(
 				"wrong number of operations found (wsdl may have changed)", 12,
 				operations.size());
-		Operation op = operations.get(0);
-		assertEquals("wrong name for first operation", "run_eGquery", op
-				.getName());
+		assertEquals("wrong name for first operation", "run_eGquery", operations.get(0));
 		assertEquals("wrong style", "document", parser.getStyle());
 	}
 

@@ -27,10 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.wsdl.WSDLException;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
 
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
 import net.sf.taverna.wsdl.parser.BaseTypeDescriptor;
@@ -38,9 +41,6 @@ import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 
-import org.apache.axis.message.MessageElement;
-import org.apache.axis.message.SOAPBodyElement;
-import org.apache.axis.utils.XMLUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -62,7 +62,6 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 	private static Logger logger = Logger.getLogger(LiteralBodyBuilder.class);
 
 	private static final String TYPE = "type";
-	private static final String NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
 
 	public LiteralBodyBuilder(String style, WSDLParser parser, String operationName, List<TypeDescriptor> inputDescriptors) {
 		super(style, parser, operationName,inputDescriptors);
@@ -74,11 +73,11 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 	}
 
 	@Override
-	public SOAPBodyElement build(Map inputMap) throws WSDLException,
+	public SOAPElement build(Map inputMap) throws WSDLException,
 			ParserConfigurationException, SOAPException, IOException,
 			SAXException, UnknownOperationException {
 
-		SOAPBodyElement body = super.build(inputMap);
+		SOAPElement body = super.build(inputMap);
 
 		if (getStyle() == Style.DOCUMENT) {
 			fixTypeAttributes(body);
@@ -92,14 +91,14 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 			Map<String, String> namespaceMappings, TypeDescriptor descriptor,
 			String inputName, String typeName) {
 		if (getStyle()==Style.DOCUMENT) {
-			return XMLUtils.StringToElement("", descriptor.getQname().getLocalPart(), "");
-		}
-		else {
-			return XMLUtils.StringToElement("", inputName, "");
+                        return createElementNS("", descriptor.getQname().getLocalPart());
+			
+		} else {
+                    return createElementNS("", inputName);
 		}
 	}
 	
-		private void fixTypeAttributes(Node parent) {
+        private void fixTypeAttributes(Node parent) {
 		if (parent.getNodeType() == Node.ELEMENT_NODE) {
 			Element el = (Element) parent;
 			if (parent.hasAttributes()) {
@@ -108,7 +107,7 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 				for (int i = 0; i < attributes.getLength(); i++) {
 					Node node = attributes.item(i);
 					
-					if (NS_XSI.equals(node.getNamespaceURI()) && TYPE.equals(node.getLocalName())) {
+					if (XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI.equals(node.getNamespaceURI()) && TYPE.equals(node.getLocalName())) {
 						// TAV-712 - don't just strip out xsi:type - let's fix the
 						// name prefixes instead
 						
@@ -126,8 +125,8 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 						}
 						
 						String xsiTypeNS;
-						if (parent instanceof MessageElement) {
-							xsiTypeNS = ((MessageElement)parent).getNamespaceURI(xsiTypePrefix);
+						if (parent instanceof SOAPElement) {
+							xsiTypeNS = ((SOAPElement)parent).getNamespaceURI(xsiTypePrefix);
 						} else {
 							xsiTypeNS = node
 									.lookupNamespaceURI(xsiTypePrefix);
@@ -160,17 +159,12 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 			Object dataValue, TypeDescriptor descriptor, String mimeType,
 			String typeName) throws ParserConfigurationException, SAXException,
 			IOException, UnknownOperationException {
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-				.newInstance();
-		builderFactory.setNamespaceAware(true);
-		DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
 
-		Element el;
 		ArrayTypeDescriptor arrayDescriptor = (ArrayTypeDescriptor) descriptor;
 		TypeDescriptor elementType = arrayDescriptor.getElementType();
 		int size = 0;
 
-		el = XMLUtils.StringToElement("", typeName, "");
+                Element el = createElementNS("", inputName);
 
 		if (dataValue instanceof List) {
 			List dataValues = (List) dataValue;
@@ -181,7 +175,9 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 			// if mime type is text/xml then the data is an array in xml form,
 			// else its just a single primitive element
 			if (mimeType.equals("'text/xml'")) {
-
+                                DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+                                builderFactory.setNamespaceAware(true);
+                                DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
 				Document doc = docBuilder.parse(new ByteArrayInputStream(
 						dataValue.toString().getBytes()));
 				Node child = doc.getDocumentElement().getFirstChild();
@@ -210,13 +206,18 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 	}
 
 	@Override
-	protected SOAPBodyElement addElementToBody(String operationNamespace, SOAPBodyElement body, Element el) throws SOAPException {
+	protected SOAPElement addElementToBody(String operationNamespace, SOAPElement body, Element el) throws SOAPException {
+                SOAPElement element = SOAPFactory.newInstance().createElement(el);
+                
 		if (getStyle()==Style.DOCUMENT) {
-			body = new SOAPBodyElement(el);
-			body.setNamespaceURI(operationNamespace);
-		}
-		else {
-			body.addChildElement(new SOAPBodyElement(el));
+                    // el itself is a body
+                        Node node = el.getOwnerDocument().renameNode(el, operationNamespace, el.getLocalName());
+                        node.setPrefix(body.getPrefix()); // unnecessary, but to keep junits happy
+                        
+                        body = SOAPFactory.newInstance().createElement((Element)node);
+
+		} else {
+			body.addChildElement(element);
 		}
 		return body;
 	}
