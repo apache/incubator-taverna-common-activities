@@ -60,7 +60,7 @@
              			"description": "The depth of the port",
                         "type": "integer",
                         "required": true
-                    }
+                    },
                     "granularDepth": {
                  		"title": "Port Granular Depth",
              			"description": "The granular depth of the port",

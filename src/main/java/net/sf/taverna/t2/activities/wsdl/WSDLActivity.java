@@ -1,25 +1,26 @@
 /*******************************************************************************
- * Copyright (C) 2007 The University of Manchester
- *
+ * Copyright (C) 2007 The University of Manchester   
+ * 
  *  Modifications to the initial code base are copyright of their
  *  respective authors, or their employers as appropriate.
- *
+ * 
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public License
  *  as published by the Free Software Foundation; either version 2.1 of
  *  the License, or (at your option) any later version.
- *
+ *    
  *  This program is distributed in the hope that it will be useful, but
  *  WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- *
+ *    
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  ******************************************************************************/
 package net.sf.taverna.t2.activities.wsdl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -27,32 +28,29 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 
+//import net.sf.taverna.t2.activities.wsdl.security.SecurityProfiles;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.ReferenceServiceException;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 import net.sf.taverna.wsdl.parser.UnknownOperationException;
 import net.sf.taverna.wsdl.parser.WSDLParser;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * An asynchronous Activity that is concerned with WSDL based web-services.
@@ -63,22 +61,20 @@ import com.fasterxml.jackson.databind.JsonNode;
  * port <em>attachmentList</em> is added to represent any attachements that are
  * returned by the webservice.
  * </p>
- *
+ * 
  * @author Stuart Owen
  * @author Stian Soiland-Reyes
  */
-public class WSDLActivity extends
-		AbstractAsynchronousActivity<JsonNode> implements
+public class WSDLActivity extends AbstractAsynchronousActivity<JsonNode> implements
 		InputPortTypeDescriptorActivity, OutputPortTypeDescriptorActivity {
-
-	public static final String URI = "http://ns.taverna.org.uk/2010/activity/wsdl";
-
+    
+        public static final String URI = "http://ns.taverna.org.uk/2010/activity/wsdl";
 	public static final String ENDPOINT_REFERENCE = "EndpointReference";
+        
 	private JsonNode configurationBean;
 	private WSDLParser parser;
-//	private Map<String, Integer> outputDepth = new HashMap<String, Integer>();
 	private boolean isWsrfService = false;
-//	private String endpointReferenceInputPortName;
+	private String endpointReferenceInputPortName;
 	private CredentialManager credentialManager;
 
 	public WSDLActivity(CredentialManager credentialManager) {
@@ -103,13 +99,13 @@ public class WSDLActivity extends
 	@Override
 	public void configure(JsonNode bean)
 			throws ActivityConfigurationException {
-		this.configurationBean = bean;
-		try {
-			parseWSDL();
-		} catch (Exception ex) {
-			throw new ActivityConfigurationException(
-					"Unable to parse the WSDL " + bean.get("operation").get("wsdl").textValue(), ex);
-		}
+            this.configurationBean = bean;
+            try {
+                    parseWSDL();
+            } catch (Exception ex) {
+                throw new ActivityConfigurationException(
+                            "Unable to parse the WSDL " + bean.get("operation").get("wsdl").textValue(), ex);
+            }
 	}
 
 	@Override
@@ -119,10 +115,11 @@ public class WSDLActivity extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @seenet.sf.taverna.t2.activities.wsdl.InputPortTypeDescriptorActivity#
 	 * getTypeDescriptorForInputPort(java.lang.String)
 	 */
+        @Override
 	public TypeDescriptor getTypeDescriptorForInputPort(String portName)
 			throws UnknownOperationException, IOException {
 		List<TypeDescriptor> inputDescriptors = parser
@@ -139,10 +136,11 @@ public class WSDLActivity extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @seenet.sf.taverna.t2.activities.wsdl.InputPortTypeDescriptorActivity#
 	 * getTypeDescriptorsForInputPorts()
 	 */
+        @Override
 	public Map<String, TypeDescriptor> getTypeDescriptorsForInputPorts()
 			throws UnknownOperationException, IOException {
 		Map<String, TypeDescriptor> descriptors = new HashMap<String, TypeDescriptor>();
@@ -156,10 +154,11 @@ public class WSDLActivity extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @seenet.sf.taverna.t2.activities.wsdl.OutputPortTypeDescriptorActivity#
 	 * getTypeDescriptorForOutputPort(java.lang.String)
 	 */
+        @Override
 	public TypeDescriptor getTypeDescriptorForOutputPort(String portName)
 			throws UnknownOperationException, IOException {
 		TypeDescriptor result = null;
@@ -176,10 +175,11 @@ public class WSDLActivity extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @seenet.sf.taverna.t2.activities.wsdl.OutputPortTypeDescriptorActivity#
 	 * getTypeDescriptorsForOutputPorts()
 	 */
+        @Override
 	public Map<String, TypeDescriptor> getTypeDescriptorsForOutputPorts()
 			throws UnknownOperationException, IOException {
 		Map<String, TypeDescriptor> descriptors = new HashMap<String, TypeDescriptor>();
@@ -193,28 +193,30 @@ public class WSDLActivity extends
 
 	private void parseWSDL() throws ParserConfigurationException,
 			WSDLException, IOException, SAXException, UnknownOperationException {
-		String wsdlLocation = configurationBean.get("operation").get("wsdl").textValue();
-		URLConnection connection = null;
-		try {
-			URL wsdlURL = new URL(wsdlLocation);
-			connection = wsdlURL.openConnection();
-			connection.setConnectTimeout(RemoteHealthChecker.getTimeoutInSeconds() * 1000);
-			connection.connect();
-		} catch (MalformedURLException e) {
-			throw new IOException("Malformed URL", e);
-		} catch (SocketTimeoutException e) {
-			throw new IOException("Timeout", e);
-		} catch (IOException e) {
-			throw e;
-		} finally {
-			if ((connection != null) && (connection.getInputStream() != null)) {
-				connection.getInputStream().close();
-			}
+	    URLConnection connection = null;
+	    try {
+		URL wsdlURL = new URL(configurationBean.get("operation").get("wsdl").textValue());
+		connection = wsdlURL.openConnection();
+		connection.setConnectTimeout(RemoteHealthChecker.getTimeoutInSeconds() * 1000);
+		connection.connect();
+	    } catch (MalformedURLException e) {
+		throw new IOException("Malformed URL", e);
+	    } catch (SocketTimeoutException e) {
+		throw new IOException("Timeout", e);
+	    } catch (IOException e) {
+		throw e;
+	    } finally {
+		if ((connection != null) && (connection.getInputStream() != null)) {
+		    connection.getInputStream().close();
 		}
-		parser = new WSDLParser(wsdlLocation);
-		isWsrfService = parser.isWsrfService();
+	    }
+	    parser = new WSDLParser(configurationBean.get("operation").get("wsdl").textValue());
+            isWsrfService = parser.isWsrfService();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void executeAsynch(final Map<String, T2Reference> data,
 			final AsynchronousActivityCallback callback) {
@@ -228,7 +230,6 @@ public class WSDLActivity extends
 
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 				Map<String, Object> invokerInputMap = new HashMap<String, Object>();
-				String endpointReferenceInputPortName = getEndpointReferenceInputPortName();
 
 				try {
 					String endpointReference = null;
@@ -254,12 +255,12 @@ public class WSDLActivity extends
 
 					Map<String, Object> invokerOutputMap = invoker.invoke(
 							invokerInputMap, configurationBean);
-					
+
 					for (String outputName : invokerOutputMap.keySet()) {
-					    Object value = invokerOutputMap.get(outputName);
-						
+						Object value = invokerOutputMap.get(outputName);
+
 						if (value != null) {
-							Integer depth = getOutputPortDepth(outputName);
+                                                        Integer depth = getOutputPortDepth(outputName);
 							if (depth != null) {
 								outputData.put(outputName, referenceService
 										.register(value, depth, true, callback
@@ -279,13 +280,10 @@ public class WSDLActivity extends
 					logger.error("Error finding the input data for "
 							+ getConfiguration().get("operation"), e);
 					callback.fail("Unable to find input data", e);
-					return;
 				} catch (Exception e) {
 					logger.error("Error invoking WSDL service "
 							+ getConfiguration().get("operation"), e);
-					callback.fail(
-							"An error occurred invoking the WSDL service", e);
-					return;
+					callback.fail("An error occurred invoking the WSDL service", e);
 				}
 
 			}
@@ -298,31 +296,8 @@ public class WSDLActivity extends
 		for (ActivityOutputPort outputPort : getOutputPorts()) {
 			if (outputPort.getName().equals(portName)) {
 				return outputPort.getDepth();
-			}
-		}
-		return null;
-	}
-
-	private String getEndpointReferenceInputPortName() {
-		String endpointReferenceInputPortName = null;
-		if (parser.isWsrfService()) {
-			Set<String> inputPorts = new HashSet<>();
-			try {
-				List<TypeDescriptor> inputDescriptors = parser.getOperationInputParameters(configurationBean
-						.get("operation").get("name").textValue());
-				for (TypeDescriptor descriptor : inputDescriptors) {
-					inputPorts.add(descriptor.getName());
-				}
-			} catch (UnknownOperationException | IOException e) {
-			}
-			// Make sure the port name is unique
-			endpointReferenceInputPortName = WSDLActivity.ENDPOINT_REFERENCE;
-			int counter = 0;
-			while (inputPorts.contains(endpointReferenceInputPortName)) {
-				endpointReferenceInputPortName = WSDLActivity.ENDPOINT_REFERENCE + counter++;
-			}
-		}
-		return endpointReferenceInputPortName;
-	}
-
+                        }
+                }
+                return null;
+        }
 }

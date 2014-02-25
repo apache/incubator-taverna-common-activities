@@ -33,6 +33,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Iterator;
 
 /**
  * An {@link ActivityFactory} for creating <code>XMLInputSplitterActivity</code>.
@@ -72,7 +73,9 @@ public class XMLInputSplitterActivityFactory implements ActivityFactory {
 			throws ActivityConfigurationException {
 		Set<ActivityInputPort> inputPorts = new HashSet<>();
 		if (configuration.has("inputPorts")) {
-			for (JsonNode inputPort : configuration.get("inputPorts")) {
+//                        for (JsonNode inputPort : configuration.get("inputPorts")) {
+                        for (Iterator<JsonNode> iter = configuration.get("inputPorts").iterator();iter.hasNext();) {
+                                JsonNode inputPort = iter.next();
 				inputPorts.add(edits.createActivityInputPort(inputPort.get("name").textValue(),
 						inputPort.get("depth").intValue(), false, null, String.class));
 			}
@@ -85,7 +88,9 @@ public class XMLInputSplitterActivityFactory implements ActivityFactory {
 			throws ActivityConfigurationException {
 		Set<ActivityOutputPort> outputPorts = new HashSet<>();
 		if (configuration.has("outputPorts")) {
-			for (JsonNode outputPort : configuration.get("outputPorts")) {
+//			for (JsonNode outputPort : configuration.get("outputPorts")) {
+                        for (Iterator<JsonNode> iter = configuration.get("outputPorts").iterator();iter.hasNext();) {
+                            JsonNode outputPort = iter.next();
 				outputPorts.add(edits.createActivityOutputPort(outputPort.get("name").textValue(),
 						outputPort.get("depth").intValue(), outputPort.get("granularDepth").intValue()));
 			}

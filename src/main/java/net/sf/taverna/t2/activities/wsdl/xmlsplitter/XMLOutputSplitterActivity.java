@@ -47,6 +47,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Iterator;
 
 /**
  * An activity that replicates the behaviour of the Taverna 1 XMLOutputSplitter.
@@ -126,7 +127,9 @@ public class XMLOutputSplitterActivity extends
 				// mimetype. Need to use the actual InputPort once the mimetype
 				// becomes available again.
 				if (configBean.has("outputPorts")) {
-					for (JsonNode outputPort : configBean.get("outputPorts")) {
+//					for (JsonNode outputPort : configBean.get("outputPorts")) {
+                                        for (Iterator<JsonNode> iter = configBean.get("outputPorts").iterator();iter.hasNext();) {
+                                                JsonNode outputPort = iter.next();
 						outputNames.add(outputPort.get("name").textValue());
 						outputTypes.add(outputPort.get("mimeType").textValue());
 					}
@@ -189,6 +192,7 @@ public class XMLOutputSplitterActivity extends
 	 * {@inheritDoc}
 	 *
 	 */
+        @Override
 	public Map<String, TypeDescriptor> getTypeDescriptorsForOutputPorts()
 			throws UnknownOperationException, IOException {
 		Map<String, TypeDescriptor> descriptors = new HashMap<String, TypeDescriptor>();

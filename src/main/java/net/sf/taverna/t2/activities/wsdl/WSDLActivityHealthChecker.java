@@ -44,6 +44,7 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 
 	private Activity<?> activity;
 
+        @Override
 	public boolean canVisit(Object subject) {
 		if (subject == null) {
 			return false;
@@ -57,6 +58,7 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 		return false;
 	}
 
+        @Override
 	public VisitReport visit(Object o, List<Object> ancestors) {
 		List<VisitReport> reports = new ArrayList<VisitReport>();
 		activity = (Activity<?>) o;
@@ -147,24 +149,28 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 
 	private VisitReport testEndpoint(WSDLParser parser, String operationName) {
 		List<VisitReport> reports = new ArrayList<VisitReport>();
-		List<String> endpoints = parser
-				.getOperationEndpointLocations(operationName);
-		for (String endpoint : endpoints) {
-			reports.add(RemoteHealthChecker.contactEndpoint(activity, endpoint));
-		}
+                
+                try {
+                    List<String> endpoints = parser
+                                    .getOperationEndpointLocations(operationName);
+                    for (String endpoint : endpoints) {
+                            reports.add(RemoteHealthChecker.contactEndpoint(activity, endpoint));
+                    }
+                } catch (UnknownOperationException ex) {
+		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "Operation could not be located.", HealthCheck.UNKNOWN_OPERATION, Status.SEVERE);
+		    report.setProperty("operationName", operationName);
+		    return report;                    
+                }
 
 		Status status = VisitReport.getWorstStatus(reports);
-		if (reports.size()==1) {
-			return reports.get(0);
-		}
-		else if (reports.size()==0) {
+		if (reports.isEmpty()) {
 		    VisitReport report = new VisitReport(HealthCheck.getInstance(), activity, "Service could not be located.", HealthCheck.NO_ENDPOINTS, Status.SEVERE);
 		    report.setProperty("operationName", operationName);
 		    return report;
-		}
-		else {
+		} else if (reports.size()==1) {
+			return reports.get(0);
+		} else {
 			return new VisitReport(HealthCheck.getInstance(), activity, "Endpoint tests",  HealthCheck.NO_PROBLEM, status, reports);
 		}
-	}
-
+        }
 }

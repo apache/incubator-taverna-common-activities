@@ -9,8 +9,9 @@
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>wsdl-activity</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
-	<name>Taverna 2 WSDL Activity</name>
+	<name>Taverna 3 WSDL Activity</name>
 	<build>
 		<plugins>
 			<plugin>
@@ -40,7 +41,7 @@
 		<dependency>
 			<groupId>net.sf.taverna</groupId>
 			<artifactId>wsdl-generic</artifactId>
-			<version>${wsdl.generic.version}</version>
+			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.taverna.t2.security</groupId>
@@ -52,16 +53,25 @@
 			<artifactId>com.springsource.org.jdom</artifactId>
 			<version>${jdom.version}</version>
 		</dependency>
+                
+                <dependency>
+                        <groupId>org.apache.ws.security</groupId>
+                        <artifactId>wss4j</artifactId>
+                        <version>1.6.13</version>
+                </dependency>
+<!--                
 		<dependency>
 			<groupId>org.apache.ws</groupId>
 			<artifactId>com.springsource.org.apache.ws.security</artifactId>
 			<version>${ws.security.version}</version>
 		</dependency>
+                
 		<dependency>
 			<groupId>org.apache.xml</groupId>
 			<artifactId>com.springsource.org.apache.xml.security</artifactId>
 			<version>${xml.security.version}</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>org.apache.log4j</groupId>
 			<artifactId>com.springsource.org.apache.log4j</artifactId>
@@ -81,7 +91,10 @@
 		<dependency>
 			<groupId>net.sf.taverna.t2.activities</groupId>
 			<artifactId>activity-test-utils</artifactId>
+			<version>2.0.1-SNAPSHOT</version>
+<!--
 			<version>${project.version}</version>
+-->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
