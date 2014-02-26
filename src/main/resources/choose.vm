@@ -58,7 +58,7 @@
        </script>
   
   <h2>$!message</h2>
-    <form name="myform">
+    <form name="myform" onSubmit="reply(); return false;">
 #foreach( $value in $selectionValues )
       <label>$value<input type="radio" name="group" value="$value" /></label><br />  
 #end

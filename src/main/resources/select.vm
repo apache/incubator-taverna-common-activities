@@ -42,7 +42,7 @@
        </script>
   
   <h2>$!message</h2>
-    <form name="myform">
+    <form name="myform" onSubmit="reply(); return false;">
       <select name="mySelect">
 #foreach( $value in $valueList )
       <option value="$value">$value</option>

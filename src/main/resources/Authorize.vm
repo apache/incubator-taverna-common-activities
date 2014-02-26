@@ -59,7 +59,7 @@
        </script>
   
   <h2>Please select an authentication site</h2>
-      <form name="myform">
+      <form name="myform" onSubmit="forward(); return false;">
       <select name="mySelect">
 #foreach( $value in $loginSites )
       <option value="$value.getName()">$value.getName()</option>

@@ -45,7 +45,7 @@
     <p>The credential manager could not find a username and password for the service at <code>$!serviceURI</code></p>
     <p>$!requestingPrompt</p>
     <p>Please provide a username and password</p>
-    <form name="myform">
+    <form name="myform" onSubmit="reply(); return false;">
       <label>User name<input type="text" name="username"/></label><br />
       <label>Password<input type="password" name="password"/></label><br />
       <label>Save in credental manager<input type="checkbox" name="shouldsave"/></label><br />

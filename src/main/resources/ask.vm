@@ -38,7 +38,7 @@
        </script>
   
   <h2>$!message</h2>
-    <form name="myform">
+    <form name="myform" onSubmit="reply(); return false;">
       <input type="text" name="answerInput"/><br />
       <input type="button" value="Cancel" onClick = "cancel()"/>
       <input type="button" value="Submit" onClick = "reply()"/>
