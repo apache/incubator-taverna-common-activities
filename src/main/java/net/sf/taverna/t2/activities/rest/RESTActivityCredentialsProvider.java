@@ -35,28 +35,20 @@ public class RESTActivityCredentialsProvider extends BasicCredentialsProvider
   private static final String HTTP_PROTOCOL = "http";
   private static final String HTTPS_PROTOCOL = "https";
   
-  
-  // the only existing instance of this class - it's a singleton
-  private static RESTActivityCredentialsProvider credentialsProvider;
-  
-  
-  private RESTActivityCredentialsProvider() {
-    // making constructor private - nobody can now instantiate this class manually
+  private static class Singleton {
+	  static RESTActivityCredentialsProvider instance = new RESTActivityCredentialsProvider();
   }
   
+ 
+  protected RESTActivityCredentialsProvider() {
+    // making constructor private - nobody can now instantiate this class manually
+  }
+    
   /**
    * @return The only existing instance of the RESTActivityCredentialsProvider - singleton.
    */
-  public static RESTActivityCredentialsProvider getInstance()
-  {
-    if (credentialsProvider == null) {
-      synchronized (RESTActivityCredentialsProvider.class) {
-        if (credentialsProvider == null) {
-          credentialsProvider = new RESTActivityCredentialsProvider();
-        }
-      }
-    }
-    return (credentialsProvider);
+  public static RESTActivityCredentialsProvider getInstance() {
+    return Singleton.instance;
   }
   
   @Override
