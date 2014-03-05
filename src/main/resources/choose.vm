@@ -55,6 +55,11 @@
 	       return true;
          }
 
+         pmrpc.call({
+           destination : "publish",
+           publicProcedureName : "setTitle",
+           params : ["$!title"]});
+           
        </script>
   
   <h2>$!message</h2>

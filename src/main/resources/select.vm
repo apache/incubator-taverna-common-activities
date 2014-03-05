@@ -38,6 +38,11 @@
            });
 	       return true;
          }
+         
+         pmrpc.call({
+           destination : "publish",
+           publicProcedureName : "setTitle",
+           params : ["$!title"]});
 
        </script>
   
