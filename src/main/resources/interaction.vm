@@ -51,7 +51,7 @@
 
 
          function reply(status, results) {
-           document.getElementById('presentationDiv').innerHTML="<p>Returning results</p>";
+             document.getElementById('presentationDiv').innerHTML="<p>Returning results</p>";
 #if ($outputDataUrl)
            var outputData = JSON.stringify(results);
            var dataRequest = new XMLHttpRequest();
@@ -65,7 +65,12 @@
            xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
            xmlhttp.setRequestHeader("Slug", "$entryId" + "-reply");
            xmlhttp.send(msg);
-           document.getElementById('presentationDiv').innerHTML="<p>Returned results</p>";
+           var shownMessage = 'Returned results';
+           if (status != 'OK') {
+             shownMessage = status;
+           }
+           document.getElementById('presentationDiv').innerHTML="<p>" + shownMessage + "</p>";
+             
            return false;
          }
          
