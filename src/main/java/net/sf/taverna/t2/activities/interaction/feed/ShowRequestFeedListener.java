@@ -24,7 +24,9 @@ public class ShowRequestFeedListener extends FeedReader {
 	private static Logger logger = Logger
 			.getLogger(ShowRequestFeedListener.class);
 	
-	private static boolean operational = !Boolean.valueOf(System.getProperty("taverna.interaction.ignore_requests"));
+	private static final String ignore_requests_property = System.getProperty("taverna.interaction.ignore_requests");
+
+	private static boolean operational = (ignore_requests_property == null) || !Boolean.valueOf(ignore_requests_property);
 	
 	public static synchronized ShowRequestFeedListener getInstance() {
 		if ((instance == null) && operational) {

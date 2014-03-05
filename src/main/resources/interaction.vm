@@ -51,6 +51,7 @@
 
 
          function reply(status, results) {
+           document.getElementById('presentationDiv').innerHTML="<p>Returning results</p>";
 #if ($outputDataUrl)
            var outputData = JSON.stringify(results);
            var dataRequest = new XMLHttpRequest();
@@ -64,6 +65,7 @@
            xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
            xmlhttp.setRequestHeader("Slug", "$entryId" + "-reply");
            xmlhttp.send(msg);
+           document.getElementById('presentationDiv').innerHTML="<p>Returned results</p>";
            return false;
          }
          
@@ -150,9 +152,10 @@
       
   	   </script>      
  
-     <iframe id="presentationFrame" name="presentationFrame" src="about:blank">
+     <div id="presentationDiv">
+       <iframe id="presentationFrame" name="presentationFrame" src="about:blank">
 </iframe>
-
+     </div>
      <div id="acknowledgment">
        <p>The interaction service was developed in the <a href="http://www.biovel.eu" target="_blank">BioVeL project</a></p>
      </div>
