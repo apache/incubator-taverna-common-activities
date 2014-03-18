@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>net.sf.taverna</groupId>
+        <artifactId>parent</artifactId>
+        <version>0.2.2011-01-24</version>
+    </parent>
+    <groupId>net.sf.taverna</groupId>
+    <artifactId>wsdl-generic</artifactId>
+    <version>1.9-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+    <name>WSDL generic library</name>
+    <description>
+        WSDL handling classes that are shared between Taverna 1 and 2
+    </description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/integration/**</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>integration-test</phase>
+                        <configuration>
+                            <excludes>
+                                <exclude>none</exclude>
+                            </excludes>
+                            <includes>
+                                <include>**/integration/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <releases />
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>mygrid-repository</id>
+            <name>myGrid Repository</name>
+            <url>http://www.mygrid.org.uk/maven/repository</url>
+        </repository>
+                <repository>
+                        <id>akathist-repository</id>
+                        <!-- disable broken http://9stmaryrd.com/maven/ referenced by raven 1.9 -->
+                        <url>http://build.mygrid.org.uk/maven/404</url>
+                        <releases>
+                                <enabled>false</enabled>
+                        </releases>
+                        <snapshots>
+                                <enabled>false</enabled>
+                        </snapshots>
+                </repository>
+    </repositories>
+    <scm>
+        <connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.7/</connection>
+        <developerConnection>scm:svn:https://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.7/</developerConnection>
+        <url>http://code.google.com/p/taverna/source/browse/#svn/taverna/utils/net.sf.taverna.wsdl-generic/tags/wsdl-generic-1.7/</url>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.12</version>
+        </dependency>
+        <!--<dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-jaxrpc</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-saaj</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wsdl4j</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
+      to make security work inside Raven,
+      instead use a single dependency 
+      that bundles the above together with wss4j:
+    -->
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis-wss4j</artifactId>
+            <version>1.4-1.5.4-2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.org.mygrid.taverna.scufl</groupId>
+            <artifactId>scufl-model</artifactId>
+            <version>1.7.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xmlParserAPIs</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

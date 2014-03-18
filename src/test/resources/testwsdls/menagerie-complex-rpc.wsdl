@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://xfire.codehaus.org/BookService" xmlns:tns="http://xfire.codehaus.org/BookService" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope" xmlns:ns1="http://complex.pojo.axis2.menagerie.googlecode" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc11="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenc12="http://www.w3.org/2003/05/soap-encoding" xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://complex.pojo.axis2.menagerie.googlecode">
+<xsd:complexType name="Person">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="address" nillable="true" type="ns1:Address"/>
+<xsd:element minOccurs="0" name="age" type="xsd:int"/>
+<xsd:element minOccurs="0" name="firstName" nillable="true" type="xsd:string"/>
+<xsd:element minOccurs="0" name="lastName" nillable="true" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="Address">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="city" nillable="true" type="xsd:string"/>
+<xsd:element minOccurs="0" name="road" nillable="true" type="xsd:string"/>
+<xsd:element minOccurs="0" name="roadNumber" type="xsd:int"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="ArrayOfPerson">
+<xsd:sequence>
+<xsd:element maxOccurs="unbounded" minOccurs="0" name="Person" nillable="true" type="ns1:Person"/>
+</xsd:sequence>
+</xsd:complexType>
+<xsd:complexType name="ComplexWithInternalList">
+<xsd:sequence>
+<xsd:element minOccurs="0" name="innerArray" nillable="true" type="tns:ArrayOfString"/>
+<xsd:element minOccurs="0" name="innerList" nillable="true" type="tns:ArrayOfString"/>
+<xsd:element minOccurs="0" name="length" type="xsd:int"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:schema>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://xfire.codehaus.org/BookService">
+<xsd:complexType name="ArrayOfString">
+<xsd:sequence>
+<xsd:element maxOccurs="unbounded" minOccurs="0" name="string" nillable="true" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="countPeopleListRequest">
+    <wsdl:part name="people" type="ns1:ArrayOfPerson">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPersonArrayResponse">
+    <wsdl:part name="out" type="ns1:ArrayOfPerson">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPersonListResponse">
+    <wsdl:part name="out" type="ns1:ArrayOfPerson">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="personToStringRequest">
+    <wsdl:part name="person" type="ns1:Person">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getComplexWithInternalListResponse">
+    <wsdl:part name="out" type="ns1:ComplexWithInternalList">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="createPersonRequest">
+  </wsdl:message>
+  <wsdl:message name="countPeopleArrayResponse">
+    <wsdl:part name="out" type="xsd:int">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getComplexWithInternalListRequest">
+  </wsdl:message>
+  <wsdl:message name="createPersonResponse">
+    <wsdl:part name="out" type="ns1:Person">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPersonListRequest">
+    <wsdl:part name="size" type="xsd:int">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="countPeopleArrayRequest">
+    <wsdl:part name="people" type="ns1:ArrayOfPerson">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="personToStringResponse">
+    <wsdl:part name="out" type="xsd:string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="countPeopleListResponse">
+    <wsdl:part name="out" type="xsd:int">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPersonArrayRequest">
+    <wsdl:part name="size" type="xsd:int">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Complex-rePortType">
+    <wsdl:operation name="personToString">
+      <wsdl:input name="personToStringRequest" message="tns:personToStringRequest">
+    </wsdl:input>
+      <wsdl:output name="personToStringResponse" message="tns:personToStringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="countPeopleList">
+      <wsdl:input name="countPeopleListRequest" message="tns:countPeopleListRequest">
+    </wsdl:input>
+      <wsdl:output name="countPeopleListResponse" message="tns:countPeopleListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPersonList">
+      <wsdl:input name="getPersonListRequest" message="tns:getPersonListRequest">
+    </wsdl:input>
+      <wsdl:output name="getPersonListResponse" message="tns:getPersonListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="countPeopleArray">
+      <wsdl:input name="countPeopleArrayRequest" message="tns:countPeopleArrayRequest">
+    </wsdl:input>
+      <wsdl:output name="countPeopleArrayResponse" message="tns:countPeopleArrayResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createPerson">
+      <wsdl:input name="createPersonRequest" message="tns:createPersonRequest">
+    </wsdl:input>
+      <wsdl:output name="createPersonResponse" message="tns:createPersonResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPersonArray">
+      <wsdl:input name="getPersonArrayRequest" message="tns:getPersonArrayRequest">
+    </wsdl:input>
+      <wsdl:output name="getPersonArrayResponse" message="tns:getPersonArrayResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getComplexWithInternalList">
+      <wsdl:input name="getComplexWithInternalListRequest" message="tns:getComplexWithInternalListRequest">
+    </wsdl:input>
+      <wsdl:output name="getComplexWithInternalListResponse" message="tns:getComplexWithInternalListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Complex-reHttpBinding" type="tns:Complex-rePortType">
+    <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="personToString">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="personToStringRequest">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:input>
+      <wsdl:output name="personToStringResponse">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="countPeopleList">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="countPeopleListRequest">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:input>
+      <wsdl:output name="countPeopleListResponse">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPersonList">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getPersonListRequest">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:input>
+      <wsdl:output name="getPersonListResponse">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="countPeopleArray">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="countPeopleArrayRequest">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:input>
+      <wsdl:output name="countPeopleArrayResponse">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="createPerson">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="createPersonRequest">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:input>
+      <wsdl:output name="createPersonResponse">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPersonArray">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getPersonArrayRequest">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:input>
+      <wsdl:output name="getPersonArrayResponse">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getComplexWithInternalList">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="getComplexWithInternalListRequest">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:input>
+      <wsdl:output name="getComplexWithInternalListResponse">
+        <wsdlsoap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://xfire.codehaus.org/BookService"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Complex-re">
+    <wsdl:port name="Complex-reHttpPort" binding="tns:Complex-reHttpBinding">
+      <wsdlsoap:address location="http://www.mygrid.org.uk/menagerie/xfire/Complex-re"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
