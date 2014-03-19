@@ -26,12 +26,14 @@ import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.junit.Test;
+import org.junit.Ignore;
 
 public class SecureServicesInvokerTest {
 
+	@Ignore("Integration test depending on external service")
 	@Test
-	public void testCreteCallAndInvoke() { 
-		try { 
+	public void testCreteCallAndInvoke() throws Exception { 
+//		try { 
 			
 
 			String endpoint = "http://www.mygrid.org.uk/axis/services/UsernameHelloService"; // test server
@@ -124,11 +126,10 @@ public class SecureServicesInvokerTest {
 			String ret = (String) call.invoke(new Object[] {nickName}) ;
 			System.out.println("Got: '" + ret + "'") ; 
 			assertEquals(ret, "Hello Beauty!");
-		} 
-		catch (Exception e) { 
-			e.printStackTrace() ; 
-		} 
-		System.exit(0) ; 
+//		} 
+//		catch (Exception e) { 
+//			e.printStackTrace() ; 
+//		} 
 	} 
 
 }
