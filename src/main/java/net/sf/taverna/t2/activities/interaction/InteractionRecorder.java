@@ -5,6 +5,7 @@ package net.sf.taverna.t2.activities.interaction;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
@@ -53,7 +54,7 @@ public class InteractionRecorder {
 			try {
 				deleteUrl(urlString);
 			} catch (final IOException e) {
-				logger.error("Unable to delete " + urlString, e);
+				logger.info("Unable to delete " + urlString, e);
 			}
 
 		}
@@ -68,7 +69,7 @@ public class InteractionRecorder {
 		httpCon.setRequestMethod("DELETE");
 		final int response = httpCon.getResponseCode();
 		if (response >= 400) {
-			logger.error("Received response code" + response);
+			logger.info("Received response code" + response);
 		}
 	}
 
