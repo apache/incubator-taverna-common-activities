@@ -186,6 +186,16 @@ public class SshReference extends AbstractExternalReference implements
 		this.dataNatureInteger = dataNatureInteger;
 	}
 
-
+	public SshReference clone() {
+		SshReference result = new SshReference();
+		result.setHost(this.getHost());
+		result.setPort(this.getPort());
+		result.setDirectory(this.getDirectory());
+		result.setSubDirectory(this.getSubDirectory());
+		result.setFileName(this.getFileName());
+		result.setDataNature(this.getDataNature());
+		result.setCharset(this.getCharset());
+		return result;
+	}
 
 }
