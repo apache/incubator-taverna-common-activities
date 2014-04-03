@@ -26,6 +26,12 @@
 			<version>${jetty.version}</version>
 
 		</dependency>
+		
+		    <dependency>
+      <groupId>com.sun.xml.stream</groupId>
+      <artifactId>sjsxp</artifactId>
+      <version>1.0.1</version>
+    </dependency>
 
 		
 		<dependency>
@@ -68,8 +74,7 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
   			<artifactId>commons-codec</artifactId>
-  			<version>1.4</version>
-		</dependency>
+  			</dependency>
 				
 		<dependency>
 		  <groupId>net.sf.taverna.t2.security</groupId>

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
+import net.sf.taverna.t2.activities.interaction.velocity.NotifyChecker;
 import net.sf.taverna.t2.activities.interaction.velocity.ProduceChecker;
 import net.sf.taverna.t2.activities.interaction.velocity.RequireChecker;
 import net.sf.taverna.t2.reference.T2Reference;
@@ -67,6 +68,11 @@ public final class InteractionActivity extends
 			produceChecker.visit(
 					(ASTprocess) this.presentationTemplate.getData(),
 					this.outputDepths);
+			
+			final NotifyChecker notifyChecker = new NotifyChecker();
+			notifyChecker.visit(
+					(ASTprocess) this.presentationTemplate.getData(),
+					this.configBean);
 			this.configurePortsFromTemplate();
 		}
 		this.configurePorts(this.configBean);
