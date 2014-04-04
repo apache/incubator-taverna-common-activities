@@ -68,8 +68,7 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
   			<artifactId>commons-codec</artifactId>
-  			<version>1.4</version>
-		</dependency>
+  			</dependency>
 				
 		<dependency>
 		  <groupId>net.sf.taverna.t2.security</groupId>

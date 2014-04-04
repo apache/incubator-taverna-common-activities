@@ -54,6 +54,8 @@ public class InteractionVelocity {
 				new RequireDirective());
 		RuntimeSingleton.getRuntimeInstance().addDirective(
 				new ProduceDirective());
+		RuntimeSingleton.getRuntimeInstance().addDirective(
+				new NotifyDirective());
 		velocityInitialized = true;
 
 		loadTemplates();

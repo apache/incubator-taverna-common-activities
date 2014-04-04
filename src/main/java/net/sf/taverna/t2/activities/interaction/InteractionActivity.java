@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
+import net.sf.taverna.t2.activities.interaction.velocity.NotifyChecker;
 import net.sf.taverna.t2.activities.interaction.velocity.ProduceChecker;
 import net.sf.taverna.t2.activities.interaction.velocity.RequireChecker;
 import net.sf.taverna.t2.reference.T2Reference;
@@ -20,6 +21,8 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputP
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.parser.node.ASTprocess;
 
 public final class InteractionActivity extends
@@ -56,6 +59,7 @@ public final class InteractionActivity extends
 
 		if (this.configBean.getInteractionActivityType().equals(
 				InteractionActivityType.VelocityTemplate)) {
+			try {
 			this.presentationTemplate = Velocity.getTemplate(configBean
 					.getPresentationOrigin());
 			final RequireChecker requireChecker = new RequireChecker();
@@ -67,7 +71,15 @@ public final class InteractionActivity extends
 			produceChecker.visit(
 					(ASTprocess) this.presentationTemplate.getData(),
 					this.outputDepths);
+			
+			final NotifyChecker notifyChecker = new NotifyChecker();
+			notifyChecker.visit(
+					(ASTprocess) this.presentationTemplate.getData(),
+					this.configBean);
 			this.configurePortsFromTemplate();
+			} catch (ResourceNotFoundException | ParseErrorException e) {
+				throw new ActivityConfigurationException("Unable to find/parse template", e);
+			}
 		}
 		this.configurePorts(this.configBean);
 
