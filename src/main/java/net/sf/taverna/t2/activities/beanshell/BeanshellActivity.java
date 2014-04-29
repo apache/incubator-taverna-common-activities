@@ -135,8 +135,11 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 				String workflowRunID;
 				if (procID.contains(":")) {
 					workflowRunID = procID.substring(0, procID.indexOf(':'));
-				} else
+				} else {
 					workflowRunID = procID; // for tests, will be an empty string
+				}
+
+				synchronized (interpreter) {
 
 				// Configure the classloader for executing the Beanshell
 				if (classLoader == null) {
@@ -151,7 +154,6 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 
 				}
 
-				synchronized (interpreter) {
 
 					ReferenceService referenceService = callback.getContext().getReferenceService();
 
