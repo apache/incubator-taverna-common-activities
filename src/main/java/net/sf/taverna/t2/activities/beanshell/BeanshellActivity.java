@@ -138,28 +138,28 @@ public class BeanshellActivity extends
 				// Workflow run identifier (needed when classloader sharing is set to 'workflow').
 				String procID = callback.getParentProcessIdentifier();
 				String workflowRunID;
-				if (procID.contains(":")){
+				if (procID.contains(":")) {
 					workflowRunID = procID.substring(0, procID.indexOf(':'));
-				}
-				else
+				} else {
 					workflowRunID = procID; // for tests, will be an empty string
-				
-				// Configure the classloader for executing the Beanshell
-				if (classLoader == null) {
-					try {
-						classLoader = findClassLoader(configurationBean,
-								workflowRunID);
-						interpreter.setClassLoader(classLoader);
-					} catch (RuntimeException rex) {
-						logger.error(rex);
-						String message = "Unable to obtain the classloader for Beanshell service";
-						callback.fail(message);
-						return;
-					}
-					
 				}
-								
+				
 				synchronized (interpreter) {
+					
+					// Configure the classloader for executing the Beanshell
+					if (classLoader == null) {
+						try {
+							classLoader = findClassLoader(configurationBean,
+									workflowRunID);
+							interpreter.setClassLoader(classLoader);
+						} catch (RuntimeException rex) {
+							logger.error(rex);
+							String message = "Unable to obtain the classloader for Beanshell service";
+							callback.fail(message);
+							return;
+						}
+						
+					}								
 					
 					ReferenceService referenceService = callback.getContext().getReferenceService();
 	
