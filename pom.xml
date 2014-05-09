@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>wsdl-activity</artifactId>
-	<version>1.6-SNAPSHOT</version>
+	<version>1.6.test</version>
 	<name>Taverna 2 WSDL Activity</name>
 	<dependencies>
 		<dependency>
