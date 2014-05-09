@@ -33,8 +33,7 @@ public class SecureServicesInvokerTest {
 	// Broken service
 	@Ignore
 	@Test
-	public void testCreteCallAndInvoke() { 
-		try { 
+	public void testCreteCallAndInvoke() throws Exception { 
 			
 
 			String endpoint = "http://www.mygrid.org.uk/axis/services/UsernameHelloService"; // test server
@@ -127,11 +126,6 @@ public class SecureServicesInvokerTest {
 			String ret = (String) call.invoke(new Object[] {nickName}) ;
 			System.out.println("Got: '" + ret + "'") ; 
 			assertEquals(ret, "Hello Beauty!");
-		} 
-		catch (Exception e) { 
-			e.printStackTrace() ; 
-		} 
-		System.exit(0) ; 
 	} 
 
 }
