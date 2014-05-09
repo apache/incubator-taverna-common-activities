@@ -25,10 +25,13 @@ import org.apache.axis.transport.http.HTTPTransport;
 import org.apache.ws.axis.security.WSDoAllSender;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.handler.WSHandlerConstants;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SecureServicesInvokerTest {
 
+	// Broken service
+	@Ignore
 	@Test
 	public void testCreteCallAndInvoke() { 
 		try { 
