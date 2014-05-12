@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>beanshell-activity</artifactId>
-	<version>1.5.1-SNAPSHOT</version>
+	<version>1.5.1</version>
 	<name>Taverna 2 Beanshell Activity</name>
 	<dependencies>
 		<dependency>
@@ -78,4 +78,3 @@
 	</scm>
 
 </project>
-
