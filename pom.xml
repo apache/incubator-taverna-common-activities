@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-                <groupId>net.sf.taverna</groupId>
-                <artifactId>taverna-parent</artifactId>
-                <version>2.6-SNAPSHOT</version>
+		<groupId>net.sf.taverna</groupId>
+		<artifactId>taverna-parent</artifactId>
+		<version>2.6-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>beanshell-activity</artifactId>
+	<version>1.6-SNAPSHOT</version>
 	<name>Taverna 2 Beanshell Activity</name>
-        <version>1.6-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>
@@ -24,7 +24,7 @@
 		<dependency>
 			<groupId>net.sf.taverna.t2.activities</groupId>
 			<artifactId>dependency-activity</artifactId>
-			<version>${project.version}</version>
+			<version>${t2.activities.version}</version>
 		</dependency>		
 		<dependency>
 			<groupId>org.beanshell</groupId>
@@ -34,14 +34,14 @@
 		<dependency>
 			<groupId>net.sf.taverna.t2.activities</groupId>
 			<artifactId>activity-test-utils</artifactId>
-			<version>${project.version}</version>
+			<version>${t2.activities.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
 			<version>${junit.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>
@@ -50,5 +50,31 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-</project>
+        <repositories>
+                <repository>
+                        <releases />
+                        <snapshots>
+                                <enabled>false</enabled>
+                        </snapshots>
+                        <id>mygrid-repository</id>
+                        <name>myGrid Repository</name>
+                        <url>http://www.mygrid.org.uk/maven/repository</url>
+                </repository>
+                <repository>
+                        <releases>
+                                <enabled>false</enabled>
+                        </releases>
+                        <snapshots />
+                        <id>mygrid-snapshot-repository</id>
+                        <name>myGrid Snapshot Repository</name>
+                        <url>http://www.mygrid.org.uk/maven/snapshot-repository</url>
+                </repository>
+        </repositories>
+	<scm>
+		<connection>scm:git:https://github.com/taverna/taverna-beanshell-activity.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/taverna/taverna-beanshell-activity.git</developerConnection>
+		<url>https://github.com/taverna/taverna-beanshell-activity/</url>
+		<tag>HEAD</tag>
+	</scm>
 
+</project>
