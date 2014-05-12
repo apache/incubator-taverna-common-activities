@@ -3,13 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.sf.taverna.t2</groupId>
-		<artifactId>activities</artifactId>
-		<version>1.5-SNAPSHOT</version>
+                <groupId>net.sf.taverna</groupId>
+                <artifactId>taverna-parent</artifactId>
+                <version>2.6-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>interaction-activity</artifactId>
 	<name>Taverna Interaction activity</name>
+        <version>1.6-SNAPSHOT</version>
 
 	<properties>
 		<jetty.version>6.1.24</jetty.version>
@@ -68,6 +69,7 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
   			<artifactId>commons-codec</artifactId>
+                        <version>${commons.codec.version}</version>
   			</dependency>
 				
 		<dependency>
@@ -151,6 +153,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+                        <version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
