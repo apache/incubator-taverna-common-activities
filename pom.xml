@@ -2,15 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.sf.taverna.t2</groupId>
-		<artifactId>activities</artifactId>
-		<version>1.5-SNAPSHOT</version>
+                <groupId>net.sf.taverna</groupId>
+                <artifactId>taverna-parent</artifactId>
+                <version>2.6-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>spreadsheet-import-activity</artifactId>
 	<name>Taverna 2 Spreadsheet Import Activity</name>
 	<description>Activity to import data from spreadsheet files</description>
-
+        <version>1.6-SNAPSHOT</version>
 	<repositories>
 		<repository>
 			<id>mygrid-repository</id>
