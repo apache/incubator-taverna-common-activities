@@ -11,7 +11,7 @@
 	<artifactId>external-tool-activity</artifactId>
 	<version>2.0.1-SNAPSHOT</version>
 	<packaging>bundle</packaging>
-	<name>Taverna 2 ExternalTool Activity</name>
+	<name>Taverna 2 External Tool Activity</name>
 
 	<dependencies>
 		<dependency>
