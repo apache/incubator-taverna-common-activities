@@ -2,12 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.sf.taverna.t2</groupId>
-		<artifactId>activities</artifactId>
-		<version>2.0.1-SNAPSHOT</version>
+		<groupId>net.sf.taverna</groupId>
+		<artifactId>taverna-parent</artifactId>
+		<version>3.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>xpath-activity</artifactId>
+	<version>2.0.1-SNAPSHOT</version>
 	<name>XPath Activity - Core</name>
 	<packaging>bundle</packaging>
 	<build>
@@ -68,4 +69,11 @@
 			<url>http://www.mygrid.org.uk/maven/snapshot-repository</url>
 		</repository>
 	</repositories>
+       <scm>
+                <connection>scm:git:https://github.com/taverna/taverna-xpath-activity.git</connection>
+                <developerConnection>scm:git:ssh://git@github.com/taverna/taverna-xpath-activity.git</developerConnection>
+                <url>https://github.com/taverna/taverna-xpath-activity/</url>
+                <tag>HEAD</tag>
+        </scm>
+
 </project>
