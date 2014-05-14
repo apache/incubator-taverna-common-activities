@@ -3,13 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.sf.taverna.t2</groupId>
-		<artifactId>activities</artifactId>
-		<version>1.5-SNAPSHOT</version>
+		<groupId>net.sf.taverna</groupId>
+		<artifactId>taverna-parent</artifactId>
+		<version>2.6-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>external-tool-activity</artifactId>
-	<name>Taverna 2 ExternalTool Activity</name>
+	<version>1.6-SNAPSHOT</version>
+	<name>Taverna 2 External Tool Activity</name>
 
 	<dependencies>
 		<dependency>
@@ -46,7 +47,7 @@
 		<dependency>
 			<groupId>net.sf.taverna.t2.activities</groupId>
 			<artifactId>activity-test-utils</artifactId>
-			<version>${project.version}</version>
+			<version>${t2.activities.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -97,6 +98,4 @@
                 <url>https://github.com/taverna/taverna-external-tool-activity/</url>
                 <tag>HEAD</tag>
         </scm>
-
-	
 </project>
