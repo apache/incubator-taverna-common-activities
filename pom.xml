@@ -97,12 +97,6 @@
 			<version>4.4</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>uk.org.mygrid.taverna</groupId>
-			<artifactId>taverna-core</artifactId>
-			<version>1.7.2.0</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<repositories>
