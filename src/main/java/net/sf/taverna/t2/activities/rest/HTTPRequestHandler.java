@@ -22,7 +22,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-//import org.apache.http.client.HttpClient;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -40,7 +39,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
 import org.apache.http.impl.conn.SingleClientConnManager;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
@@ -91,6 +89,7 @@ public class HTTPRequestHandler {
 	 *            discarded.
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	public static HTTPRequestResponse initiateHTTPRequest(String requestURL,
 			RESTActivityConfigurationBean configBean, Object inputMessageBody,
 			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
@@ -102,9 +101,8 @@ public class HTTPRequestHandler {
 				URL url = new URL(requestURL); // the URL object which will
 				// parse the port out for us
 				int port = url.getPort();
-				if (port == -1) { // no port was defined in the URL
+				if (port == -1) // no port was defined in the URL
 					port = HTTPS_DEFAULT_PORT; // default HTTPS port
-				}
 				Scheme https = new Scheme("https", new org.apache.http.conn.ssl.SSLSocketFactory(
 						SSLContext.getDefault()), port);
 				SchemeRegistry schemeRegistry = new SchemeRegistry();
@@ -129,17 +127,17 @@ public class HTTPRequestHandler {
 
 		switch (configBean.getHttpMethod()) {
 		case GET:
-			return (doGET(connectionManager, requestURL, configBean, urlParameters, credentialsProvider));
+			return doGET(connectionManager, requestURL, configBean, urlParameters, credentialsProvider);
 		case POST:
-			return (doPOST(connectionManager, requestURL, configBean, inputMessageBody, urlParameters, credentialsProvider));
+			return doPOST(connectionManager, requestURL, configBean, inputMessageBody, urlParameters, credentialsProvider);
 		case PUT:
-			return (doPUT(connectionManager, requestURL, configBean, inputMessageBody, urlParameters, credentialsProvider));
+			return doPUT(connectionManager, requestURL, configBean, inputMessageBody, urlParameters, credentialsProvider);
 		case DELETE:
-			return (doDELETE(connectionManager, requestURL, configBean, urlParameters, credentialsProvider));
+			return doDELETE(connectionManager, requestURL, configBean, urlParameters, credentialsProvider);
 		default:
-			return (new HTTPRequestResponse(new Exception("Error: something went wrong; "
+			return new HTTPRequestResponse(new Exception("Error: something went wrong; "
 					+ "no failure has occurred, but but unexpected HTTP method (\""
-					+ configBean.getHttpMethod() + "\") encountered.")));
+					+ configBean.getHttpMethod() + "\") encountered."));
 		}
 	}
 
@@ -147,7 +145,7 @@ public class HTTPRequestHandler {
 			String requestURL, RESTActivityConfigurationBean configBean,
 			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		HttpGet httpGet = new HttpGet(requestURL);
-		return (performHTTPRequest(connectionManager, httpGet, configBean, urlParameters, credentialsProvider));
+		return performHTTPRequest(connectionManager, httpGet, configBean, urlParameters, credentialsProvider);
 	}
 
 	private static HTTPRequestResponse doPOST(ClientConnectionManager connectionManager,
@@ -158,14 +156,12 @@ public class HTTPRequestHandler {
 		// TODO - decide whether this is needed for PUT requests, too (or just
 		// here, for POST)
 		// check whether to send the HTTP Expect header or not
-		if (!configBean.getSendHTTPExpectRequestHeader()) {
+		if (!configBean.getSendHTTPExpectRequestHeader())
 			httpPost.getParams().setBooleanParameter("http.protocol.expect-continue", false);
-		}
 
 		// If the user wants to set MIME type for the 'Content-Type' header
-		if (!configBean.getContentTypeForUpdates().equals("")) {
+		if (!configBean.getContentTypeForUpdates().isEmpty())
 			httpPost.setHeader(CONTENT_TYPE_HEADER_NAME, configBean.getContentTypeForUpdates());
-		}
 		try {
 			HttpEntity entity = null;
 			if (inputMessageBody == null) {
@@ -181,16 +177,15 @@ public class HTTPRequestHandler {
 					+ "attach a message body to the POST request. See attached cause of this "
 					+ "exception for details.")));
 		}
-		return (performHTTPRequest(connectionManager, httpPost, configBean, urlParameters, credentialsProvider));
+		return performHTTPRequest(connectionManager, httpPost, configBean, urlParameters, credentialsProvider);
 	}
 
 	private static HTTPRequestResponse doPUT(ClientConnectionManager connectionManager,
 			String requestURL, RESTActivityConfigurationBean configBean, Object inputMessageBody,
 			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		HttpPut httpPut = new HttpPut(requestURL);
-		if (!configBean.getContentTypeForUpdates().equals("")) {
+		if (!configBean.getContentTypeForUpdates().isEmpty())
 			httpPut.setHeader(CONTENT_TYPE_HEADER_NAME, configBean.getContentTypeForUpdates());
-		}
 		try {
 			HttpEntity entity = null;
 			if (inputMessageBody == null) {
@@ -202,18 +197,18 @@ public class HTTPRequestHandler {
 			}
 			httpPut.setEntity(entity);
 		} catch (UnsupportedEncodingException e) {
-			return (new HTTPRequestResponse(new Exception("Error occurred while trying to "
+			return new HTTPRequestResponse(new Exception("Error occurred while trying to "
 					+ "attach a message body to the PUT request. See attached cause of this "
-					+ "exception for details.")));
+					+ "exception for details."));
 		}
-		return (performHTTPRequest(connectionManager, httpPut, configBean, urlParameters, credentialsProvider));
+		return performHTTPRequest(connectionManager, httpPut, configBean, urlParameters, credentialsProvider);
 	}
 
 	private static HTTPRequestResponse doDELETE(ClientConnectionManager connectionManager,
 			String requestURL, RESTActivityConfigurationBean configBean,
 			Map<String, String> urlParameters, CredentialsProvider credentialsProvider) {
 		HttpDelete httpDelete = new HttpDelete(requestURL);
-		return (performHTTPRequest(connectionManager, httpDelete, configBean, urlParameters, credentialsProvider));
+		return performHTTPRequest(connectionManager, httpDelete, configBean, urlParameters, credentialsProvider);
 	}
 
 	/**
@@ -239,27 +234,24 @@ public class HTTPRequestHandler {
 
 		// See if user wanted to set any other HTTP headers
 		ArrayList<ArrayList<String>> otherHTTPHeaders = configBean.getOtherHTTPHeaders();
-		if (!otherHTTPHeaders.isEmpty()) {
-			for (ArrayList<String> httpHeaderNameValuePair : otherHTTPHeaders) {
+		if (!otherHTTPHeaders.isEmpty())
+			for (ArrayList<String> httpHeaderNameValuePair : otherHTTPHeaders)
 				if (httpHeaderNameValuePair.get(0) != null
-						&& !httpHeaderNameValuePair.get(0).equals("")) {
+						&& !httpHeaderNameValuePair.get(0).isEmpty()) {
 					String headerParameterizedValue = httpHeaderNameValuePair.get(1);
 					String headerValue = URISignatureHandler.generateCompleteURI(headerParameterizedValue, urlParameters, configBean.getEscapeParameters());
 					httpRequest.setHeader(httpHeaderNameValuePair.get(0), headerValue);
 				}
-			}
-		}
-
-		HTTPRequestResponse requestResponse = new HTTPRequestResponse();
 
 		try {
+			HTTPRequestResponse requestResponse = new HTTPRequestResponse();
 			DefaultHttpClient httpClient = new DefaultHttpClient(connectionManager, null);
 			((DefaultHttpClient) httpClient).setCredentialsProvider(credentialsProvider);
 			HttpContext localContext = new BasicHttpContext();
 
 			// Set the proxy settings, if any
 			if (System.getProperty(PROXY_HOST) != null
-					&& !System.getProperty(PROXY_HOST).equals("")) {
+					&& !System.getProperty(PROXY_HOST).isEmpty()) {
 				// Instruct HttpClient to use the standard
 				// JRE proxy selector to obtain proxy information
 				ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(httpClient
@@ -267,7 +259,7 @@ public class HTTPRequestHandler {
 				httpClient.setRoutePlanner(routePlanner);
 				// Do we need to authenticate the user to the proxy?
 				if (System.getProperty(PROXY_USERNAME) != null
-						&& !System.getProperty(PROXY_USERNAME).equals("")) {
+						&& !System.getProperty(PROXY_USERNAME).isEmpty())
 					// Add the proxy username and password to the list of
 					// credentials
 					httpClient.getCredentialsProvider().setCredentials(
@@ -275,7 +267,6 @@ public class HTTPRequestHandler {
 									.getProperty(PROXY_PORT))),
 							new UsernamePasswordCredentials(System.getProperty(PROXY_USERNAME),
 									System.getProperty(PROXY_PASSWORD)));
-				}
 			}
 
 			// execute the request
@@ -297,24 +288,21 @@ public class HTTPRequestHandler {
 			requestResponse.setRedirectionHTTPMethod(targetRequest.getMethod());
 			requestResponse.setHeaders(response.getAllHeaders());
 
-			// read and store response body
-			// (check there is some content - negative length of content means
-			// unknown length;
-			// zero definitely means no content...)
+			/* read and store response body
+			 (check there is some content - negative length of content means
+			 unknown length;
+			 zero definitely means no content...)*/
 			// TODO - make sure that this test is sufficient to determine if
 			// there is no response entity
-			if (response.getEntity() != null && response.getEntity().getContentLength() != 0) {
+			if (response.getEntity() != null && response.getEntity().getContentLength() != 0)
 				requestResponse.setResponseBody(readResponseBody(response.getEntity()));
-			}
 
 			// release resources (e.g. connection pool, etc)
 			httpClient.getConnectionManager().shutdown();
-
+			return requestResponse;
 		} catch (Exception ex) {
-			requestResponse = new HTTPRequestResponse(ex);
+			return new HTTPRequestResponse(ex);
 		}
-
-		return (requestResponse);
 	}
 
 	/**
@@ -326,32 +314,27 @@ public class HTTPRequestHandler {
 	 * @throws IOException
 	 */
 	private static Object readResponseBody(HttpEntity entity) throws IOException {
+		if (entity == null)
+			return null;
 
-		if (entity != null) {
-			// test whether the data is binary or textual -
-			// for binary data will read just as it is, for textual data
-			// will attempt to perform charset conversion from the original
-			// one into UTF-8
+		/*
+		 * test whether the data is binary or textual - for binary data will
+		 * read just as it is, for textual data will attempt to perform charset
+		 * conversion from the original one into UTF-8
+		 */
 
-			if (entity.getContentType() == null) {
-				// HTTP message contains a body but content type is null??? - we
-				// have seen services like this
-				return (readFromInputStreamAsBinary(entity.getContent()));
-			}
+		if (entity.getContentType() == null)
+			// HTTP message contains a body but content type is null??? - we
+			// have seen services like this
+			return readFromInputStreamAsBinary(entity.getContent());
 
-			String contentType = entity.getContentType().getValue().toLowerCase();
-			if (contentType.startsWith("text") || contentType.contains("charset=")) {
-				// read as text
-				return (readResponseBodyAsString(entity));
-			} else {
-				// read as binary - enough to pass the input stream, not the
-				// whole entity
-				return (readFromInputStreamAsBinary(entity.getContent()));
-			}
-		} else {
-			// HTTP message did not contain body...
-			return (null);
-		}
+		String contentType = entity.getContentType().getValue().toLowerCase();
+		if (contentType.startsWith("text") || contentType.contains("charset="))
+			// read as text
+			return readResponseBodyAsString(entity);
+		// read as binary - enough to pass the input stream, not the
+		// whole entity
+		return readFromInputStreamAsBinary(entity.getContent());
 	}
 
 	/**
@@ -364,18 +347,14 @@ public class HTTPRequestHandler {
 	 * @throws IOException
 	 */
 	private static String readResponseBodyAsString(HttpEntity entity) throws IOException {
-
-		// From RFC2616
-		// http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-		// Content-Type = "Content-Type" ":" media-type,
-		// where media-type = type "/" subtype *( ";" parameter )
-		// can have 0 or more parameters such as
-		// "charset", etc.
-		// Linear white space (LWS) MUST NOT be used
-		// between the type and subtype,
-		// nor between an attribute and its value.
-		// e.g. Content-Type: text/html;
-		// charset=ISO-8859-4
+		/*
+		 * From RFC2616 http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+		 * Content-Type = "Content-Type" ":" media-type, where media-type = type
+		 * "/" subtype *( ";" parameter ) can have 0 or more parameters such as
+		 * "charset", etc. Linear white space (LWS) MUST NOT be used between the
+		 * type and subtype, nor between an attribute and its value. e.g.
+		 * Content-Type: text/html; charset=ISO-8859-4
+		 */
 
 		// get charset name
 		String charset = null;
@@ -384,22 +363,21 @@ public class HTTPRequestHandler {
 		String[] contentTypeParts = contentType.split(";");
 		for (String contentTypePart : contentTypeParts) {
 			contentTypePart = contentTypePart.trim();
-			if (contentTypePart.startsWith("charset=")) {
+			if (contentTypePart.startsWith("charset="))
 				charset = contentTypePart.substring("charset=".length());
-			}
 		}
 
 		// read the data line by line
 		StringBuilder responseBodyString = new StringBuilder();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent(),
-				charset != null ? charset : "UTF-8"));
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+				entity.getContent(), charset != null ? charset : "UTF-8"))) {
 
-		String str;
-		while ((str = reader.readLine()) != null) {
-			responseBodyString.append(str + "\n");
+			String str;
+			while ((str = reader.readLine()) != null)
+				responseBodyString.append(str + "\n");
+
+			return responseBodyString.toString();
 		}
-
-		return (responseBodyString.toString());
 	}
 
 	/**
@@ -412,9 +390,7 @@ public class HTTPRequestHandler {
 	 */
 	public static byte[] readFromInputStreamAsBinary(InputStream inputStream) throws IOException {
 		// use BufferedInputStream for better performance
-		BufferedInputStream in = new BufferedInputStream(inputStream);
-
-		try {
+		try (BufferedInputStream in = new BufferedInputStream(inputStream)) {
 			// this list is to hold all fetched data
 			List<byte[]> data = new ArrayList<byte[]>();
 
@@ -433,42 +409,29 @@ public class HTTPRequestHandler {
 
 			// now check how much data was read and return that as a single byte
 			// array
-			if (data.size() == 1) {
+			if (data.size() == 1)
 				// just a single block of data - return it as it is
-				return (data.get(0));
-			} else {
-				// there is more than one block of data -- calculate total
-				// length of data
-				bufLength = 0;
-				for (byte[] portionOfData : data)
-					bufLength += portionOfData.length;
+				return data.get(0);
 
-				// allocate a single large byte array that could contain all
-				// data
-				buf = new byte[bufLength];
+			// there is more than one block of data -- calculate total
+			// length of data
+			bufLength = 0;
+			for (byte[] portionOfData : data)
+				bufLength += portionOfData.length;
 
-				// fill this byte array with data from all fragments
-				int lastFilledPositionInOutputArray = 0;
-				for (byte[] portionOfData : data) {
-					System.arraycopy(portionOfData, 0, buf, lastFilledPositionInOutputArray,
-							portionOfData.length);
-					lastFilledPositionInOutputArray += portionOfData.length;
-				}
+			// allocate a single large byte array that could contain all
+			// data
+			buf = new byte[bufLength];
 
-				return (buf);
+			// fill this byte array with data from all fragments
+			int lastFilledPositionInOutputArray = 0;
+			for (byte[] portionOfData : data) {
+				System.arraycopy(portionOfData, 0, buf,
+						lastFilledPositionInOutputArray, portionOfData.length);
+				lastFilledPositionInOutputArray += portionOfData.length;
 			}
-		} finally {
-			// this method will still throw any IOExceptions that may occur, but
-			// this block is used to close the input stream anyway
-			if (in != null) {
-				try {
-					in.close();
-				} catch (Exception e) { /*
-										 * do nothing on this failure - it was
-										 * just an attempt to recover resources
-										 */
-				}
-			}
+
+			return buf;
 		}
 	}
 
@@ -503,7 +466,7 @@ public class HTTPRequestHandler {
 			 */
 		}
 		
-		   public void setHeaders(Header[] allHeaders) {
+		public void setHeaders(Header[] allHeaders) {
 			this.allHeaders = allHeaders;
 		}
 	
@@ -624,5 +587,4 @@ public class HTTPRequestHandler {
 			return (statusCode >= 400 && statusCode < 600);
 		}
 	}
-
 }

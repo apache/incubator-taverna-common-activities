@@ -263,7 +263,7 @@ public class URISignatureHandler {
 	 *             the placeholders found in <code>uriSignature</code>.
 	 */
 	public static String generateCompleteURI(String uriSignature,
-			Map<String, String> parameters, boolean escapeParameters)
+			Map<String, String> specifiedParameters, boolean escapeParameters)
 			throws URISignatureParsingException,
 			URIGenerationFromSignatureException {
 		StringBuilder completeURI = new StringBuilder(uriSignature);
@@ -276,12 +276,14 @@ public class URISignatureHandler {
 
 		// check that the URI signature contains some placeholders
 		if (placeholdersWithPositions.keySet().size() > 0) {
+			Map<String, String> parameters;
 			// some work will actually have to be done to replace placeholders
 			// with real values;
 			// check that the parameter map contains some values
-			if (parameters == null || parameters.isEmpty()) {
-				throw new URIGenerationFromSignatureException(
-						"Parameter map is null or empty");
+			if (specifiedParameters == null || specifiedParameters.isEmpty()) {
+				parameters = Collections.EMPTY_MAP;
+			} else {
+				parameters = specifiedParameters;
 			}
 
 			// the 'placeholders' linked list is guaranteed to be in the order
@@ -298,11 +300,11 @@ public class URISignatureHandler {
 
 			while (placeholdersIterator.hasNext()) {
 				String placeholder = placeholdersIterator.next();
+				int placeholderStartPos = placeholdersWithPositions
+						.get(placeholder) - 1;
+				int placeholderEndPos = placeholderStartPos
+						+ placeholder.length() + 2;
 				if (parameters.containsKey(placeholder)) {
-					int placeholderStartPos = placeholdersWithPositions
-							.get(placeholder) - 1;
-					int placeholderEndPos = placeholderStartPos
-							+ placeholder.length() + 2;
 					if (escapeParameters) {
 						completeURI.replace(placeholderStartPos,
 								placeholderEndPos, urlEncodeQuery(parameters
@@ -312,9 +314,30 @@ public class URISignatureHandler {
 								placeholderEndPos, parameters.get(placeholder));
 					}
 				} else {
-					throw new URIGenerationFromSignatureException(
-							"Parameter map does not contain a key/value for \""
-									+ placeholder + "\" placeholder");
+					int qnPos = completeURI.lastIndexOf("?", placeholderStartPos);
+ 					int ampPos = completeURI.lastIndexOf("&", placeholderStartPos);
+ 					int slashPos = completeURI.lastIndexOf("/", placeholderStartPos);
+ 					int startParamPos = Math.max(qnPos, ampPos);
+					if (startParamPos > -1 && startParamPos > slashPos) {
+ 						// We found an optional parameter, so delete all of it
+ 						if (qnPos > ampPos) {
+ 							// It might be the first or only parameter so delete carefully
+ 							if (placeholderEndPos >= (completeURI.length() - 1)) {
+ 								// No parameters
+ 								completeURI.replace(startParamPos, placeholderEndPos, "");
+ 							} else {
+ 								// Remove the & from the following parameter, not the ? that starts
+ 								completeURI.replace(startParamPos + 1, placeholderEndPos + 1, "");
+ 							}
+						} else {
+ 							// Just delete the optional parameter in total
+							completeURI.replace(startParamPos, placeholderEndPos, "");
+ 						}
+ 					} else {
+ 						throw new URIGenerationFromSignatureException(
+ 								"Parameter map does not contain a key/value for \""
+ 										+ placeholder + "\" mandatory placeholder");
+ 					}
 				}
 			}
 		}

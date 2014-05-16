@@ -27,37 +27,37 @@ import org.apache.log4j.Logger;
  */
 public class RESTActivityCredentialsProvider extends BasicCredentialsProvider {
 	private static Logger logger = Logger.getLogger(RESTActivityCredentialsProvider.class);
-
+	
 	private static final int DEFAULT_HTTP_PORT = 80;
 	private static final int DEFAULT_HTTPS_PORT = 443;
-
+	
 	private static final String HTTP_PROTOCOL = "http";
 	private static final String HTTPS_PROTOCOL = "https";
-
+	
 	private CredentialManager credentialManager;
-
+	
 	public RESTActivityCredentialsProvider(CredentialManager credentialManager) {
 		this.credentialManager = credentialManager;
 	}
-
+	
 	@Override
 	public Credentials getCredentials(AuthScope authscope) {
 		logger.info("Looking for credentials for: Host - " + authscope.getHost() + ";" + "Port - "
 				+ authscope.getPort() + ";" + "Realm - " + authscope.getRealm() + ";"
 				+ "Authentication scheme - " + authscope.getScheme());
-
+		
 		// Ask the superclass first
 		Credentials creds = super.getCredentials(authscope);
 		if (creds != null) {
-			// We have used setCredentials() on this class (for proxy host,
-			// port, username,password)
-			// just before we invoked the http request, which will then pick the
-			// proxy credentials up from here.
+			/*
+			 * We have used setCredentials() on this class (for proxy host,
+			 * port, username,password) just before we invoked the http request,
+			 * which will then pick the proxy credentials up from here.
+			 */
 			return creds;
 		}
-
+		
 		// Otherwise, ask Credential Manager if is can provide the credential
-
 		String AUTHENTICATION_REQUEST_MSG = "This REST service requires authentication in "
 				+ authscope.getRealm();
 
@@ -67,9 +67,12 @@ public class RESTActivityCredentialsProvider extends BasicCredentialsProvider {
 			/*
 			 * if port is 80 - use HTTP, don't append port if port is 443 - use
 			 * HTTPS, don't append port any other port - append port + do 2
-			 * tests: --- test HTTPS first has...() --- if not there, do
-			 * get...() for HTTP (which will save the thing) (save both these
-			 * entries for HTTP + HTTPS if not there)
+			 * tests:
+			 * 
+			 * --- test HTTPS first has...()
+			 * --- if not there, do get...() for HTTP (which will save the thing)
+			 *
+			 * (save both these entries for HTTP + HTTPS if not there)
 			 */
 
 			// build the service URI back to front
@@ -94,10 +97,11 @@ public class RESTActivityCredentialsProvider extends BasicCredentialsProvider {
 				credentials = credentialManager.getUsernameAndPasswordForService(
 						URI.create(serviceURI.toString()), true, AUTHENTICATION_REQUEST_MSG);
 			} else {
-				// non-default port - will need to try both HTTP and HTTPS;
-				// just check (no pop-up will be shown) if credentials are there
-				// - one protocol that
-				// matched will be used; if
+				/*
+				 * non-default port - will need to try both HTTP and HTTPS; just
+				 * check (no pop-up will be shown) if credentials are there -
+				 * one protocol that matched will be used; if
+				 */
 				if (credentialManager.hasUsernamePasswordForService(URI.create(HTTPS_PROTOCOL
 						+ serviceURI.toString()))) {
 					credentials = credentialManager.getUsernameAndPasswordForService(
@@ -109,14 +113,18 @@ public class RESTActivityCredentialsProvider extends BasicCredentialsProvider {
 							URI.create(HTTP_PROTOCOL + serviceURI.toString()), true,
 							AUTHENTICATION_REQUEST_MSG);
 				} else {
-					// non of the two options succeeded, request details with a
-					// popup for HTTP...
+					/*
+					 * Neither of the two options succeeded, request details with a
+					 * popup for HTTP...
+					 */
 					credentials = credentialManager.getUsernameAndPasswordForService(
 							URI.create(HTTP_PROTOCOL + serviceURI.toString()), true,
 							AUTHENTICATION_REQUEST_MSG);
 
-					// ...then save a second entry with HTTPS protocol (if the
-					// user has chosen to save the credentials)
+					/*
+					 * ...then save a second entry with HTTPS protocol (if the
+					 * user has chosen to save the credentials)
+					 */
 					if (credentials != null && credentials.isShouldSave()) {
 						credentialManager.addUsernameAndPasswordForService(credentials,
 								URI.create(HTTPS_PROTOCOL + serviceURI.toString()));
@@ -157,14 +165,14 @@ public class RESTActivityCredentialsProvider extends BasicCredentialsProvider {
 			this.password = password;
 		}
 
+		@Override
 		public String getPassword() {
 			return password;
 		}
 
+		@Override
 		public Principal getUserPrincipal() {
 			return user;
 		}
-
 	}
-
 }

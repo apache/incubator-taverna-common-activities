@@ -32,6 +32,9 @@ public class URISignatureHandlerTest {
 	final String badURI_NestedPlaceholdersSpaced = "http://sandbox.myexperiment.org/user.xml?id={us{er}_id}&verbose=true";
 	final String badURI_DuplicatePlaceholders = "http://sandbox.myexperiment.org/user.xml?id={user_id}&verbose={user_id}";
 	final String badURI_DuplicatePlaceholdersWithOthers = "http://sysmo-db.org/sops/{unit}/experimental_conditions/{cond_id}?condition_unit={unit}";
+	
+     final String validURI_MultipleQueryString =
+            "http://dr-site.esrin.esa.int/{catalogue}/genesi/ASA_IMS_1P/rdf/?count={count?}&startPage={startPage?}&startIndex={startIndex?}&q={searchTerms?}"; 	
 
 	// ==========================================================================
 	// TEST URI SIGNATURE BOOLEAN VALIDATION
@@ -61,6 +64,11 @@ public class URISignatureHandlerTest {
 		assertTrue(URISignatureHandler.isValid(validURI_3MixedPlaceholders));
 	}
 
+ 	@Test
+ 	public void isValid_validURI_MultipleQueryString() {
+ 		assertTrue(URISignatureHandler.isValid(validURI_MultipleQueryString));
+ 	}
+ 	
 	// failure cases
 
 	@Test
@@ -165,6 +173,11 @@ public class URISignatureHandlerTest {
 		URISignatureHandler.validate(validURI_3MixedPlaceholders);
 	}
 
+ 	@Test
+ 	public void validate_validURI_validURI_Multiple() {
+ 		URISignatureHandler.validate(validURI_MultipleQueryString);
+ 	}
+	
 	// failure cases
 
 	@Test(expected = URISignatureHandler.URISignatureParsingException.class)
@@ -278,6 +291,19 @@ public class URISignatureHandlerTest {
 		assertEquals("Wrong third placeholder", "unit", placeholders.get(2));
 	}
 
+	@Test
+ 	public void extractPlaceholders_validURI_MultipleQueryString() {
+ 		List<String> placeholders = URISignatureHandler
+ 				.extractPlaceholders(validURI_MultipleQueryString);
+ 		assertNotNull(placeholders);
+ 		assertEquals(5, placeholders.size());
+ 		assertEquals("Wrong first placeholder", "catalogue", placeholders.get(0));
+ 		assertEquals("Wrong second placeholder", "count?", placeholders.get(1));
+ 		assertEquals("Wrong third placeholder", "startPage?", placeholders.get(2));
+ 		assertEquals("Wrong fourth placeholder", "startIndex?", placeholders.get(3));
+ 		assertEquals("Wrong fifth placeholder", "searchTerms?", placeholders.get(4));
+ 	}
+	
 	// failure cases
 
 	/*
@@ -420,7 +446,57 @@ public class URISignatureHandlerTest {
 				"http://sysmo-db.org/sops/1 11/experimental_conditions/2/2$2&2:?condition_unit=3;3",
 				completeURI);
 	}
-
+	
+ 	@SuppressWarnings("serial")
+ 	@Test
+ 	public void generateCompleteURI_successfulURIGeneration_optionalParams() {
+ 		String uriSignature = "http://dr-site.esrin.esa.int/{catalogue}/genesi/ASA_IMS_1P/rdf/?count={count?}&startPage={startPage?}&startIndex={startIndex?}&q={searchTerms?}";
+ 		Map<String, String> allParameters = new HashMap<String, String>() {
+ 			{
+ 				put("catalogue", "catalogue");
+ 				put("count?", "10");
+ 				put("startPage?", "1");
+ 				put("startIndex?", "1");
+ 				put("searchTerms?", "term1");
+ 			}
+ 		};
+ 
+ 		Map<String, String> parametersMissingOptional = new HashMap<String, String>() {
+ 			{
+ 				put("catalogue", "catalogue");
+ 				put("count?", "10");
+ 				put("searchTerms?", "term1");
+ 			}
+ 		};
+ 
+ 		Map<String, String> parametersMissingFirstOptional = new HashMap<String, String>() {
+ 			{
+ 				put("catalogue", "catalogue");
+ 				put("startPage?", "1");
+ 				put("startIndex?", "1");
+ 				put("searchTerms?", "term1");
+ 			}
+ 		};
+ 
+ 		String completeURI1 = URISignatureHandler.generateCompleteURI(
+ 				uriSignature, allParameters, false);
+ 		assertEquals(
+				"http://dr-site.esrin.esa.int/catalogue/genesi/ASA_IMS_1P/rdf/?count=10&startPage=1&startIndex=1&q=term1",
+ 				completeURI1);
+ 
+ 		String completeURI2 = URISignatureHandler.generateCompleteURI(
+ 				uriSignature, parametersMissingOptional, false);
+ 		assertEquals(
+ 				"http://dr-site.esrin.esa.int/catalogue/genesi/ASA_IMS_1P/rdf/?count=10&q=term1",
+ 				completeURI2);
+ 
+ 		String completeURI3 = URISignatureHandler.generateCompleteURI(
+ 				uriSignature, parametersMissingFirstOptional, false);
+ 		assertEquals(
+ 				"http://dr-site.esrin.esa.int/catalogue/genesi/ASA_IMS_1P/rdf/?startPage=1&startIndex=1&q=term1",
+ 				completeURI3);
+ 	}
+ 
 	@Test
 	public void generateCompleteURI_signatureWithNoPlaceholders_nullParameterMap() {
 		String completeURI = URISignatureHandler.generateCompleteURI(
@@ -451,8 +527,8 @@ public class URISignatureHandlerTest {
 	}
 
 	@SuppressWarnings("serial")
-	@Test(expected = URISignatureHandler.URIGenerationFromSignatureException.class)
-	public void generateCompleteURI_signatureWithPlaceholders_missingParameterURIGeneration_FailureExpected() {
+	@Test
+	public void generateCompleteURI_signatureWithPlaceholders_missingParameterURIGeneration_FailureNotExpected() {
 		String uriSignature = "http://sysmo-db.org/sops/{sop_id}/experimental_conditions/{cond_id}?condition_unit={unit}";
 		Map<String, String> parameters = new HashMap<String, String>() {
 			{
@@ -465,7 +541,7 @@ public class URISignatureHandlerTest {
 				uriSignature, parameters, true);
 
 		assertEquals(
-				"http://sysmo-db.org/sops/111/experimental_conditions/2222?condition_unit=33",
+				"http://sysmo-db.org/sops/111/experimental_conditions/2222",
 				completeURI);
 	}
 
@@ -494,4 +570,25 @@ public class URISignatureHandlerTest {
 				completeURI);
 	}
 
+	@SuppressWarnings("serial")
+ 	@Test(expected = URISignatureHandler.URIGenerationFromSignatureException.class)
+ 	public void generateCompleteURI_failureURIGeneration_optionalParams() {
+ 		String uriSignature = "http://dr-site.esrin.esa.int/{catalogue}/genesi/ASA_IMS_1P/rdf/?count={count?}&startPage={startPage?}&startIndex={startIndex?}&q={searchTerms?}";
+ 
+ 		Map<String, String> parametersMissingCompulsory = new HashMap<String, String>() {
+ 			{
+ 				put("count?", "10");
+ 				put("startPage?", "1");
+ 				put("startIndex?", "1");
+ 				put("searchTerms?", "term1");
+ 			}
+ 		};
+ 
+ 		String completeURI = URISignatureHandler.generateCompleteURI(
+ 				uriSignature, parametersMissingCompulsory, false);
+ 
+ 		assertEquals(
+ 				"http://dr-site.esrin.esa.int/catalogue/genesi/ASA_IMS_1P/rdf/?count={count?}&startPage={startPage?}&startIndex={startIndex?}&q={searchTerms?}",
+ 				completeURI);
+ 	}
 }

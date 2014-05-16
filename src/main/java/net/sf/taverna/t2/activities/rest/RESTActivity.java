@@ -114,11 +114,11 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 
 		// now process the URL signature - extract all placeholders and create
 		// an input data type for each
-		Map<String, Class<?>> activityInputs = new HashMap<String, Class<?>>();
+		Map<String, Class<?>> activityInputs = new HashMap<>();
 		List<String> placeholders = URISignatureHandler.extractPlaceholders(configBean
 				.getUrlSignature());
 		String acceptsHeaderValue = configBean.getAcceptsHeaderValue();
-		if (acceptsHeaderValue != null && !acceptsHeaderValue.isEmpty()) {
+		if (acceptsHeaderValue != null && !acceptsHeaderValue.isEmpty())
 			try {
 				List<String> acceptsPlaceHolders = URISignatureHandler
 						.extractPlaceholders(acceptsHeaderValue);
@@ -127,8 +127,7 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 			} catch (URISignatureParsingException e) {
 				logger.error(e);
 			}
-		}
-		for (ArrayList<String> httpHeaderNameValuePair : configBean.getOtherHTTPHeaders()) {
+		for (ArrayList<String> httpHeaderNameValuePair : configBean.getOtherHTTPHeaders())
 			try {
 				List<String> headerPlaceHolders = URISignatureHandler
 						.extractPlaceholders(httpHeaderNameValuePair.get(1));
@@ -137,13 +136,11 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 			} catch (URISignatureParsingException e) {
 				logger.error(e);
 			}
-		}
-		for (String placeholder : placeholders) {
+		for (String placeholder : placeholders)
 			// these inputs will have a dynamic name each;
 			// the data type is string as they are the values to be
 			// substituted into the URL signature at the execution time
 			activityInputs.put(placeholder, String.class);
-		}
 
 		// all inputs have now been configured - store the resulting set-up in
 		// the config bean;
@@ -151,6 +148,22 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 		// so that existing
 		// set-up could simply be referred to, rather than "re-calculated"
 		configBean.setActivityInputs(activityInputs);
+
+		// ---- CREATE OUTPUTS ----
+		// all outputs are of depth 0 - i.e. just a single value on each;
+
+		// output ports for Response Body and Status are static - they don't
+		// depend on the configuration of the activity;
+		addOutput(OUT_RESPONSE_BODY, 0);
+		addOutput(OUT_STATUS, 0);
+		if (configBean.getShowActualUrlPort())
+			addOutput(OUT_COMPLETE_URL, 0);
+		if (configBean.getShowResponseHeadersPort())
+			addOutput(OUT_RESPONSE_HEADERS, 1);
+
+		// Redirection port may be hidden/shown
+		if (configBean.getShowRedirectionOutputPort())
+			addOutput(OUT_REDIRECTION, 0);
 	}
 
 	/**
@@ -160,7 +173,7 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 	 * @see RESTActivity#hasMessageBodyInputPort(HTTP_METHOD)
 	 */
 	public boolean hasMessageBodyInputPort() {
-		return (RESTActivity.hasMessageBodyInputPort(configBean.getHttpMethod()));
+		return hasMessageBodyInputPort(configBean.getHttpMethod());
 	}
 
 	/**
@@ -174,22 +187,24 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 	 *         methods; false otherwise.
 	 */
 	public static boolean hasMessageBodyInputPort(HTTP_METHOD httpMethod) {
-		return (httpMethod == HTTP_METHOD.POST || httpMethod == HTTP_METHOD.PUT);
+		return httpMethod == HTTP_METHOD.POST || httpMethod == HTTP_METHOD.PUT;
 	}
 
 	/**
 	 * This method executes pre-configured instance of REST activity. It
 	 * resolves inputs of the activity and registers its outputs; the real
-	 * invocation of the HTTP request is perfomed by
+	 * invocation of the HTTP request is performed by
 	 * {@link HTTPRequestHandler#initiateHTTPRequest(String, RESTActivityConfigurationBean, String)}
 	 * .
 	 */
+	@Override
 	public void executeAsynch(final Map<String, T2Reference> inputs,
 			final AsynchronousActivityCallback callback) {
 		// Don't execute service directly now, request to be run asynchronously
 		callback.requestRun(new Runnable() {
 			private Logger logger = Logger.getLogger(RESTActivity.class);
 
+			@Override
 			public void run() {
 
 				InvocationContext context = callback.getContext();
@@ -200,13 +215,12 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 				// RE-ASSEMBLE REQUEST URL FROM SIGNATURE AND PARAMETERS
 				// (just use the configuration that was determined in
 				// configurePorts() - all ports in this set are required)
-				Map<String, String> urlParameters = new HashMap<String, String>();
+				Map<String, String> urlParameters = new HashMap<>();
 				try {
-					for (String inputName : configBean.getActivityInputs().keySet()) {
+					for (String inputName : configBean.getActivityInputs().keySet())
 						urlParameters.put(inputName, (String) referenceService.renderIdentifier(
 								inputs.get(inputName), configBean.getActivityInputs()
 										.get(inputName), context));
-					}
 				} catch (Exception e) {
 					// problem occurred while resolving the inputs
 					callback.fail("REST activity was unable to resolve all necessary inputs"
@@ -268,20 +282,15 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 							// and hope we'll get back something intelligible
 							String str = null;
 							try {
-								str = new String(((byte[]) requestResponse.getResponseBody()),
+								str = new String((byte[]) requestResponse.getResponseBody(),
 										"UTF-8");
 							} catch (UnsupportedEncodingException e) {
 								logger.error(
-										"Failed to reconstruct the response body byte[] into string using UTF-8 encoding",
+										"Failed to reconstruct the response body byte[]"
+										+ " into string using UTF-8 encoding",
 										e);
-								str = new String(((byte[]) requestResponse.getResponseBody())); // try
-																								// with
-																								// no
-																								// encoding,
-																								// probably
-																								// will
-																								// get
-																								// garbage
+								// try with no encoding, probably will get garbage
+								str = new String((byte[]) requestResponse.getResponseBody());
 							}
 							errorDocument = referenceService.getErrorDocumentService()
 									.registerError(str, 0, context);
@@ -314,10 +323,10 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 							context);
 					outputs.put(OUT_COMPLETE_URL, completeURLRef);
 				}
-				if (configBean.getShowResponseHeadersPort()) {
+				if (configBean.getShowResponseHeadersPort())
 					outputs.put(OUT_RESPONSE_HEADERS, referenceService.register(
 							requestResponse.getHeadersAsStrings(), 1, true, context));
-				}
+
 				// only put an output to the Redirection port if the processor
 				// is configured to display that port
 				if (configBean.getShowRedirectionOutputPort()) {
@@ -333,5 +342,4 @@ public class RESTActivity extends AbstractAsynchronousActivity<JsonNode> {
 			}
 		});
 	}
-
 }
