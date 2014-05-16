@@ -60,12 +60,11 @@ public class URISignatureHandler {
 	public static LinkedHashMap<String, Integer> extractPlaceholdersWithPositions(
 			String uriSignature) {
 		// no signature - nothing to process
-		if (uriSignature == null || uriSignature.length() == 0) {
+		if (uriSignature == null || uriSignature.isEmpty())
 			throw new URISignatureParsingException(
 					"URI signature is null or empty - nothing to process.");
-		}
 
-		LinkedHashMap<String, Integer> foundPlaceholdersWithPositions = new LinkedHashMap<String, Integer>();
+		LinkedHashMap<String, Integer> foundPlaceholdersWithPositions = new LinkedHashMap<>();
 
 		int nestingLevel = 0;
 		int startSymbolIdx = -1;
@@ -75,19 +74,18 @@ public class URISignatureHandler {
 		for (int i = 0; i < uriSignature.length(); i++) {
 			switch (uriSignature.charAt(i)) {
 			case PLACEHOLDER_START_SYMBOL:
-				nestingLevel++;
-				if (nestingLevel == 1) {
-					startSymbolIdx = i;
-				} else /* if (nestingLevel > 0) */{
+				if (++nestingLevel != 1)
 					throw new URISignatureParsingException(
 							"Malformed URL: at least two parameter placeholder opening\n" +
-							"symbols follow each other without being closed appropriately\n" +
+									"symbols follow each other without being closed appropriately\n" +
 							"(possibly the signature contains nested placeholders).");
-				}
+				startSymbolIdx = i;
 				break;
 
 			case PLACEHOLDER_END_SYMBOL:
-				nestingLevel--;
+				if (--nestingLevel < 0)
+					throw new URISignatureParsingException(
+							"Malformed URL: parameter placeholder closing symbol found before the opening one.");
 				if (nestingLevel == 0) {
 					// correctly opened and closed placeholder found; check if
 					// it is a "fresh" one
@@ -102,9 +100,6 @@ public class URISignatureHandler {
 								"Malformed URL: duplicate parameter placeholder \""
 										+ placeholderCandidate + "\" found.");
 					}
-				} else /* if (nestingLevel < 0) */{
-					throw new URISignatureParsingException(
-							"Malformed URL: parameter placeholder closing symbol found before the opening one.");
 				}
 				break;
 
@@ -118,13 +113,12 @@ public class URISignatureHandler {
 		// placeholder
 		// opening symbol was found, but the closing one never occurred after
 		// that)
-		if (nestingLevel > 0) {
+		if (nestingLevel > 0)
 			throw new URISignatureParsingException(
 					"Malformed URL: parameter placeholder opening symbol found,\n"
 							+ "but the closing one has not been encountered.");
-		}
 
-		return (foundPlaceholdersWithPositions);
+		return foundPlaceholdersWithPositions;
 	}
 
 	/**
@@ -139,8 +133,8 @@ public class URISignatureHandler {
 	 *         in the provided URI signature.
 	 */
 	public static List<String> extractPlaceholders(String uriSignature) {
-		return (new ArrayList<String>(extractPlaceholdersWithPositions(
-				uriSignature).keySet()));
+		return new ArrayList<>(extractPlaceholdersWithPositions(uriSignature)
+				.keySet());
 	}
 
 	/**
@@ -183,28 +177,26 @@ public class URISignatureHandler {
 		String allowedURLCharactersString = new String("abcdefghijklmnopqrstuvwxyz0123456789$-_.+!*'(),;/?:@&=%");
 		char[] allowedURLCharactersArray = allowedURLCharactersString.toCharArray();
 		List<Character> allowedURLCharactersList = new ArrayList<Character>();
-		    for (char value : allowedURLCharactersArray) {
+		    for (char value : allowedURLCharactersArray)
 		    	allowedURLCharactersList.add(new Character(value));
-		    }
 
-		int index=0;
+		int index = 0;
 		String unsafeCharactersDetected = "";
 		while (index < candidateURLSignature.length()){
 			char character = candidateURLSignature.charAt(index);
-			if (character == '{'){ // a start of a parameter
+			if (character == '{') { // a start of a parameter
 				// This is a paramater name - ignore until we find the closing '}'
 				index++;
 				while(character != '}' && index < candidateURLSignature.length()){
 					character = candidateURLSignature.charAt(index);
 					index++;
 				}
-			}
-			else if (!allowedURLCharactersList.contains(Character.valueOf(Character.toLowerCase(character)))){
+			} else if (!allowedURLCharactersList.contains(Character
+					.valueOf(Character.toLowerCase(character)))) {
 				// We found an unsafe character in the URL - add to the list of unsafe characters
-				unsafeCharactersDetected+="'" + character + "', ";
+				unsafeCharactersDetected += "'" + character + "', ";
 				index++;
-			}
-			else{
+			} else {
 				index++;
 			}
 		}
@@ -281,7 +273,7 @@ public class URISignatureHandler {
 			// with real values;
 			// check that the parameter map contains some values
 			if (specifiedParameters == null || specifiedParameters.isEmpty()) {
-				parameters = Collections.EMPTY_MAP;
+				parameters = Collections.emptyMap();
 			} else {
 				parameters = specifiedParameters;
 			}
@@ -357,6 +349,7 @@ public class URISignatureHandler {
 	 * 
 	 * @author Sergejs Aleksejevs
 	 */
+	@SuppressWarnings("serial")
 	public static class URISignatureParsingException extends
 			IllegalArgumentException {
 		public URISignatureParsingException() {
@@ -409,8 +402,7 @@ public class URISignatureHandler {
 		    if (!Character.isLetterOrDigit(b) || (b >= 0x80)) {
 		    	sb.append("%");
 		    	sb.append(Integer.toHexString(b).toUpperCase());
-		    }
-		    else {
+			} else {
 		    	sb.append((char)b);
 		    }
 		}

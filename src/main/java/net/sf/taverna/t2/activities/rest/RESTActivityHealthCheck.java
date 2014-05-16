@@ -18,7 +18,7 @@ public class RESTActivityHealthCheck extends VisitKind {
 	public static final int GENERAL_CONFIG_PROBLEM = 10;
 
 	@Override
-	public Class<? extends Visitor> getVisitorClass() {
+	public Class<? extends Visitor<?>> getVisitorClass() {
 		return RESTActivityHealthChecker.class;
 	}
 

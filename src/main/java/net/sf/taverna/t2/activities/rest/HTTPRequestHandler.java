@@ -575,10 +575,6 @@ public class HTTPRequestHandler {
 			return exception;
 		}
 
-		private void setException(Exception exception) {
-			this.exception = exception;
-		}
-
 		/**
 		 * @return <code>true</code> if HTTP code of server response is either
 		 *         4xx or 5xx.

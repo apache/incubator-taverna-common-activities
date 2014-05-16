@@ -14,10 +14,12 @@ import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
  * @author Sergejs Aleksejevs
  */
 public class RESTActivityHealthChecker implements HealthChecker<RESTActivity> {
+	@Override
 	public boolean canVisit(Object subject) {
 		return (subject instanceof RESTActivity);
 	}
 
+	@Override
 	public VisitReport visit(RESTActivity activity, List<Object> ancestors) {
 		// collection of validation reports that this health checker will create
 		List<VisitReport> reports = new ArrayList<VisitReport>();
@@ -48,6 +50,7 @@ public class RESTActivityHealthChecker implements HealthChecker<RESTActivity> {
 	 * verifying details in the configuration bean -
 	 * that is quick.
 	 */
+	@Override
 	public boolean isTimeConsuming() {
 		return false;
 	}
