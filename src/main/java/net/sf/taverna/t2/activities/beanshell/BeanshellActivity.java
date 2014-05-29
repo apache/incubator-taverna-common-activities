@@ -38,12 +38,13 @@ import org.apache.log4j.Logger;
 import uk.org.taverna.configuration.app.ApplicationConfiguration;
 import bsh.EvalError;
 import bsh.Interpreter;
+import bsh.TargetError;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * An Activity providing Beanshell functionality.
- *
+ * 
  * @author David Withers
  * @author Stuart Owen
  * @author Alex Nenadic
@@ -79,9 +80,8 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 	}
 
 	/**
-	 * Creates the interpreter required to run the beanshell script, and assigns the correct
-	 * classloader
-	 * setting according to the
+	 * Creates the interpreter required to run the beanshell script, and assigns
+	 * the correct classloader setting according to the
 	 */
 	private void createInterpreter() {
 		interpreter = new Interpreter();
@@ -92,16 +92,17 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 	 * specified depth, the granular depths should always be equal to the actual
 	 * depth.
 	 * <p>
-	 * Workflow definitions created with Taverna 2.0b1 would not honour this and always set the
-	 * granular depth to 0.
+	 * Workflow definitions created with Taverna 2.0b1 would not honour this and
+	 * always set the granular depth to 0.
 	 * <p>
 	 * This method modifies the granular depths to be equal to the depths.
 	 */
 	protected void checkGranularDepths() {
 		for (OutputPort outputPort : getOutputPorts()) {
 			if (outputPort.getGranularDepth() != outputPort.getDepth()) {
-				logger.warn("Replacing granular depth of port " + outputPort.getName());
-//				outputPort.setGranularDepth(outputPort.getDepth());
+				logger.warn("Replacing granular depth of port "
+						+ outputPort.getName());
+				// outputPort.setGranularDepth(outputPort.getDepth());
 			}
 		}
 	}
@@ -130,32 +131,33 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 
 			public void run() {
 
-				// Workflow run identifier (needed when classloader sharing is set to 'workflow').
+				// Workflow run identifier (needed when classloader sharing is
+				// set to 'workflow').
 				String procID = callback.getParentProcessIdentifier();
 				String workflowRunID;
 				if (procID.contains(":")) {
 					workflowRunID = procID.substring(0, procID.indexOf(':'));
 				} else {
-					workflowRunID = procID; // for tests, will be an empty string
+					workflowRunID = procID; // for tests, will be an empty
+											// string
 				}
 
 				synchronized (interpreter) {
 
-				// Configure the classloader for executing the Beanshell
-				if (classLoader == null) {
-					try {
-						classLoader = findClassLoader(json, workflowRunID);
-						interpreter.setClassLoader(classLoader);
-					} catch (RuntimeException rex) {
-						String message = "Unable to obtain the classloader for Beanshell service";
-						callback.fail(message, rex);
-						return;
+					// Configure the classloader for executing the Beanshell
+					if (classLoader == null) {
+						try {
+							classLoader = findClassLoader(json, workflowRunID);
+							interpreter.setClassLoader(classLoader);
+						} catch (RuntimeException rex) {
+							String message = "Unable to obtain the classloader for Beanshell service";
+							callback.fail(message, rex);
+							return;
+						}
 					}
 
-				}
-
-
-					ReferenceService referenceService = callback.getContext().getReferenceService();
+					ReferenceService referenceService = callback.getContext()
+							.getReferenceService();
 
 					Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 
@@ -164,8 +166,10 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 						// set inputs
 						for (String inputName : data.keySet()) {
 							ActivityInputPort inputPort = getInputPort(inputName);
-							Object input = referenceService.renderIdentifier(data.get(inputName),
-									inputPort.getTranslatedElementClass(), callback.getContext());
+							Object input = referenceService.renderIdentifier(
+									data.get(inputName),
+									inputPort.getTranslatedElementClass(),
+									callback.getContext());
 							inputName = sanatisePortName(inputName);
 							interpreter.set(inputName, input);
 						}
@@ -179,26 +183,38 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 								ErrorDocumentService errorDocService = referenceService
 										.getErrorDocumentService();
 								value = errorDocService.registerError(
-										"No value produced for output variable " + name,
-										outputPort.getDepth(), callback.getContext());
+										"No value produced for output variable "
+												+ name, outputPort.getDepth(),
+										callback.getContext());
 							}
-							outputData.put(name, referenceService.register(value,
-									outputPort.getDepth(), true, callback.getContext()));
+							outputData.put(name, referenceService.register(
+									value, outputPort.getDepth(), true,
+									callback.getContext()));
 						}
 						callback.receiveResult(outputData, new int[0]);
 					} catch (EvalError e) {
-						callback.fail("Error evaluating the beanshell script " + this, e);
+						logger.error(e);
+						try {
+							int lineNumber = e.getErrorLineNumber();
+
+							callback.fail("Line " + lineNumber + ": "
+									+ determineMessage(e));
+						} catch (NullPointerException e2) {
+							callback.fail(determineMessage(e));
+						}
 					} catch (ReferenceServiceException e) {
-						callback.fail("Error accessing beanshell input/output data for " + this, e);
+						callback.fail(
+								"Error accessing beanshell input/output data for "
+										+ this, e);
 					}
 					clearInterpreter();
 				}
 			}
 
 			/**
-			 * Removes any invalid characters from the port name.
-			 * For example, xml-text would become xmltext.
-			 *
+			 * Removes any invalid characters from the port name. For example,
+			 * xml-text would become xmltext.
+			 * 
 			 * @param name
 			 * @return
 			 */
@@ -216,5 +232,20 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 			}
 		});
 
+	}
+
+	private static String determineMessage(Throwable e) {
+		if (e instanceof TargetError) {
+			Throwable t = ((TargetError) e).getTarget();
+			if (t != null) {
+				return t.getClass().getCanonicalName() + ": "
+						+ determineMessage(t);
+			}
+		}
+		Throwable cause = e.getCause();
+		if (cause != null) {
+			return determineMessage(cause);
+		}
+		return e.getMessage();
 	}
 }

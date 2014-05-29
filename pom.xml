@@ -10,6 +10,7 @@
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>beanshell-activity</artifactId>
 	<packaging>bundle</packaging>
+	<version>1.6-SNAPSHOT</version>
 	<name>Taverna 2 Beanshell Activity</name>
 	<dependencies>
 		<dependency>
@@ -42,7 +43,6 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.2.2</version>
 		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -88,6 +88,4 @@
 		<url>https://github.com/taverna/taverna-beanshell-activity/</url>
 		<tag>HEAD</tag>
 	</scm>
-
 </project>
-
