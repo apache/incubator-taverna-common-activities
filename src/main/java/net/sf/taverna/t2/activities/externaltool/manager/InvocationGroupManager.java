@@ -61,7 +61,7 @@ public interface InvocationGroupManager {
 	public InvocationMechanism getInvocationMechanism(String defaultMechanismName);
 
 	public void mechanismChanged(InvocationMechanism im);
-
+	
 	/**
 	 * Get the directory where the invocation information will be/is saved to.
 	 */

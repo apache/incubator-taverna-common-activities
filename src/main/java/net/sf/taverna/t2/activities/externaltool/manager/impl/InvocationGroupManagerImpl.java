@@ -6,9 +6,11 @@ package net.sf.taverna.t2.activities.externaltool.manager.impl;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -57,14 +59,14 @@ public class InvocationGroupManagerImpl implements Observable<InvocationManagerE
 	private static SAXBuilder builder = new SAXBuilder();
 
 	private static Logger logger = Logger.getLogger(InvocationGroupManagerImpl.class);
+	
+	private Map<InvocationGroup, InvocationGroup> groupReplacements = Collections.synchronizedMap(new HashMap<InvocationGroup, InvocationGroup>());
+    
+	private Map<String, InvocationMechanism> mechanismReplacements = Collections.synchronizedMap(new HashMap<String, InvocationMechanism>());
 
-	private HashMap<InvocationGroup, InvocationGroup> groupReplacements = new HashMap<InvocationGroup, InvocationGroup>();
+	private Map<String, InvocationGroup> groupImports = Collections.synchronizedMap(new HashMap<String, InvocationGroup> ());
 
-	private HashMap<String, InvocationMechanism> mechanismReplacements = new HashMap<String, InvocationMechanism>();
-
-	private HashMap<String, InvocationGroup> groupImports = new HashMap<String, InvocationGroup> ();
-
-	private HashMap<String, InvocationMechanism> mechanismImports = new HashMap<String, InvocationMechanism> ();
+	private Map<String, InvocationMechanism> mechanismImports = Collections.synchronizedMap(new HashMap<String, InvocationMechanism> ());
 
 	private final ApplicationConfiguration applicationConfiguration;
 
@@ -245,7 +247,10 @@ public class InvocationGroupManagerImpl implements Observable<InvocationManagerE
 			return;
 		}
 		try {
-			Document document = builder.build(f);
+			Document document = null;
+			synchronized (builder) {
+				document = builder.build(f);
+			}
 			Element topElement = document.getRootElement();
 			Element mechanismsElement = topElement.getChild("invocationMechanisms");
 			for (Object mechanismObject : mechanismsElement.getChildren("invocationMechanism")) {
@@ -349,7 +354,9 @@ public class InvocationGroupManagerImpl implements Observable<InvocationManagerE
 		FileWriter writer;
 		try {
 			writer = new FileWriter(f);
-			outputter.output(configDocument, writer);
+			synchronized (outputter) {
+				outputter.output(configDocument, writer);
+			}
 			writer.close();
 		} catch (IOException e) {
 			logger.error("Unable to save invocation manager", e);
