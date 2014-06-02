@@ -120,7 +120,7 @@ public class WSDLActivityHealthChecker extends RemoteHealthChecker {
 
 		return report;
 	}
-
+	
 	public static boolean checkStyleAndUse(String style, String use) {
 		return !(style.equalsIgnoreCase("rpc") && use.equalsIgnoreCase("literal"));
 	}

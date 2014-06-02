@@ -103,6 +103,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 				portBean.put("mimeType", TypeDescriptor.translateJavaType(attributeTypes[i]));
 				portBean.put("depth", depthForDescriptor(attributes.get(i)));
 			}
+			
 		} else if (descriptor instanceof ArrayTypeDescriptor) {
 			ObjectNode portBean = inputDefinitions.addObject();
 			portBean.put("name", descriptor.getName());
@@ -161,7 +162,6 @@ public class XMLSplitterConfigurationBeanBuilder {
 				portBean.put("granularDepth", depth);
 			}
 
-
 			List<TypeDescriptor> attributes = ((ComplexTypeDescriptor) descriptor).getAttributes();
 			String[] elementNames = Arrays.copyOf(names, names.length);
 			Arrays.sort(elementNames);
@@ -181,6 +181,7 @@ public class XMLSplitterConfigurationBeanBuilder {
 				portBean.put("depth", depth);
 				portBean.put("granularDepth", depth);
 			}
+			
 		} else if (descriptor instanceof ArrayTypeDescriptor) {
 			ObjectNode portBean = outputDefinitions.addObject();
 			String name=descriptor.getName();

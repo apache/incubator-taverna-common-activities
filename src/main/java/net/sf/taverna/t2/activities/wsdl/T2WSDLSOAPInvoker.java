@@ -172,7 +172,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_PLAINTEXTPASSWORD)
 				|| securityProfile
 						.equals(SecurityProfiles.WSSECURITY_TIMESTAMP_USERNAMETOKEN_DIGESTPASSWORD)) {
-
+			
 			UsernamePassword usernamePassword = getUsernameAndPasswordForService(bean, false);
 			call.setProperty(Call.USERNAME_PROPERTY, usernamePassword.getUsername());
 			call.setProperty(Call.PASSWORD_PROPERTY, usernamePassword.getPasswordAsString());
@@ -230,6 +230,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		EngineConfiguration wssEngineConfiguration = null;
 		if (bean.has("securityProfile")) {
 			URI securityProfile = new URI(bean.get("securityProfile").textValue());
+
 			// If security settings require WS-Security and not just e.g. Basic HTTP
 			// AuthN - configure the axis engine from the appropriate config strings
 			if (securityProfile
@@ -266,7 +267,7 @@ public class T2WSDLSOAPInvoker extends WSDLSOAPInvoker {
 		//AxisProperties.setClassDefault(SecureSocketFactory.class, "net.sf.taverna.t2.activities.wsdl.security.TavernaAxisCustomSSLSocketFactory");
 
 		Call call = super.getCall(wssEngineConfiguration);
-
+		
 		// Now that we have an axis Call object, configure any additional
 		// security properties on it (or its message context or its Transport
 		// handler),
