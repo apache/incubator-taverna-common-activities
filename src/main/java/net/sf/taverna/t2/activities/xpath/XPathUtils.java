@@ -20,6 +20,8 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.xpath;
 
+import static org.dom4j.DocumentHelper.createXPath;
+
 import org.dom4j.DocumentHelper;
 import org.dom4j.InvalidXPathException;
 
@@ -27,7 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Utility methods for validating xpath expressions.
- *
+ * 
  * @author David Withers
  */
 public class XPathUtils {
@@ -38,7 +40,7 @@ public class XPathUtils {
 
 	/**
 	 * Validates an XPath expression.
-	 *
+	 * 
 	 * @return {@link XPathActivityConfigurationBean#XPATH_VALID XPATH_VALID} -
 	 *         if the expression is valid;<br/>
 	 *         {@link XPathActivityConfigurationBean#XPATH_EMPTY XPATH_EMPTY} -
@@ -48,31 +50,31 @@ public class XPathUtils {
 	 */
 	public static int validateXPath(String xpathExpressionToValidate) {
 		// no XPath expression
-		if (xpathExpressionToValidate == null || xpathExpressionToValidate.trim().length() == 0) {
-			return (0);
+		if (xpathExpressionToValidate == null
+				|| xpathExpressionToValidate.trim().isEmpty()) {
+			return XPATH_EMPTY;
 		}
 
 		try {
 			// try to parse the XPath expression...
-			DocumentHelper.createXPath(xpathExpressionToValidate.trim());
+			createXPath(xpathExpressionToValidate.trim());
 			// ...success
-			return (1);
+			return XPATH_VALID;
 		} catch (InvalidXPathException e) {
 			// ...failed to parse the XPath expression: notify of the error
-			return (-1);
+			return XPATH_INVALID;
 		}
 	}
 
 	/**
 	 * Tests validity of the configuration held.
-	 *
-	 * @return <code>true</code> if the configuration in the bean is valid; <code>false</code>
-	 *         otherwise.
+	 * 
+	 * @return <code>true</code> if the configuration in the bean is valid;
+	 *         <code>false</code> otherwise.
 	 */
 	public static boolean isValid(JsonNode json) {
 		return (json.has("xpathExpression")
-				&& validateXPath(json.get("xpathExpression").textValue()) == XPATH_VALID
-				&& json.has("xpathNamespaceMap"));
+				&& validateXPath(json.get("xpathExpression").textValue()) == XPATH_VALID && json
+					.has("xpathNamespaceMap"));
 	}
-
 }

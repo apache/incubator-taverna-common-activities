@@ -20,6 +20,10 @@
  ******************************************************************************/
 package net.sf.taverna.t2.activities.xpath;
 
+import static net.sf.taverna.t2.activities.xpath.XPathActivity.IN_XML;
+import static net.sf.taverna.t2.activities.xpath.XPathActivity.OUT_TEXT;
+import static net.sf.taverna.t2.activities.xpath.XPathActivity.OUT_XML;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
@@ -67,7 +71,7 @@ public class XPathActivityFactory implements ActivityFactory {
 	public Set<ActivityInputPort> getInputPorts(JsonNode configuration)
 			throws ActivityConfigurationException {
 		Set<ActivityInputPort> outputPorts = new HashSet<>();
-		outputPorts.add(edits.createActivityInputPort(XPathActivity.IN_XML, 0, true, null,
+		outputPorts.add(edits.createActivityInputPort(IN_XML, 0, true, null,
 				String.class));
 		return outputPorts;
 	}
@@ -76,8 +80,8 @@ public class XPathActivityFactory implements ActivityFactory {
 	public Set<ActivityOutputPort> getOutputPorts(JsonNode configuration)
 			throws ActivityConfigurationException {
 		Set<ActivityOutputPort> outputPorts = new HashSet<>();
-		outputPorts.add(edits.createActivityOutputPort(XPathActivity.OUT_TEXT, 1, 1));
-		outputPorts.add(edits.createActivityOutputPort(XPathActivity.OUT_XML, 1, 1));
+		outputPorts.add(edits.createActivityOutputPort(OUT_TEXT, 1, 1));
+		outputPorts.add(edits.createActivityOutputPort(OUT_XML, 1, 1));
 		return outputPorts;
 	}
 

@@ -1,5 +1,8 @@
 package net.sf.taverna.t2.activities.xpath;
 
+import static net.sf.taverna.t2.activities.xpath.XPathActivity.URI;
+import static org.dom4j.DocumentHelper.createXPath;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
@@ -10,19 +13,18 @@ import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 import org.dom4j.InvalidXPathException;
 
 /**
  *
  * @author Sergejs Aleksejevs
  */
-@ConfigurationBean(uri = XPathActivity.URI + "#Config")
+@ConfigurationBean(uri = URI + "#Config")
 public class XPathActivityConfigurationBean implements Serializable {
 	// --- CONSTANTS ---
-	public static final int XPATH_VALID = 1;
-	public static final int XPATH_EMPTY = 0;
-	public static final int XPATH_INVALID = -1;
+	public static final int XPATH_VALID = XPathUtils.XPATH_VALID;
+	public static final int XPATH_EMPTY = XPathUtils.XPATH_EMPTY;
+	public static final int XPATH_INVALID = XPathUtils.XPATH_INVALID;
 
 	private String xmlDocument;
 	private String xpathExpression;
@@ -55,18 +57,18 @@ public class XPathActivityConfigurationBean implements Serializable {
 	public static int validateXPath(String xpathExpressionToValidate) {
 		// no XPath expression
 		if (xpathExpressionToValidate == null
-				|| xpathExpressionToValidate.trim().length() == 0) {
-			return (0);
+				|| xpathExpressionToValidate.trim().isEmpty()) {
+			return XPATH_EMPTY;
 		}
 
 		try {
 			// try to parse the XPath expression...
-			DocumentHelper.createXPath(xpathExpressionToValidate.trim());
+			createXPath(xpathExpressionToValidate.trim());
 			// ...success
-			return (1);
+			return XPATH_VALID;
 		} catch (InvalidXPathException e) {
 			// ...failed to parse the XPath expression: notify of the error
-			return (-1);
+			return XPATH_INVALID;
 		}
 	}
 
@@ -116,7 +118,7 @@ public class XPathActivityConfigurationBean implements Serializable {
 		setXpathNamespaceMap(namespaceMap);
 	}
 
-	@ConfigurationBean(uri = XPathActivity.URI + "/NamespaceMapping")
+	@ConfigurationBean(uri = URI + "/NamespaceMapping")
 	public static class NamespaceMapping {
 		private String prefix;
 
@@ -139,7 +141,5 @@ public class XPathActivityConfigurationBean implements Serializable {
 		public void setUri(URI uri) {
 			this.uri = uri;
 		}
-
 	}
-
 }
