@@ -269,10 +269,10 @@ public class XMLInputSplitter {
 			Object descendantObject = iterator.next();
 			if (descendantObject instanceof Element) {
 				Element childElement = (Element) descendantObject;
-				if (childElement.getNamespaceURI() == null
-						|| childElement.getNamespaceURI().length() == 0)
+				if (childElement.getNamespaceURI() == null) {
 					childElement.setNamespace(Namespace
 							.getNamespace(namespaceURI));
+				}
 			}
 		}
 	}

@@ -23,6 +23,7 @@ package net.sf.taverna.wsdl.soap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import javax.wsdl.WSDLException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 
 import net.sf.taverna.wsdl.parser.ArrayTypeDescriptor;
@@ -46,6 +48,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -104,7 +107,7 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 			Element el = (Element) parent;
 			if (parent.hasAttributes()) {
 				NamedNodeMap attributes = parent.getAttributes();
-				List<Node> attributeNodesForRemoval = new ArrayList<Node>();
+//				List<Node> attributeNodesForRemoval = new ArrayList<Node>();
 				for (int i = 0; i < attributes.getLength(); i++) {
 					Node node = attributes.item(i);
 					
@@ -143,15 +146,23 @@ public class LiteralBodyBuilder extends AbstractBodyBuilder {
 						}
 					}
 				}
-				for (Node node : attributeNodesForRemoval) {
-					el.removeAttributeNS(node.getNamespaceURI(), node
-							.getLocalName());
-				}
+//				for (Node node : attributeNodesForRemoval) {
+//					el.removeAttributeNS(node.getNamespaceURI(), node
+//							.getLocalName());
+//				}
 			}
 		}
-		for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-			fixTypeAttributes(parent.getChildNodes().item(i));
+		
+		if (parent instanceof SOAPElement) {
+			for (Iterator childIterator = ((SOAPElement) parent).getChildElements(); childIterator.hasNext();) {
+				Node childElement = (Node) childIterator.next();
+				fixTypeAttributes(childElement);
+			}
 		}
+//		final NodeList childNodes = parent.getChildNodes();
+//		for (int i = 0; i < childNodes.getLength(); i++) {
+//			fixTypeAttributes(childNodes.item(i));
+//		}
 	}
 
 	@Override

@@ -134,11 +134,11 @@ public class WSDLSOAPInvoker {
 		call.setTimeout(getTimeout());
 
 		SOAPEnvelope requestEnv = makeRequestEnvelope(inputMap);
-		logger.info("Invoking service with SOAP envelope:\n"+requestEnv);
+//		logger.info("Invoking service with SOAP envelope:\n"+requestEnv);
 		
 		SOAPEnvelope responseEnv = invokeCall(call, requestEnv);
 		
-		logger.info("Received SOAP response:\n"+responseEnv);
+//		logger.info("Received SOAP response:\n"+responseEnv);
 
 		Map<String, Object> result;
 		if (responseEnv == null) {
@@ -152,7 +152,7 @@ public class WSDLSOAPInvoker {
 			}
 		} else {
 			List response = responseEnv.getBodyElements();
-			logger.info("SOAP response was:" + response);
+//			logger.info("SOAP response was:" + response);
 			SOAPResponseParser parser = SOAPResponseParserFactory
 					.instance()
 					.create(
