@@ -73,7 +73,7 @@ public class InvocationGroupManagerImpl implements Observable<InvocationManagerE
 	private final List<MechanismCreator> mechanismCreators;
 
 	private final List<InvocationPersister> invocationPersisters;
-
+	
 	protected MultiCaster<InvocationManagerEvent> observers = new MultiCaster<InvocationManagerEvent>(
 			this);
 
