@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>net.sf.taverna</groupId>
-		<artifactId>parent</artifactId>
-		<version>0.2.2011-02-17</version>
+		<artifactId>taverna-parent</artifactId>
+		<version>3.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna</groupId>
 	<artifactId>wsdl-generic</artifactId>
@@ -84,11 +84,10 @@
 			<artifactId>com.springsource.javax.xml.rpc</artifactId>
 			<version>1.1.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.4</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
