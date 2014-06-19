@@ -28,9 +28,11 @@ import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.parser.node.ASTprocess;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public final class InteractionActivity extends
-		AbstractAsynchronousActivity<InteractionActivityConfigurationBean>
-		implements AsynchronousActivity<InteractionActivityConfigurationBean> {
+		AbstractAsynchronousActivity<JsonNode>
+		implements AsynchronousActivity<JsonNode> {
 	
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/interaction";
 
@@ -57,6 +59,8 @@ public final class InteractionActivity extends
 
 	private ResponseFeedListener responseFeedListener;
 
+	private JsonNode json;
+
 	public InteractionActivity(final CredentialManager credentialManager,
 			final InteractionRecorder interactionRecorder,
 			final InteractionUtils interactionUtils,
@@ -73,12 +77,12 @@ public final class InteractionActivity extends
 	}
 
 	@Override
-	public void configure(final InteractionActivityConfigurationBean configBean)
+	public void configure(final JsonNode json)
 			throws ActivityConfigurationException {
+		
+		this.json = json;
 
-		// Store for getConfiguration(), but you could also make
-		// getConfiguration() return a new bean from other sources
-		this.configBean = configBean;
+		this.configBean = new InteractionActivityConfigurationBean(json);
 
 		this.inputDepths.clear();
 		this.outputDepths.clear();
@@ -156,8 +160,8 @@ public final class InteractionActivity extends
 	}
 
 	@Override
-	public InteractionActivityConfigurationBean getConfiguration() {
-		return this.configBean;
+	public JsonNode getConfiguration() {
+		return this.json;
 	}
 
 	public ActivityInputPort getInputPort(final String name) {
@@ -167,6 +171,10 @@ public final class InteractionActivity extends
 			}
 		}
 		return null;
+	}
+
+	public InteractionActivityConfigurationBean getConfigBean() {
+		return this.configBean;
 	}
 
 }

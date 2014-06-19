@@ -27,7 +27,7 @@ public class InteractionActivityHealthChecker implements
 	public VisitReport visit(final InteractionActivity activity,
 			final List<Object> ancestry) {
 		final InteractionActivityConfigurationBean config = activity
-				.getConfiguration();
+				.getConfigBean();
 
 		if (config.getInteractionActivityType().equals(
 				InteractionActivityType.LocallyPresentedHtml)) {

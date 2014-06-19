@@ -19,7 +19,8 @@ import java.util.Set;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import uk.org.taverna.configuration.app.ApplicationConfiguration;
 

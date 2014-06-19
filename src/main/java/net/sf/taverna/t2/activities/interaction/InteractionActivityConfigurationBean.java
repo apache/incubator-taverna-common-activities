@@ -2,6 +2,9 @@ package net.sf.taverna.t2.activities.interaction;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
 
 /**
@@ -27,6 +30,13 @@ public class InteractionActivityConfigurationBean extends
 		this.interactionActivityType = InteractionActivityType.LocallyPresentedHtml;
 	}
 
+	public InteractionActivityConfigurationBean(JsonNode json) throws ActivityConfigurationException {
+		this.setPresentationOrigin(json);
+		this.setInteractionActivityType(json);
+		this.setProgressNotification(json);
+	}
+
+
 	public InteractionActivityType getInteractionActivityType() {
 		return this.interactionActivityType;
 	}
@@ -35,6 +45,23 @@ public class InteractionActivityConfigurationBean extends
 			final InteractionActivityType interactionActivityType) {
 		this.interactionActivityType = interactionActivityType;
 	}
+	
+	private void setInteractionActivityType(JsonNode json) {
+		JsonNode subNode = json.get("interactivityActivityType");
+		this.setInteractionActivityType(InteractionActivityType.LocallyPresentedHtml);
+		if (subNode == null) {
+			return;
+		}
+		String textValue = subNode.textValue();
+		if (textValue == null) {
+			return;
+		}
+		if ("VelocityTemplate".equals(textValue)) {
+			this.setInteractionActivityType(InteractionActivityType.VelocityTemplate);
+		}
+	}
+
+
 
 	public String getPresentationOrigin() {
 		return this.presentationOrigin;
@@ -43,6 +70,19 @@ public class InteractionActivityConfigurationBean extends
 	public void setPresentationOrigin(final String presentationOrigin) {
 		this.presentationOrigin = presentationOrigin;
 	}
+	
+	private void setPresentationOrigin(JsonNode json) throws ActivityConfigurationException {
+		JsonNode subNode = json.get("presentationOrigin");
+		if (subNode == null) {
+			throw new ActivityConfigurationException("presentationOrigin must be specified");
+		}
+		String textValue = subNode.textValue();
+		if (textValue == null) {
+			throw new ActivityConfigurationException("presentationOrigin must be specified");			
+		}
+		this.setPresentationOrigin(textValue);
+	}
+
 
 	/**
 	 * @return the progressNotification
@@ -58,5 +98,16 @@ public class InteractionActivityConfigurationBean extends
 	public void setProgressNotification(final boolean progressNotification) {
 		this.progressNotification = progressNotification;
 	}
+	
+	private void setProgressNotification(JsonNode json) {
+		JsonNode subNode = json.get("progressNotification");
+		this.setProgressNotification(false);
+		if (subNode == null) {
+			return;
+		}
+		this.setProgressNotification(subNode.booleanValue());
+	}
+
+
 
 }

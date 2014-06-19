@@ -105,7 +105,7 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public InteractionType getInteractionType() {
-		if (this.activity.getConfiguration().isProgressNotification()) {
+		if (this.activity.getConfigBean().isProgressNotification()) {
 			return InteractionType.Notification;
 		}
 		return InteractionType.DataRequest;
@@ -113,12 +113,12 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public InteractionActivityType getPresentationType() {
-		return this.activity.getConfiguration().getInteractionActivityType();
+		return this.activity.getConfigBean().getInteractionActivityType();
 	}
 
 	@Override
 	public String getPresentationOrigin() {
-		return this.activity.getConfiguration().getPresentationOrigin();
+		return this.activity.getConfigBean().getPresentationOrigin();
 	}
 
 	@Override
