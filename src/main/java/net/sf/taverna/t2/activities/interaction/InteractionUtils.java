@@ -15,11 +15,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sf.taverna.raven.appconfig.ApplicationRuntime;
+// import net.sf.taverna.raven.appconfig.ApplicationRuntime;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import uk.org.taverna.configuration.app.ApplicationConfiguration;
 
 /**
  * @author alanrw
@@ -29,38 +31,44 @@ public class InteractionUtils {
 
 	static final Set<String> publishedUrls = Collections
 			.synchronizedSet(new HashSet<String>());
+	
+	private ApplicationConfiguration appConfig;
+	
+	private InteractionRecorder interactionRecorder;
+
+	private InteractionPreference interactionPreference;
 
 	private InteractionUtils() {
 		super();
 	}
 
-	protected static void copyFixedFile(final String fixedFileName)
+	protected void copyFixedFile(final String fixedFileName)
 			throws IOException {
-		final String targetUrl = InteractionPreference.getInstance()
+		final String targetUrl = interactionPreference
 				.getLocationUrl() + "/" + fixedFileName;
-		InteractionUtils.publishFile(
+		this.publishFile(
 				targetUrl,
 				InteractionActivity.class.getResourceAsStream("/"
 						+ fixedFileName), null, null);
 	}
 
-	public static void publishFile(final String urlString,
+	public void publishFile(final String urlString,
 			final String contents, final String runId,
 			final String interactionId) throws IOException {
 		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
 				contents.getBytes("UTF-8"));
-		InteractionUtils.publishFile(urlString, byteArrayInputStream, runId,
+		this.publishFile(urlString, byteArrayInputStream, runId,
 				interactionId);
 	}
 
-	static void publishFile(final String urlString, final InputStream is,
+	void publishFile(final String urlString, final InputStream is,
 			final String runId, final String interactionId) throws IOException {
 		if (InteractionUtils.publishedUrls.contains(urlString)) {
 			return;
 		}
 		InteractionUtils.publishedUrls.add(urlString);
 		if (runId != null) {
-			InteractionRecorder.addResource(runId, interactionId, urlString);
+			interactionRecorder.addResource(runId, interactionId, urlString);
 		}
 
 		final URL url = new URL(urlString);
@@ -87,8 +95,8 @@ public class InteractionUtils {
 		return runId;
 	}
 
-	public static File getInteractionServiceDirectory() {
-		final File workingDir = ApplicationRuntime.getInstance()
+	public File getInteractionServiceDirectory() {
+		final File workingDir = appConfig
 				.getApplicationHomeDir();
 		final File interactionServiceDirectory = new File(workingDir,
 				"interactionService");
@@ -102,5 +110,17 @@ public class InteractionUtils {
 		mapper.writeValue(sw, o);
 		final String theString = sw.toString();
 		return theString;
+	}
+
+	public void setAppConfig(ApplicationConfiguration appConfig) {
+		this.appConfig = appConfig;
+	}
+
+	public void setInteractionRecorder(InteractionRecorder interactionRecorder) {
+		this.interactionRecorder = interactionRecorder;
+	}
+
+	public void setInteractionPreference(InteractionPreference interactionPreference) {
+		this.interactionPreference = interactionPreference;
 	}
 }

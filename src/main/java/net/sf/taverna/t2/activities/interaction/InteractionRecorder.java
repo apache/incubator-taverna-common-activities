@@ -5,7 +5,6 @@ package net.sf.taverna.t2.activities.interaction;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
@@ -34,12 +33,14 @@ public class InteractionRecorder {
 
 	static Map<String, Map<String, Set<String>>> runToInteractionMap = Collections
 			.synchronizedMap(new HashMap<String, Map<String, Set<String>>>());
+	
+	public InteractionUtils interactionUtils;
 
 	private InteractionRecorder() {
 		super();
 	}
 
-	public static void deleteRun(final String runToDelete) {
+	public void deleteRun(final String runToDelete) {
 		final Set<String> interactionIds = new HashSet<String>(
 				getInteractionMap(runToDelete).keySet());
 		for (final String interactionId : interactionIds) {
@@ -48,7 +49,7 @@ public class InteractionRecorder {
 		runToInteractionMap.remove(runToDelete);
 	}
 
-	public static void deleteInteraction(final String runId,
+	public void deleteInteraction(final String runId,
 			final String interactionId) {
 		for (final String urlString : getResourceSet(runId, interactionId)) {
 			try {
@@ -61,7 +62,7 @@ public class InteractionRecorder {
 		getInteractionMap(runId).remove(interactionId);
 	}
 
-	private static void deleteUrl(final String urlString) throws IOException {
+	private void deleteUrl(final String urlString) throws IOException {
 		logger.info("Deleting resource " + urlString);
 		final URL url = new URL(urlString);
 		final HttpURLConnection httpCon = (HttpURLConnection) url
@@ -73,7 +74,7 @@ public class InteractionRecorder {
 		}
 	}
 
-	public static void addResource(final String runId,
+	public void addResource(final String runId,
 			final String interactionId, final String resourceId) {
 		if (resourceId == null) {
 			logger.error("Attempt to add null resource",
@@ -86,7 +87,7 @@ public class InteractionRecorder {
 		resourceSet.add(resourceId);
 	}
 
-	private static Set<String> getResourceSet(final String runId,
+	private Set<String> getResourceSet(final String runId,
 			final String interactionId) {
 		final Map<String, Set<String>> interactionMap = getInteractionMap(runId);
 		Set<String> resourceSet = interactionMap.get(interactionId);
@@ -97,7 +98,7 @@ public class InteractionRecorder {
 		return resourceSet;
 	}
 
-	private static Map<String, Set<String>> getInteractionMap(final String runId) {
+	private Map<String, Set<String>> getInteractionMap(final String runId) {
 		Map<String, Set<String>> interactionMap = InteractionRecorder.runToInteractionMap
 				.get(runId);
 		if (interactionMap == null) {
@@ -108,7 +109,7 @@ public class InteractionRecorder {
 		return interactionMap;
 	}
 
-	public static void persist() {
+	public void persist() {
 		final File outputFile = getUsageFile();
 		try {
 			FileUtils.writeStringToFile(outputFile, InteractionUtils
@@ -118,12 +119,12 @@ public class InteractionRecorder {
 		}
 	}
 
-	private static File getUsageFile() {
-		return new File(InteractionUtils.getInteractionServiceDirectory(),
+	private File getUsageFile() {
+		return new File(interactionUtils.getInteractionServiceDirectory(),
 				"usage");
 	}
 
-	public static void load() {
+	public void load() {
 		final File inputFile = getUsageFile();
 		try {
 			final String usageString = FileUtils.readFileToString(inputFile);

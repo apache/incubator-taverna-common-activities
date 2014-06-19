@@ -5,20 +5,57 @@
 	<parent>
                 <groupId>net.sf.taverna</groupId>
                 <artifactId>taverna-parent</artifactId>
-                <version>2.6-SNAPSHOT</version>
+                <version>3.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>net.sf.taverna.t2.activities</groupId>
 	<artifactId>interaction-activity</artifactId>
-	<version>1.6-SNAPSHOT</version>
+	<version>2.0.l-SNAPSHOT</version>
+	<packaging>bundle</packaging>
 	<name>Taverna Interaction activity</name>
 
 	<properties>
 		<jetty.version>6.1.24</jetty.version>
-		<abdera.version>1.0</abdera.version>
+		<abdera.version>1.1.3</abdera.version>
+		<jackson.version>1.9.13</jackson.version>
+		<velocity.version>1.7</velocity.version>
 	</properties>
 
 	<dependencies>
 	
+			<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>workflowmodel-api</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+		
+				<dependency>
+		  <groupId>net.sf.taverna.t2.security</groupId>
+		  <artifactId>credential-manager</artifactId>
+		  <version>${t2.core.version}</version>
+		</dependency>
+
+	<dependency>
+		<groupId>net.sf.taverna.t2.activities</groupId>
+		<artifactId>activity-test-utils</artifactId>
+		<version>${t2.activities.version}</version>
+		<scope>test</scope>
+	</dependency>
+
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>com.springsource.org.apache.commons.io</artifactId>
+		<version>${commons.io.version}</version>
+	</dependency>
+
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>com.springsource.org.apache.commons.codec</artifactId>
+		<version>${commons.codec.version}</version>
+	</dependency>
+				
+
+		
+		<!--  Mortbay jetty artifacts are bundles -->
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
@@ -41,39 +78,9 @@
 			<groupId>net.sf.webdav-servlet</groupId>
 			<artifactId>webdav-servlet</artifactId>
 			<version>2.0</version>
-		</dependency>
-
+		</dependency>	
 		
-		<dependency>
-			<groupId>net.sf.taverna.t2.core</groupId>
-			<artifactId>workflowmodel-api</artifactId>
-			<version>${t2.core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.taverna.t2.activities</groupId>
-			<artifactId>activity-test-utils</artifactId>
-			<version>${t2.activities.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-io</groupId>
-  			<artifactId>commons-io</artifactId>
-  			<version>2.4</version>
-		</dependency>
-				
-		<dependency>
-			<groupId>commons-codec</groupId>
-  			<artifactId>commons-codec</artifactId>
-                        <version>${commons.codec.version}</version>
-  		</dependency>
-				
-		<dependency>
-		  <groupId>net.sf.taverna.t2.security</groupId>
-		  <artifactId>credential-manager</artifactId>
-		  <version>${t2.core.version}</version>
-		</dependency>
-		
+<!--  The abdera artifacts are bundles -->
 		<dependency>
 			<groupId>org.apache.abdera</groupId>
 			<artifactId>abdera-core</artifactId>
@@ -121,29 +128,25 @@
 			<artifactId>abdera-parser</artifactId>
 			<version>${abdera.version}</version>
 		</dependency>
-		
-			<dependency>
+
+<!--  The velocity artifact is a bundle -->
+		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
-			<version>1.7</version>
+			<version>${velocity.version}</version>
 		</dependency>
 
+<!-- The Jackson artifacts are bundles -->
 		<dependency>
-			<groupId>velocity-tools</groupId>
-			<artifactId>velocity-tools-generic</artifactId>
-			<version>1.2</version>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-lgpl</artifactId>
-			<version>1.9.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-lgpl</artifactId>
-			<version>1.9.4</version>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
 		<dependency>

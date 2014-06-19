@@ -5,11 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
+import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
 import net.sf.taverna.t2.activities.interaction.velocity.NotifyChecker;
 import net.sf.taverna.t2.activities.interaction.velocity.ProduceChecker;
 import net.sf.taverna.t2.activities.interaction.velocity.RequireChecker;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
@@ -28,6 +31,8 @@ import org.apache.velocity.runtime.parser.node.ASTprocess;
 public final class InteractionActivity extends
 		AbstractAsynchronousActivity<InteractionActivityConfigurationBean>
 		implements AsynchronousActivity<InteractionActivityConfigurationBean> {
+	
+	public static final String URI = "http://ns.taverna.org.uk/2010/activity/interaction";
 
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger
@@ -40,7 +45,30 @@ public final class InteractionActivity extends
 	private final Map<String, Integer> inputDepths = new HashMap<String, Integer>();
 	private final Map<String, Integer> outputDepths = new HashMap<String, Integer>();
 
-	public InteractionActivity() {
+	private CredentialManager credentialManager;
+
+	private InteractionRecorder interactionRecorder;
+
+	private InteractionUtils interactionUtils;
+
+	private InteractionJetty interactionJetty;
+
+	private InteractionPreference interactionPreference;
+
+	private ResponseFeedListener responseFeedListener;
+
+	public InteractionActivity(final CredentialManager credentialManager,
+			final InteractionRecorder interactionRecorder,
+			final InteractionUtils interactionUtils,
+			final InteractionJetty interactionJetty,
+			final InteractionPreference interactionPreference,
+			final ResponseFeedListener responseFeedListener) {
+		this.credentialManager = credentialManager;
+		this.interactionRecorder = interactionRecorder;
+		this.interactionUtils = interactionUtils;
+		this.interactionJetty = interactionJetty;
+		this.interactionPreference = interactionPreference;
+		this.responseFeedListener = responseFeedListener;
 		this.configBean = new InteractionActivityConfigurationBean();
 	}
 
@@ -118,7 +146,13 @@ public final class InteractionActivity extends
 		final InteractionRequestor requestor = new InteractionCallbackRequestor(
 				this, callback, inputs);
 		callback.requestRun(new InteractionActivityRunnable(requestor,
-				this.presentationTemplate));
+				this.presentationTemplate,
+				this.credentialManager,
+				this.interactionRecorder,
+				this.interactionUtils,
+				this.interactionJetty,
+				this.interactionPreference,
+				this.responseFeedListener));
 	}
 
 	@Override

@@ -52,6 +52,8 @@ import org.apache.abdera.protocol.server.provider.managed.ManagedCollectionAdapt
  * directory used by the Adapter.
  */
 public class HackedFilesystemAdapter extends ManagedCollectionAdapter {
+	
+	private InteractionJetty interactionJetty;
 
 	private final File root;
 	private final static FileSorter sorter = new FileSorter();
@@ -65,7 +67,7 @@ public class HackedFilesystemAdapter extends ManagedCollectionAdapter {
 	}
 
 	private File getRoot() {
-		return InteractionJetty.getFeedDirectory();
+		return interactionJetty.getFeedDirectory();
 	}
 
 	private Entry getEntry(final File entryFile) {
@@ -253,5 +255,9 @@ public class HackedFilesystemAdapter extends ManagedCollectionAdapter {
 			return o1.lastModified() > o2.lastModified() ? -1 : o1
 					.lastModified() < o2.lastModified() ? 1 : 0;
 		}
+	}
+
+	public void setInteractionJetty(InteractionJetty interactionJetty) {
+		this.interactionJetty = interactionJetty;
 	}
 }

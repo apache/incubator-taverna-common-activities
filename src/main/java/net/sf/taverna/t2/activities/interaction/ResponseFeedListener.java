@@ -25,6 +25,10 @@ import org.codehaus.jackson.map.ObjectMapper;
  * 
  */
 public final class ResponseFeedListener extends FeedReader {
+	
+	private InteractionRecorder interactionRecorder;
+
+	private InteractionPreference interactionPreference;
 
 	private static final String STATUS_OK = "OK";
 
@@ -36,23 +40,12 @@ public final class ResponseFeedListener extends FeedReader {
 
 	private static final Map<String, InteractionRequestor> requestorMap = new HashMap<String, InteractionRequestor>();
 
-	public static synchronized ResponseFeedListener getInstance() {
-		if (instance == null) {
-			instance = new ResponseFeedListener();
-		}
-		return instance;
-	}
-
 	private ResponseFeedListener() {
 		super("ResponseFeedListener");
 	}
 	
 	@Override
 	protected void considerEntry(final Entry entry) {
-		considerInReplyTo(entry);
-	}
-
-	static void considerInReplyTo(final Entry entry) {
 		synchronized (requestorMap) {
 			final String refString = getReplyTo(entry);
 			if (refString == null) {
@@ -60,9 +53,9 @@ public final class ResponseFeedListener extends FeedReader {
 			}
 			final String runId = getRunId(entry);
 
-			final String entryUrl = InteractionPreference.getInstance()
+			final String entryUrl = interactionPreference
 					.getFeedUrlString() + "/" + entry.getId().toASCIIString();
-			InteractionRecorder.addResource(runId, refString, entryUrl);
+			interactionRecorder.addResource(runId, refString, entryUrl);
 
 			if (requestorMap.containsKey(refString)) {
 
@@ -77,10 +70,10 @@ public final class ResponseFeedListener extends FeedReader {
 					requestor.fail(statusContent);
 					return;
 				}
-				final String outputDataUrl = InteractionPreference
+				final String outputDataUrl = interactionPreference
 						.getOutputDataUrlString(refString);
 				// Note that this may not really exist
-				InteractionRecorder
+				interactionRecorder
 						.addResource(runId, refString, outputDataUrl);
 				String content = null;
 				InputStream iStream;
@@ -105,7 +98,7 @@ public final class ResponseFeedListener extends FeedReader {
 							content, Map.class);
 					requestor.receiveResult(rootAsMap);
 					cleanup(refString);
-					InteractionRecorder.deleteInteraction(runId, refString);
+					interactionRecorder.deleteInteraction(runId, refString);
 
 				} catch (final JsonParseException e) {
 					logger.error(e);
@@ -147,6 +140,19 @@ public final class ResponseFeedListener extends FeedReader {
 			final String refString = entry.getId().toString();
 			requestorMap.put(refString, requestor);
 		}
+	}
+
+	public void setInteractionRecorder(InteractionRecorder interactionRecorder) {
+		this.interactionRecorder = interactionRecorder;
+	}
+
+	public void setInteractionPreference(InteractionPreference interactionPreference) {
+		this.interactionPreference = interactionPreference;
+	}
+
+	@Override
+	protected InteractionPreference getInteractionPreference() {
+		return this.interactionPreference;
 	}
 
 }

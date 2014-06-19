@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
  * 
  */
 public class InteractionRunDeletionListener implements RunDeletionListener {
+	
+	private InteractionRecorder interactionRecorder;
 
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger
@@ -19,7 +21,11 @@ public class InteractionRunDeletionListener implements RunDeletionListener {
 
 	@Override
 	public void deleteRun(final String runToDelete) {
-		InteractionRecorder.deleteRun(runToDelete);
+		interactionRecorder.deleteRun(runToDelete);
+	}
+
+	public void setInteractionRecorder(InteractionRecorder interactionRecorder) {
+		this.interactionRecorder = interactionRecorder;
 	}
 
 }

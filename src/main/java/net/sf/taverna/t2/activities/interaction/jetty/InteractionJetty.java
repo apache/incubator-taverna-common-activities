@@ -10,11 +10,13 @@ import java.net.URISyntaxException;
 
 import net.sf.taverna.t2.activities.interaction.FeedReader;
 import net.sf.taverna.t2.activities.interaction.InteractionUtils;
+import net.sf.taverna.t2.activities.interaction.ResponseFeedListener;
+import net.sf.taverna.t2.activities.interaction.feed.ShowRequestFeedListener;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
-import net.sf.taverna.t2.spi.SPIRegistry;
+//import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.webdav.WebdavServlet;
 
 import org.apache.abdera.protocol.server.ServiceManager;
@@ -37,19 +39,21 @@ import org.mortbay.jetty.servlet.ServletHolder;
 public class InteractionJetty {
 
 	private static Logger logger = Logger.getLogger(InteractionJetty.class);
+	
+	private InteractionUtils interactionUtils;
+	
+	private ShowRequestFeedListener showRequestFeedListener;
+	private ResponseFeedListener responseFeedListener;
+
+	private InteractionPreference interactionPreference;
 
 	private static Server server;
-
-	private static InteractionPreference interactionPreference = InteractionPreference
-			.getInstance();
 
 	private static String REALM_NAME = "TavernaInteraction";
 	
 	private static boolean listenersStarted = false;
-	
-	private static SPIRegistry<FeedReader> feedReaderRegistry = new SPIRegistry(FeedReader.class);
 
-	public static synchronized void startJettyIfNecessary() {
+	public synchronized void startJettyIfNecessary(CredentialManager credentialManager) {
 		if (server != null) {
 			return;
 		}
@@ -106,8 +110,7 @@ public class InteractionJetty {
 			try {
 				final HashUserRealm realm = new HashUserRealm(REALM_NAME);
 				final URI serviceURI = createServiceURI(port);
-				final UsernamePassword up = CredentialManager
-						.getInstance()
+				final UsernamePassword up = credentialManager
 						.getUsernameAndPasswordForService(serviceURI, true,
 								"Please specify the username and password to secure your interactions");
 				if (up != null) {
@@ -145,37 +148,56 @@ public class InteractionJetty {
 		return new URI("http://localhost:" + port + "/#" + REALM_NAME);
 	}
 
-	public static File getJettySubdirectory(final String subdirectoryName) {
-		final File workingDir = InteractionUtils
+	public File getJettySubdirectory(final String subdirectoryName) {
+		final File workingDir = interactionUtils
 				.getInteractionServiceDirectory();
 		final File subDir = new File(workingDir, "jetty/" + subdirectoryName);
 		subDir.mkdirs();
 		return subDir;
 	}
 
-	public static File getFeedDirectory() {
+	public File getFeedDirectory() {
 		return getJettySubdirectory("feed");
 	}
 
-	public static File getInteractionDirectory() {
+	public File getInteractionDirectory() {
 		return getJettySubdirectory("interaction");
 	}
 	
-	public static synchronized void startListenersIfNecessary() {
+	public synchronized void startListenersIfNecessary() {
 		if (listenersStarted) {
 			return;
 		}
-		for (FeedReader fr : feedReaderRegistry.getInstances()) {
-			if (fr != null) {
-			try {
-				fr.start();
-			}
-			catch (Exception e) {
-				logger.error("Failed to start " + fr.getClass().getCanonicalName(), e);
-			}
-			}
-		}
 		listenersStarted = true;
+		startListener(this.responseFeedListener);
+		startListener(showRequestFeedListener);
+
+	}
+
+	private void startListener(FeedReader fr) {
+		try {
+			fr.start();
+		}
+		catch (Exception e) {
+			logger.error("Failed to start " + fr.getClass().getCanonicalName(), e);
+		}
+	}
+	
+	public void setInteractionUtils(InteractionUtils interactionUtils) {
+		this.interactionUtils = interactionUtils;
+	}
+
+	public void setShowRequestFeedListener(
+			ShowRequestFeedListener showRequestFeedListener) {
+		this.showRequestFeedListener = showRequestFeedListener;
+	}
+
+	public void setResponseFeedListener(ResponseFeedListener responseFeedListener) {
+		this.responseFeedListener = responseFeedListener;
+	}
+
+	public void setInteractionPreference(InteractionPreference interactionPreference) {
+		this.interactionPreference = interactionPreference;
 	}
 
 }

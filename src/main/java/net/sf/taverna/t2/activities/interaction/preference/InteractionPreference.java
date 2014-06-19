@@ -13,15 +13,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
-import net.sf.taverna.raven.appconfig.ApplicationRuntime;
-
 import org.apache.log4j.Logger;
+
+import uk.org.taverna.configuration.app.ApplicationConfiguration;
 
 /**
  * @author alanrw
  * 
  */
 public class InteractionPreference {
+	
+	private ApplicationConfiguration appConfig;
 
 	private static final String USE_JETTY = "useJetty";
 
@@ -57,15 +59,8 @@ public class InteractionPreference {
 
 	private final Properties properties;
 
-	public static InteractionPreference getInstance() {
-		if (instance == null) {
-			instance = new InteractionPreference();
-		}
-		return instance;
-	}
-
 	private File getConfigFile() {
-		final File home = ApplicationRuntime.getInstance()
+		final File home = appConfig
 				.getApplicationHomeDir();
 		final File config = new File(home, "conf");
 		if (!config.exists()) {
@@ -237,48 +232,38 @@ public class InteractionPreference {
 				.setProperty(USE_USERNAME, Boolean.toString(useUsername));
 	}
 
-	public static String getOutputDataUrlString(final String interactionId) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public String getOutputDataUrlString(final String interactionId) {
+		return this.getLocationUrl()
 				+ "/interaction" + interactionId + "OutputData.json";
 	}
 
-	public static String getInputDataUrlString(final String interactionId) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public String getInputDataUrlString(final String interactionId) {
+		return this.getLocationUrl()
 				+ "/interaction" + interactionId + "InputData.json";
 	}
 
-	public static URL getFeedUrl() throws MalformedURLException {
-		return new URL(InteractionPreference.getInstance().getFeedUrlString());
+	public URL getFeedUrl() throws MalformedURLException {
+		return new URL(this.getFeedUrlString());
 	}
 
-	public static String getInteractionUrlString(final String interactionId) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public String getInteractionUrlString(final String interactionId) {
+		return this.getLocationUrl()
 				+ "/interaction" + interactionId + ".html";
 	}
 
-	public static String getPresentationUrlString(final String interactionId) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public String getPresentationUrlString(final String interactionId) {
+		return this.getLocationUrl()
 				+ "/presentation" + interactionId + ".html";
 	}
 
-	public static String getPublicationUrlString(final String interactionId,
+	public String getPublicationUrlString(final String interactionId,
 			final String key) {
-		return InteractionPreference.getInstance().getLocationUrl()
+		return this.getLocationUrl()
 				+ "/interaction" + interactionId + "_" + key;
 	}
 
-	/*
-	 * public static String getRunFolderUrlString(final String runId) { return
-	 * InteractionPreference.getInstance().getLocationUrl() + "/" + runId; }
-	 */
+	public void setAppConfig(ApplicationConfiguration appConfig) {
+		this.appConfig = appConfig;
+	}
 
-	/*
-	 * public boolean getUseHttps() { return
-	 * (Boolean.parseBoolean(properties.getProperty(USE_HTTPS))); }
-	 * 
-	 * public void setUseHttps(boolean useHttps) {
-	 * properties.setProperty(USE_HTTPS, Boolean.toString(useHttps));
-	 * 
-	 * }
-	 */
 }

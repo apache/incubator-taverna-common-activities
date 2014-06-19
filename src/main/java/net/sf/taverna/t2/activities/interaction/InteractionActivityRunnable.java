@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
@@ -18,6 +17,7 @@ import net.sf.taverna.t2.activities.interaction.atom.AtomUtils;
 import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
+import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.i18n.text.Normalizer;
@@ -42,10 +42,34 @@ public final class InteractionActivityRunnable implements Runnable {
 
 	private final InteractionRequestor requestor;
 
+	private CredentialManager credentialManager;
+
+	private InteractionRecorder interactionRecorder;
+	
+	private InteractionUtils interactionUtils;
+
+	private InteractionJetty interactionJetty;
+
+	private InteractionPreference interactionPreference;
+
+	private ResponseFeedListener responseFeedListener;
+
 	public InteractionActivityRunnable(final InteractionRequestor requestor,
-			final Template presentationTemplate) {
+			final Template presentationTemplate,
+			final CredentialManager credentialManager,
+			final InteractionRecorder interactionRecorder,
+			final InteractionUtils interactionUtils,
+			final InteractionJetty interactionJetty,
+			final InteractionPreference interactionPreference,
+			final ResponseFeedListener responseFeedListener) {
 		this.requestor = requestor;
 		this.presentationTemplate = presentationTemplate;
+		this.credentialManager = credentialManager;
+		this.interactionRecorder = interactionRecorder;
+		this.interactionUtils = interactionUtils;
+		this.interactionJetty = interactionJetty;
+		this.interactionPreference = interactionPreference;
+		this.responseFeedListener = responseFeedListener;
 	}
 
 	@Override
@@ -61,13 +85,13 @@ public final class InteractionActivityRunnable implements Runnable {
 
 		final Map<String, Object> inputData = this.requestor.getInputData();
 
-		if (InteractionPreference.getInstance().getUseJetty()) {
-			InteractionJetty.startJettyIfNecessary();
+		if (interactionPreference.getUseJetty()) {
+			interactionJetty.startJettyIfNecessary(credentialManager);
 		}
-		InteractionJetty.startListenersIfNecessary();
+		interactionJetty.startListenersIfNecessary();
 		try {
-			InteractionUtils.copyFixedFile("pmrpc.js");
-			InteractionUtils.copyFixedFile("interaction.css");
+			interactionUtils.copyFixedFile("pmrpc.js");
+			interactionUtils.copyFixedFile("interaction.css");
 		} catch (final IOException e1) {
 			logger.error(e1);
 			this.requestor.fail("Unable to copy necessary fixed file");
@@ -80,12 +104,12 @@ public final class InteractionActivityRunnable implements Runnable {
 			for (final String key : inputData.keySet()) {
 				final Object value = inputData.get(key);
 				if (value instanceof byte[]) {
-					final String replacementUrl = InteractionPreference
+					final String replacementUrl = interactionPreference
 							.getPublicationUrlString(id, key);
 					final ByteArrayInputStream bais = new ByteArrayInputStream(
 							(byte[]) value);
 					try {
-						InteractionUtils.publishFile(replacementUrl, bais,
+						interactionUtils.publishFile(replacementUrl, bais,
 								runId, id);
 						bais.close();
 						inputData.put(key, replacementUrl);
@@ -101,10 +125,10 @@ public final class InteractionActivityRunnable implements Runnable {
 			if (inputDataString == null) {
 				return;
 			}
-			final String inputDataUrl = InteractionPreference
+			final String inputDataUrl = interactionPreference
 					.getInputDataUrlString(id);
 			try {
-				InteractionUtils.publishFile(inputDataUrl, inputDataString,
+				interactionUtils.publishFile(inputDataUrl, inputDataString,
 						runId, id);
 			} catch (final IOException e) {
 				logger.error(e);
@@ -116,7 +140,7 @@ public final class InteractionActivityRunnable implements Runnable {
 
 			if (!this.requestor.getInteractionType().equals(
 					InteractionType.Notification)) {
-				outputDataUrl = InteractionPreference
+				outputDataUrl = interactionPreference
 						.getOutputDataUrlString(id);
 			}
 			final String interactionUrlString = this.generateHtml(inputDataUrl,
@@ -132,7 +156,7 @@ public final class InteractionActivityRunnable implements Runnable {
 			}
 			if (!this.requestor.getInteractionType().equals(
 					InteractionType.Notification)) {
-				ResponseFeedListener.getInstance().registerInteraction(
+				responseFeedListener.registerInteraction(
 						interactionNotificationMessage, this.requestor);
 			} else {
 				this.requestor.carryOn();
@@ -199,7 +223,7 @@ public final class InteractionActivityRunnable implements Runnable {
 
 		URL feedUrl;
 
-			feedUrl = new URL(InteractionPreference.getInstance()
+			feedUrl = new URL(interactionPreference
 					.getFeedUrlString());
 			final String entryContent = ((FOMElement) entry)
 					.toFormattedString();
@@ -222,7 +246,7 @@ public final class InteractionActivityRunnable implements Runnable {
 				throw (new IOException ("Received response code " + response));
 			}
 			if (response == HttpURLConnection.HTTP_CREATED) {
-				InteractionRecorder.addResource(runId, id,
+				interactionRecorder.addResource(runId, id,
 						httpCon.getHeaderField("Location"));
 			}
 	}
@@ -238,16 +262,16 @@ public final class InteractionActivityRunnable implements Runnable {
 			velocityContext.put(inputName, input);
 		}
 
-		velocityContext.put("feed", InteractionPreference.getInstance()
+		velocityContext.put("feed", interactionPreference
 				.getFeedUrlString());
 		velocityContext.put("runId", runId);
 		velocityContext.put("entryId", id);
-		final String pmrpcUrl = InteractionPreference.getInstance()
+		final String pmrpcUrl = interactionPreference
 				.getLocationUrl() + "/pmrpc.js";
 		velocityContext.put("pmrpcUrl", pmrpcUrl);
 		velocityContext.put("inputDataUrl", inputDataUrl);
 		velocityContext.put("outputDataUrl", outputDataUrl);
-		final String interactionUrl = InteractionPreference
+		final String interactionUrl = interactionPreference
 				.getInteractionUrlString(id);
 
 		velocityContext.put("interactionUrl", interactionUrl);
@@ -258,12 +282,12 @@ public final class InteractionActivityRunnable implements Runnable {
 			if (this.requestor.getPresentationType().equals(
 					InteractionActivityType.VelocityTemplate)) {
 
-				presentationUrl = InteractionPreference
+				presentationUrl = interactionPreference
 						.getPresentationUrlString(id);
 
 				final String presentationString = this.processTemplate(
 						this.presentationTemplate, velocityContext);
-				InteractionUtils.publishFile(presentationUrl,
+				interactionUtils.publishFile(presentationUrl,
 						presentationString, runId, id);
 
 			} else if (this.requestor.getPresentationType().equals(
@@ -276,7 +300,7 @@ public final class InteractionActivityRunnable implements Runnable {
 			final String interactionString = this.processTemplate(
 					InteractionVelocity.getInteractionTemplate(),
 					velocityContext);
-			InteractionUtils.publishFile(interactionUrl, interactionString,
+			interactionUtils.publishFile(interactionUrl, interactionString,
 					runId, id);
 
 			if (!authorizeUrl.isEmpty()) {

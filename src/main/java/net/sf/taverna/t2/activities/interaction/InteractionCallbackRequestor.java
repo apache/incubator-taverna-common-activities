@@ -11,8 +11,8 @@ import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
 import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
+import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 /**
@@ -146,8 +146,8 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 	}
 
 	private Integer findPortDepth(final String portName) {
-		final Set<OutputPort> ports = this.activity.getOutputPorts();
-		for (final OutputPort op : ports) {
+		final Set<ActivityOutputPort> ports = this.activity.getOutputPorts();
+		for (final ActivityOutputPort op : ports) {
 			if (op.getName().equals(portName)) {
 				return op.getDepth();
 			}

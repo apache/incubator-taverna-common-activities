@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import net.sf.taverna.t2.activities.interaction.FeedReader;
+import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Link;
@@ -27,20 +28,18 @@ public class ShowRequestFeedListener extends FeedReader {
 	private static final String ignore_requests_property = System.getProperty("taverna.interaction.ignore_requests");
 
 	private static boolean operational = (ignore_requests_property == null) || !Boolean.valueOf(ignore_requests_property);
-	
-	public static synchronized ShowRequestFeedListener getInstance() {
-		if ((instance == null) && operational) {
-			instance = new ShowRequestFeedListener();
-		}
-		return instance;
-	}
 
+	private InteractionPreference interactionPreference;
+	
 	private ShowRequestFeedListener() {
 		super("ShowRequestFeedListener");
 	}
 	
 			@Override
 			protected void considerEntry(final Entry entry) {
+				if (!operational) {
+					return;
+				}
 				final Link presentationLink = entry.getLink("presentation");
 				if (presentationLink != null) {
 					try {
@@ -52,6 +51,15 @@ public class ShowRequestFeedListener extends FeedReader {
 						logger.error("Cannot open presentation");
 					}
 				}
+			}
+
+			@Override
+			protected InteractionPreference getInteractionPreference() {
+				return this.interactionPreference;
+			}
+
+			public void setInteractionPreference(InteractionPreference interactionPreference) {
+				this.interactionPreference = interactionPreference;
 			}
 
 }

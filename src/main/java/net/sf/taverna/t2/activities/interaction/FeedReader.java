@@ -6,10 +6,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 
-import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 
-import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -43,7 +41,7 @@ public abstract class FeedReader extends Thread {
 				InputStream openStream = null;
 				try {
 					final Date newLastCheckedDate = new Date();
-					final URL url = InteractionPreference.getFeedUrl();
+					final URL url = getInteractionPreference().getFeedUrl();
 					openStream = url.openStream();
 					final Document<Feed> doc = parser.parse(openStream,
 							url.toString());
@@ -84,4 +82,6 @@ public abstract class FeedReader extends Thread {
 			logger.error(e);
 		}
 	}
+
+	protected abstract InteractionPreference getInteractionPreference();
 }

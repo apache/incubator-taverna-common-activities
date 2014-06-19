@@ -5,8 +5,6 @@ package net.sf.taverna.t2.activities.interaction.atom;
 
 import javax.xml.namespace.QName;
 
-import org.apache.abdera.model.Element;
-
 /**
  * @author alanrw
  * 
