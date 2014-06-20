@@ -26,13 +26,11 @@ public class InteractionActivityHealthChecker implements
 	@Override
 	public VisitReport visit(final InteractionActivity activity,
 			final List<Object> ancestry) {
-		final InteractionActivityConfigurationBean config = activity
-				.getConfigBean();
 
-		if (config.getInteractionActivityType().equals(
+		if (activity.getInteractionActivityType().equals(
 				InteractionActivityType.LocallyPresentedHtml)) {
 			return RemoteHealthChecker.contactEndpoint(activity,
-					config.getPresentationOrigin());
+					activity.getPresentationOrigin());
 		}
 
 		return null;

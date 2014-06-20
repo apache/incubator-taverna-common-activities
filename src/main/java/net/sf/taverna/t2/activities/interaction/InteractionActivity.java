@@ -40,8 +40,6 @@ public final class InteractionActivity extends
 	private static final Logger logger = Logger
 			.getLogger(InteractionActivity.class);
 
-	InteractionActivityConfigurationBean configBean;
-
 	private Template presentationTemplate;
 
 	private final Map<String, Integer> inputDepths = new HashMap<String, Integer>();
@@ -73,7 +71,7 @@ public final class InteractionActivity extends
 		this.interactionJetty = interactionJetty;
 		this.interactionPreference = interactionPreference;
 		this.responseFeedListener = responseFeedListener;
-		this.configBean = new InteractionActivityConfigurationBean();
+		this.json = null;
 	}
 
 	@Override
@@ -82,64 +80,8 @@ public final class InteractionActivity extends
 		
 		this.json = json;
 
-		this.configBean = new InteractionActivityConfigurationBean(json);
-
-		this.inputDepths.clear();
-		this.outputDepths.clear();
-
 		InteractionVelocity.checkVelocity();
 
-		if (this.configBean.getInteractionActivityType().equals(
-				InteractionActivityType.VelocityTemplate)) {
-			try {
-			this.presentationTemplate = Velocity.getTemplate(configBean
-					.getPresentationOrigin());
-			final RequireChecker requireChecker = new RequireChecker();
-			requireChecker.visit(
-					(ASTprocess) this.presentationTemplate.getData(),
-					this.inputDepths);
-
-			final ProduceChecker produceChecker = new ProduceChecker();
-			produceChecker.visit(
-					(ASTprocess) this.presentationTemplate.getData(),
-					this.outputDepths);
-			
-			final NotifyChecker notifyChecker = new NotifyChecker();
-			notifyChecker.visit(
-					(ASTprocess) this.presentationTemplate.getData(),
-					this.configBean);
-			this.configurePortsFromTemplate();
-			} catch (ResourceNotFoundException | ParseErrorException e) {
-				throw new ActivityConfigurationException("Unable to find/parse template", e);
-			}
-		}
-		this.configurePorts(this.configBean);
-
-	}
-
-	protected void configurePortsFromTemplate() {
-		final List<ActivityInputPortDefinitionBean> inputs = new ArrayList<ActivityInputPortDefinitionBean>();
-
-		for (final String inputName : this.inputDepths.keySet()) {
-			final ActivityInputPortDefinitionBean inputBean = new ActivityInputPortDefinitionBean();
-			inputBean.setName(inputName);
-			inputBean.setDepth(this.inputDepths.get(inputName));
-			inputBean.setAllowsLiteralValues(true);
-			inputBean.setHandledReferenceSchemes(null);
-			inputBean.setTranslatedElementType(String.class);
-			inputs.add(inputBean);
-		}
-		this.configBean.setInputPortDefinitions(inputs);
-
-		final List<ActivityOutputPortDefinitionBean> outputs = new ArrayList<ActivityOutputPortDefinitionBean>();
-		for (final String outputName : this.outputDepths.keySet()) {
-			final ActivityOutputPortDefinitionBean outputBean = new ActivityOutputPortDefinitionBean();
-			outputBean.setName(outputName);
-			outputBean.setDepth(this.outputDepths.get(outputName));
-			outputBean.setGranularDepth(this.outputDepths.get(outputName));
-			outputs.add(outputBean);
-		}
-		this.configBean.setOutputPortDefinitions(outputs);
 	}
 
 	@Override
@@ -173,8 +115,40 @@ public final class InteractionActivity extends
 		return null;
 	}
 
-	public InteractionActivityConfigurationBean getConfigBean() {
-		return this.configBean;
+	InteractionActivityType getInteractionActivityType() {
+		JsonNode subNode = json.get("interactivityActivityType");
+		if (subNode == null) {
+			return InteractionActivityType.LocallyPresentedHtml;
+		}
+		String textValue = subNode.textValue();
+		if (textValue == null) {
+			return InteractionActivityType.LocallyPresentedHtml;
+		}
+		if ("VelocityTemplate".equals(textValue)) {
+			return InteractionActivityType.VelocityTemplate;
+		}
+		return InteractionActivityType.LocallyPresentedHtml;
+	}
+	
+
+	 String getPresentationOrigin() {
+		JsonNode subNode = json.get("presentationOrigin");
+		if (subNode == null) {
+			return null;
+		}
+		String textValue = subNode.textValue();
+		if (textValue == null) {
+			return null;			
+		}
+		return textValue;
+	}
+
+	public boolean isProgressNotification() {
+		JsonNode subNode = json.get("progressNotification");
+		if (subNode == null) {
+			return false;
+		}
+		return subNode.booleanValue();
 	}
 
 }
