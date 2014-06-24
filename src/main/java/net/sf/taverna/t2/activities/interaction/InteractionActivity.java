@@ -59,18 +59,22 @@ public final class InteractionActivity extends
 
 	private JsonNode json;
 
+	private InteractionVelocity interactionVelocity;
+
 	public InteractionActivity(final CredentialManager credentialManager,
 			final InteractionRecorder interactionRecorder,
 			final InteractionUtils interactionUtils,
 			final InteractionJetty interactionJetty,
 			final InteractionPreference interactionPreference,
-			final ResponseFeedListener responseFeedListener) {
+			final ResponseFeedListener responseFeedListener,
+			final InteractionVelocity interactionVelocity) {
 		this.credentialManager = credentialManager;
 		this.interactionRecorder = interactionRecorder;
 		this.interactionUtils = interactionUtils;
 		this.interactionJetty = interactionJetty;
 		this.interactionPreference = interactionPreference;
 		this.responseFeedListener = responseFeedListener;
+		this.interactionVelocity = interactionVelocity;
 		this.json = null;
 	}
 
@@ -79,9 +83,6 @@ public final class InteractionActivity extends
 			throws ActivityConfigurationException {
 		
 		this.json = json;
-
-		InteractionVelocity.checkVelocity();
-
 	}
 
 	@Override
@@ -98,7 +99,8 @@ public final class InteractionActivity extends
 				this.interactionUtils,
 				this.interactionJetty,
 				this.interactionPreference,
-				this.responseFeedListener));
+				this.responseFeedListener,
+				this.interactionVelocity));
 	}
 
 	@Override

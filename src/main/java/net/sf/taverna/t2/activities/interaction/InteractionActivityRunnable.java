@@ -54,6 +54,8 @@ public final class InteractionActivityRunnable implements Runnable {
 
 	private ResponseFeedListener responseFeedListener;
 
+	private InteractionVelocity interactionVelocity;
+
 	public InteractionActivityRunnable(final InteractionRequestor requestor,
 			final Template presentationTemplate,
 			final CredentialManager credentialManager,
@@ -61,7 +63,8 @@ public final class InteractionActivityRunnable implements Runnable {
 			final InteractionUtils interactionUtils,
 			final InteractionJetty interactionJetty,
 			final InteractionPreference interactionPreference,
-			final ResponseFeedListener responseFeedListener) {
+			final ResponseFeedListener responseFeedListener,
+			final InteractionVelocity interactionVelocity) {
 		this.requestor = requestor;
 		this.presentationTemplate = presentationTemplate;
 		this.credentialManager = credentialManager;
@@ -70,6 +73,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		this.interactionJetty = interactionJetty;
 		this.interactionPreference = interactionPreference;
 		this.responseFeedListener = responseFeedListener;
+		this.interactionVelocity = interactionVelocity;
 	}
 
 	@Override
@@ -298,7 +302,7 @@ public final class InteractionActivityRunnable implements Runnable {
 			velocityContext.put("presentationUrl", presentationUrl);
 
 			final String interactionString = this.processTemplate(
-					InteractionVelocity.getInteractionTemplate(),
+					interactionVelocity.getInteractionTemplate(),
 					velocityContext);
 			interactionUtils.publishFile(interactionUrl, interactionString,
 					runId, id);

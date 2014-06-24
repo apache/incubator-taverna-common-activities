@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeSingleton;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
@@ -28,46 +29,42 @@ public class InteractionVelocity {
 
 	public static Logger logger = Logger.getLogger(InteractionVelocity.class);
 
-	private static boolean velocityInitialized = false;
+//	private static boolean velocityInitialized = false;
 
-	private static String TEMPLATE_SUFFIX = ".vm";
+	private static final String TEMPLATE_SUFFIX = ".vm";
 
-	private static Template interactionTemplate = null;
-	private static String INTERACTION_TEMPLATE_NAME = "interaction";
+	private Template interactionTemplate = null;
+	private static final String INTERACTION_TEMPLATE_NAME = "interaction";
 
-	private static ArrayList<String> templateNames = new ArrayList<String>();
+	private ArrayList<String> templateNames = new ArrayList<String>();
 
+	private VelocityEngine ve = new VelocityEngine();
+	
 	@SuppressWarnings("deprecation")
-	public static void checkVelocity() {
-		if (velocityInitialized) {
-			return;
-		}
-		Velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "string");
-		Velocity.setProperty("resource.loader.class",
+	public synchronized void checkVelocity() {
+
+		ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "string");
+		ve.setProperty("resource.loader.class",
 				"org.apache.velocity.runtime.resource.loader.StringResourceLoader");
-		Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+		ve.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
 				"org.apache.velocity.runtime.log.Log4JLogChute");
-		Velocity.setProperty("runtime.log.logsystem.log4j.logger",
+		ve.setProperty("runtime.log.logsystem.log4j.logger",
 				"net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity");
-		Velocity.init();
-		RuntimeSingleton.getRuntimeInstance().addDirective(
-				new RequireDirective());
-		RuntimeSingleton.getRuntimeInstance().addDirective(
-				new ProduceDirective());
-		RuntimeSingleton.getRuntimeInstance().addDirective(
-				new NotifyDirective());
-		velocityInitialized = true;
+		ve.init();
+		ve.loadDirective(RequireDirective.class.getName());
+		ve.loadDirective(ProduceDirective.class.getName());
+		ve.loadDirective(NotifyDirective.class.getName());
 
 		loadTemplates();
 
-		interactionTemplate = Velocity.getTemplate(INTERACTION_TEMPLATE_NAME);
+		interactionTemplate = ve.getTemplate(INTERACTION_TEMPLATE_NAME);
 		if (interactionTemplate == null) {
 			logger.error("Could not open interaction template "
 					+ INTERACTION_TEMPLATE_NAME);
 		}
 	}
 
-	private static void loadTemplates() {
+	private void loadTemplates() {
 		final InputStream is = InteractionActivity.class
 				.getResourceAsStream("/index");
 		if (is == null) {
@@ -109,12 +106,12 @@ public class InteractionVelocity {
 		}
 	}
 
-	public static Template getInteractionTemplate() {
+	public Template getInteractionTemplate() {
 		checkVelocity();
 		return interactionTemplate;
 	}
 
-	private static String getTemplateFromResource(final String templatePath)
+	private String getTemplateFromResource(final String templatePath)
 			throws IOException {
 		checkVelocity();
 		final InputStream stream = InteractionVelocity.class
@@ -123,7 +120,7 @@ public class InteractionVelocity {
 		return result;
 	}
 
-	public static ArrayList<String> getTemplateNames() {
+	public ArrayList<String> getTemplateNames() {
 		checkVelocity();
 		return templateNames;
 	}

@@ -9,6 +9,7 @@ import java.util.Set;
 
 import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
+import net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
@@ -36,6 +37,8 @@ public class InteractionActivityFactory implements ActivityFactory {
 
 	private ResponseFeedListener responseFeedListener;
 
+	private InteractionVelocity interactionVelocity;
+
 	/* (non-Javadoc)
 	 * @see net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory#createActivity()
 	 */
@@ -46,7 +49,8 @@ public class InteractionActivityFactory implements ActivityFactory {
 				this.interactionUtils,
 				this.interactionJetty,
 				this.interactionPreference,
-				this.responseFeedListener);
+				this.responseFeedListener,
+				this.interactionVelocity);
 	}
 
 	/* (non-Javadoc)
@@ -122,6 +126,10 @@ public class InteractionActivityFactory implements ActivityFactory {
 
 	public void setResponseFeedListener(ResponseFeedListener responseFeedListener) {
 		this.responseFeedListener = responseFeedListener;
+	}
+
+	public void setInteractionVelocity(InteractionVelocity interactionVelocity) {
+		this.interactionVelocity = interactionVelocity;
 	}
 
 }

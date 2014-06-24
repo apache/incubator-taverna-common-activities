@@ -12,6 +12,7 @@
 		<property name="interactionJetty" ref="interactionJetty" />
 		<property name="interactionPreference" ref="interactionPreference" />
 		<property name="responseFeedListener" ref="responseFeedListener"/>
+		<property name="interactionVelocity" ref="interactionVelocity" />
 	</bean>
 	
 	<bean id="interactionUtils" class="net.sf.taverna.t2.activities.interaction.InteractionUtils">
@@ -50,6 +51,11 @@
 	
 	<bean id="interactionPreference" class="net.sf.taverna.t2.activities.interaction.preference.InteractionPreference">
 		<property name="appConfig" ref="app-config" />
+	</bean>
+	
+	<bean id="interactionVelocity"
+		class="net.sf.taverna.t2.activities.interaction.velocity.InteractionVelocity"
+		init-method="checkVelocity">
 	</bean>
 
 </beans>
