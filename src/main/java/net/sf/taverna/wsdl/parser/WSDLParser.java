@@ -22,6 +22,7 @@ package net.sf.taverna.wsdl.parser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,6 +67,7 @@ import org.xml.sax.SAXException;
 
 import com.ibm.wsdl.extensions.soap.SOAPBindingImpl;
 import com.ibm.wsdl.extensions.soap.SOAPOperationImpl;
+
 import org.apache.axis.wsdl.symbolTable.SchemaUtils;
 
 /**
@@ -225,7 +227,98 @@ public class WSDLParser {
 		}
 		return result;
 	}
-
+	
+	/**
+	 * Returns transport attribute if binding is a SOAP binding or null otherwise.
+	 * @param binding
+	 * @return
+	 */
+	public String getTransportForSOAPBinding(Binding binding){
+		
+		String transport = null;
+		List extensibilityElementList = binding.getExtensibilityElements();
+		for (Iterator itr = extensibilityElementList.iterator(); itr.hasNext();) {
+			ExtensibilityElement ee = (ExtensibilityElement) itr.next();
+			if (ee instanceof SOAPBindingImpl) {
+				SOAPBinding soapBinding = (SOAPBinding) ee;
+				transport = soapBinding.getTransportURI();
+			}
+		}
+		return transport;
+	}
+	
+	public String getServiceDocumentation(){
+		
+		 if (getDefinition().getDocumentationElement() != null){
+			 return getDefinition().getDocumentationElement().getNodeValue();
+		 }
+		 else if (getDefinition().getServices().get(0) != null 
+				 && ((Service)getDefinition().getServices().get(0)).getDocumentationElement() != null){
+			 return ((Service)getDefinition().getServices().get(0)).getDocumentationElement().getNodeValue();		          
+		 }
+		 else{
+		    return "";
+		 }	
+	}
+	
+	public String getParameterOrder(Operation operation){
+		if (operation.getParameterOrdering() != null){			
+			return Arrays.toString(operation.getParameterOrdering().toArray());
+		}
+		else{
+			return "";
+		}
+	}
+	
+	public boolean isSOAPBinding(Binding binding){	
+		List extensibilityElementList = binding.getExtensibilityElements();
+		for (Iterator k = extensibilityElementList.iterator(); k.hasNext();) {
+			ExtensibilityElement ee = (ExtensibilityElement) k.next();
+			if (ee instanceof SOAPBindingImpl) {
+				return true;
+			}
+		}		
+		return false;
+	}
+	
+	/**
+	 * Return the URI location of the port's SOAP address element, if it exists, 
+	 * or null otherwise.
+	 * @param port
+	 * @return
+	 */
+	public String getSOAPAddressLocationForPort(Port port){
+		
+		String endpoint = null;	
+		for (Object obj : port.getExtensibilityElements()) {
+			if (obj instanceof SOAPAddress) {
+				SOAPAddress address = (SOAPAddress) obj;
+				endpoint = address.getLocationURI();
+				break;
+			}
+		}
+		return endpoint;
+	}
+	
+	/**
+	 * Return the port which binging contains the given operation.
+	 * @param operationName
+	 * @return
+	 */
+	public Port getPortForOperation(String operationName) {
+		Collection<Service> services = getDefinition().getServices().values();
+		Binding binding = getBinding(operationName);
+		for (Service service : services) {
+			Collection<Port> ports = service.getPorts().values();
+			for (Port port : ports) {
+				if (port.getBinding().equals(binding)) {
+					return port;
+				}
+			}
+		}
+		return null;
+	}
+	
 	private Binding getBinding(String operationName) {
 		Binding result = null;
 		Map<String, Binding> bindingToOpMap = bindingMap.get(getWSDLLocation());
@@ -797,7 +890,11 @@ public class WSDLParser {
 			
 			DefinedType refType = (DefinedType) type.getRefType();
 
-			do {
+			// Changed this loop because of the 'offending' WSDL 
+			// (http://www.ncbi.nlm.nih.gov/soap/v2.0/efetch_snp.wsdl) which
+			// uncovered the problem 
+			while (true){
+		
 				List containedElements = refType.getContainedElements();
 				if (containedElements != null) {
 					result.getElements().addAll(
@@ -808,8 +905,17 @@ public class WSDLParser {
 					result.getAttributes().addAll(
 							constructAttributes(containedAttributes));
 				}
-			} while ((refType = (DefinedType) refType
-					.getComplexTypeExtensionBase(getSymbolTable())) != null);
+				
+				if ((refType
+						.getComplexTypeExtensionBase(getSymbolTable()) != null && refType
+						.getComplexTypeExtensionBase(getSymbolTable()) instanceof DefinedType)){
+					refType = (DefinedType) refType
+						.getComplexTypeExtensionBase(getSymbolTable());
+				}
+				else{
+					break;
+				}
+			} 
 
 		}
 
