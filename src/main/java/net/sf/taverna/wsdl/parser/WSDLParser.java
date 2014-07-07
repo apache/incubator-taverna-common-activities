@@ -59,9 +59,12 @@ import org.apache.axis.wsdl.symbolTable.DefinedType;
 import org.apache.axis.wsdl.symbolTable.ElementDecl;
 import org.apache.axis.wsdl.symbolTable.Parameter;
 import org.apache.axis.wsdl.symbolTable.Parameters;
-import org.apache.axis.wsdl.symbolTable.SymbolTable;
 import org.apache.axis.wsdl.symbolTable.TypeEntry;
 import org.apache.log4j.Logger; //import org.apache.wsif.providers.soap.apacheaxis.WSIFDynamicProvider_ApacheAxis;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 //import org.apache.wsif.util.WSIFPluggableProviders;
 import org.xml.sax.SAXException;
 
@@ -247,18 +250,47 @@ public class WSDLParser {
 		return transport;
 	}
 	
-	public String getServiceDocumentation(){
-		
-		 if (getDefinition().getDocumentationElement() != null){
-			 return getDefinition().getDocumentationElement().getNodeValue();
-		 }
-		 else if (getDefinition().getServices().get(0) != null 
-				 && ((Service)getDefinition().getServices().get(0)).getDocumentationElement() != null){
-			 return ((Service)getDefinition().getServices().get(0)).getDocumentationElement().getNodeValue();		          
-		 }
-		 else{
-		    return "";
-		 }	
+	public String getServiceDocumentation() {
+		Service service = (Service) getDefinition().getServices().values()
+				.iterator().next(); // Get the first service
+		if (service != null) {
+			if (service.getDocumentationElement() != null) {
+				String text = getTextNodeValue(service.getDocumentationElement());
+				if (text != null){
+					return text;
+				}
+			}
+		} else if (getDefinition().getDocumentationElement() != null) {
+			String text = getTextNodeValue(getDefinition().getDocumentationElement());
+			if (text != null){
+				return text;
+			}
+		}
+		return null;
+	}
+	
+	// Get the text value of the node - look only at immediate children elements.
+	// Services like:
+	// http://api.bioinfo.no/wsdl/Blast.wsdl
+	// http://api.bioinfo.no/wsdl/JasparDB.wsdl
+	// have complex or mixed type elements for the documentation element so 
+	// we have to do some smart extraction here.
+	String getTextNodeValue(Node node){
+		// If element contains text only - return that text
+		if (node.getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
+			return node.getNodeValue();
+		} else {
+			// If element is a mixed content or complex element - try to extract the text inside
+			NodeList list = node.getChildNodes();
+
+			for (int i = 0; i < list.getLength(); i++) {
+				if (list.item(i).getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
+					// return the fist text element
+					return list.item(i).getNodeValue();
+				}
+			}
+		}
+		return null;
 	}
 	
 	public String getParameterOrder(Operation operation){
@@ -893,8 +925,7 @@ public class WSDLParser {
 			// Changed this loop because of the 'offending' WSDL 
 			// (http://www.ncbi.nlm.nih.gov/soap/v2.0/efetch_snp.wsdl) which
 			// uncovered the problem 
-			while (true){
-		
+			do {
 				List containedElements = refType.getContainedElements();
 				if (containedElements != null) {
 					result.getElements().addAll(
@@ -905,17 +936,9 @@ public class WSDLParser {
 					result.getAttributes().addAll(
 							constructAttributes(containedAttributes));
 				}
-				
-				if ((refType
-						.getComplexTypeExtensionBase(getSymbolTable()) != null && refType
-						.getComplexTypeExtensionBase(getSymbolTable()) instanceof DefinedType)){
-					refType = (DefinedType) refType
-						.getComplexTypeExtensionBase(getSymbolTable());
-				}
-				else{
-					break;
-				}
-			} 
+				refType.getClass();
+			} while ((refType = (DefinedType) refType
+					.getComplexTypeExtensionBase(getSymbolTable())) != null);
 
 		}
 
