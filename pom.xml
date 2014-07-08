@@ -13,7 +13,7 @@
 	<packaging>bundle</packaging>
 	<name>wsdl-generic</name>
 	<description>
-        WSDL handling classes bundled for Taverna 3 OSGi
+        WSDL handling classes bundled for Taverna 3 OSGi and extended for the needs of Service Catalographer
     </description>
 
 	<build>

@@ -256,18 +256,18 @@ public class WSDLParser {
 				.iterator().next(); // Get the first service
 		if (service != null) {
 			if (service.getDocumentationElement() != null) {
-				String text = getTextNodeValue(service.getDocumentationElement());
+				String text = getTextForNode(service.getDocumentationElement());
 				if (text != null){
 					return text;
 				}
 			}
 		} else if (getDefinition().getDocumentationElement() != null) {
-			String text = getTextNodeValue(getDefinition().getDocumentationElement());
+			String text = getTextForNode(getDefinition().getDocumentationElement());
 			if (text != null){
 				return text;
 			}
 		}
-		return null;
+		return "";
 	}
 	
 	// Get the text value of the node - look only at immediate children elements.
@@ -276,7 +276,7 @@ public class WSDLParser {
 	// http://api.bioinfo.no/wsdl/JasparDB.wsdl
 	// have complex or mixed type elements for the documentation element so 
 	// we have to do some smart extraction here.
-	String getTextNodeValue(Node node){
+	String getTextForNode(Node node){
 		// If element contains text only - return that text
 		if (node.getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
 			return node.getNodeValue();
@@ -604,17 +604,14 @@ public class WSDLParser {
 	 */
 	public String getOperationDocumentation(String operationName)
 			throws UnknownOperationException {
-		String result = "";
-
 		Operation operation = getOperation(operationName);
 		if (operation.getDocumentationElement() != null) {
-			if (operation.getDocumentationElement().getFirstChild() != null) {
-				result = operation.getDocumentationElement().getFirstChild()
-						.getNodeValue();
+			String text = getTextForNode(operation.getDocumentationElement());
+			if (text != null){
+				return text;
 			}
 		}
-
-		return result;
+		return "";
 	}
 
 	/**
