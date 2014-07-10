@@ -55,7 +55,9 @@ public class RESTActivityFactory implements ActivityFactory {
 
 	@Override
 	public RESTActivity createActivity() {
-		return new RESTActivity(credentialsProvider);
+                RESTActivity activity = new RESTActivity(credentialsProvider);
+                activity.setEdits(edits);
+		return activity; 
 	}
 
 	@Override
