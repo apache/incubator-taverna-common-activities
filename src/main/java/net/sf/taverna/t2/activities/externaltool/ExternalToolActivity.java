@@ -87,7 +87,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 			MimeType mimeTypeAnnotation = new MimeType();
 			mimeTypeAnnotation.setText(mimeType);
 			try {
-				edits.getAddAnnotationChainEdit(annotated, mimeTypeAnnotation).doEdit();
+				getEdits().getAddAnnotationChainEdit(annotated, mimeTypeAnnotation).doEdit();
 			} catch (EditException e) {
 				Logger.getLogger(ExternalToolActivity.class).error(e);
 			}
@@ -109,7 +109,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	 */
 	private void addInputWithMime(String portName, int portDepth, Class<?> translatedElementClass, List<String> mimeTypes) {
 		List<Class<? extends ExternalReferenceSPI>> handledReferenceSchemes = Collections.emptyList();
-		ActivityInputPort inputPort = edits.createActivityInputPort(portName, portDepth, true, handledReferenceSchemes,
+		ActivityInputPort inputPort = getEdits().createActivityInputPort(portName, portDepth, true, handledReferenceSchemes,
 				translatedElementClass);
 		inputPorts.add(inputPort);
 		if (mimeTypes != null) {
@@ -128,7 +128,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	 *            Accepted mime types for this port
 	 */
 	private void addOutputWithMime(String portName, int portDepth, List<String> mimeTypes) {
-		ActivityOutputPort outputPort = edits.createActivityOutputPort(portName, portDepth, portDepth);
+		ActivityOutputPort outputPort = getEdits().createActivityOutputPort(portName, portDepth, portDepth);
 		outputPorts.add(outputPort);
 		addMimeTypes(outputPort, mimeTypes);
 	}

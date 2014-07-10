@@ -32,11 +32,11 @@
 
 	<list id="mechanismCreators" interface="net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator" cardinality="0..N" />
 
-    <list id="invocationPersisters" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister" cardinality="0..N" />
+        <list id="invocationPersisters" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister" cardinality="0..N" />
 
 	<reference id="credentialManager" interface="net.sf.taverna.t2.security.credentialmanager.CredentialManager" />
 
 	<reference id="applicationConfiguration" interface="uk.org.taverna.configuration.app.ApplicationConfiguration" />
 
-
+        <reference id="edits" interface="net.sf.taverna.t2.workflowmodel.Edits" />
 </beans:beans>

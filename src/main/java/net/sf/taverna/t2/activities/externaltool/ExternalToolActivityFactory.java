@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator;
+import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
@@ -45,10 +46,13 @@ public class ExternalToolActivityFactory implements ActivityFactory {
 
 	private List<MechanismCreator> mechanismCreators;
 
+        private Edits edits;
+
 	@Override
 	public ExternalToolActivity createActivity() {
 		ExternalToolActivity activity = new ExternalToolActivity();
 		activity.setInvocationCreators(invocationCreators);
+                activity.setEdits(edits);
 		return activity;
 	}
 
@@ -87,6 +91,10 @@ public class ExternalToolActivityFactory implements ActivityFactory {
 			throws ActivityConfigurationException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+        public void setEdits(Edits edits) {
+		this.edits = edits;
 	}
 
 }

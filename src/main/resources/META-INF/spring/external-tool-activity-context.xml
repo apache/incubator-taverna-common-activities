@@ -37,6 +37,7 @@
 	<bean id="externalToolActivityFactory" class="net.sf.taverna.t2.activities.externaltool.ExternalToolActivityFactory">
 		<property name="invocationCreators" ref="invocationCreators" />
 		<property name="mechanismCreators" ref="mechanismCreators" />
+                <property name="edits" ref="edits" />
 	</bean>
 
 	<bean id="invocationGroupManager" class="net.sf.taverna.t2.activities.externaltool.manager.impl.InvocationGroupManagerImpl">
