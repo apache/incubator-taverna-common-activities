@@ -22,7 +22,17 @@
 				<configuration>
 					<instructions>
 						<Private-Package>org.apache.poi.*;-split-package:=merge-first,org.openxmlformats.schemas.*,schemasMicrosoftCom*,schemaorg_apache_xmlbeans.system.*,org.odftoolkit.*,com.csvreader.*</Private-Package>
-						<Import-Package>!org.apache.poi.hdgf.extractor,!org.apache.poi.hslf.extractor,!org.apache.poi.hwpf.extractor,!org.apache.poi.sl.*,org.apache.xmlbeans.impl.schema,*</Import-Package>
+						<Import-Package>!org.apache.poi.hdgf.extractor,
+                                                        !org.apache.poi.hslf.extractor,
+                                                        !org.apache.poi.hwpf.extractor,
+                                                        !org.apache.poi.sl.*,
+                                                        org.apache.xmlbeans.impl.schema,
+                                                        !junit.*,
+                                                        !org.openxmlformats.schemas.*,
+                                                        !schemasMicrosoftComOfficePowerpoint,
+                                                        !schemasMicrosoftComOfficeWord,
+                                                        *
+                                                </Import-Package>
 					</instructions>
 				</configuration>
 			</plugin>
@@ -44,13 +54,11 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>${poi.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>${poi.version}</version>
-			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.apache.xmlbeans</groupId>
