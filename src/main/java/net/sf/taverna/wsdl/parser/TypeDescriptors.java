@@ -49,7 +49,7 @@ import org.xml.sax.InputSource;
 
 public class TypeDescriptors
 {
-    private XmlSchemaCollection schemas;
+    private final XmlSchemaCollection schemas;
     
     /**
      * Constructor that takes a collection of XML Schemas.
@@ -178,7 +178,8 @@ public class TypeDescriptors
 
     private TypeDescriptor getElementDescriptor(XmlSchemaElement element) {
         TypeDescriptor elementDescriptor;
-
+        TypeDescriptor typeDesc;
+        
         QName typeName;
         if (element.isRef()) {
             XmlSchemaRef<XmlSchemaElement> ref = element.getRef();
@@ -190,17 +191,25 @@ public class TypeDescriptors
                     target = schemas.getElementByQName(targetName);
                 }
             }
-            typeName = target.getSchemaTypeName();
+            if (target != null) {
+                typeName = target.getSchemaTypeName();
+                if (typeName != null) {
+                    typeDesc = getTypeDescriptor(typeName);
+                } else {
+                    XmlSchemaType xmlSchemaType = target.getSchemaType();
+                    typeDesc = getTypeDescriptor(xmlSchemaType);
+                }   
+            } else {
+                return null; // invalid XML Schema...
+            }
         } else {
             typeName = element.getSchemaTypeName();
-        }
-
-        TypeDescriptor typeDesc;
-        if (typeName != null) {
-            typeDesc = getTypeDescriptor(typeName);
-        } else {
-            XmlSchemaType xmlSchemaType = element.getSchemaType();
-            typeDesc = getTypeDescriptor(xmlSchemaType);
+            if (typeName != null) {
+                typeDesc = getTypeDescriptor(typeName);
+            } else {
+                XmlSchemaType xmlSchemaType = element.getSchemaType();
+                typeDesc = getTypeDescriptor(xmlSchemaType);
+            }
         }
 
         if (element.getMaxOccurs() > 1) {
@@ -477,13 +486,17 @@ public class TypeDescriptors
             typeDesc.setName(attrName.getLocalPart());
             typeDesc.setQname(attrName);
 
+            TypeDescriptor attrTypeDesc;
+            
             QName attrTypeName = xmlSchemaAttribute.getSchemaTypeName();
-            if (attrTypeName == null) {
+            if (attrTypeName != null) {
+                attrTypeDesc = getTypeDescriptor(attrTypeName);
+
+            } else {
                 XmlSchemaSimpleType xmlSchemaSimpleType = xmlSchemaAttribute.getSchemaType();
-                attrTypeName = xmlSchemaSimpleType.getQName();
+                attrTypeDesc = getTypeDescriptor(xmlSchemaSimpleType);
             }
 
-            TypeDescriptor attrTypeDesc = getTypeDescriptor(attrTypeName);
             typeDesc.setType(attrTypeDesc.getType());
 
             typeDesc.setOptional(XmlSchemaUse.OPTIONAL == xmlSchemaAttribute.getUse());
