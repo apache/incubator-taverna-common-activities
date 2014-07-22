@@ -53,9 +53,10 @@ public class TypeDescriptor {
 	public QName getQname() {
 		if (qname != null)
 			return qname;
-		else {
+		else if (type != null) {
 			return new QName("", type);
 		}
+                return null;
 	}
 
 	public void setQnameFromString(String qname) {
