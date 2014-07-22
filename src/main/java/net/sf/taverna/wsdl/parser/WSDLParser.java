@@ -923,7 +923,7 @@ public class WSDLParser {
 			// Changed this loop because of the 'offending' WSDL 
 			// (http://www.ncbi.nlm.nih.gov/soap/v2.0/efetch_snp.wsdl) which
 			// uncovered the problem 
-			do {
+			while (true) {
 				List containedElements = refType.getContainedElements();
 				if (containedElements != null) {
 					result.getElements().addAll(
@@ -934,9 +934,15 @@ public class WSDLParser {
 					result.getAttributes().addAll(
 							constructAttributes(containedAttributes));
 				}
-				refType.getClass();
-			} while ((refType = (DefinedType) refType
-					.getComplexTypeExtensionBase(getSymbolTable())) != null);
+				if ((refType.getComplexTypeExtensionBase(getSymbolTable()) != null && refType
+						.getComplexTypeExtensionBase(getSymbolTable()) instanceof DefinedType)) {
+					refType = (DefinedType) refType
+							.getComplexTypeExtensionBase(getSymbolTable());
+				} else {
+					break;
+				}
+			}
+		
 
 		}
 
