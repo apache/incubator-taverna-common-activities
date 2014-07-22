@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.wsdl.Binding;
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
@@ -64,6 +65,7 @@ import javax.wsdl.extensions.soap12.SOAP12Body;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
@@ -554,7 +556,7 @@ public class WSDL11Parser implements GenericWSDLParser {
         return bindingOperation;
     }
     
-    private List<BindingOperation> getBindingOperations(String portName) {
+    public List<BindingOperation> getBindingOperations(String portName) {
         
         Port port = getPort(portName);
         if (port != null) {
@@ -691,12 +693,15 @@ public class WSDL11Parser implements GenericWSDLParser {
     private String getDocumentation(WSDLElement wsdlElement) {
 
         Element element = wsdlElement.getDocumentationElement();
-        if (element != null && element.getFirstChild() != null) {
-            return element.getFirstChild().getNodeValue();
-        }
-
-        return "";
+        if (element != null) {
+			String text = WSDLParser.getTextForNode(element);
+			if (text != null){
+				return text;
+			}
+		}
+		return "";
     }
+    
     /*
      * Recursive method to process all Schemas defined in definition and its imports
      */
@@ -819,4 +824,9 @@ public class WSDL11Parser implements GenericWSDLParser {
         
         return parser;
     }
+
+	@Override
+	public Definition getDefinition() {
+		return definition;
+	}
 }

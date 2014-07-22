@@ -26,7 +26,10 @@ package net.sf.taverna.wsdl.parser;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
+
 import org.apache.ws.commons.schema.XmlSchemaObject;
 
 /**
@@ -51,6 +54,7 @@ public interface GenericWSDLParser {
     String getSoapAddress(String portName);
     String getOperationEndpointLocation(String operationName) throws UnknownOperationException;
     String getOperationDocumentation(String portName, String operationName) throws UnknownOperationException;
+    Definition getDefinition();
     
     LinkedHashMap<String, XmlSchemaObject> getInputParameters(String portName, String operationName) throws UnknownOperationException;
     LinkedHashMap<String, XmlSchemaObject> getOutputParameters(String portName, String operationName) throws UnknownOperationException;

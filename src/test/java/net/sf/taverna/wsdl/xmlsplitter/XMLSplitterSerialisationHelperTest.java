@@ -29,7 +29,7 @@ import java.util.List;
 import net.sf.taverna.wsdl.parser.ComplexTypeDescriptor;
 import net.sf.taverna.wsdl.parser.TypeDescriptor;
 
-import org.embl.ebi.escience.scufl.XScufl;
+//import org.embl.ebi.escience.scufl.XScufl;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
@@ -37,10 +37,10 @@ import org.junit.Test;
 
 public class XMLSplitterSerialisationHelperTest {
 
-	@Test
-	public void testScuflNS() throws Exception {
-		assertEquals("namespace should be equal",XScufl.XScuflNS,XMLSplitterSerialisationHelper.XScuflNS);
-	}
+//	@Test
+//	public void testScuflNS() throws Exception {
+//		assertEquals("namespace should be equal",XScufl.XScuflNS,XMLSplitterSerialisationHelper.XScuflNS);
+//	}
 
     @Test
 	public void testCyclicToElement() throws Exception {

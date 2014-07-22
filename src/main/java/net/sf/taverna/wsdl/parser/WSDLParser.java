@@ -25,12 +25,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import javax.wsdl.Binding;
+import javax.wsdl.BindingOperation;
+import javax.wsdl.Definition;
+import javax.wsdl.Operation;
+import javax.wsdl.Port;
+import javax.wsdl.Service;
 import javax.wsdl.WSDLException;
+import javax.wsdl.extensions.ExtensibilityElement;
+import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.ibm.wsdl.extensions.soap.SOAPBindingImpl;
 
 
 /**
@@ -47,7 +61,7 @@ public class WSDLParser {
 
     private static final String SERVICE_SECURITY_URI = "http://security.introduce.cagrid.nci.nih.gov/ServiceSecurity/";
     
-    private GenericWSDLParser parser;
+    private WSDL11Parser parser;
 
     /**
      * Constructor which takes the location of the base wsdl file, and begins to
@@ -61,11 +75,11 @@ public class WSDLParser {
      */
     public WSDLParser(String wsdlLocation) throws ParserConfigurationException,
             WSDLException, IOException, SAXException {
-        try {
-            parser = WSDL20Parser.getWSDL20Parser(wsdlLocation);
-        } catch (Exception ex) {
+        //try {
+        //    parser = WSDL20Parser.getWSDL20Parser(wsdlLocation);
+        //} catch (Exception ex) {
             parser = WSDL11Parser.getWSDL11Parser(wsdlLocation);
-        }
+        //}
     }
 
     public List<QName> getServices() {
@@ -74,10 +88,6 @@ public class WSDLParser {
     
     public List<String> getPorts(QName serviceName) {
         return parser.getPorts(serviceName);
-    }
-    
-    public List<String> getOperations(String portName) {
-        return parser.getOperations(portName);
     }
 
     /**
@@ -276,4 +286,124 @@ public class WSDLParser {
     public WSRF_Version isWSRFPort(String portName) {
         return parser.isWSRFPort(portName);
     }
+    
+    public Definition getDefinition() {
+        return parser.getDefinition();
+    }
+    
+	public String getServiceDocumentation() {
+		if (getDefinition() == null){
+			return "";
+		}
+		Service service = (Service) getDefinition().getServices().values()
+				.iterator().next(); // Get the first service
+		if (service != null) {
+			if (service.getDocumentationElement() != null) {
+				String text = getTextForNode(service.getDocumentationElement());
+				if (text != null){
+					return text;
+				}
+			}
+		} else if (getDefinition().getDocumentationElement() != null) {
+			String text = getTextForNode(getDefinition().getDocumentationElement());
+			if (text != null){
+				return text;
+			}
+		}
+		return "";
+	}
+    
+	
+	// Get the text value of the node - look only at immediate children elements.
+	// Services like:
+	// http://api.bioinfo.no/wsdl/Blast.wsdl
+	// http://api.bioinfo.no/wsdl/JasparDB.wsdl
+	// have complex or mixed type elements for the documentation element so 
+	// we have to do some smart extraction here.
+	public static String getTextForNode(Node node){
+		// If element contains text only - return that text
+		if (node.getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
+			return node.getNodeValue();
+		} else {
+			// If element is a mixed content or complex element - try to extract the text inside
+			NodeList list = node.getChildNodes();
+
+			for (int i = 0; i < list.getLength(); i++) {
+				if (list.item(i).getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
+					// return the fist text element
+					return list.item(i).getNodeValue();
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns transport attribute if binding is a SOAP binding or null
+	 * otherwise.
+	 * 
+	 * @param binding
+	 * @return
+	 */
+	public String getTransportForSOAPBinding(Binding binding) {
+
+		String transport = null;
+		List extensibilityElementList = binding.getExtensibilityElements();
+		for (Object extensibilityElement : extensibilityElementList) {
+			ExtensibilityElement ee = (ExtensibilityElement) extensibilityElement;
+			if (ee instanceof SOAPBindingImpl) {
+				SOAPBinding soapBinding = (SOAPBinding) ee;
+				transport = soapBinding.getTransportURI();
+			}
+		}
+		return transport;
+	}
+
+	/**
+	 * Return the URI location of the port's SOAP address element, if it exists,
+	 * or null otherwise.
+	 * 
+	 * @param port
+	 * @return
+	 */
+	public String getSOAPAddressLocationForPort(Port port) {
+
+		if (port == null){
+			return null;
+		}
+		else{
+			return parser.getSoapAddress(port.getName());
+		}
+	}
+	
+	public boolean isSOAPBinding(Binding binding) {
+		List extensibilityElementList = binding.getExtensibilityElements();
+		for (Object extensibilityElement : extensibilityElementList) {
+			ExtensibilityElement ee = (ExtensibilityElement) extensibilityElement;
+			if (ee instanceof SOAPBindingImpl) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+    public List<Operation> getOperationsForPort(String portName) {
+        List<Operation> operations = new ArrayList<Operation>();
+        for (BindingOperation bindingOperation : parser.getBindingOperations(portName)) {
+            Operation operation = bindingOperation.getOperation();
+            if (operation != null) {
+                operations.add(operation);
+            }
+        }
+        return operations;
+    }
+	
+	public String getParameterOrder(Operation operation) {
+		if (operation.getParameterOrdering() != null) {
+			return Arrays.toString(operation.getParameterOrdering().toArray());
+		} else {
+			return "";
+		}
+	}
+
 }

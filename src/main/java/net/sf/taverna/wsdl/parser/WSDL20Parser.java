@@ -33,6 +33,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -41,6 +43,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.inb.bsc.wsdl20.Binding;
@@ -52,7 +55,9 @@ import org.inb.bsc.wsdl20.Interface;
 import org.inb.bsc.wsdl20.InterfaceMessageReference;
 import org.inb.bsc.wsdl20.InterfaceOperation;
 import org.inb.bsc.wsdl20.Service;
+
 import static org.inb.bsc.wsdl20.extensions.soap.SOAPBindingOperationExtensions.SOAP_ACTION_ATTR;
+
 import org.inb.bsc.wsdl20.factory.WSDL2Factory;
 import org.inb.bsc.wsdl20.xml.WSDL2Reader;
 import org.w3c.dom.Element;
@@ -285,4 +290,10 @@ public class WSDL20Parser implements GenericWSDLParser {
         
         return parser;
     }
+    
+	@Override
+	// SOAP 1.1 <definition> element
+	public Definition getDefinition() {
+		return null;
+	}
 }
