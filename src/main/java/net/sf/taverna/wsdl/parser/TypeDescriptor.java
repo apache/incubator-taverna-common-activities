@@ -232,6 +232,9 @@ public class TypeDescriptor {
 	private static boolean testForCyclic(ComplexTypeDescriptor descriptor,
 			List<String> parents) {
 		boolean result = false;
+		if (descriptor.getQname() == null){
+			return false;
+		}
 		String descKey = descriptor.getQname().toString();
 		if (parents.contains(descKey))
 			result = true;
