@@ -27,7 +27,6 @@ package net.sf.taverna.wsdl.parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -100,7 +99,7 @@ public class TypeDescriptors
             } else if (xmlSchemaObject instanceof XmlSchemaType) {
                 typeDescriptor = getDescriptor((XmlSchemaType)xmlSchemaObject);
             } else {
-                throw new IllegalArgumentException("wrong XmlSchemaObject. Mast be either xs:element or xs:type");
+                throw new IllegalArgumentException("Wrong XmlSchemaObject: must be either xs:element or xs:type");
             }
             
             typeDescriptor.setName(partName);
@@ -157,6 +156,10 @@ public class TypeDescriptors
      * @return a Type Descriptor for the parameter.
      */
     public TypeDescriptor getTypeDescriptor(QName typeName) {
+    	if (typeName == null){
+    		return null;
+    	}
+    	
         XmlSchemaType xmlSchemaType = schemas.getTypeByQName(typeName);
 
         if (xmlSchemaType == null) {
@@ -234,7 +237,10 @@ public class TypeDescriptors
     private TypeDescriptor getTypeDescriptor(XmlSchemaType xmlSchemaType) {
         TypeDescriptor typeDesc;
 
-        if (xmlSchemaType instanceof XmlSchemaSimpleType) {
+        if (xmlSchemaType == null){
+        	return null;
+        }
+        else if (xmlSchemaType instanceof XmlSchemaSimpleType) {
             typeDesc = getSimpleTypeDescriptor((XmlSchemaSimpleType)xmlSchemaType);
         } else {
             typeDesc = getComplexTypeDescriptor((XmlSchemaComplexType)xmlSchemaType);
@@ -484,7 +490,9 @@ public class TypeDescriptors
             }
 
             TypeDescriptor attrTypeDesc = getTypeDescriptor(attrTypeName);
-            typeDesc.setType(attrTypeDesc.getType());
+            if (attrTypeDesc != null) {
+            	typeDesc.setType(attrTypeDesc.getType());
+            }
 
             typeDesc.setOptional(XmlSchemaUse.OPTIONAL == xmlSchemaAttribute.getUse());
             attributes.add(typeDesc);

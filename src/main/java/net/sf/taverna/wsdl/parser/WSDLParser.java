@@ -89,6 +89,10 @@ public class WSDLParser {
     public List<String> getPorts(QName serviceName) {
         return parser.getPorts(serviceName);
     }
+    
+    public List<String> getOperations(String portName) {
+        return parser.getOperations(portName);
+    }
 
     /**
      * @return a list of WSDLOperations for all operations for this service,

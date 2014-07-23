@@ -575,7 +575,7 @@ public class WSDL11Parser implements GenericWSDLParser {
         return Collections.EMPTY_LIST;
     }
 
-    private Port getPort(String portName) {
+    public Port getPort(String portName) {
 
         Collection<Service> services = definition.getAllServices().values();
         for (Service service : services) {
