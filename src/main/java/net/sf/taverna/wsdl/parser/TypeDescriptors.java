@@ -480,7 +480,7 @@ public class TypeDescriptors
                     attrName = xmlSchemaRefAttribute.getWireName();
                 }
             } else {
-                    attrName = xmlSchemaAttribute.getWireName();
+                attrName = xmlSchemaAttribute.getWireName();
             }
             
             typeDesc.setName(attrName.getLocalPart());
@@ -491,10 +491,14 @@ public class TypeDescriptors
             QName attrTypeName = xmlSchemaAttribute.getSchemaTypeName();
             if (attrTypeName != null) {
                 attrTypeDesc = getTypeDescriptor(attrTypeName);
-
             } else {
                 XmlSchemaSimpleType xmlSchemaSimpleType = xmlSchemaAttribute.getSchemaType();
-                attrTypeDesc = getTypeDescriptor(xmlSchemaSimpleType);
+                if (xmlSchemaSimpleType == null) {
+                    attrTypeDesc = new BaseTypeDescriptor();
+                    attrTypeDesc.setType("anySimpleType");
+                } else {
+                    attrTypeDesc = getTypeDescriptor(xmlSchemaSimpleType);
+                }
             }
 
             typeDesc.setType(attrTypeDesc.getType());
