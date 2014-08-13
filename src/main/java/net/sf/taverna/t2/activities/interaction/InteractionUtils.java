@@ -4,7 +4,6 @@
 package net.sf.taverna.t2.activities.interaction;
 
 import static net.sf.taverna.t2.activities.interaction.InteractionRecorder.addResource;
-import static net.sf.taverna.t2.activities.interaction.InteractionUtils.publishedUrls;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

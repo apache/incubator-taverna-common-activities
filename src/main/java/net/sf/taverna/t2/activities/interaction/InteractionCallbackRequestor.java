@@ -5,7 +5,6 @@ package net.sf.taverna.t2.activities.interaction;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.taverna.t2.invocation.InvocationContext;
 import net.sf.taverna.t2.reference.ReferenceService;
@@ -20,20 +19,14 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCa
  * 
  */
 public class InteractionCallbackRequestor implements InteractionRequestor {
-
 	private final AsynchronousActivityCallback callback;
-
 	private final Map<String, T2Reference> inputs;
-
 	private final InteractionActivity activity;
-
 	private boolean answered = false;
-
 	private String path;
-
 	private Integer count;
-	
-	private static Map<String, Integer> invocationCount = new HashMap<String, Integer> ();
+
+	private static Map<String, Integer> invocationCount = new HashMap<>();
 
 	public InteractionCallbackRequestor(final InteractionActivity activity,
 			final AsynchronousActivityCallback callback,
@@ -47,28 +40,28 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public String getRunId() {
-		return this.callback.getContext()
+		return callback.getContext()
 				.getEntities(WorkflowRunIdEntity.class).get(0)
 				.getWorkflowRunId();
 	}
 
 	@Override
 	public Map<String, Object> getInputData() {
-		final Map<String, Object> inputData = new HashMap<String, Object>();
+		Map<String, Object> inputData = new HashMap<>();
+		InvocationContext context = callback.getContext();
+		ReferenceService referenceService = context.getReferenceService();
 
-		final InvocationContext context = this.callback.getContext();
-		final ReferenceService referenceService = context.getReferenceService();
-		for (final String inputName : this.inputs.keySet()) {
-			final Object input = referenceService.renderIdentifier(this.inputs
-					.get(inputName), this.getInputPort(inputName)
-					.getTranslatedElementClass(), this.callback.getContext());
+		for (String inputName : inputs.keySet()) {
+			Object input = referenceService.renderIdentifier(inputs
+					.get(inputName), getInputPort(inputName)
+					.getTranslatedElementClass(), callback.getContext());
 			inputData.put(inputName, input);
 		}
 		return inputData;
 	}
 
-	public ActivityInputPort getInputPort(final String name) {
-		for (final ActivityInputPort port : this.activity.getInputPorts()) {
+	public ActivityInputPort getInputPort(String name) {
+		for (ActivityInputPort port : activity.getInputPorts()) {
 			if (port.getName().equals(name)) {
 				return port;
 			}
@@ -77,35 +70,34 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 	}
 
 	@Override
-	public void fail(final String string) {
-		if (this.answered) {
+	public void fail(String string) {
+		if (answered) {
 			return;
 		}
-		this.callback.fail(string);
-		this.answered = true;
+		callback.fail(string);
+		answered = true;
 	}
 
 	@Override
 	public void carryOn() {
-		if (this.answered) {
+		if (answered) {
 			return;
 		}
-		this.callback.receiveResult(new HashMap<String, T2Reference>(),
+		callback.receiveResult(new HashMap<String, T2Reference>(),
 				new int[0]);
-		this.answered = true;
+		answered = true;
 	}
 
 	@Override
 	public String generateId() {
-		final String workflowRunId = getRunId();
-		final String parentProcessIdentifier = this.callback
-				.getParentProcessIdentifier();
+		String workflowRunId = getRunId();
+		String parentProcessIdentifier = callback.getParentProcessIdentifier();
 		return (workflowRunId + ":" + parentProcessIdentifier);
 	}
 
 	@Override
 	public InteractionType getInteractionType() {
-		if (this.activity.getConfiguration().isProgressNotification()) {
+		if (activity.getConfiguration().isProgressNotification()) {
 			return InteractionType.Notification;
 		}
 		return InteractionType.DataRequest;
@@ -113,41 +105,41 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public InteractionActivityType getPresentationType() {
-		return this.activity.getConfiguration().getInteractionActivityType();
+		return activity.getConfiguration().getInteractionActivityType();
 	}
 
 	@Override
 	public String getPresentationOrigin() {
-		return this.activity.getConfiguration().getPresentationOrigin();
+		return activity.getConfiguration().getPresentationOrigin();
 	}
 
 	@Override
-	public void receiveResult(final Map<String, Object> resultMap) {
-		if (this.answered) {
+	public void receiveResult(Map<String, Object> resultMap) {
+		if (answered) {
 			return;
 		}
-		final Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+		Map<String, T2Reference> outputs = new HashMap<>();
 
-		final InvocationContext context = this.callback.getContext();
-		final ReferenceService referenceService = context.getReferenceService();
+		InvocationContext context = callback.getContext();
+		ReferenceService referenceService = context.getReferenceService();
 
-		for (final Object key : resultMap.keySet()) {
-			final String keyString = (String) key;
-			final Object value = resultMap.get(key);
-			final Integer depth = this.findPortDepth(keyString);
+		for (Object key : resultMap.keySet()) {
+			String keyString = (String) key;
+			Object value = resultMap.get(key);
+			Integer depth = findPortDepth(keyString);
 			if (depth == null) {
-				this.callback.fail("Data sent for unknown port : " + keyString);
+				callback.fail("Data sent for unknown port : " + keyString);
+				continue;
 			}
 			outputs.put(keyString,
 					referenceService.register(value, depth, true, context));
 		}
-		this.callback.receiveResult(outputs, new int[0]);
-		this.answered = true;
+		callback.receiveResult(outputs, new int[0]);
+		answered = true;
 	}
 
-	private Integer findPortDepth(final String portName) {
-		final Set<OutputPort> ports = this.activity.getOutputPorts();
-		for (final OutputPort op : ports) {
+	private Integer findPortDepth(String portName) {
+		for (OutputPort op : activity.getOutputPorts()) {
 			if (op.getName().equals(portName)) {
 				return op.getDepth();
 			}
@@ -156,8 +148,7 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 	}
 
 	private String calculatePath() {
-		final String parentProcessIdentifier = this.callback
-				.getParentProcessIdentifier();
+		String parentProcessIdentifier = callback.getParentProcessIdentifier();
 		String result = "";
 		String parts[] = parentProcessIdentifier.split(":");
 
@@ -172,7 +163,7 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	@Override
 	public String getPath() {
-		return this.path;
+		return path;
 	}
 	
 	private synchronized static Integer calculateInvocationCount(String path) {

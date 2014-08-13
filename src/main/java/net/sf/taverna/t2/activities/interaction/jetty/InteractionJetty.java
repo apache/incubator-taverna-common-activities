@@ -3,13 +3,18 @@
  */
 package net.sf.taverna.t2.activities.interaction.jetty;
 
+import static java.lang.Integer.parseInt;
+import static java.lang.Thread.sleep;
+import static net.sf.taverna.t2.activities.interaction.InteractionUtils.getInteractionServiceDirectory;
+import static org.apache.abdera.protocol.server.ServiceManager.PROVIDER;
+import static org.mortbay.jetty.servlet.Context.SESSIONS;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.sf.taverna.t2.activities.interaction.FeedReader;
-import net.sf.taverna.t2.activities.interaction.InteractionUtils;
 import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
 import net.sf.taverna.t2.security.credentialmanager.CMException;
 import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
@@ -17,7 +22,6 @@ import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
 import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.webdav.WebdavServlet;
 
-import org.apache.abdera.protocol.server.ServiceManager;
 import org.apache.abdera.protocol.server.provider.basic.BasicProvider;
 import org.apache.abdera.protocol.server.servlet.AbderaServlet;
 import org.apache.log4j.Logger;
@@ -43,87 +47,49 @@ public class InteractionJetty {
 	private static InteractionPreference interactionPreference = InteractionPreference
 			.getInstance();
 
-	private static String REALM_NAME = "TavernaInteraction";
-	
+	private static final String REALM_NAME = "TavernaInteraction";
+
 	private static boolean listenersStarted = false;
-	
-	private static SPIRegistry<FeedReader> feedReaderRegistry = new SPIRegistry(FeedReader.class);
+
+	private static SPIRegistry<FeedReader> feedReaderRegistry = new SPIRegistry<>(
+			FeedReader.class);
 
 	public static synchronized void startJettyIfNecessary() {
 		if (server != null) {
 			return;
 		}
-		
-//		final ClassLoader previousContextClassLoader = Thread.currentThread()
-//				.getContextClassLoader();
-//		Thread.currentThread().setContextClassLoader(
-//				InteractionJetty.class.getClassLoader());
 
-		final String port = interactionPreference.getPort();
+		// final ClassLoader previousContextClassLoader = Thread.currentThread()
+		// .getContextClassLoader();
+		// Thread.currentThread().setContextClassLoader(
+		// InteractionJetty.class.getClassLoader());
 
-		server = new Server(Integer.parseInt(port));
+		String port = interactionPreference.getPort();
+		server = new Server(parseInt(port));
 		server.setStopAtShutdown(true);
 
-		final WebdavServlet interactionServlet = new WebdavServlet();
-
-		final ServletHolder interactionHolder = new ServletHolder();
-		interactionHolder.setServlet(interactionServlet);
+		ServletHolder interactionHolder = new ServletHolder();
+		interactionHolder.setServlet(new WebdavServlet());
 
 		try {
-
 			interactionHolder.setInitParameter("rootpath",
 					getInteractionDirectory().getCanonicalPath());
-		} catch (final IOException e1) {
+		} catch (IOException e1) {
 			logger.error("Unable to set root of interaction", e1);
 		}
 
-		final HandlerList handlers = new HandlerList();
-		final Context overallContext = new Context(handlers, "/",
-				Context.SESSIONS);
+		Context overallContext = new Context(new HandlerList(), "/", SESSIONS);
 		overallContext.setContextPath("/");
 		server.setHandler(overallContext);
 
-		final AbderaServlet abderaServlet = new AbderaServlet();
-		final ServletHolder abderaHolder = new ServletHolder(abderaServlet);
-		abderaHolder.setInitParameter(ServiceManager.PROVIDER,
-				BasicProvider.class.getName());
+		ServletHolder abderaHolder = new ServletHolder(new AbderaServlet());
+		abderaHolder.setInitParameter(PROVIDER, BasicProvider.class.getName());
 
 		overallContext.addServlet(abderaHolder, "/*");
 		overallContext.addServlet(interactionHolder, "/interaction/*");
 
 		if (interactionPreference.getUseUsername()) {
-			final Constraint constraint = new Constraint();
-			constraint.setName(Constraint.__BASIC_AUTH);
-
-			constraint.setRoles(new String[] { "user", "admin", "moderator" });
-			constraint.setAuthenticate(true);
-
-			final ConstraintMapping cm = new ConstraintMapping();
-			cm.setConstraint(constraint);
-			cm.setPathSpec("/*");
-
-			final SecurityHandler sh = new SecurityHandler();
-			try {
-				final HashUserRealm realm = new HashUserRealm(REALM_NAME);
-				final URI serviceURI = createServiceURI(port);
-				final UsernamePassword up = CredentialManager
-						.getInstance()
-						.getUsernameAndPasswordForService(serviceURI, true,
-								"Please specify the username and password to secure your interactions");
-				if (up != null) {
-					final String username = up.getUsername();
-					realm.put(username, up.getPasswordAsString());
-					realm.addUserToRole(username, "user");
-				}
-				sh.setUserRealm(realm);
-			} catch (final CMException e) {
-				logger.error(e);
-			} catch (final URISyntaxException e) {
-				logger.error(e);
-			}
-			sh.setConstraintMappings(new ConstraintMapping[] { cm });
-			overallContext.addHandler(sh);
-
+			applyAccessCredentials(port, overallContext);
 		}
 
 		getFeedDirectory();
@@ -131,24 +97,55 @@ public class InteractionJetty {
 		try {
 			server.start();
 			while (!server.isRunning()) {
-				Thread.sleep(5000);
+				sleep(5000);
 			}
 		} catch (final Exception e) {
 			logger.error("Unable to start Jetty");
 		}
-//		Thread.currentThread()
-//				.setContextClassLoader(previousContextClassLoader);
+		// Thread.currentThread()
+		// .setContextClassLoader(previousContextClassLoader);
 	}
 
-	public static URI createServiceURI(final String port)
-			throws URISyntaxException {
+	private static void applyAccessCredentials(String port,
+			Context overallContext) {
+		Constraint constraint = new Constraint();
+		constraint.setName(Constraint.__BASIC_AUTH);
+
+		constraint.setRoles(new String[] { "user", "admin", "moderator" });
+		constraint.setAuthenticate(true);
+
+		ConstraintMapping cm = new ConstraintMapping();
+		cm.setConstraint(constraint);
+		cm.setPathSpec("/*");
+
+		SecurityHandler sh = new SecurityHandler();
+		try {
+			HashUserRealm realm = new HashUserRealm(REALM_NAME);
+			UsernamePassword up = CredentialManager
+					.getInstance()
+					.getUsernameAndPasswordForService(createServiceURI(port),
+							true,
+							"Please specify the username and password to secure your interactions");
+			if (up != null) {
+				String username = up.getUsername();
+				realm.put(username, up.getPasswordAsString());
+				realm.addUserToRole(username, "user");
+			}
+			sh.setUserRealm(realm);
+		} catch (CMException | URISyntaxException e) {
+			logger.error(e);
+		}
+		sh.setConstraintMappings(new ConstraintMapping[] { cm });
+		overallContext.addHandler(sh);
+	}
+
+	public static URI createServiceURI(String port) throws URISyntaxException {
 		return new URI("http://localhost:" + port + "/#" + REALM_NAME);
 	}
 
-	public static File getJettySubdirectory(final String subdirectoryName) {
-		final File workingDir = InteractionUtils
-				.getInteractionServiceDirectory();
-		final File subDir = new File(workingDir, "jetty/" + subdirectoryName);
+	public static File getJettySubdirectory(String subdirectoryName) {
+		File subDir = new File(getInteractionServiceDirectory(), "jetty/"
+				+ subdirectoryName);
 		subDir.mkdirs();
 		return subDir;
 	}
@@ -160,22 +157,21 @@ public class InteractionJetty {
 	public static File getInteractionDirectory() {
 		return getJettySubdirectory("interaction");
 	}
-	
+
 	public static synchronized void startListenersIfNecessary() {
 		if (listenersStarted) {
 			return;
 		}
 		for (FeedReader fr : feedReaderRegistry.getInstances()) {
 			if (fr != null) {
-			try {
-				fr.start();
-			}
-			catch (Exception e) {
-				logger.error("Failed to start " + fr.getClass().getCanonicalName(), e);
-			}
+				try {
+					fr.start();
+				} catch (Exception e) {
+					logger.error("Failed to start "
+							+ fr.getClass().getCanonicalName(), e);
+				}
 			}
 		}
 		listenersStarted = true;
 	}
-
 }

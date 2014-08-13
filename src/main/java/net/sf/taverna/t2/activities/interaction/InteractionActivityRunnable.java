@@ -80,7 +80,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		try {
 			copyFixedFile("pmrpc.js");
 			copyFixedFile("interaction.css");
-		} catch (final IOException e1) {
+		} catch (IOException e1) {
 			logger.error(e1);
 			requestor.fail("Unable to copy necessary fixed file");
 			return;
@@ -276,7 +276,7 @@ public final class InteractionActivityRunnable implements Runnable {
 
 	private String processTemplate(Template template, VelocityContext context)
 			throws IOException {
-		final StringWriter resultWriter = new StringWriter();
+		StringWriter resultWriter = new StringWriter();
 		template.merge(context, resultWriter);
 		resultWriter.close();
 		return resultWriter.toString();

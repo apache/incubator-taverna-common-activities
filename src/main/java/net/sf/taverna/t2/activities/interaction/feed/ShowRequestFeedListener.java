@@ -3,7 +3,10 @@
  */
 package net.sf.taverna.t2.activities.interaction.feed;
 
-import java.awt.Desktop;
+import static java.awt.Desktop.getDesktop;
+import static java.lang.Boolean.getBoolean;
+import static org.apache.log4j.Logger.getLogger;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -18,16 +21,13 @@ import org.apache.log4j.Logger;
  * 
  */
 public class ShowRequestFeedListener extends FeedReader {
-	
 	private static ShowRequestFeedListener instance;
+	private static Logger logger = getLogger(ShowRequestFeedListener.class);
+	private final static boolean operational;
+	static {
+		operational = !getBoolean("taverna.interaction.ignore_requests");
+	}
 
-	private static Logger logger = Logger
-			.getLogger(ShowRequestFeedListener.class);
-	
-	private static final String ignore_requests_property = System.getProperty("taverna.interaction.ignore_requests");
-
-	private static boolean operational = (ignore_requests_property == null) || !Boolean.valueOf(ignore_requests_property);
-	
 	public static synchronized ShowRequestFeedListener getInstance() {
 		if ((instance == null) && operational) {
 			instance = new ShowRequestFeedListener();
@@ -38,20 +38,16 @@ public class ShowRequestFeedListener extends FeedReader {
 	private ShowRequestFeedListener() {
 		super("ShowRequestFeedListener");
 	}
-	
-			@Override
-			protected void considerEntry(final Entry entry) {
-				final Link presentationLink = entry.getLink("presentation");
-				if (presentationLink != null) {
-					try {
-						Desktop.getDesktop().browse(
-								presentationLink.getHref().toURI());
-					} catch (final IOException e) {
-						logger.error("Cannot open presentation");
-					} catch (final URISyntaxException e) {
-						logger.error("Cannot open presentation");
-					}
-				}
-			}
 
+	@Override
+	protected void considerEntry(Entry entry) {
+		Link presentationLink = entry.getLink("presentation");
+		if (presentationLink != null) {
+			try {
+				getDesktop().browse(presentationLink.getHref().toURI());
+			} catch (final IOException | URISyntaxException e) {
+				logger.error("Cannot open presentation");
+			}
+		}
+	}
 }
