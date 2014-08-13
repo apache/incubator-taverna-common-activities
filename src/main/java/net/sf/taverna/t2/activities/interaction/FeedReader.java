@@ -1,15 +1,12 @@
 package net.sf.taverna.t2.activities.interaction;
 
+import static net.sf.taverna.t2.activities.interaction.preference.InteractionPreference.getFeedUrl;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 
-import net.sf.taverna.t2.activities.interaction.jetty.InteractionJetty;
-import net.sf.taverna.t2.activities.interaction.preference.InteractionPreference;
-
-import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -37,20 +34,19 @@ public abstract class FeedReader extends Thread {
 			while (true) {
 				try {
 					sleep(5000);
-				} catch (final InterruptedException e1) {
+				} catch (InterruptedException e1) {
 					logger.error(e1);
 				}
-				InputStream openStream = null;
 				try {
 					final Date newLastCheckedDate = new Date();
-					final URL url = InteractionPreference.getFeedUrl();
-					openStream = url.openStream();
-					final Document<Feed> doc = parser.parse(openStream,
-							url.toString());
+					final URL url = getFeedUrl(true);
+					final Document<Feed> doc;
+					try (InputStream openStream = url.openStream()) {
+						doc = parser.parse(openStream, url.toString());
+					}
 					final Feed feed = doc.getRoot().sortEntriesByEdited(true);
 
-					for (final Entry entry : feed.getEntries()) {
-
+					for (Entry entry : feed.getEntries()) {
 						Date d = entry.getEdited();
 						if (d == null) {
 							d = entry.getUpdated();
@@ -58,29 +54,17 @@ public abstract class FeedReader extends Thread {
 						if (d == null) {
 							d = entry.getPublished();
 						}
-						 if (d.before(lastCheckedDate)) {
-						 break;
-						 }
-						this.considerEntry(entry);
+						if (d == null || d.before(lastCheckedDate)) {
+							break;
+						}
+						considerEntry(entry);
 					}
 					lastCheckedDate = newLastCheckedDate;
-				} catch (final MalformedURLException e) {
+				} catch (ParseException | IOException e) {
 					logger.error(e);
-				} catch (final ParseException e) {
-					logger.error(e);
-				} catch (final IOException e) {
-					logger.error(e);
-				} finally {
-					try {
-						if (openStream != null) {
-							openStream.close();
-						}
-					} catch (final IOException e) {
-						logger.error(e);
-					}
 				}
 			}
-		} catch (final Exception e) {
+		} catch (Exception e) {
 			logger.error(e);
 		}
 	}

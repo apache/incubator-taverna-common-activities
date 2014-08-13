@@ -3,6 +3,13 @@
  */
 package net.sf.taverna.t2.activities.interaction;
 
+import static net.sf.taverna.t2.activities.interaction.InteractionRecorder.addResource;
+import static net.sf.taverna.t2.activities.interaction.InteractionRecorder.deleteInteraction;
+import static net.sf.taverna.t2.activities.interaction.atom.AtomUtils.getInReplyToQName;
+import static net.sf.taverna.t2.activities.interaction.atom.AtomUtils.getResultStatusQName;
+import static net.sf.taverna.t2.activities.interaction.atom.AtomUtils.getRunIdQName;
+import static net.sf.taverna.t2.activities.interaction.preference.InteractionPreference.getOutputDataUrlString;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -32,9 +39,10 @@ public final class ResponseFeedListener extends FeedReader {
 
 	private static ResponseFeedListener instance;
 
-	private static final Logger logger = Logger.getLogger(ResponseFeedListener.class);
+	private static final Logger logger = Logger
+			.getLogger(ResponseFeedListener.class);
 
-	private static final Map<String, InteractionRequestor> requestorMap = new HashMap<String, InteractionRequestor>();
+	private static final Map<String, InteractionRequestor> requestorMap = new HashMap<>();
 
 	public static synchronized ResponseFeedListener getInstance() {
 		if (instance == null) {
@@ -46,7 +54,7 @@ public final class ResponseFeedListener extends FeedReader {
 	private ResponseFeedListener() {
 		super("ResponseFeedListener");
 	}
-	
+
 	@Override
 	protected void considerEntry(final Entry entry) {
 		considerInReplyTo(entry);
@@ -61,37 +69,31 @@ public final class ResponseFeedListener extends FeedReader {
 			final String runId = getRunId(entry);
 
 			final String entryUrl = InteractionPreference.getInstance()
-					.getFeedUrlString() + "/" + entry.getId().toASCIIString();
-			InteractionRecorder.addResource(runId, refString, entryUrl);
+					.getFeedUrlString(true)
+					+ "/"
+					+ entry.getId().toASCIIString();
+			addResource(runId, refString, entryUrl);
 
 			if (requestorMap.containsKey(refString)) {
 
 				final InteractionRequestor requestor = requestorMap
 						.get(refString);
 
-				final Element statusElement = entry.getExtension(AtomUtils
-						.getResultStatusQName());
+				final Element statusElement = entry
+						.getExtension(getResultStatusQName());
 				final String statusContent = statusElement.getText().trim();
 				if (!statusContent.equals(STATUS_OK)) {
 					cleanup(refString);
 					requestor.fail(statusContent);
 					return;
 				}
-				final String outputDataUrl = InteractionPreference
-						.getOutputDataUrlString(refString);
+				final String outputDataUrl = getOutputDataUrlString(true,
+						refString);
 				// Note that this may not really exist
-				InteractionRecorder
-						.addResource(runId, refString, outputDataUrl);
+				addResource(runId, refString, outputDataUrl);
 				String content = null;
-				InputStream iStream;
-				try {
-					iStream = new URL(outputDataUrl).openStream();
+				try (InputStream iStream = new URL(outputDataUrl).openStream()) {
 					content = IOUtils.toString(iStream);
-					iStream.close();
-				} catch (final MalformedURLException e1) {
-					logger.error(e1);
-					requestor.fail(DATA_READ_FAILED);
-					return;
 				} catch (final IOException e1) {
 					logger.error(e1);
 					requestor.fail(DATA_READ_FAILED);
@@ -105,16 +107,10 @@ public final class ResponseFeedListener extends FeedReader {
 							content, Map.class);
 					requestor.receiveResult(rootAsMap);
 					cleanup(refString);
-					InteractionRecorder.deleteInteraction(runId, refString);
-
-				} catch (final JsonParseException e) {
-					logger.error(e);
-				} catch (final IOException e) {
-					logger.error(e);
-				} catch (final Exception e) {
+					deleteInteraction(runId, refString);
+				} catch (Exception e) {
 					logger.error(e);
 				}
-
 			}
 		}
 	}
@@ -124,8 +120,7 @@ public final class ResponseFeedListener extends FeedReader {
 	}
 
 	private static String getReplyTo(final Entry entry) {
-		final Element replyTo = entry.getFirstChild(AtomUtils
-				.getInReplyToQName());
+		final Element replyTo = entry.getFirstChild(getInReplyToQName());
 		if (replyTo == null) {
 			return null;
 		}
@@ -133,8 +128,7 @@ public final class ResponseFeedListener extends FeedReader {
 	}
 
 	private static String getRunId(final Entry entry) {
-		final Element runIdElement = entry.getFirstChild(AtomUtils
-				.getRunIdQName());
+		final Element runIdElement = entry.getFirstChild(getRunIdQName());
 		if (runIdElement == null) {
 			return null;
 		}

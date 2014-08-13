@@ -3,6 +3,9 @@
  */
 package net.sf.taverna.t2.activities.interaction;
 
+import static net.sf.taverna.t2.activities.interaction.InteractionRecorder.addResource;
+import static net.sf.taverna.t2.activities.interaction.InteractionUtils.publishedUrls;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -34,33 +37,30 @@ public class InteractionUtils {
 		super();
 	}
 
-	protected static void copyFixedFile(final String fixedFileName)
+	protected static void copyFixedFile(String fixedFileName)
 			throws IOException {
-		final String targetUrl = InteractionPreference.getInstance()
-				.getLocationUrl() + "/" + fixedFileName;
-		InteractionUtils.publishFile(
-				targetUrl,
+		publishFile(
+				InteractionPreference.getInstance().getLocationUrl(true) + "/"
+						+ fixedFileName,
 				InteractionActivity.class.getResourceAsStream("/"
 						+ fixedFileName), null, null);
 	}
 
-	public static void publishFile(final String urlString,
-			final String contents, final String runId,
-			final String interactionId) throws IOException {
-		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
-				contents.getBytes("UTF-8"));
-		InteractionUtils.publishFile(urlString, byteArrayInputStream, runId,
+	public static void publishFile(String urlString, String contents,
+			String runId, String interactionId) throws IOException {
+		publishFile(urlString,
+				new ByteArrayInputStream(contents.getBytes("UTF-8")), runId,
 				interactionId);
 	}
 
-	static void publishFile(final String urlString, final InputStream is,
-			final String runId, final String interactionId) throws IOException {
-		if (InteractionUtils.publishedUrls.contains(urlString)) {
+	static void publishFile(String urlString, InputStream is, String runId,
+			String interactionId) throws IOException {
+		if (publishedUrls.contains(urlString)) {
 			return;
 		}
-		InteractionUtils.publishedUrls.add(urlString);
+		publishedUrls.add(urlString);
 		if (runId != null) {
-			InteractionRecorder.addResource(runId, interactionId, urlString);
+			addResource(runId, interactionId, urlString);
 		}
 
 		final URL url = new URL(urlString);
@@ -68,13 +68,14 @@ public class InteractionUtils {
 				.openConnection();
 		httpCon.setDoOutput(true);
 		httpCon.setRequestMethod("PUT");
-		final OutputStream outputStream = httpCon.getOutputStream();
-		IOUtils.copy(is, outputStream);
-		is.close();
-		outputStream.close();
+		try (final OutputStream outputStream = httpCon.getOutputStream()) {
+			IOUtils.copy(is, outputStream);
+		} finally {
+			is.close();
+		}
 		int code = httpCon.getResponseCode();
-		if ((code >= 400) || (code < 0)){
-			throw new IOException ("Received code " + code);
+		if ((code >= 400) || (code < 0)) {
+			throw new IOException("Received code " + code);
 		}
 	}
 
@@ -88,10 +89,8 @@ public class InteractionUtils {
 	}
 
 	public static File getInteractionServiceDirectory() {
-		final File workingDir = ApplicationRuntime.getInstance()
-				.getApplicationHomeDir();
-		final File interactionServiceDirectory = new File(workingDir,
-				"interactionService");
+		File interactionServiceDirectory = new File(ApplicationRuntime
+				.getInstance().getApplicationHomeDir(), "interactionService");
 		interactionServiceDirectory.mkdirs();
 		return interactionServiceDirectory;
 	}

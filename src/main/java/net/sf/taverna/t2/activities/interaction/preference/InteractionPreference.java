@@ -3,9 +3,10 @@
  */
 package net.sf.taverna.t2.activities.interaction.preference;
 
-import java.awt.GraphicsEnvironment;
+import static java.awt.GraphicsEnvironment.isHeadless;
+import static java.lang.System.getProperty;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -24,31 +25,24 @@ import org.apache.log4j.Logger;
 public class InteractionPreference {
 
 	private static final String USE_JETTY = "useJetty";
-
 	private static final String DEFAULT_USE_JETTY = "true";
 
 	private static final String PORT = "port";
-
 	private static final String DEFAULT_PORT = "8080";
 
 	private static final String HOST = "host";
-
 	private static final String DEFAULT_HOST = "http://localhost";
 
 	private static final String WEBDAV_PATH = "webdavPath";
-
 	private static final String DEFAULT_WEBDAV_PATH = "/interaction";
 
 	private static final String FEED_PATH = "feedPath";
-
 	private static final String DEFAULT_FEED_PATH = "/feed";
 
 	private static final String USE_USERNAME = "Secure with username / password";
-
 	private static final String DEFAULT_USE_USERNAME = "false";
 
 	// private static final String USE_HTTPS = "Use HTTPS";
-
 	// private static final String DEFAULT_USE_HTTPS = "false";
 
 	private final Logger logger = Logger.getLogger(InteractionPreference.class);
@@ -56,6 +50,18 @@ public class InteractionPreference {
 	private static InteractionPreference instance = null;
 
 	private final Properties properties;
+
+	/**
+	 * If not <tt>null</tt>, a replacement in the form "
+	 * <tt>http://foo.example.com:12345</tt>" to use to configure where exactly
+	 * to talk to for access to the WebDAV and Atom feed. Needed for the case
+	 * where an odd network configuration is present, such as inside a Docker
+	 * VM. (See T3-809 for more details.)
+	 * <p>
+	 * Note that this effectively allows overriding of the protocol, host and
+	 * port used, but not the path.
+	 */
+	private String publishAddressOverride;
 
 	public static InteractionPreference getInstance() {
 		if (instance == null) {
@@ -65,81 +71,70 @@ public class InteractionPreference {
 	}
 
 	private File getConfigFile() {
-		final File home = ApplicationRuntime.getInstance()
-				.getApplicationHomeDir();
-		final File config = new File(home, "conf");
+		File config = new File(ApplicationRuntime.getInstance()
+				.getApplicationHomeDir(), "conf");
 		if (!config.exists()) {
 			config.mkdir();
 		}
-		final File configFile = new File(config, this.getFilePrefix() + "-"
-				+ this.getUUID() + ".config");
-		return configFile;
+		return new File(config, getFilePrefix() + "-" + getUUID() + ".config");
 	}
 
 	private InteractionPreference() {
-		final File configFile = this.getConfigFile();
-		this.properties = new Properties();
+		File configFile = getConfigFile();
+		properties = new Properties();
 		if (configFile.exists()) {
-			try {
-				final FileReader reader = new FileReader(configFile);
-				this.properties.load(reader);
-				reader.close();
-			} catch (final FileNotFoundException e) {
-				this.logger.error(e);
-			} catch (final IOException e) {
-				this.logger.error(e);
+			try (FileReader reader = new FileReader(configFile)) {
+				properties.load(reader);
+			} catch (IOException e) {
+				logger.error(e);
 			}
 		}
-		if (GraphicsEnvironment.isHeadless()
-				|| ((System.getProperty("java.awt.headless") != null) && System
-						.getProperty("java.awt.headless").equals("true"))) {
-			final String definedHost = System
-					.getProperty("taverna.interaction.host");
+		if (isHeadless()
+				|| ((getProperty("java.awt.headless") != null) && getProperty("java.awt.headless").equals("true"))) {
+			String definedHost = getProperty("taverna.interaction.host");
+			publishAddressOverride = getProperty("taverna.interaction.publishAddressOverride");
 			if (definedHost != null) {
-				this.properties.setProperty(USE_JETTY, "false");
-				this.logger.info("USE_JETTY set to false");
-				this.properties.setProperty(HOST, definedHost);
+				properties.setProperty(USE_JETTY, "false");
+				logger.info("USE_JETTY set to false");
+				properties.setProperty(HOST, definedHost);
 			}
-			final String definedPort = System
-					.getProperty("taverna.interaction.port");
+			String definedPort = getProperty("taverna.interaction.port");
 			if (definedPort != null) {
-				this.properties.setProperty(PORT, definedPort);
+				properties.setProperty(PORT, definedPort);
 			}
-			final String definedWebDavPath = System
-					.getProperty("taverna.interaction.webdav_path");
+			String definedWebDavPath = getProperty("taverna.interaction.webdav_path");
 			if (definedWebDavPath != null) {
-				this.properties.setProperty(WEBDAV_PATH, definedWebDavPath);
+				properties.setProperty(WEBDAV_PATH, definedWebDavPath);
 			}
-			final String definedFeedPath = System
-					.getProperty("taverna.interaction.feed_path");
+			String definedFeedPath = getProperty("taverna.interaction.feed_path");
 			if (definedFeedPath != null) {
-				this.properties.setProperty(FEED_PATH, definedFeedPath);
+				properties.setProperty(FEED_PATH, definedFeedPath);
 			}
 		} else {
-			this.logger.info("Running non-headless");
+			logger.info("Running non-headless");
 		}
-		this.fillDefaultProperties();
+		fillDefaultProperties();
 	}
 
 	private void fillDefaultProperties() {
-		if (!this.properties.containsKey(USE_JETTY)) {
-			this.properties.setProperty(USE_JETTY, DEFAULT_USE_JETTY);
-			this.logger.info("USE_JETTY set to " + DEFAULT_USE_JETTY);
+		if (!properties.containsKey(USE_JETTY)) {
+			properties.setProperty(USE_JETTY, DEFAULT_USE_JETTY);
+			logger.info("USE_JETTY set to " + DEFAULT_USE_JETTY);
 		}
-		if (!this.properties.containsKey(PORT)) {
-			this.properties.setProperty(PORT, DEFAULT_PORT);
+		if (!properties.containsKey(PORT)) {
+			properties.setProperty(PORT, DEFAULT_PORT);
 		}
-		if (!this.properties.containsKey(HOST)) {
-			this.properties.setProperty(HOST, DEFAULT_HOST);
+		if (!properties.containsKey(HOST)) {
+			properties.setProperty(HOST, DEFAULT_HOST);
 		}
-		if (!this.properties.containsKey(WEBDAV_PATH)) {
-			this.properties.setProperty(WEBDAV_PATH, DEFAULT_WEBDAV_PATH);
+		if (!properties.containsKey(WEBDAV_PATH)) {
+			properties.setProperty(WEBDAV_PATH, DEFAULT_WEBDAV_PATH);
 		}
-		if (!this.properties.containsKey(FEED_PATH)) {
-			this.properties.setProperty(FEED_PATH, DEFAULT_FEED_PATH);
+		if (!properties.containsKey(FEED_PATH)) {
+			properties.setProperty(FEED_PATH, DEFAULT_FEED_PATH);
 		}
-		if (!this.properties.containsKey(USE_USERNAME)) {
-			this.properties.setProperty(USE_USERNAME, DEFAULT_USE_USERNAME);
+		if (!properties.containsKey(USE_USERNAME)) {
+			properties.setProperty(USE_USERNAME, DEFAULT_USE_USERNAME);
 		}
 		/*
 		 * if (!properties.containsKey(USE_HTTPS)) {
@@ -152,15 +147,10 @@ public class InteractionPreference {
 	}
 
 	public void store() {
-		try {
-			final FileOutputStream out = new FileOutputStream(
-					this.getConfigFile());
-			this.properties.store(out, "");
-			out.close();
-		} catch (final FileNotFoundException e) {
-			this.logger.error(e);
-		} catch (final IOException e) {
-			this.logger.error(e);
+		try (FileOutputStream out = new FileOutputStream(getConfigFile())) {
+			properties.store(out, "");
+		} catch (IOException e) {
+			logger.error(e);
 		}
 	}
 
@@ -168,44 +158,44 @@ public class InteractionPreference {
 		return "DA992717-5A46-469D-AE25-883F0E4CD348";
 	}
 
-	public void setPort(final String text) {
-		this.properties.setProperty(PORT, text);
+	public void setPort(String text) {
+		properties.setProperty(PORT, text);
 	}
 
-	public void setHost(final String text) {
-		this.properties.setProperty(HOST, text);
+	public void setHost(String text) {
+		properties.setProperty(HOST, text);
 	}
 
-	public void setUseJetty(final boolean use) {
-		this.properties.setProperty(USE_JETTY, Boolean.toString(use));
+	public void setUseJetty(boolean use) {
+		properties.setProperty(USE_JETTY, Boolean.toString(use));
 	}
 
-	public void setFeedPath(final String path) {
-		this.properties.setProperty(FEED_PATH, path);
+	public void setFeedPath(String path) {
+		properties.setProperty(FEED_PATH, path);
 	}
 
-	public void setWebDavPath(final String path) {
-		this.properties.setProperty(WEBDAV_PATH, path);
+	public void setWebDavPath(String path) {
+		properties.setProperty(WEBDAV_PATH, path);
 	}
 
 	public String getPort() {
-		return this.properties.getProperty(PORT);
+		return properties.getProperty(PORT);
 	}
 
 	public String getHost() {
-		return this.properties.getProperty(HOST);
+		return properties.getProperty(HOST);
 	}
 
 	public boolean getUseJetty() {
-		return (Boolean.parseBoolean(this.properties.getProperty(USE_JETTY)));
+		return Boolean.parseBoolean(properties.getProperty(USE_JETTY));
 	}
 
 	public String getFeedPath() {
-		return this.properties.getProperty(FEED_PATH);
+		return properties.getProperty(FEED_PATH);
 	}
 
 	public String getWebDavPath() {
-		return this.properties.getProperty(WEBDAV_PATH);
+		return properties.getProperty(WEBDAV_PATH);
 	}
 
 	public String getDefaultHost() {
@@ -220,65 +210,55 @@ public class InteractionPreference {
 		return DEFAULT_WEBDAV_PATH;
 	}
 
-	public String getFeedUrlString() {
-		return this.getHost() + ":" + this.getPort() + this.getFeedPath();
+	private String getAuthority(boolean forNetworkActivity) {
+		if (forNetworkActivity && publishAddressOverride != null)
+			return publishAddressOverride;
+		return getHost() + ":" + getPort();
 	}
 
-	public String getLocationUrl() {
-		return this.getHost() + ":" + this.getPort() + this.getWebDavPath();
+	public String getFeedUrlString(boolean forNetworkActivity) {
+		return getAuthority(forNetworkActivity) + getFeedPath();
+	}
+
+	public String getLocationUrl(boolean forNetworkActivity) {
+		return getAuthority(forNetworkActivity) + getWebDavPath();
 	}
 
 	public boolean getUseUsername() {
-		return (Boolean.parseBoolean(this.properties.getProperty(USE_USERNAME)));
+		return Boolean.parseBoolean(properties.getProperty(USE_USERNAME));
 	}
 
-	public void setUseUsername(final boolean useUsername) {
-		this.properties
-				.setProperty(USE_USERNAME, Boolean.toString(useUsername));
+	public void setUseUsername(boolean useUsername) {
+		properties.setProperty(USE_USERNAME, Boolean.toString(useUsername));
 	}
 
-	public static String getOutputDataUrlString(final String interactionId) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public static String getOutputDataUrlString(boolean forNetworkActivity, String interactionId) {
+		return InteractionPreference.getInstance().getLocationUrl(forNetworkActivity)
 				+ "/interaction" + interactionId + "OutputData.json";
 	}
 
-	public static String getInputDataUrlString(final String interactionId) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public static String getInputDataUrlString(boolean forNetworkActivity, String interactionId) {
+		return InteractionPreference.getInstance().getLocationUrl(forNetworkActivity)
 				+ "/interaction" + interactionId + "InputData.json";
 	}
 
-	public static URL getFeedUrl() throws MalformedURLException {
-		return new URL(InteractionPreference.getInstance().getFeedUrlString());
+	public static URL getFeedUrl(boolean forNetworkActivity) throws MalformedURLException {
+		return new URL(InteractionPreference.getInstance().getFeedUrlString(forNetworkActivity));
 	}
 
-	public static String getInteractionUrlString(final String interactionId) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public static String getInteractionUrlString(boolean forNetworkActivity, String interactionId) {
+		return InteractionPreference.getInstance().getLocationUrl(forNetworkActivity)
 				+ "/interaction" + interactionId + ".html";
 	}
 
-	public static String getPresentationUrlString(final String interactionId) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public static String getPresentationUrlString(boolean forNetworkActivity, String interactionId) {
+		return InteractionPreference.getInstance().getLocationUrl(forNetworkActivity)
 				+ "/presentation" + interactionId + ".html";
 	}
 
-	public static String getPublicationUrlString(final String interactionId,
-			final String key) {
-		return InteractionPreference.getInstance().getLocationUrl()
+	public static String getPublicationUrlString(boolean forNetworkActivity, String interactionId,
+			String key) {
+		return InteractionPreference.getInstance().getLocationUrl(forNetworkActivity)
 				+ "/interaction" + interactionId + "_" + key;
 	}
-
-	/*
-	 * public static String getRunFolderUrlString(final String runId) { return
-	 * InteractionPreference.getInstance().getLocationUrl() + "/" + runId; }
-	 */
-
-	/*
-	 * public boolean getUseHttps() { return
-	 * (Boolean.parseBoolean(properties.getProperty(USE_HTTPS))); }
-	 * 
-	 * public void setUseHttps(boolean useHttps) {
-	 * properties.setProperty(USE_HTTPS, Boolean.toString(useHttps));
-	 * 
-	 * }
-	 */
 }
