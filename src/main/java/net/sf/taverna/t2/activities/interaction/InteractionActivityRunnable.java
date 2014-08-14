@@ -4,6 +4,7 @@
 package net.sf.taverna.t2.activities.interaction;
 
 import static java.util.UUID.randomUUID;
+import static net.sf.taverna.t2.activities.interaction.InteractionActivityType.VelocityTemplate;
 import static net.sf.taverna.t2.activities.interaction.InteractionRecorder.addResource;
 import static net.sf.taverna.t2.activities.interaction.InteractionUtils.copyFixedFile;
 import static net.sf.taverna.t2.activities.interaction.InteractionUtils.getUsedRunId;
@@ -110,11 +111,11 @@ public final class InteractionActivityRunnable implements Runnable {
 				}
 			}
 
-			final String inputDataString = createInputDataJson(inputData);
+			String inputDataString = createInputDataJson(inputData);
 			if (inputDataString == null) {
 				return;
 			}
-			final String inputDataUrl = getInputDataUrlString(false, id);
+			String inputDataUrl = getInputDataUrlString(false, id);
 			try {
 				publishFile(getInputDataUrlString(true, id), inputDataString,
 						runId, id);
@@ -129,12 +130,13 @@ public final class InteractionActivityRunnable implements Runnable {
 			if (requestor.getInteractionType() != InteractionType.Notification) {
 				outputDataUrl = getOutputDataUrlString(false, id);
 			}
+			String presentationUrl = getPresentationUrl(id);
 			String interactionUrlString = generateHtml(inputDataUrl,
-					outputDataUrl, inputData, runId, id);
+					outputDataUrl, presentationUrl, inputData, runId, id);
 
 			try {
 				postInteractionMessage(id, interactionNotificationMessage,
-						interactionUrlString, runId);
+						interactionUrlString, presentationUrl, runId);
 			} catch (IOException e) {
 				logger.error(e);
 				requestor.fail("Unable to post message");
@@ -189,8 +191,10 @@ public final class InteractionActivityRunnable implements Runnable {
 	}
 
 	private void postInteractionMessage(String id, Entry entry,
-			String interactionUrlString, String runId) throws IOException {
+			String interactionUrlString, String presentationUrl, String runId)
+			throws IOException {
 		entry.addLink(escapeXml(interactionUrlString), "presentation");
+		entry.addLink(escapeXml(presentationUrl), "taverna-content");
 		entry.setContentAsXhtml("<p><a href=\""
 				+ escapeXml(interactionUrlString) + "\">Open: "
 				+ escapeXml(interactionUrlString) + "</a></p>");
@@ -222,7 +226,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		}
 	}
 
-	private String generateHtml(String inputDataUrl, String outputDataUrl,
+	private String generateHtml(String inputDataUrl, String outputDataUrl, String presentationUrl,
 			Map<String, Object> inputData, String runId, String id) {
 		VelocityContext velocityContext = new VelocityContext();
 
@@ -242,20 +246,12 @@ public final class InteractionActivityRunnable implements Runnable {
 
 		velocityContext.put("interactionUrl", interactionUrl);
 
-		String presentationUrl = "";
 		final String authorizeUrl = "";
 		try {
-			switch (requestor.getPresentationType()) {
-			case VelocityTemplate:
-				presentationUrl = getPresentationUrlString(false, id);
+			if (requestor.getPresentationType() == VelocityTemplate)
 				publishFile(getPresentationUrlString(true, id),
 						processTemplate(presentationTemplate, velocityContext),
 						runId, id);
-				break;
-			case LocallyPresentedHtml:
-				presentationUrl = requestor.getPresentationOrigin();
-				break;
-			}
 
 			velocityContext.put("presentationUrl", presentationUrl);
 
@@ -272,6 +268,16 @@ public final class InteractionActivityRunnable implements Runnable {
 			requestor.fail("Unable to generate HTML");
 			return null;
 		}
+	}
+
+	private String getPresentationUrl(String id) {
+		switch (requestor.getPresentationType()) {
+		case VelocityTemplate:
+			return getPresentationUrlString(false, id);
+		case LocallyPresentedHtml:
+			return requestor.getPresentationOrigin();
+		}
+		throw new java.lang.IllegalStateException("unknown presentation type");
 	}
 
 	private String processTemplate(Template template, VelocityContext context)
