@@ -1,18 +1,19 @@
 package net.sf.taverna.t2.activities.interaction;
 
+import static net.sf.taverna.t2.activities.interaction.InteractionActivityType.LocallyPresentedHtml;
+import static net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker.contactEndpoint;
+
 import java.util.List;
 
 import net.sf.taverna.t2.visit.VisitReport;
 import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
-import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
 
 /**
- * Example health checker
+ * Checks if remote-defined HTML interaction pages are actually available.
  * 
  */
 public class InteractionActivityHealthChecker implements
 		HealthChecker<InteractionActivity> {
-
 	@Override
 	public boolean canVisit(final Object o) {
 		return o instanceof InteractionActivity;
@@ -24,18 +25,14 @@ public class InteractionActivityHealthChecker implements
 	}
 
 	@Override
-	public VisitReport visit(final InteractionActivity activity,
-			final List<Object> ancestry) {
-		final InteractionActivityConfigurationBean config = activity
+	public VisitReport visit(InteractionActivity activity, List<Object> ancestry) {
+		InteractionActivityConfigurationBean config = activity
 				.getConfiguration();
 
-		if (config.getInteractionActivityType().equals(
-				InteractionActivityType.LocallyPresentedHtml)) {
-			return RemoteHealthChecker.contactEndpoint(activity,
-					config.getPresentationOrigin());
+		if (config.getInteractionActivityType().equals(LocallyPresentedHtml)) {
+			return contactEndpoint(activity, config.getPresentationOrigin());
 		}
 
 		return null;
 	}
-
 }

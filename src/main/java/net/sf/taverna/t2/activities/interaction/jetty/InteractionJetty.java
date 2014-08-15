@@ -39,18 +39,14 @@ import org.mortbay.jetty.servlet.ServletHolder;
  * 
  */
 public class InteractionJetty {
-
+	private static final String REALM_NAME = "TavernaInteraction";
 	private static Logger logger = Logger.getLogger(InteractionJetty.class);
 
 	private static Server server;
+	private static boolean listenersStarted = false;
 
 	private static InteractionPreference interactionPreference = InteractionPreference
 			.getInstance();
-
-	private static final String REALM_NAME = "TavernaInteraction";
-
-	private static boolean listenersStarted = false;
-
 	private static SPIRegistry<FeedReader> feedReaderRegistry = new SPIRegistry<>(
 			FeedReader.class);
 
@@ -99,7 +95,7 @@ public class InteractionJetty {
 			while (!server.isRunning()) {
 				sleep(5000);
 			}
-		} catch (final Exception e) {
+		} catch (Exception e) {
 			logger.error("Unable to start Jetty");
 		}
 		// Thread.currentThread()

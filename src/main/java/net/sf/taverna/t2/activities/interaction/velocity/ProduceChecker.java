@@ -13,23 +13,18 @@ import org.apache.velocity.runtime.visitor.BaseVisitor;
  * 
  */
 public class ProduceChecker extends BaseVisitor {
-
 	@Override
-	public Object visit(final ASTDirective node, final Object data) {
+	public Object visit(ASTDirective node, Object data) {
 		@SuppressWarnings("unchecked")
-		final Map<String, Integer> map = ((Map<String, Integer>) data);
+		Map<String, Integer> map = (Map<String, Integer>) data;
 		if (node.getDirectiveName().equals("produce")) {
-			final String key = String.valueOf(node.jjtGetChild(0).value(
-					this.context));
+			String key = String.valueOf(node.jjtGetChild(0).value(context));
 			if (node.jjtGetNumChildren() > 1) {
-				final Integer depth = (Integer) node.jjtGetChild(1).value(
-						this.context);
-				map.put(key, depth);
+				map.put(key, (Integer) node.jjtGetChild(1).value(context));
 			} else {
 				map.put(key, 0);
 			}
 		}
 		return map;
 	}
-
 }

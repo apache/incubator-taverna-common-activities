@@ -3,6 +3,7 @@
  */
 package net.sf.taverna.t2.activities.interaction;
 
+import static java.lang.System.getProperty;
 import static net.sf.taverna.t2.activities.interaction.InteractionRecorder.addResource;
 
 import java.io.ByteArrayInputStream;
@@ -28,9 +29,9 @@ import org.codehaus.jackson.map.ObjectMapper;
  * 
  */
 public class InteractionUtils {
-
 	static final Set<String> publishedUrls = Collections
 			.synchronizedSet(new HashSet<String>());
+	private static volatile InteractionPreference prefs;
 
 	private InteractionUtils() {
 		super();
@@ -38,9 +39,10 @@ public class InteractionUtils {
 
 	protected static void copyFixedFile(String fixedFileName)
 			throws IOException {
+		if (prefs == null)
+			prefs = InteractionPreference.getInstance();
 		publishFile(
-				InteractionPreference.getInstance().getLocationUrl(true) + "/"
-						+ fixedFileName,
+				prefs.getLocationUrl(true) + "/" + fixedFileName,
 				InteractionActivity.class.getResourceAsStream("/"
 						+ fixedFileName), null, null);
 	}
@@ -62,12 +64,11 @@ public class InteractionUtils {
 			addResource(runId, interactionId, urlString);
 		}
 
-		final URL url = new URL(urlString);
-		final HttpURLConnection httpCon = (HttpURLConnection) url
+		HttpURLConnection httpCon = (HttpURLConnection) new URL(urlString)
 				.openConnection();
 		httpCon.setDoOutput(true);
 		httpCon.setRequestMethod("PUT");
-		try (final OutputStream outputStream = httpCon.getOutputStream()) {
+		try (OutputStream outputStream = httpCon.getOutputStream()) {
 			IOUtils.copy(is, outputStream);
 		} finally {
 			is.close();
@@ -78,9 +79,9 @@ public class InteractionUtils {
 		}
 	}
 
-	public static String getUsedRunId(final String engineRunId) {
+	public static String getUsedRunId(String engineRunId) {
 		String runId = engineRunId;
-		final String specifiedId = System.getProperty("taverna.runid");
+		String specifiedId = getProperty("taverna.runid");
 		if (specifiedId != null) {
 			runId = specifiedId;
 		}
@@ -94,11 +95,11 @@ public class InteractionUtils {
 		return interactionServiceDirectory;
 	}
 
-	public static String objectToJson(final Object o) throws IOException {
-		final ObjectMapper mapper = new ObjectMapper();
-		final StringWriter sw = new StringWriter();
+	private static final ObjectMapper mapper = new ObjectMapper();
+
+	public static String objectToJson(Object o) throws IOException {
+		StringWriter sw = new StringWriter();
 		mapper.writeValue(sw, o);
-		final String theString = sw.toString();
-		return theString;
+		return sw.toString();
 	}
 }

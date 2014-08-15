@@ -41,13 +41,12 @@ public class ShowRequestFeedListener extends FeedReader {
 
 	@Override
 	protected void considerEntry(Entry entry) {
-		Link presentationLink = entry.getLink("presentation");
-		if (presentationLink != null) {
-			try {
+		try {
+			Link presentationLink = entry.getLink("presentation");
+			if (presentationLink != null)
 				getDesktop().browse(presentationLink.getHref().toURI());
-			} catch (final IOException | URISyntaxException e) {
-				logger.error("Cannot open presentation");
-			}
+		} catch (IOException | URISyntaxException e) {
+			logger.error("Cannot open presentation");
 		}
 	}
 }

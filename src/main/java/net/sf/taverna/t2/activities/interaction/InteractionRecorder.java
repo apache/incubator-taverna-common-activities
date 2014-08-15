@@ -106,7 +106,7 @@ public class InteractionRecorder {
 	}
 
 	public static void persist() {
-		final File outputFile = getUsageFile();
+		File outputFile = getUsageFile();
 		try {
 			writeStringToFile(outputFile, objectToJson(runToInteractionMap));
 		} catch (final IOException e) {
@@ -119,23 +119,18 @@ public class InteractionRecorder {
 	}
 
 	public static void load() {
-		final File inputFile = getUsageFile();
+		File inputFile = getUsageFile();
 		try {
 			String usageString = readFileToString(inputFile);
 			ObjectMapper mapper = new ObjectMapper();
 			@SuppressWarnings("unchecked")
-			Map<String, Object> rootAsMap = mapper.readValue(usageString,
-					Map.class);
+			Map<String, Map<String, List<String>>> rootAsMap = mapper
+					.readValue(usageString, Map.class);
 			runToInteractionMap.clear();
 			for (String runId : rootAsMap.keySet()) {
-				@SuppressWarnings("unchecked")
-				Map<String, Object> runMap = (Map<String, Object>) rootAsMap
-						.get(runId);
+				Map<String, List<String>> runMap = rootAsMap.get(runId);
 				for (String interactionId : runMap.keySet()) {
-					@SuppressWarnings("unchecked")
-					List<String> urlList = (List<String>) runMap
-							.get(interactionId);
-					for (String url : urlList) {
+					for (String url : runMap.get(interactionId)) {
 						addResource(runId, interactionId, url);
 					}
 				}

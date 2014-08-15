@@ -29,21 +29,22 @@ import org.codehaus.jackson.map.ObjectMapper;
  * 
  */
 public final class ResponseFeedListener extends FeedReader {
-
 	private static final String STATUS_OK = "OK";
-
 	private static final String DATA_READ_FAILED = "Data read failed";
 
 	private static ResponseFeedListener instance;
+	private static InteractionPreference prefs;
 
 	private static final Logger logger = Logger
 			.getLogger(ResponseFeedListener.class);
 
 	private static final Map<String, InteractionRequestor> requestorMap = new HashMap<>();
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	public static synchronized ResponseFeedListener getInstance() {
 		if (instance == null) {
 			instance = new ResponseFeedListener();
+			prefs = InteractionPreference.getInstance();
 		}
 		return instance;
 	}
@@ -52,64 +53,64 @@ public final class ResponseFeedListener extends FeedReader {
 		super("ResponseFeedListener");
 	}
 
-	@Override
-	protected void considerEntry(final Entry entry) {
-		considerInReplyTo(entry);
-	}
+	private InteractionRequestor getRequestor(String runId, String refString,
+			Entry entry) {
+		String entryUrl = prefs.getFeedUrlString(true) + "/"
+				+ entry.getId().toASCIIString();
+		addResource(runId, refString, entryUrl);
 
-	static void considerInReplyTo(final Entry entry) {
 		synchronized (requestorMap) {
-			String refString = getReplyTo(entry);
-			if (refString == null) {
-				return;
-			}
-			String runId = getRunId(entry);
-
-			String entryUrl = InteractionPreference.getInstance()
-					.getFeedUrlString(true)
-					+ "/"
-					+ entry.getId().toASCIIString();
-			addResource(runId, refString, entryUrl);
-
-			if (requestorMap.containsKey(refString)) {
-				InteractionRequestor requestor = requestorMap.get(refString);
-
-				Element statusElement = entry
-						.getExtension(getResultStatusQName());
-				String statusContent = statusElement.getText().trim();
-				if (!statusContent.equals(STATUS_OK)) {
-					cleanup(refString);
-					requestor.fail(statusContent);
-					return;
-				}
-				String outputDataUrl = getOutputDataUrlString(true, refString);
-				// Note that this may not really exist
-				addResource(runId, refString, outputDataUrl);
-				String content = null;
-				try (InputStream iStream = new URL(outputDataUrl).openStream()) {
-					content = IOUtils.toString(iStream);
-				} catch (final IOException e1) {
-					logger.error(e1);
-					requestor.fail(DATA_READ_FAILED);
-					return;
-				}
-
-				try {
-					ObjectMapper mapper = new ObjectMapper();
-					@SuppressWarnings("unchecked")
-					Map<String, Object> rootAsMap = mapper.readValue(content,
-							Map.class);
-					requestor.receiveResult(rootAsMap);
-					cleanup(refString);
-					deleteInteraction(runId, refString);
-				} catch (Exception e) {
-					logger.error(e);
-				}
-			}
+			return requestorMap.get(refString);
 		}
 	}
 
-	private static void cleanup(final String refString) {
+	@Override
+	protected void considerEntry(Entry entry) {
+		String runId = getRunId(entry);
+		String refString = getReplyTo(entry);
+		if (refString == null) {
+			return;
+		}
+		InteractionRequestor requestor = getRequestor(runId, refString, entry);
+		if (requestor == null)
+			return;
+
+		Element statusElement = entry.getExtension(getResultStatusQName());
+		String statusContent = statusElement.getText().trim();
+		if (!statusContent.equals(STATUS_OK)) {
+			cleanup(refString);
+			requestor.fail(statusContent);
+			return;
+		}
+		String outputDataUrl = getOutputDataUrlString(true, refString);
+		// Note that this may not really exist
+		addResource(runId, refString, outputDataUrl);
+		String content = null;
+		try (InputStream iStream = new URL(outputDataUrl).openStream()) {
+			content = IOUtils.toString(iStream);
+		} catch (IOException e) {
+			logger.error(e);
+			requestor.fail(DATA_READ_FAILED);
+			return;
+		}
+
+		try {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> rootAsMap = mapper
+					.readValue(content, Map.class);
+			requestor.receiveResult(rootAsMap);
+			cleanup(refString);
+			deleteInteraction(runId, refString);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+	}
+
+	static void considerInReplyTo(Entry entry) {
+		getInstance().considerEntry(entry);
+	}
+
+	private static void cleanup(String refString) {
 		requestorMap.remove(refString);
 	}
 

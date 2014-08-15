@@ -3,6 +3,9 @@
  */
 package net.sf.taverna.t2.activities.interaction;
 
+import static net.sf.taverna.t2.activities.interaction.InteractionType.DataRequest;
+import static net.sf.taverna.t2.activities.interaction.InteractionType.Notification;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,9 +31,9 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 
 	private static Map<String, Integer> invocationCount = new HashMap<>();
 
-	public InteractionCallbackRequestor(final InteractionActivity activity,
-			final AsynchronousActivityCallback callback,
-			final Map<String, T2Reference> inputs) {
+	public InteractionCallbackRequestor(InteractionActivity activity,
+			AsynchronousActivityCallback callback,
+			Map<String, T2Reference> inputs) {
 		this.activity = activity;
 		this.callback = callback;
 		this.inputs = inputs;
@@ -98,9 +101,9 @@ public class InteractionCallbackRequestor implements InteractionRequestor {
 	@Override
 	public InteractionType getInteractionType() {
 		if (activity.getConfiguration().isProgressNotification()) {
-			return InteractionType.Notification;
+			return Notification;
 		}
-		return InteractionType.DataRequest;
+		return DataRequest;
 	}
 
 	@Override

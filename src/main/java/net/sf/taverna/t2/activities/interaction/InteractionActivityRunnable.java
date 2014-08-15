@@ -3,9 +3,11 @@
  */
 package net.sf.taverna.t2.activities.interaction;
 
+import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.util.UUID.randomUUID;
 import static net.sf.taverna.t2.activities.interaction.InteractionActivityType.VelocityTemplate;
 import static net.sf.taverna.t2.activities.interaction.InteractionRecorder.addResource;
+import static net.sf.taverna.t2.activities.interaction.InteractionType.Notification;
 import static net.sf.taverna.t2.activities.interaction.InteractionUtils.copyFixedFile;
 import static net.sf.taverna.t2.activities.interaction.InteractionUtils.getUsedRunId;
 import static net.sf.taverna.t2.activities.interaction.InteractionUtils.objectToJson;
@@ -33,6 +35,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
@@ -48,6 +51,8 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
 public final class InteractionActivityRunnable implements Runnable {
+	private static final String ATOM_ENTRY = "application/atom+xml;type=entry;charset=UTF-8";
+
 	private static final Logger logger = Logger
 			.getLogger(InteractionActivityRunnable.class);
 
@@ -73,6 +78,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		String id = sanitize(randomUUID().toString(), "", true,
 				Normalizer.Form.D);
 		Map<String, Object> inputData = requestor.getInputData();
+		ResponseFeedListener feedListener = ResponseFeedListener.getInstance();
 
 		if (prefs.getUseJetty()) {
 			startJettyIfNecessary();
@@ -81,8 +87,8 @@ public final class InteractionActivityRunnable implements Runnable {
 		try {
 			copyFixedFile("pmrpc.js");
 			copyFixedFile("interaction.css");
-		} catch (IOException e1) {
-			logger.error(e1);
+		} catch (IOException e) {
+			logger.error("problem posting interaction", e);
 			requestor.fail("Unable to copy necessary fixed file");
 			return;
 		}
@@ -90,23 +96,22 @@ public final class InteractionActivityRunnable implements Runnable {
 			Entry interactionNotificationMessage = createBasicInteractionMessage(
 					id, runId);
 
-			for (String key : inputData.keySet()) {
+			for (String key : new ArrayList<>(inputData.keySet())) {
 				Object value = inputData.get(key);
 				if (!(value instanceof byte[])) {
 					continue;
 				}
-				String realReplacementUrl = getPublicationUrlString(true, id,
-						key);
+				String realUrl = getPublicationUrlString(true, id, key);
 				ByteArrayInputStream bais = new ByteArrayInputStream(
 						(byte[]) value);
 				try {
-					publishFile(realReplacementUrl, bais, runId, id);
+					publishFile(realUrl, bais, runId, id);
 					bais.close();
 					inputData.put(key, getPublicationUrlString(false, id, key));
-				} catch (final IOException e) {
-					logger.error(e);
+				} catch (IOException e) {
+					logger.error("problem posting interaction", e);
 					requestor
-							.fail("Unable to publish to " + realReplacementUrl);
+							.fail("Unable to publish to " + realUrl);
 					return;
 				}
 			}
@@ -119,34 +124,34 @@ public final class InteractionActivityRunnable implements Runnable {
 			try {
 				publishFile(getInputDataUrlString(true, id), inputDataString,
 						runId, id);
-			} catch (final IOException e) {
-				logger.error(e);
+			} catch (Exception e) {
+				logger.error("problem posting interaction", e);
 				requestor.fail("Unable to publish to " + inputDataUrl);
 				return;
 			}
 
 			String outputDataUrl = null;
 
-			if (requestor.getInteractionType() != InteractionType.Notification) {
+			if (requestor.getInteractionType() != Notification) {
 				outputDataUrl = getOutputDataUrlString(false, id);
 			}
 			String presentationUrl = getPresentationUrl(id);
-			String interactionUrlString = generateHtml(inputDataUrl,
-					outputDataUrl, presentationUrl, inputData, runId, id);
 
 			try {
+				String interactionUrlString = generateHtml(inputDataUrl,
+						outputDataUrl, presentationUrl, inputData, runId, id);
 				postInteractionMessage(id, interactionNotificationMessage,
 						interactionUrlString, presentationUrl, runId);
-			} catch (IOException e) {
-				logger.error(e);
+			} catch (Exception e) {
+				logger.error("problem posting interaction", e);
 				requestor.fail("Unable to post message");
 				return;
 			}
-			if (requestor.getInteractionType() != InteractionType.Notification) {
-				ResponseFeedListener.getInstance().registerInteraction(
-						interactionNotificationMessage, requestor);
-			} else {
+			if (requestor.getInteractionType() == Notification) {
 				requestor.carryOn();
+			} else {
+				feedListener.registerInteraction(
+						interactionNotificationMessage, requestor);
 			}
 		}
 	}
@@ -154,7 +159,7 @@ public final class InteractionActivityRunnable implements Runnable {
 	private String createInputDataJson(Map<String, Object> inputData) {
 		try {
 			return objectToJson(inputData);
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			logger.error(e);
 			requestor.fail("Unable to generate JSON");
 			return null;
@@ -182,7 +187,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		interactionNotificationMessage.addExtension(getCountQName()).setText(
 				escapeJavaScript(requestor.getInvocationCount().toString()));
 
-		if (requestor.getInteractionType() == InteractionType.Notification) {
+		if (requestor.getInteractionType() == Notification) {
 			interactionNotificationMessage.addExtension(getProgressQName());
 		}
 		interactionNotificationMessage.addExtension(getIdQName()).setText(id);
@@ -205,8 +210,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		final HttpURLConnection httpCon = (HttpURLConnection) feedUrl
 				.openConnection();
 		httpCon.setDoOutput(true);
-		httpCon.setRequestProperty("Content-Type",
-				"application/atom+xml;type=entry;charset=UTF-8");
+		httpCon.setRequestProperty("Content-Type", ATOM_ENTRY);
 		httpCon.setRequestProperty("Content-Length", "" + entryContent.length());
 		httpCon.setRequestProperty("Slug", id);
 		httpCon.setRequestMethod("POST");
@@ -221,13 +225,14 @@ public final class InteractionActivityRunnable implements Runnable {
 			logger.error("Received response code" + response);
 			throw new IOException("Received response code " + response);
 		}
-		if (response == HttpURLConnection.HTTP_CREATED) {
+		if (response == HTTP_CREATED) {
 			addResource(runId, id, httpCon.getHeaderField("Location"));
 		}
 	}
 
-	private String generateHtml(String inputDataUrl, String outputDataUrl, String presentationUrl,
-			Map<String, Object> inputData, String runId, String id) {
+	private String generateHtml(String inputDataUrl, String outputDataUrl,
+			String presentationUrl, Map<String, Object> inputData,
+			String runId, String id) throws IOException {
 		VelocityContext velocityContext = new VelocityContext();
 
 		for (String inputName : inputData.keySet()) {
@@ -246,28 +251,18 @@ public final class InteractionActivityRunnable implements Runnable {
 
 		velocityContext.put("interactionUrl", interactionUrl);
 
-		final String authorizeUrl = "";
-		try {
-			if (requestor.getPresentationType() == VelocityTemplate)
-				publishFile(getPresentationUrlString(true, id),
-						processTemplate(presentationTemplate, velocityContext),
-						runId, id);
-
-			velocityContext.put("presentationUrl", presentationUrl);
-
-			publishFile(realInteractionUrl,
-					processTemplate(getInteractionTemplate(), velocityContext),
+		if (requestor.getPresentationType() == VelocityTemplate)
+			publishFile(getPresentationUrlString(true, id),
+					processTemplate(presentationTemplate, velocityContext),
 					runId, id);
 
-			if (!authorizeUrl.isEmpty()) {
-				return authorizeUrl;
-			}
-			return interactionUrl;
-		} catch (final IOException e) {
-			logger.error(e);
-			requestor.fail("Unable to generate HTML");
-			return null;
-		}
+		velocityContext.put("presentationUrl", presentationUrl);
+
+		publishFile(realInteractionUrl,
+				processTemplate(getInteractionTemplate(), velocityContext),
+				runId, id);
+
+		return interactionUrl;
 	}
 
 	private String getPresentationUrl(String id) {
@@ -277,7 +272,7 @@ public final class InteractionActivityRunnable implements Runnable {
 		case LocallyPresentedHtml:
 			return requestor.getPresentationOrigin();
 		}
-		throw new java.lang.IllegalStateException("unknown presentation type");
+		throw new IllegalStateException("unknown presentation type");
 	}
 
 	private String processTemplate(Template template, VelocityContext context)
