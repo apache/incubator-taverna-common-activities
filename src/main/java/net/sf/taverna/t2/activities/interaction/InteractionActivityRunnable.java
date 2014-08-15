@@ -242,8 +242,8 @@ public final class InteractionActivityRunnable implements Runnable {
 		velocityContext.put("feed", prefs.getFeedUrlString(false));
 		velocityContext.put("runId", runId);
 		velocityContext.put("entryId", id);
-		velocityContext.put("pmrpcUrl", prefs.getLocationUrl(false)
-				+ "/pmrpc.js");
+		velocityContext.put("baseUrl", prefs.getLocationUrl(false) + "/");
+		velocityContext.put("pmrpcUrl", "pmrpc.js");
 		velocityContext.put("inputDataUrl", inputDataUrl);
 		velocityContext.put("outputDataUrl", outputDataUrl);
 		String interactionUrl = getInteractionUrlString(false, id);
