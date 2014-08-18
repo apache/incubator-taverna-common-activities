@@ -4,6 +4,7 @@
 package net.sf.taverna.t2.activities.interaction.preference;
 
 import static java.awt.GraphicsEnvironment.isHeadless;
+import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 
 import java.io.File;
@@ -89,8 +90,7 @@ public class InteractionPreference {
 				logger.error(e);
 			}
 		}
-		if (isHeadless()
-				|| ((getProperty("java.awt.headless") != null) && getProperty("java.awt.headless").equals("true"))) {
+		if (isHeadless() || getBoolean("java.awt.headless")) {
 			String definedHost = getProperty("taverna.interaction.host");
 			publishAddressOverride = getProperty("taverna.interaction.publishAddressOverride");
 			if (definedHost != null) {
