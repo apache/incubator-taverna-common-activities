@@ -24,7 +24,7 @@ public class XPathActivityHealthCheck extends VisitKind {
 	public static final int MISSING_NAMESPACE_MAPPINGS = 25;
 
 	@Override
-	public Class<? extends Visitor> getVisitorClass() {
+	public Class<? extends Visitor<?>> getVisitorClass() {
 		return XPathActivityHealthChecker.class;
 	}
 
