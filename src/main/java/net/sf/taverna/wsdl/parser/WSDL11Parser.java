@@ -233,6 +233,7 @@ public class WSDL11Parser implements GenericWSDLParser {
     }
     
     @Deprecated
+    @Override
     public String getOperationEndpointLocation(String operationName) throws UnknownOperationException {
         return getSoapAddress(findPort(operationName));
     }
@@ -262,6 +263,7 @@ public class WSDL11Parser implements GenericWSDLParser {
      * 
      * @throws UnknownOperationException 
      */
+    @Override
     public QName getRPCRequestMethodName(String portName, String operationName) throws UnknownOperationException {
         if (portName == null) {
             portName = findPort(operationName);
@@ -299,6 +301,7 @@ public class WSDL11Parser implements GenericWSDLParser {
      * 
      * @throws UnknownOperationException 
      */
+    @Override
     public QName getRPCResponseMethodName(String portName, String operationName) throws UnknownOperationException {
         if (portName == null) {
             portName = findPort(operationName);
@@ -379,6 +382,7 @@ public class WSDL11Parser implements GenericWSDLParser {
         return getOutputParameters(null, operationName);
     }
     
+    @Override
     public LinkedHashMap<String, XmlSchemaObject> getOutputParameters(String portName, String operationName) throws UnknownOperationException {
         if (portName == null) {
             portName = findPort(operationName);

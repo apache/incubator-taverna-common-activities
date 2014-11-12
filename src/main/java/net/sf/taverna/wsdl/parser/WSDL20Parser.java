@@ -41,22 +41,27 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.woden.WSDLFactory;
+import org.apache.woden.WSDLReader;
+import org.apache.woden.XMLElement;
+import org.apache.woden.types.NCName;
+import org.apache.woden.wsdl20.Binding;
+import org.apache.woden.wsdl20.BindingOperation;
+import org.apache.woden.wsdl20.Description;
+import org.apache.woden.wsdl20.ElementDeclaration;
+import org.apache.woden.wsdl20.Endpoint;
+import org.apache.woden.wsdl20.Interface;
+import org.apache.woden.wsdl20.InterfaceMessageReference;
+import org.apache.woden.wsdl20.InterfaceOperation;
+import org.apache.woden.wsdl20.Service;
+import org.apache.woden.wsdl20.enumeration.Direction;
+import org.apache.woden.wsdl20.extensions.ExtensionProperty;
+import org.apache.woden.wsdl20.extensions.soap.SOAPConstants;
+import org.apache.woden.wsdl20.xml.DescriptionElement;
+import org.apache.woden.wsdl20.xml.DocumentationElement;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.inb.bsc.wsdl20.Binding;
-import org.inb.bsc.wsdl20.BindingOperation;
-import org.inb.bsc.wsdl20.Description;
-import org.inb.bsc.wsdl20.ElementDeclaration;
-import org.inb.bsc.wsdl20.Endpoint;
-import org.inb.bsc.wsdl20.Interface;
-import org.inb.bsc.wsdl20.InterfaceMessageReference;
-import org.inb.bsc.wsdl20.InterfaceOperation;
-import org.inb.bsc.wsdl20.Service;
-import static org.inb.bsc.wsdl20.extensions.soap.SOAPBindingOperationExtensions.SOAP_ACTION_ATTR;
-import org.inb.bsc.wsdl20.factory.WSDL2Factory;
-import org.inb.bsc.wsdl20.xml.WSDL2Reader;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
 /**
  * @author Dmitry Repchevsky
@@ -76,14 +81,15 @@ public class WSDL20Parser implements GenericWSDLParser {
 
     @Override
     public String getDocumentBaseURI() {
-        URI documentBaseURI = description.getDocumentBaseURI();
+        DescriptionElement element = description.toElement();
+        URI documentBaseURI = element.getDocumentBaseURI();
         return documentBaseURI == null ? null : documentBaseURI.toString();
     }
 
     @Override
     public List<QName> getServices() {
         List<QName> services = new ArrayList<QName>();
-        for (Service service : description.getAllServices()) {
+        for (Service service : description.getServices()) {
             services.add(service.getName());
         }
         return services;
@@ -91,20 +97,37 @@ public class WSDL20Parser implements GenericWSDLParser {
 
     @Override
     public List<String> getPorts(QName serviceName) {
-        List<String> interfaces = new ArrayList<String>();
-        for (Interface _interface : description.getAllInterfaces()) {
-            interfaces.add(_interface.getName().getLocalPart());
+        List<String> ports = new ArrayList<String>();
+        
+        Service service = description.getService(serviceName);
+        if (service != null) {
+            for (Endpoint endpoint : service.getEndpoints()) {
+                final NCName endpointName = endpoint.getName();
+                if (endpointName != null) {
+                    ports.add(endpointName.toString());
+                }
+            }
         }
-        return interfaces;
+        return ports;
     }
 
     @Override
     public List<String> getOperations(String portName) {
         List<String> operations = new ArrayList<String>();
-        for (Interface _interface : description.getAllInterfaces()) {
-            if (portName.equals(_interface.getName().getLocalPart())) {
-                for (InterfaceOperation operation : _interface.getAllInterfaceOperations()) {
-                    operations.add(operation.getName().getLocalPart());
+        
+        for (Service service : description.getServices()) {
+            for (Endpoint endpoint : service.getEndpoints()) {
+                final NCName endpointName = endpoint.getName();
+                if (endpointName != null && endpointName.toString().equals(portName)) {
+                    Binding binding = endpoint.getBinding();
+                    if (binding != null) {
+                        for (BindingOperation bindingOperation : binding.getBindingOperations()) {
+                            InterfaceOperation interfaceOperation = bindingOperation.getInterfaceOperation();
+                            if (interfaceOperation != null) {
+                                operations.add(interfaceOperation.getName().getLocalPart());
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -123,27 +146,17 @@ public class WSDL20Parser implements GenericWSDLParser {
 
     @Override
     public String getSOAPActionURI(String portName, String operationName) throws UnknownOperationException {
-        for (Binding binding : description.getAllBindings()) {
-            if (portName != null) {
-                Interface _interface = binding.getInterface();
-                if (_interface == null || !portName.equals(_interface.getName().getLocalPart())) {
-                    continue;
-                }
-            }    
-        
-            for (BindingOperation o : binding.getBindingOperations()) {
-                InterfaceOperation operation = o.getInterfaceOperation();
-                if (operation != null && operationName.equals(operation.getName().getLocalPart())) {
-                    return operation.getExtensionAttribute(SOAP_ACTION_ATTR);
-                }
-            }
-        }
-        return null;
+        BindingOperation bindingOperation = getBindingOperation(portName, operationName);
+        InterfaceOperation interfaceOperation = bindingOperation.getInterfaceOperation();
+
+        ExtensionProperty property = interfaceOperation.getExtensionProperty(SOAPConstants.NS_URI_SOAP, SOAPConstants.ATTR_ACTION);
+        return property == null ? null : property.getContent().toString();
     }
 
     @Override
     public QName getRPCRequestMethodName(String portName, String operationName) throws UnknownOperationException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // NO RPC SUPPORT YET
+        return new QName(operationName);
     }
 
     @Override
@@ -164,15 +177,12 @@ public class WSDL20Parser implements GenericWSDLParser {
 
     @Override
     public String getSoapAddress(String portName) {
-        for (Service service : description.getAllServices()) {
+        for (Service service : description.getServices()) {
             for (Endpoint endpoint : service.getEndpoints()) {
-                Binding binding = endpoint.getBinding();
-                if (binding != null) {
-                    Interface _interface = binding.getInterface();
-                    if (_interface != null && portName.equals(_interface.getName().getLocalPart())) {
-                        URI address = endpoint.getAddress();
-                        return address == null ? null : address.toString();
-                    }
+                final NCName endpointName = endpoint.getName();
+                if (endpointName != null && endpointName.toString().equals(portName)) {
+                    URI address = endpoint.getAddress();
+                    return address == null ? null : address.toString();
                 }
             }    
         }
@@ -181,7 +191,7 @@ public class WSDL20Parser implements GenericWSDLParser {
 
     @Override
     public String getOperationEndpointLocation(String operationName) throws UnknownOperationException {
-        for (Service service : description.getAllServices()) {
+        for (Service service : description.getServices()) {
             for (Endpoint endpoint : service.getEndpoints()) {
                 Binding binding = endpoint.getBinding();
                 if (binding != null) {
@@ -201,23 +211,25 @@ public class WSDL20Parser implements GenericWSDLParser {
     @Override
     public String getOperationDocumentation(String portName, String operationName) throws UnknownOperationException {
         Writer writer = new StringWriter();
-        for (Interface _interface : description.getAllInterfaces()) {
-            if (portName == null || portName.equals(_interface.getName().getLocalPart())) {
-                for (InterfaceOperation operation : _interface.getAllInterfaceOperations()) {
-                    if (operationName.equals(operation.getName().getLocalPart())) {
-                        try {
-                            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-                            for (Element element : operation.getDocumentationElements()) {
-                                try {
-                                    transformer.transform(new DOMSource(element), new StreamResult(writer));
-                                } catch (TransformerException ex) {}
-                            }
-                        } catch (TransformerFactoryConfigurationError ex) {}
-                        catch (TransformerConfigurationException ex) {}
-                    }
+        
+        BindingOperation bindingOperation = getBindingOperation(portName, operationName);
+        InterfaceOperation interfaceOperation = bindingOperation.getInterfaceOperation();
+
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            for (DocumentationElement documentation : interfaceOperation.toElement().getDocumentationElements()) {
+                XMLElement xml = documentation.getContent();
+                Object source = xml.getSource();
+                if (source instanceof Element) {
+                    Element element = (Element)source;
+                    try {
+                        transformer.transform(new DOMSource(element), new StreamResult(writer));
+                    } catch (TransformerException ex) {}
                 }
             }
-        }
+        } catch (TransformerFactoryConfigurationError ex) {}
+          catch (TransformerConfigurationException ex) {}
+        
         return writer.toString();
     }
 
@@ -225,18 +237,14 @@ public class WSDL20Parser implements GenericWSDLParser {
     public LinkedHashMap<String, XmlSchemaObject> getInputParameters(String portName, String operationName) throws UnknownOperationException {
         LinkedHashMap<String, XmlSchemaObject> parameters = new LinkedHashMap<String, XmlSchemaObject>();
 
+        BindingOperation bindingOperation = getBindingOperation(portName, operationName);
+        InterfaceOperation interfaceOperation = bindingOperation.getInterfaceOperation();
+        
         // NOTE THAT THIS CODE IS NOT VALID FOR "RPC" STYLE
-        for (Interface _interface : description.getAllInterfaces()) {
-            if (portName == null || portName.equals(_interface.getName().getLocalPart())) {
-                for (InterfaceOperation operation : _interface.getAllInterfaceOperations()) {
-                    if (operationName.equals(operation.getName().getLocalPart())) {
-                        for (InterfaceMessageReference input : operation.getInputs()) {
-                            ElementDeclaration element = input.getElementDeclaration();
-                            parameters.put(element.getName().getLocalPart(), (XmlSchemaObject)element.getContent());
-                        }
-                        return parameters;
-                    }
-                }
+        for (InterfaceMessageReference input : interfaceOperation.getInterfaceMessageReferences()) {
+            if (Direction.IN == input.getDirection()) {
+                ElementDeclaration element = input.getElementDeclaration();
+                parameters.put(element.getName().getLocalPart(), (XmlSchemaObject)element.getContent());
             }
         }
         return parameters;
@@ -246,21 +254,55 @@ public class WSDL20Parser implements GenericWSDLParser {
     public LinkedHashMap<String, XmlSchemaObject> getOutputParameters(String portName, String operationName) throws UnknownOperationException {
         LinkedHashMap<String, XmlSchemaObject> parameters = new LinkedHashMap<String, XmlSchemaObject>();
         
+        BindingOperation bindingOperation = getBindingOperation(portName, operationName);
+        InterfaceOperation interfaceOperation = bindingOperation.getInterfaceOperation();
+        
         // NOTE THAT THIS CODE IS NOT VALID FOR "RPC" STYLE
-        for (Interface _interface : description.getAllInterfaces()) {
-            if (portName == null || portName.equals(_interface.getName().getLocalPart())) {
-                for (InterfaceOperation operation : _interface.getAllInterfaceOperations()) {
-                    if (operationName.equals(operation.getName().getLocalPart())) {
-                        for (InterfaceMessageReference output : operation.getOutputs()) {
-                            ElementDeclaration element = output.getElementDeclaration();
-                            parameters.put(element.getName().getLocalPart(), (XmlSchemaObject)element.getContent());
+        for (InterfaceMessageReference output : interfaceOperation.getInterfaceMessageReferences()) {
+            if (Direction.OUT == output.getDirection()) {
+                ElementDeclaration element = output.getElementDeclaration();
+                parameters.put(element.getName().getLocalPart(), (XmlSchemaObject)element.getContent());
+            }
+        }
+        return parameters;
+    }
+    
+    private BindingOperation getBindingOperation(String portName, String operationName) throws UnknownOperationException {
+        
+        Binding[] bindings = null;
+        if (portName == null) {
+            bindings = description.getBindings();
+        } else {
+            loop:
+            for (Service service : description.getServices()) {
+                for (Endpoint endpoint : service.getEndpoints()) {
+                    final NCName endpointName = endpoint.getName();
+                    if (endpointName != null && endpointName.toString().equals(portName)) {
+                        Binding binding = endpoint.getBinding();
+                        if (binding != null) {
+                            bindings = new Binding[] {binding};
+                            break loop;
                         }
-                        return parameters;
+                    }
+                }
+            }
+            if (bindings == null) {
+                bindings = description.getBindings();
+            }
+        }
+
+        if (bindings != null) {
+            for (Binding binding : bindings) {
+                for (BindingOperation bindingOperation : binding.getBindingOperations()) {
+                    InterfaceOperation interfaceOperation = bindingOperation.getInterfaceOperation();
+                    if (interfaceOperation != null && operationName.equals(interfaceOperation.getName().getLocalPart())) {
+                        return bindingOperation;
                     }
                 }
             }
         }
-        return parameters;
+
+        throw new UnknownOperationException("Unknown operation: " + operationName);
     }
     
     public static synchronized WSDL20Parser getWSDL20Parser(String wsdlLocation) throws Exception {
@@ -273,10 +315,10 @@ public class WSDL20Parser implements GenericWSDLParser {
         }
         
         if (parser == null) {
-            WSDL2Factory factory = WSDL2Factory.newInstance();
-            WSDL2Reader reader = factory.getWSLD2Reader();
-            InputSource source = new InputSource(wsdlLocation);
-            Description description = reader.read(source);
+            WSDLFactory factory = WSDLFactory.newInstance();
+            WSDLReader reader = factory.newWSDLReader();
+            reader.setFeature(WSDLReader.FEATURE_VALIDATION, true);
+            Description description = reader.readWSDL(wsdlLocation);
 
             parser = new WSDL20Parser(description);
             
