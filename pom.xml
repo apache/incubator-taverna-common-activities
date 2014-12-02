@@ -10,17 +10,12 @@
 	<artifactId>rest-activity</artifactId>
 	<name>Taverna REST Activity</name>
         <version>1.6-SNAPSHOT</version>
+
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.taverna.t2.core</groupId>
 			<artifactId>workflowmodel-api</artifactId>
 			<version>${t2.core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.taverna.t2.activities</groupId>
-			<artifactId>activity-test-utils</artifactId>
-			<version>${t2.activities.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -37,20 +32,12 @@
 			<artifactId>credential-manager</artifactId>
 			<version>${t2.security.version}</version>
 		</dependency>
-		
+
 		<dependency>
-			<groupId>net.sf.taverna.t2.ui-api</groupId>
-			<artifactId>report-api</artifactId>
-			<version>${t2.ui.api.version}</version>
-		</dependency>
-		<!-- 
-		   for opening configuration dialog of XPath activity 
-		   from 'Solution' area of 'VisitExplainer'
-		-->
-		<dependency>
-			<groupId>net.sf.taverna.t2.ui-components</groupId>
-			<artifactId>report-view</artifactId>
-			<version>${t2.ui.components.version}</version>
+			<groupId>net.sf.taverna.t2.activities</groupId>
+			<artifactId>activity-test-utils</artifactId>
+			<version>${t2.activities.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -58,8 +45,8 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
 	</dependencies>
+
         <repositories>
                 <repository>
                         <releases />
