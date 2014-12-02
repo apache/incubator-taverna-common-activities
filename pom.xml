@@ -10,41 +10,24 @@
   <version>1.6-SNAPSHOT</version>
   <name>Taverna XPath Activity</name>
   
-  <dependencies>
- 	<dependency>
- 		<groupId>dom4j</groupId>
- 		<artifactId>dom4j</artifactId>
- 		<version>${dom4j.version}</version>
- 	</dependency>
- 	<dependency>
- 		<groupId>jaxen</groupId>
- 		<artifactId>jaxen</artifactId>
- 		<version>${jaxen.version}</version>
- 		<type>jar</type>
- 		<scope>compile</scope>
- 	</dependency>
-  
-	<dependency>
-		<groupId>net.sf.taverna.t2.core</groupId>
-		<artifactId>workflowmodel-api</artifactId>
-		<version>${t2.core.version}</version>
-  	</dependency>
-	<dependency>
-		<groupId>net.sf.taverna.t2.ui-api</groupId>
-		<artifactId>report-api</artifactId>
-		<version>${t2.ui.api.version}</version>
-	</dependency>
-	
-	<!-- 
-	   for opening configuration dialog of XPath activity 
-	   from 'Solution' area of 'VisitExplainer'
-	-->
-	<dependency>
-		<groupId>net.sf.taverna.t2.ui-components</groupId>
-		<artifactId>report-view</artifactId>
-		<version>${t2.ui.components.version}</version>
-	</dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>${dom4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>${jaxen.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>workflowmodel-api</artifactId>
+			<version>${t2.core.version}</version>
+  		</dependency>
+	</dependencies>
+
           <repositories>
                 <repository>
                         <releases />
