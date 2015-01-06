@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://testing.org" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://testing.org" xmlns:intf="http://testing.org" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.3
+Built on Oct 05, 2005 (05:23:37 EDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://testing.org" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="getStringArrayReturn">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+     </sequence>
+
+    </complexType>
+   </element>
+   <element name="getStringReturn" type="xsd:string"/>
+   <complexType name="Address">
+    <sequence>
+     <element name="city" nillable="true" type="xsd:string"/>
+     <element name="number" type="xsd:int"/>
+     <element name="road" nillable="true" type="xsd:string"/>
+    </sequence>
+
+   </complexType>
+   <complexType name="Person">
+    <sequence>
+     <element name="address" nillable="true" type="impl:Address"/>
+     <element name="age" type="xsd:int"/>
+     <element name="name" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <element name="getPersonReturn" type="impl:Person"/>
+
+   <element name="p" type="impl:Person"/>
+   <element name="personToStringReturn" type="xsd:string"/>
+   <element name="str" type="xsd:string"/>
+   <element name="countStringReturn" type="xsd:int"/>
+   <element name="array">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+     </sequence>
+
+    </complexType>
+   </element>
+   <element name="countStringArrayReturn" type="xsd:int"/>
+   <complexType name="ArrayOfPerson">
+    <sequence>
+     <element maxOccurs="unbounded" minOccurs="0" name="item" type="impl:Person"/>
+    </sequence>
+   </complexType>
+   <element name="array1">
+
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" minOccurs="0" name="item" type="impl:Person"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="personArrayToStringReturn" type="xsd:string"/>
+   <element name="getBinaryDataReturn">
+    <complexType>
+
+     <sequence>
+      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:byte"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="bytes">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:byte"/>
+
+     </sequence>
+    </complexType>
+   </element>
+   <element name="countBytesReturn" type="xsd:int"/>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="getStringRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getPersonResponse">
+
+      <wsdl:part element="impl:getPersonReturn" name="getPersonReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getBinaryDataRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getPersonRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="countStringArrayResponse">
+
+      <wsdl:part element="impl:countStringArrayReturn" name="countStringArrayReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getStringResponse">
+
+      <wsdl:part element="impl:getStringReturn" name="getStringReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="countStringRequest">
+
+      <wsdl:part element="impl:str" name="str"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="countStringResponse">
+
+      <wsdl:part element="impl:countStringReturn" name="countStringReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="countStringArrayRequest">
+
+      <wsdl:part element="impl:array" name="array"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getBinaryDataResponse">
+
+      <wsdl:part element="impl:getBinaryDataReturn" name="getBinaryDataReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="personArrayToStringResponse">
+
+      <wsdl:part element="impl:personArrayToStringReturn" name="personArrayToStringReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getStringArrayResponse">
+
+      <wsdl:part element="impl:getStringArrayReturn" name="getStringArrayReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="personArrayToStringRequest">
+
+      <wsdl:part element="impl:array1" name="array"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="personToStringResponse">
+
+      <wsdl:part element="impl:personToStringReturn" name="personToStringReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="countBytesResponse">
+
+      <wsdl:part element="impl:countBytesReturn" name="countBytesReturn"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getStringArrayRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="countBytesRequest">
+
+      <wsdl:part element="impl:bytes" name="bytes"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="personToStringRequest">
+
+      <wsdl:part element="impl:p" name="p"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="TestServices">
+
+      <wsdl:operation name="getStringArray">
+
+         <wsdl:input message="impl:getStringArrayRequest" name="getStringArrayRequest"/>
+
+         <wsdl:output message="impl:getStringArrayResponse" name="getStringArrayResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getString">
+
+         <wsdl:input message="impl:getStringRequest" name="getStringRequest"/>
+
+         <wsdl:output message="impl:getStringResponse" name="getStringResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getPerson">
+
+         <wsdl:input message="impl:getPersonRequest" name="getPersonRequest"/>
+
+         <wsdl:output message="impl:getPersonResponse" name="getPersonResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="personToString" parameterOrder="p">
+
+         <wsdl:input message="impl:personToStringRequest" name="personToStringRequest"/>
+
+         <wsdl:output message="impl:personToStringResponse" name="personToStringResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="countString" parameterOrder="str">
+
+         <wsdl:input message="impl:countStringRequest" name="countStringRequest"/>
+
+         <wsdl:output message="impl:countStringResponse" name="countStringResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="countStringArray" parameterOrder="array">
+
+         <wsdl:input message="impl:countStringArrayRequest" name="countStringArrayRequest"/>
+
+         <wsdl:output message="impl:countStringArrayResponse" name="countStringArrayResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="personArrayToString" parameterOrder="array">
+
+         <wsdl:input message="impl:personArrayToStringRequest" name="personArrayToStringRequest"/>
+
+         <wsdl:output message="impl:personArrayToStringResponse" name="personArrayToStringResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getBinaryData">
+
+         <wsdl:input message="impl:getBinaryDataRequest" name="getBinaryDataRequest"/>
+
+         <wsdl:output message="impl:getBinaryDataResponse" name="getBinaryDataResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="countBytes" parameterOrder="bytes">
+
+         <wsdl:input message="impl:countBytesRequest" name="countBytesRequest"/>
+
+         <wsdl:output message="impl:countBytesResponse" name="countBytesResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="TestServicesSoapBinding" type="impl:TestServices">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="getStringArray">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getStringArrayRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getStringArrayResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getString">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getStringRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getStringResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getPerson">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getPersonRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getPersonResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="personToString">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="personToStringRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="personToStringResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="countString">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="countStringRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="countStringResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="countStringArray">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="countStringArrayRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="countStringArrayResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="personArrayToString">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="personArrayToStringRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="personArrayToStringResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getBinaryData">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getBinaryDataRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getBinaryDataResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="countBytes">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="countBytesRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="countBytesResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="TestServicesService">
+
+      <wsdl:port binding="impl:TestServicesSoapBinding" name="TestServices">
+
+         <wsdlsoap:address location="http://localhost:8080/testservices/services/TestServices"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>
