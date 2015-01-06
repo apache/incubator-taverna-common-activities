@@ -35,7 +35,7 @@ public class InteractionRecorder {
 	static Map<String, Map<String, Set<String>>> runToInteractionMap = Collections
 			.synchronizedMap(new HashMap<String, Map<String, Set<String>>>());
 	
-	public InteractionUtils interactionUtils;
+	private InteractionUtils interactionUtils;
 
 	private InteractionRecorder() {
 		super();
@@ -121,7 +121,7 @@ public class InteractionRecorder {
 	}
 
 	private File getUsageFile() {
-		return new File(interactionUtils.getInteractionServiceDirectory(),
+		return new File(getInteractionUtils().getInteractionServiceDirectory(),
 				"usage");
 	}
 
@@ -150,6 +150,14 @@ public class InteractionRecorder {
 		} catch (final IOException e) {
 			logger.info(e);
 		}
+	}
+
+	public InteractionUtils getInteractionUtils() {
+		return interactionUtils;
+	}
+
+	public void setInteractionUtils(InteractionUtils interactionUtils) {
+		this.interactionUtils = interactionUtils;
 	}
 
 }

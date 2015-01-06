@@ -16,7 +16,7 @@
 	</bean>
 	
 	<bean id="interactionUtils" class="net.sf.taverna.t2.activities.interaction.InteractionUtils">
-		<property name="appConfig" ref="app-config" />
+		<property name="appConfig" ref="applicationConfiguration" />
 		<property name="interactionRecorder" ref="interactionRecorder" />
 		<property name="interactionPreference" ref="interactionPreference" />
 	</bean>
@@ -50,7 +50,7 @@
 	</bean>
 	
 	<bean id="interactionPreference" class="net.sf.taverna.t2.activities.interaction.preference.InteractionPreference">
-		<property name="appConfig" ref="app-config" />
+		<constructor-arg ref="applicationConfiguration" />
 	</bean>
 	
 	<bean id="interactionVelocity"

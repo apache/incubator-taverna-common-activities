@@ -55,8 +55,6 @@ public class InteractionPreference {
 
 	private final Logger logger = Logger.getLogger(InteractionPreference.class);
 
-	private static InteractionPreference instance = null;
-
 	private final Properties properties;
 
 	private File getConfigFile() {
@@ -71,7 +69,8 @@ public class InteractionPreference {
 		return configFile;
 	}
 
-	private InteractionPreference() {
+	private InteractionPreference(ApplicationConfiguration appConfig) {
+		setAppConfig(appConfig);
 		final File configFile = this.getConfigFile();
 		this.properties = new Properties();
 		if (configFile.exists()) {

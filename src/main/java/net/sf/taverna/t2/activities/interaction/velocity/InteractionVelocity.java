@@ -29,7 +29,7 @@ public class InteractionVelocity {
 
 	public static Logger logger = Logger.getLogger(InteractionVelocity.class);
 
-//	private static boolean velocityInitialized = false;
+	private static boolean velocityInitialized = false;
 
 	private static final String TEMPLATE_SUFFIX = ".vm";
 
@@ -42,7 +42,10 @@ public class InteractionVelocity {
 	
 	@SuppressWarnings("deprecation")
 	public synchronized void checkVelocity() {
-
+		if (velocityInitialized) { 
+			return;
+		}
+		velocityInitialized = true;
 		ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "string");
 		ve.setProperty("resource.loader.class",
 				"org.apache.velocity.runtime.resource.loader.StringResourceLoader");
