@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "id": "http://ns.taverna.org.uk/2010/activity/rest.schema.json",
+    "title": "REST activity configuration",
+    "type": "object",
+    "properties": {
+        "@context": {
+            "description": "JSON-LD context for interpreting the configuration as RDF",
+            "required": true,
+            "enum": ["http://ns.taverna.org.uk/2010/activity/rest.context.json"]
+        },
+        "request": {
+            "type": "object",
+            "description": "The HTTP request the REST activity is to perform",
+            "required": true,
+            "properties": {
+                "httpMethod": {
+                    "description": "The HTTP method of the REST request",
+                    "default": "GET",
+                    "enum": ["GET", "POST", "PUT", "DELETE"]
+                },
+                "absoluteURITemplate": {
+                    "type": "string",
+                    "required": true,
+                    "description": "The URI template for this request.  The template is an URI with 0 or more {variables}, e.g. http://example.com/user/{username}?page={page} (RFC6570 Level 1). Matching activity input ports are created for each variable, so the variable name must be a valid Taverna input port name. "
+                },
+                "headers": {
+                    "description": "HTTP headers of the request. GET requests SHOULD include Accept. PUT and POST request SHOULD include Content-Type. The header Expect: 100-continue is recognized and supported by the REST activity for POST and PUT requests.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "header": {
+                                "type": "string",
+                                "required": true,
+                                "description": "The HTTP header name, e.g. Accept or Content-Type"
+                            },
+                            "value": {
+                                "type": "string",
+                                "required": true,
+                                "description": "The value of the HTTP header, e.g. text/plain"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "outgoingDataFormat": {
+            "description": "Format of the POSTed content",
+            "default": "String",
+            "enum": ["String", "Binary"]
+        },
+        "showRedirectionOutputPort": {
+            "type": "boolean",
+            "default": false,
+            "description": "If set, the output port 'redirection' is added, showing the URL of the requested body. This is particularly useful for following redirection. "
+        },
+        "showActualURLPort": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the output port 'actualURL' is added to show the requested URL after expanding the template."
+        },
+        "showResponseHeadersPort": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, the output port 'responseHeaders' is added to show the response header from the HTTP server."
+        },
+        "escapeParameters": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true (default), input port values are URI-escaped (RFC 2396) before expanding variables in the URI template."
+        }
+        
+    }
+}
