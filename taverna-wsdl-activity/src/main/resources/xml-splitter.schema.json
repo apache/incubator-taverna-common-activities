@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "id": "http://ns.taverna.org.uk/2010/activity/xml-splitter.schema.json",
+    "title": "XML splitter activity configuration",
+    "type": "object",
+    "properties": {
+        "@context": {
+            "description": "JSON-LD context for interpreting the configuration as RDF",
+            "required": true,
+            "enum": ["http://ns.taverna.org.uk/2010/activity/xml-splitter.context.json"]
+        },
+        "wrappedType": {
+            "title": "Wrapped Type XML",
+            "type": "string",
+            "required": true
+        },
+        "inputPorts": {
+            "title": "Input Ports",
+            "type": "array",
+            "required": false,
+            "items": {
+                "type": "object",
+                "properties": {
+           		    "name": {
+                		"title": "Port Name",
+            			"description": "The name of the port",
+            			"type": "string",
+		          		"required": true
+           			},
+                    "depth": {
+                 		"title": "Port Depth",
+             			"description": "The depth of the port",
+                        "type": "integer",
+                        "required": true
+           			},
+                    "mimeType": {
+                 		"title": "Mime Type",
+             			"description": "The mime type of the port",
+                        "type": "string",
+                        "required": true
+                    }
+                }
+             }
+        },
+        "outputPorts": {
+            "title": "Output Ports",
+            "type": "array",
+            "required": false,
+            "items": {
+                "type": "object",
+                "properties": {
+           		    "name": {
+                		"title": "Port Name",
+            			"description": "The name of the port",
+            			"type": "string",
+		          		"required": true
+           			},
+                    "depth": {
+                 		"title": "Port Depth",
+             			"description": "The depth of the port",
+                        "type": "integer",
+                        "required": true
+                    }
+                    "granularDepth": {
+                 		"title": "Port Granular Depth",
+             			"description": "The granular depth of the port",
+                        "type": "integer",
+                        "required": true
+           			},
+                    "mimeType": {
+                 		"title": "Mime Type",
+             			"description": "The mime type of the port",
+                        "type": "string",
+                        "required": true
+                    }
+                }
+             }
+         }
+    }
+}

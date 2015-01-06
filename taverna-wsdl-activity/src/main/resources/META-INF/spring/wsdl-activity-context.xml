@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="wsdlActivityHealthChecker" class="net.sf.taverna.t2.activities.wsdl.WSDLActivityHealthChecker" />
+	<bean id="xmlInputSplitterHealthChecker" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterHealthChecker" />
+	<bean id="xmlOutputSplitterHealthChecker" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterHealthChecker" />
+
+	<bean id="wsdlActivityFactory" class="net.sf.taverna.t2.activities.wsdl.WSDLActivityFactory">
+		<property name="credentialManager" ref="credentialManager" />
+		<property name="edits" ref="edits" />
+	</bean>
+	<bean id="xmlInputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterActivityFactory">
+		<property name="edits" ref="edits" />
+	</bean>
+	<bean id="xmlOutputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterActivityFactory">
+		<property name="edits" ref="edits" />
+	</bean>
+
+</beans>
