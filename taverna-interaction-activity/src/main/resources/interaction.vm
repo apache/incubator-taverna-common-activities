@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+  <head>
+      <meta charset="utf-8" />
+      <title></title>
+      <link rel="stylesheet" type="text/css" href="interaction.css">
+       <script type="text/javascript" src="$pmrpcUrl"></script>
+       
+  </head>
+  <body>
+  
+       <script type="text/javascript">
+       
+       var appendError = function(str){
+         throw new Error("DEBUG: "+str)
+       }
+
+       function log(str){
+         setTimeout("appendError('"+str+"')", 1)
+       }
+       
+         function createReplyContent(status) {
+           date = new Date();
+           msg = "";
+           msg += "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
+           msg += "<entry xmlns=\"http://www.w3.org/2005/Atom\" xmlns:thr=\"http://purl.org/syndication/thread/1.0\">\n";
+           msg += "<title>\"A reply to " + "$entryId" + "\"</title>\n";
+           msg += "<id>" + "$entryId" + "reply" + "</id>\n";
+           msg += "<content/>\n";
+           msg += "<interaction:run-id xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$runId" + "</interaction:run-id>\n";
+           msg += "<interaction:in-reply-to  xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">" + "$entryId" + "</interaction:in-reply-to>\n";
+           msg += "<interaction:result-status xmlns:interaction=\"http://ns.taverna.org.uk/2012/interaction\">";
+           msg += escape(status);
+           msg += "</interaction:result-status>";
+          msg += "</entry>\n";
+           return msg;
+         }
+
+       // Copied from http://www.netlobo.com/url_query_string_javascript.html
+       function getParameterValue( name )
+	{
+  	name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+  	var regexS = "[\\?&]"+name+"=([^&#]*)";
+  	var regex = new RegExp( regexS );
+  	var results = regex.exec( window.location.href );
+  	if( results == null )
+    	return "";
+  	else
+    	return results[1];
+	}
+
+
+         function reply(status, results) {
+             document.getElementById('presentationDiv').innerHTML="<p>Returning results</p>";
+#if ($outputDataUrl)
+           var outputData = JSON.stringify(results);
+           var dataRequest = new XMLHttpRequest();
+           dataRequest.open("PUT", "$outputDataUrl", false);
+           dataRequest.setRequestHeader("Content-Type", "application/json");
+           dataRequest.send(outputData);
+#end           
+           var msg = createReplyContent(status);
+           var xmlhttp = new XMLHttpRequest();
+           xmlhttp.open("POST", "$feed", false);
+           xmlhttp.setRequestHeader("Content-Type", "application/atom+xml;type=entry");
+           xmlhttp.setRequestHeader("Slug", "$entryId" + "-reply");
+           xmlhttp.send(msg);
+           var shownMessage = 'Returned results';
+           if (status != 'OK') {
+             shownMessage = status;
+           }
+           document.getElementById('presentationDiv').innerHTML="<p>" + shownMessage + "</p>";
+             
+           return false;
+         }
+         
+
+	  function getDataFromUrl(url, type) {
+	      var xmlhttp = new XMLHttpRequest();
+	      xmlhttp.open("GET", url, false);
+	      if (type != null) {
+			if (xmlhttp.overrideMimeType){
+				xmlhttp.overrideMimeType(type);
+			}
+			else{
+				xmlhttp.setRequestHeader("Content-Type",type);
+			}
+		  }
+	      xmlhttp.send();
+	      if (xmlhttp.status != 200) {
+	      	return '';
+	      }
+	      return xmlhttp.responseText;
+	  }
+	  
+	  var inputData = null;
+	  
+      function registerCalls() {
+			pmrpc.register( {
+         	  publicProcedureName : "reply",
+         	  procedure : function(status, results) {
+         	     reply(status, results);
+         	     return "OK";
+         	  }
+           });
+ 
+ 			pmrpc.register( {
+         	  publicProcedureName : "getParameterValue",
+         	  procedure : function(parameterName) {
+         	     return getParameterValue(parameterName);
+         	  }
+           });
+           
+           inputData = JSON.parse(getDataFromUrl('$inputDataUrl', "application/json"));
+         
+           pmrpc.register( {
+             publicProcedureName : "getInputData",
+             procedure : function() {
+//               log("Returning input data");
+#if (!$outputDataUrl)
+               reply("OK", {});
+#end
+               return inputData;
+             }
+           });
+         
+           pmrpc.register( {
+             publicProcedureName : "getWorkflowRunId",
+             procedure : function () {
+               return '$runId';
+             }
+           });
+ 
+         pmrpc.register( {
+         	publicProcedureName : "setTitle",
+         	procedure : function(title) {
+         	   document.title = title;
+         	   return "OK";
+         	}
+         });
+         
+         pmrpc.register( {
+         	publicProcedureName : "getDataFromUrl",
+         	procedure : function(url, type) {
+         		return getDataFromUrl(url, type);
+         	}
+         });
+
+         document.getElementById('presentationFrame').src = "$presentationUrl";
+         document.title = 'Taverna interaction';
+       }
+       
+       window.onload = function() {
+//           log("Interaction loaded");
+           registerCalls();
+           };
+      
+  	   </script>      
+ 
+     <div id="presentationDiv">
+       <iframe id="presentationFrame" name="presentationFrame" src="about:blank">
+</iframe>
+     </div>
+     <div id="acknowledgment">
+       <p>The interaction service was developed in the <a href="http://www.biovel.eu" target="_blank">BioVeL project</a></p>
+     </div>
+  </body>
+</html>
