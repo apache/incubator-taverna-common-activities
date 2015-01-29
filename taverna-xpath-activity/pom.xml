@@ -2,14 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.sf.taverna</groupId>
-		<artifactId>taverna-parent</artifactId>
-		<version>3.0.1-SNAPSHOT</version>
+		<groupId>org.apache.taverna.commonactivities</groupId>
+		<artifactId>taverna-common-activities</artifactId>
+		<version>2.1.0-incubating-SNAPSHOT</version>
 	</parent>
-	<groupId>net.sf.taverna.t2.activities</groupId>
-	<artifactId>xpath-activity</artifactId>
-	<version>2.0.1-SNAPSHOT</version>
-	<name>Taverna XPath Activity</name>
+	<artifactId>taverna-xpath-activity</artifactId>
+	<name>Apache Taverna XPath Activity</name>
 	<packaging>bundle</packaging>
 	<build>
 		<plugins>
@@ -25,43 +23,16 @@
 			</plugin>
 		</plugins>
 	</build>
-	<repositories>
-		<repository>
-			<releases />
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>mygrid-repository</id>
-			<name>myGrid Repository</name>
-			<url>http://www.mygrid.org.uk/maven/repository</url>
-		</repository>
-		<repository>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots />
-			<id>mygrid-snapshot-repository</id>
-			<name>myGrid Snapshot Repository</name>
-			<url>http://www.mygrid.org.uk/maven/snapshot-repository</url>
-		</repository>
-	</repositories>
-	<scm>
-		<connection>scm:git:https://github.com/taverna/taverna-xpath-activity.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/taverna/taverna-xpath-activity.git</developerConnection>
-		<url>https://github.com/taverna/taverna-xpath-activity/</url>
-		<tag>master</tag>
-	</scm>
-
 	<dependencies>
 		<dependency>
-			<groupId>net.sf.taverna.t2.core</groupId>
-			<artifactId>reference-api</artifactId>
-			<version>${t2.core.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-reference-api</artifactId>
+			<version>${taverna.engine.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.taverna.t2.core</groupId>
-			<artifactId>workflowmodel-api</artifactId>
-			<version>${t2.core.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-workflowmodel-api</artifactId>
+			<version>${taverna.engine.version}</version>
 		</dependency>
 
 		<dependency>

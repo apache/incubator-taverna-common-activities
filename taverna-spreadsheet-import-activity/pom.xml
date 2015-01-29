@@ -2,15 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.sf.taverna</groupId>
-		<artifactId>taverna-parent</artifactId>
-		<version>3.0.1-SNAPSHOT</version>
+		<groupId>org.apache.taverna.commonactivities</groupId>
+		<artifactId>taverna-common-activities</artifactId>
+		<version>2.1.0-incubating-SNAPSHOT</version>
 	</parent>
-	<groupId>net.sf.taverna.t2.activities</groupId>
-	<artifactId>spreadsheet-import-activity</artifactId>
-	<version>2.0.1-SNAPSHOT</version>
+	<artifactId>taverna-spreadsheet-import-activity</artifactId>
 	<packaging>bundle</packaging>
-	<name>Taverna 2 Spreadsheet Import Activity</name>
+	<name>Apache Taverna Spreadsheet Import Activity</name>
 	<description>Activity to import data from spreadsheet files</description>
 
 	<build>
@@ -41,14 +39,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>net.sf.taverna.t2.core</groupId>
-			<artifactId>reference-api</artifactId>
-			<version>${t2.core.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-reference-api</artifactId>
+			<version>${taverna.engine.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.taverna.t2.core</groupId>
-			<artifactId>workflowmodel-api</artifactId>
-			<version>${t2.core.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-workflowmodel-api</artifactId>
+			<version>${taverna.engine.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -67,6 +65,7 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<!-- FIXME: Use Apache ODFDom (incubating) -->
 			<groupId>org.odftoolkit</groupId>
 			<artifactId>odfdom-java</artifactId>
 			<version>${odfdom.version}</version>
@@ -84,8 +83,8 @@
 			<version>${xmlbeans.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.log4j</groupId>
-			<artifactId>com.springsource.org.apache.log4j</artifactId>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
 		<dependency>
@@ -94,45 +93,29 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
+
 		<dependency>
-			<groupId>net.sf.taverna.t2.activities</groupId>
-			<artifactId>activity-test-utils</artifactId>
-			<version>${t2.activities.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-activity-test-utils</artifactId>
+			<version>${taverna.engine.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<repositories>
-		<!-- This repository is down (2012-03-19) and as the project has moved 
-			to apache it's unclear if it will return. odfdom-java-0.7 artifact has been 
-			deployed to the mygrid repository. -->
-		<!-- <repository> <id>odftoolkit</id> <name>Odftoolkit Repository</name> 
-			<url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url> <releases> 
-			<checksumPolicy>fail</checksumPolicy> </releases> <snapshots> <checksumPolicy>fail</checksumPolicy> 
-			</snapshots> </repository> -->
-		<repository>
-			<releases />
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>mygrid-repository</id>
-			<name>myGrid Repository</name>
-			<url>http://www.mygrid.org.uk/maven/repository</url>
-		</repository>
-		<repository>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots />
-			<id>mygrid-snapshot-repository</id>
-			<name>myGrid Snapshot Repository</name>
-			<url>http://www.mygrid.org.uk/maven/snapshot-repository</url>
-		</repository>
-	</repositories>
-	<scm>
-		<connection>scm:git:https://github.com/taverna/taverna-spreadsheet-import-activity.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/taverna/taverna-spreadsheet-import-activity.git</developerConnection>
-		<url>https://github.com/taverna/taverna-spreadsheet-import-activity/</url>
-		<tag>HEAD</tag>
-	</scm>
+
+  <repositories>
+
+    <!-- for outdated odfdom -->
+    <repository>
+        <id>mygrid-ext-release-local</id>
+        <name>myGrid ext-release-local</name>
+        <url>http://repository.mygrid.org.uk/artifactory/ext-release-local</url>
+        <releases />
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+    </repository>
+
+  </repositories>
+
 
 </project>

@@ -3,45 +3,50 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.sf.taverna</groupId>
-		<artifactId>taverna-parent</artifactId>
-		<version>3.0.1-SNAPSHOT</version>
+    <groupId>org.apache.taverna.commonactivities</groupId>
+    <artifactId>taverna-common-activities</artifactId>
+    <version>2.1.0-incubating-SNAPSHOT</version>
 	</parent>
-	<groupId>net.sf.taverna.t2.activities</groupId>
-	<artifactId>beanshell-activity</artifactId>
+	<artifactId>taverna-beanshell-activity</artifactId>
 	<packaging>bundle</packaging>
-	<version>2.0.1-SNAPSHOT</version>
-	<name>Taverna 2 Beanshell Activity</name>
+	<name>Apache Taverna Beanshell Activity</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>artifactId=bsh</Embed-Dependency>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+
 	<dependencies>
 		<dependency>
-			<groupId>net.sf.taverna.t2.core</groupId>
-			<artifactId>reference-api</artifactId>
-			<version>${t2.core.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-reference-api</artifactId>
+			<version>${taverna.engine.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.taverna.t2.core</groupId>
-			<artifactId>workflowmodel-api</artifactId>
-			<version>${t2.core.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-workflowmodel-api</artifactId>
+			<version>${taverna.engine.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.taverna.t2.activities</groupId>
-			<artifactId>dependency-activity</artifactId>
-			<version>${t2.activities.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>uk.org.taverna.configuration</groupId>
+			<groupId>org.apache.taverna.osgi</groupId>
 			<artifactId>taverna-app-configuration-api</artifactId>
-			<version>${taverna.configuration.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.beanshell</groupId>
-			<artifactId>com.springsource.bsh</artifactId>
-			<version>${bsh.version}</version>
+			<version>${taverna.osgi.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.2.2</version>
+      <version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -50,42 +55,36 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.taverna.t2.activities</groupId>
-			<artifactId>activity-test-utils</artifactId>
-			<version>${t2.activities.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-activity-test-utils</artifactId>
+			<version>${taverna.engine.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.taverna.t2.core</groupId>
-			<artifactId>workflowmodel-impl</artifactId>
-			<version>${t2.core.version}</version>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-workflowmodel-impl</artifactId>
+			<version>${taverna.engine.version}</version>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
-        <repositories>
-                <repository>
-                        <releases />
-                        <snapshots>
-                                <enabled>false</enabled>
-                        </snapshots>
-                        <id>mygrid-repository</id>
-                        <name>myGrid Repository</name>
-                        <url>http://www.mygrid.org.uk/maven/repository</url>
-                </repository>
-                <repository>
-                        <releases>
-                                <enabled>false</enabled>
-                        </releases>
-                        <snapshots />
-                        <id>mygrid-snapshot-repository</id>
-                        <name>myGrid Snapshot Repository</name>
-                        <url>http://www.mygrid.org.uk/maven/snapshot-repository</url>
-                </repository>
-        </repositories>
-	<scm>
-		<connection>scm:git:https://github.com/taverna/taverna-beanshell-activity.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/taverna/taverna-beanshell-activity.git</developerConnection>
-		<url>https://github.com/taverna/taverna-beanshell-activity/</url>
-		<tag>HEAD</tag>
-	</scm>
+    <dependency>
+      <groupId>org.apache-extras.beanshell</groupId>
+      <artifactId>bsh</artifactId>
+      <version>${bsh.version}</version>
+    </dependency>
+  </dependencies>
+
+<!-- See https://code.google.com/a/apache-extras.org/p/beanshell/issues/detail?id=6 
+     TODO: Remove below <repository> once in Maven Central -->
+
+    <repositories>
+      <repository>
+        <id>bintray.beanshell</id>
+        <name>bintray</name>
+        <url>http://dl.bintray.com/beanshell/Beanshell</url>
+        <snapshots>
+          <enabled>false</enabled>
+        </snapshots>
+      </repository>
+    </repositories>
+
 </project>

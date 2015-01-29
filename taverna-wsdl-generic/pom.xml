@@ -3,17 +3,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.sf.taverna</groupId>
-		<artifactId>taverna-parent</artifactId>
-		<version>3.0.1-SNAPSHOT</version>
+		<groupId>org.apache.taverna.commonactivities</groupId>
+		<artifactId>taverna-common-activities</artifactId>
+		<version>2.1.0-incubating-SNAPSHOT</version>
 	</parent>
-	<groupId>net.sf.taverna</groupId>
-	<artifactId>wsdl-generic</artifactId>
-	<version>1.11.0-SNAPSHOT</version>
+	<artifactId>taverna-wsdl-generic</artifactId>
 	<packaging>bundle</packaging>
-	<name>wsdl-generic</name>
+	<name>Apache Taverna WSDL-generic Library</name>
 	<description>
-        WSDL handling classes bundled for Taverna 3 OSGi
+        Generic WSDL SOAP handling (parsing, calling)
     </description>
 
 	<build>
@@ -60,8 +58,8 @@
 			<version>${axis.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.log4j</groupId>
-			<artifactId>com.springsource.org.apache.log4j</artifactId>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
 		<dependency>
@@ -91,40 +89,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>mygrid-repository</id>
-			<name>myGrid Repository</name>
-			<url>http://www.mygrid.org.uk/maven/repository</url>
-			<releases />
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>mygrid-snapshot-repository</id>
-			<name>myGrid Snapshot Repository</name>
-			<url>http://www.mygrid.org.uk/maven/snapshot-repository</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots />
-		</repository>
-		<repository>
-			<id>com.springsource.repository.bundles.release</id>
-			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/release</url>
-		</repository>
-		<repository>
-			<id>com.springsource.repository.bundles.external</id>
-			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/external</url>
-		</repository>
-	</repositories>
-	<scm>
-		<connection>scm:svn:http://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</connection>
-		<developerConnection>scm:svn:https://taverna.googlecode.com/svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</developerConnection>
-		<url>http://code.google.com/p/taverna/source/browse/#svn/taverna/utils/net.sf.taverna.wsdl-generic/trunk/</url>
-	</scm>
 </project>

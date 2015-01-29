@@ -17,6 +17,7 @@
     <taverna.engine.version>3.1.0-incubating-SNAPSHOT</taverna.engine.version>
   </properties>
 	<modules>
+    <module>taverna-beanshell-activity</module>
     <module>taverna-external-tool-activity</module>
     <module>taverna-interaction-activity</module>
     <module>taverna-rest-activity</module>
