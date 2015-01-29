@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>net.sf.taverna</groupId>
+		<artifactId>taverna-parent</artifactId>
+		<version>3.0.1-SNAPSHOT</version>
+	</parent>
+	<groupId>net.sf.taverna.t2.activities</groupId>
+	<artifactId>spreadsheet-import-activity</artifactId>
+	<version>2.0.1-SNAPSHOT</version>
+	<packaging>bundle</packaging>
+	<name>Taverna 2 Spreadsheet Import Activity</name>
+	<description>Activity to import data from spreadsheet files</description>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Private-Package>org.apache.poi.*;-split-package:=merge-first,org.openxmlformats.schemas.*,schemasMicrosoftCom*,schemaorg_apache_xmlbeans.system.*,org.odftoolkit.*,com.csvreader.*</Private-Package>
+						<Import-Package>!org.apache.poi.hdgf.extractor,
+                                                        !org.apache.poi.hslf.extractor,
+                                                        !org.apache.poi.hwpf.extractor,
+                                                        !org.apache.poi.sl.*,
+                                                        org.apache.xmlbeans.impl.schema,
+                                                        !junit.*,
+                                                        !org.openxmlformats.schemas.*,
+                                                        !schemasMicrosoftComOfficePowerpoint,
+                                                        !schemasMicrosoftComOfficeWord,
+                                                        *
+                                                </Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>reference-api</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.core</groupId>
+			<artifactId>workflowmodel-api</artifactId>
+			<version>${t2.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${poi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.xmlbeans</groupId>
+					<artifactId>xmlbeans</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.odftoolkit</groupId>
+			<artifactId>odfdom-java</artifactId>
+			<version>${odfdom.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.javacsv</groupId>
+			<artifactId>javacsv</artifactId>
+			<version>${javacsv.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>com.springsource.org.apache.xmlbeans</artifactId>
+			<version>${xmlbeans.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.log4j</groupId>
+			<artifactId>com.springsource.org.apache.log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.activities</groupId>
+			<artifactId>activity-test-utils</artifactId>
+			<version>${t2.activities.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<!-- This repository is down (2012-03-19) and as the project has moved 
+			to apache it's unclear if it will return. odfdom-java-0.7 artifact has been 
+			deployed to the mygrid repository. -->
+		<!-- <repository> <id>odftoolkit</id> <name>Odftoolkit Repository</name> 
+			<url>https://svn.odftoolkit.org/svn/odfdom~maven2/release</url> <releases> 
+			<checksumPolicy>fail</checksumPolicy> </releases> <snapshots> <checksumPolicy>fail</checksumPolicy> 
+			</snapshots> </repository> -->
+		<repository>
+			<releases />
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>mygrid-repository</id>
+			<name>myGrid Repository</name>
+			<url>http://www.mygrid.org.uk/maven/repository</url>
+		</repository>
+		<repository>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots />
+			<id>mygrid-snapshot-repository</id>
+			<name>myGrid Snapshot Repository</name>
+			<url>http://www.mygrid.org.uk/maven/snapshot-repository</url>
+		</repository>
+	</repositories>
+	<scm>
+		<connection>scm:git:https://github.com/taverna/taverna-spreadsheet-import-activity.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/taverna/taverna-spreadsheet-import-activity.git</developerConnection>
+		<url>https://github.com/taverna/taverna-spreadsheet-import-activity/</url>
+		<tag>HEAD</tag>
+	</scm>
+
+</project>
