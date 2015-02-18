@@ -1,0 +1,1001 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://jjj.biochem.sun.ac.za/qjws" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://jjj.biochem.sun.ac.za/qjws" xmlns:intf="http://jjj.biochem.sun.ac.za/qjws" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema targetNamespace="http://jjj.biochem.sun.ac.za/qjws" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="ArrayOf_xsd_string">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="VectorType">
+    <sequence>
+     <element name="credits" nillable="true" type="xsd:string"/>
+     <element name="isModelMethodSupported" type="xsd:boolean"/>
+     <element name="model" nillable="true" type="xsd:string"/>
+     <element name="vect" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOfArrayOf_xsd_string">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[][]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="NmatType">
+    <sequence>
+     <element name="credits" nillable="true" type="xsd:string"/>
+     <element name="isModelMethodSupported" type="xsd:boolean"/>
+     <element name="model" nillable="true" type="xsd:string"/>
+     <element name="rates" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="stochMat" nillable="true" type="impl:ArrayOfArrayOf_xsd_string"/>
+     <element name="vars" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="KmatType">
+    <sequence>
+     <element name="SSFlux" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="credits" nillable="true" type="xsd:string"/>
+     <element name="indFlux" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="isModelMethodSupported" type="xsd:boolean"/>
+     <element name="kernel" nillable="true" type="impl:ArrayOfArrayOf_xsd_string"/>
+     <element name="model" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="LmatType">
+    <sequence>
+     <element name="credits" nillable="true" type="xsd:string"/>
+     <element name="indMetabs" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="isModelMethodSupported" type="xsd:boolean"/>
+     <element name="linkMat" nillable="true" type="impl:ArrayOfArrayOf_xsd_string"/>
+     <element name="metabs" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="model" nillable="true" type="xsd:string"/>
+     <element name="moieties" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="StStTableType">
+    <sequence>
+     <element name="credits" nillable="true" type="xsd:string"/>
+     <element name="fluxNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="fluxVals" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="isModelMethodSupported" type="xsd:boolean"/>
+     <element name="metabNames" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="metabVals" nillable="true" type="impl:ArrayOf_xsd_string"/>
+     <element name="model" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="TimecourseType">
+    <sequence>
+     <element name="credits" nillable="true" type="xsd:string"/>
+     <element name="isModelMethodSupported" type="xsd:boolean"/>
+     <element name="mat" nillable="true" type="impl:ArrayOfArrayOf_xsd_string"/>
+     <element name="model" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <complexType name="MatrixType">
+    <sequence>
+     <element name="credits" nillable="true" type="xsd:string"/>
+     <element name="isModelMethodSupported" type="xsd:boolean"/>
+     <element name="mat" nillable="true" type="impl:ArrayOfArrayOf_xsd_string"/>
+     <element name="model" nillable="true" type="xsd:string"/>
+     <element name="numRows" type="xsd:int"/>
+     <element maxOccurs="unbounded" name="row" nillable="true" type="impl:ArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+   <complexType name="ArrayOfArrayOfArrayOf_xsd_string">
+    <complexContent>
+     <restriction base="soapenc:Array">
+      <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[][][]"/>
+     </restriction>
+    </complexContent>
+   </complexType>
+   <complexType name="MCATypeString">
+    <sequence>
+     <element name="credits" nillable="true" type="xsd:string"/>
+     <element name="isModelMethodSupported" type="xsd:boolean"/>
+     <element name="mat" nillable="true" type="impl:ArrayOfArrayOfArrayOf_xsd_string"/>
+     <element name="model" nillable="true" type="xsd:string"/>
+     <element maxOccurs="unbounded" name="numCols" type="xsd:int"/>
+     <element name="numRows" type="xsd:int"/>
+     <element maxOccurs="unbounded" name="row" nillable="true" type="impl:ArrayOfArrayOf_xsd_string"/>
+    </sequence>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="getRatesResponse">
+
+      <wsdl:part name="getRatesReturn" type="impl:VectorType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRateEquationFormulaeRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getTimecourseRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRateEquationsResponse">
+
+      <wsdl:part name="getRateEquationsReturn" type="impl:VectorType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllBiomodelsIdsResponse">
+
+      <wsdl:part name="getAllBiomodelsIdsReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllBiomodelsIdsRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getParamValuesResponse">
+
+      <wsdl:part name="getParamValuesReturn" type="impl:VectorType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getExtVarRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCmatResponse">
+
+      <wsdl:part name="getCmatReturn" type="impl:MCATypeString"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getParamValuesRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getExtVarResponse">
+
+      <wsdl:part name="getExtVarReturn" type="impl:VectorType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="hasFunctionResponse">
+
+      <wsdl:part name="hasFunctionReturn" type="xsd:boolean"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getKmatRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllModelsRequest">
+
+   </wsdl:message>
+
+   <wsdl:message name="getRateEquationFormulaeResponse">
+
+      <wsdl:part name="getRateEquationFormulaeReturn" type="impl:VectorType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getEigenvRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSteadyStateTableRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelInfoResponse">
+
+      <wsdl:part name="getModelInfoReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getNmatRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getExternalMetabValuesResponse">
+
+      <wsdl:part name="getExternalMetabValuesReturn" type="impl:VectorType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getEmatRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsByOrganismRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsByOrganismResponse">
+
+      <wsdl:part name="getModelsByOrganismReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getSteadyStateTableResponse">
+
+      <wsdl:part name="getSteadyStateTableReturn" type="impl:StStTableType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getJacobRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsByCategoryResponse">
+
+      <wsdl:part name="getModelsByCategoryReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getInitMetabValuesResponse">
+
+      <wsdl:part name="getInitMetabValuesReturn" type="impl:VectorType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getLmatRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getCmatRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getLmatResponse">
+
+      <wsdl:part name="getLmatReturn" type="impl:LmatType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="hasFunctionRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+      <wsdl:part name="in1" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRateEquationsRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getJacobResponse">
+
+      <wsdl:part name="getJacobReturn" type="impl:MatrixType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getExternalMetabValuesRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllModelsResponse">
+
+      <wsdl:part name="getAllModelsReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getNmatResponse">
+
+      <wsdl:part name="getNmatReturn" type="impl:NmatType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getInitMetabValuesRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelsByCategoryRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRatesRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getKmatResponse">
+
+      <wsdl:part name="getKmatReturn" type="impl:KmatType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getEigenvResponse">
+
+      <wsdl:part name="getEigenvReturn" type="impl:VectorType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getEmatResponse">
+
+      <wsdl:part name="getEmatReturn" type="impl:MCATypeString"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getTimecourseResponse">
+
+      <wsdl:part name="getTimecourseReturn" type="impl:TimecourseType"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getModelInfoRequest">
+
+      <wsdl:part name="in0" type="xsd:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllBiomodelsResponse">
+
+      <wsdl:part name="getAllBiomodelsReturn" type="impl:ArrayOf_xsd_string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="getAllBiomodelsRequest">
+
+   </wsdl:message>
+
+   <wsdl:portType name="QueryJWS">
+
+      <wsdl:operation name="getRates" parameterOrder="in0">
+
+         <wsdl:input message="impl:getRatesRequest" name="getRatesRequest"/>
+
+         <wsdl:output message="impl:getRatesResponse" name="getRatesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllModels">
+
+         <wsdl:input message="impl:getAllModelsRequest" name="getAllModelsRequest"/>
+
+         <wsdl:output message="impl:getAllModelsResponse" name="getAllModelsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllBiomodels">
+
+         <wsdl:input message="impl:getAllBiomodelsRequest" name="getAllBiomodelsRequest"/>
+
+         <wsdl:output message="impl:getAllBiomodelsResponse" name="getAllBiomodelsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllBiomodelsIds">
+
+         <wsdl:input message="impl:getAllBiomodelsIdsRequest" name="getAllBiomodelsIdsRequest"/>
+
+         <wsdl:output message="impl:getAllBiomodelsIdsResponse" name="getAllBiomodelsIdsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsByOrganism" parameterOrder="in0">
+
+         <wsdl:input message="impl:getModelsByOrganismRequest" name="getModelsByOrganismRequest"/>
+
+         <wsdl:output message="impl:getModelsByOrganismResponse" name="getModelsByOrganismResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsByCategory" parameterOrder="in0">
+
+         <wsdl:input message="impl:getModelsByCategoryRequest" name="getModelsByCategoryRequest"/>
+
+         <wsdl:output message="impl:getModelsByCategoryResponse" name="getModelsByCategoryResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelInfo" parameterOrder="in0">
+
+         <wsdl:input message="impl:getModelInfoRequest" name="getModelInfoRequest"/>
+
+         <wsdl:output message="impl:getModelInfoResponse" name="getModelInfoResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getNmat" parameterOrder="in0">
+
+         <wsdl:input message="impl:getNmatRequest" name="getNmatRequest"/>
+
+         <wsdl:output message="impl:getNmatResponse" name="getNmatResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getKmat" parameterOrder="in0">
+
+         <wsdl:input message="impl:getKmatRequest" name="getKmatRequest"/>
+
+         <wsdl:output message="impl:getKmatResponse" name="getKmatResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getLmat" parameterOrder="in0">
+
+         <wsdl:input message="impl:getLmatRequest" name="getLmatRequest"/>
+
+         <wsdl:output message="impl:getLmatResponse" name="getLmatResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSteadyStateTable" parameterOrder="in0">
+
+         <wsdl:input message="impl:getSteadyStateTableRequest" name="getSteadyStateTableRequest"/>
+
+         <wsdl:output message="impl:getSteadyStateTableResponse" name="getSteadyStateTableResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTimecourse" parameterOrder="in0">
+
+         <wsdl:input message="impl:getTimecourseRequest" name="getTimecourseRequest"/>
+
+         <wsdl:output message="impl:getTimecourseResponse" name="getTimecourseResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getJacob" parameterOrder="in0">
+
+         <wsdl:input message="impl:getJacobRequest" name="getJacobRequest"/>
+
+         <wsdl:output message="impl:getJacobResponse" name="getJacobResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getEigenv" parameterOrder="in0">
+
+         <wsdl:input message="impl:getEigenvRequest" name="getEigenvRequest"/>
+
+         <wsdl:output message="impl:getEigenvResponse" name="getEigenvResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCmat" parameterOrder="in0">
+
+         <wsdl:input message="impl:getCmatRequest" name="getCmatRequest"/>
+
+         <wsdl:output message="impl:getCmatResponse" name="getCmatResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getEmat" parameterOrder="in0">
+
+         <wsdl:input message="impl:getEmatRequest" name="getEmatRequest"/>
+
+         <wsdl:output message="impl:getEmatResponse" name="getEmatResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRateEquations" parameterOrder="in0">
+
+         <wsdl:input message="impl:getRateEquationsRequest" name="getRateEquationsRequest"/>
+
+         <wsdl:output message="impl:getRateEquationsResponse" name="getRateEquationsResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRateEquationFormulae" parameterOrder="in0">
+
+         <wsdl:input message="impl:getRateEquationFormulaeRequest" name="getRateEquationFormulaeRequest"/>
+
+         <wsdl:output message="impl:getRateEquationFormulaeResponse" name="getRateEquationFormulaeResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getExtVar" parameterOrder="in0">
+
+         <wsdl:input message="impl:getExtVarRequest" name="getExtVarRequest"/>
+
+         <wsdl:output message="impl:getExtVarResponse" name="getExtVarResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getExternalMetabValues" parameterOrder="in0">
+
+         <wsdl:input message="impl:getExternalMetabValuesRequest" name="getExternalMetabValuesRequest"/>
+
+         <wsdl:output message="impl:getExternalMetabValuesResponse" name="getExternalMetabValuesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getInitMetabValues" parameterOrder="in0">
+
+         <wsdl:input message="impl:getInitMetabValuesRequest" name="getInitMetabValuesRequest"/>
+
+         <wsdl:output message="impl:getInitMetabValuesResponse" name="getInitMetabValuesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getParamValues" parameterOrder="in0">
+
+         <wsdl:input message="impl:getParamValuesRequest" name="getParamValuesRequest"/>
+
+         <wsdl:output message="impl:getParamValuesResponse" name="getParamValuesResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="hasFunction" parameterOrder="in0 in1">
+
+         <wsdl:input message="impl:hasFunctionRequest" name="hasFunctionRequest"/>
+
+         <wsdl:output message="impl:hasFunctionResponse" name="hasFunctionResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="QueryJWSSoapBinding" type="impl:QueryJWS">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="getRates">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRatesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRatesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllModels">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllModelsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllModelsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllBiomodels">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllBiomodelsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllBiomodelsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getAllBiomodelsIds">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getAllBiomodelsIdsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getAllBiomodelsIdsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsByOrganism">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsByOrganismRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsByOrganismResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelsByCategory">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelsByCategoryRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelsByCategoryResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getModelInfo">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getModelInfoRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getModelInfoResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getNmat">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getNmatRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getNmatResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getKmat">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getKmatRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getKmatResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getLmat">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getLmatRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getLmatResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getSteadyStateTable">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getSteadyStateTableRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getSteadyStateTableResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getTimecourse">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getTimecourseRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getTimecourseResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getJacob">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getJacobRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getJacobResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getEigenv">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getEigenvRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getEigenvResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getCmat">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getCmatRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getCmatResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getEmat">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getEmatRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getEmatResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRateEquations">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRateEquationsRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRateEquationsResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRateEquationFormulae">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRateEquationFormulaeRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRateEquationFormulaeResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getExtVar">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getExtVarRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getExtVarResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getExternalMetabValues">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getExternalMetabValuesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getExternalMetabValuesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getInitMetabValues">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getInitMetabValuesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getInitMetabValuesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getParamValues">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getParamValuesRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getParamValuesResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="hasFunction">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="hasFunctionRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="hasFunctionResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="http://jjj.biochem.sun.ac.za/qjws" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="QueryJWSService">
+
+      <wsdl:port binding="impl:QueryJWSSoapBinding" name="QueryJWS">
+
+         <wsdlsoap:address location="http://jjj.mib.ac.uk/axis/services/QueryJWS"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.apache.taverna</groupId>
+		<artifactId>taverna-parent</artifactId>
+		<version>1-incubating-SNAPSHOT</version>
+	</parent>
+	<groupId>org.apache.taverna.commonactivities</groupId>
+	<artifactId>taverna-common-activities</artifactId>
+	<version>2.1.0-incubating-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Apache Taverna Common Activities</name>
+  <properties>
+    <taverna.language.version>0.15.0-incubating-SNAPSHOT</taverna.language.version>
+    <taverna.osgi.version>0.2.0-incubating-SNAPSHOT</taverna.osgi.version>
+    <taverna.engine.version>3.1.0-incubating-SNAPSHOT</taverna.engine.version>
+  </properties>
+	<modules>
+    <module>taverna-beanshell-activity</module>
+    <module>taverna-external-tool-activity</module>
+    <module>taverna-interaction-activity</module>
+    <module>taverna-rest-activity</module>
+    <module>taverna-spreadsheet-import-activity</module>
+    <module>taverna-wsdl-activity</module>
+    <module>taverna-wsdl-generic</module>
+    <module>taverna-xpath-activity</module>
+  </modules>
+  <repositories>
+    <repository>
+      <id>taverna-incubating</id>
+      <name>Apache Taverna incubating Repository</name>
+        <url>http://repository.mygrid.org.uk/artifactory/incubator-snapshot-local/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots />
+    </repository>
+  </repositories>
+</project>

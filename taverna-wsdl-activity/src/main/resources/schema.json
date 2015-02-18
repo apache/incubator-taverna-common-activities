@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "id": "http://ns.taverna.org.uk/2010/activity/wsdl.schema.json",
+    "title": "WSDL activity configuration",
+    "type": "object",
+    "properties": {
+        "@context": {
+            "description": "JSON-LD context for interpreting the configuration as RDF",
+            "required": true,
+            "enum": ["http://ns.taverna.org.uk/2010/activity/wsdl.context.json"]
+        },
+        "operation": {
+            "title": "WSDL Operation",
+            "description": "The WSDL operation",
+            "type": "object",
+            "properties": {
+           		"wsdl": {
+            		"title": "WSDL URL",
+            		"description": "The location of the WSDL definition for the web service",
+            		"type": "string",
+		          	"required": true
+           		},
+           		"name": {
+            		"title": "Operation Name",
+            		"description": "The name of the WSDL operation",
+            		"type": "sting",
+ 		         	"required": true
+            	}
+            },
+            "required": true
+        },
+        "securityProfile": {
+            "title": "Security Profile",
+            "description": "WS-Security settings required by the web service",
+            "type": "string",
+            "required": false
+        }
+    }
+}

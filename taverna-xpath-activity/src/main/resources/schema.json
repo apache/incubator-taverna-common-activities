@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "id": "http://ns.taverna.org.uk/2010/activity/xpath.schema.json",
+    "title": "XPath activity configuration",
+    "type": "object",
+    "properties": {
+        "@context": {
+            "description": "JSON-LD context for interpreting the configuration as RDF",
+            "required": true,
+            "enum": ["http://ns.taverna.org.uk/2010/activity/xpath.context.json"]
+        },
+        "exampleXmlDocument": {
+            "title": "Example XML document",
+            "type": "string",
+            "required": false,
+        },
+        "xpathExpression": {
+            "title": "XPath expression",
+            "type": "string",
+            "required": true,
+        },
+        "xpathNamespaceMap": {
+            "title": "XPath Namespace Map",
+            "type": "array",
+            "required": false,
+            "items": { "type": "object", "$ref": "#/definitions/namespaceMapping" }
+        }
+    },
+    "definitions": {
+    	"namespaceMapping": {
+            "properties": {
+           		"prefix": {
+            		"title": "Namespace Prefix",
+            		"type": "string",
+		          	"required": true
+           		},
+           		"uri": {
+            		"title": "Namespace URI,
+            		"type": "string",
+ 		         	"required": true
+            	}
+            }
+    	}
+    }
+}

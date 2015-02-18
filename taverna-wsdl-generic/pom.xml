@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.apache.taverna.commonactivities</groupId>
+		<artifactId>taverna-common-activities</artifactId>
+		<version>2.1.0-incubating-SNAPSHOT</version>
+	</parent>
+	<artifactId>taverna-wsdl-generic</artifactId>
+	<packaging>bundle</packaging>
+	<name>Apache Taverna WSDL-generic Library</name>
+	<description>
+        Generic WSDL SOAP handling (parsing, calling)
+    </description>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.7</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/integration/**</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>integration-test</id>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<phase>integration-test</phase>
+						<configuration>
+							<excludes>
+								<exclude>none</exclude>
+							</excludes>
+							<includes>
+								<include>**/integration/**</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.axis</groupId>
+			<artifactId>com.springsource.org.apache.axis</artifactId>
+			<version>${axis.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>com.springsource.org.jdom</artifactId>
+			<version>${jdom.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>com.springsource.javax.activation</artifactId>
+			<version>${activation.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.wsdl</groupId>
+			<artifactId>com.springsource.javax.wsdl</artifactId>
+			<version>${javax.wsdl.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.rpc</groupId>
+			<artifactId>com.springsource.javax.xml.rpc</artifactId>
+			<version>${xml.rpc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
