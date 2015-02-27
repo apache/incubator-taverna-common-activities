@@ -73,18 +73,5 @@
     </dependency>
   </dependencies>
 
-<!-- See https://code.google.com/a/apache-extras.org/p/beanshell/issues/detail?id=6 
-     TODO: Remove below <repository> once in Maven Central -->
-
-    <repositories>
-      <repository>
-        <id>bintray.beanshell</id>
-        <name>bintray</name>
-        <url>http://dl.bintray.com/beanshell/Beanshell</url>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-      </repository>
-    </repositories>
 
 </project>
