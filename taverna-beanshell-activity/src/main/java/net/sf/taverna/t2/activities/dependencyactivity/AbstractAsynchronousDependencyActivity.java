@@ -54,8 +54,6 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 
 	private static final String LOCAL_JARS = "Local jars";
 
-	private static final String ARTIFACTS = "Artifacts";
-
 	private static Logger logger = Logger.getLogger(AbstractAsynchronousDependencyActivity.class);
 
 	/**
