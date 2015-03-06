@@ -53,8 +53,6 @@ public class BeanshellActivity extends AbstractAsynchronousDependencyActivity {
 
 	public static final String URI = "http://ns.taverna.org.uk/2010/activity/beanshell";
 
-	protected BeanshellActivityConfigurationBean configurationBean;
-
 	private static Logger logger = Logger.getLogger(BeanshellActivity.class);
 
 	private Interpreter interpreter;
