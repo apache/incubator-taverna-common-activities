@@ -17,5 +17,17 @@
             "required": true,
             "default": ""
         }
+        "classLoaderSharing": {
+            "title": "ClassLoader Sharing Policy",
+            "description": "Policy for sharing class loaders across multiple beanshell activities",
+            "default": "workflow",
+            "enum": ["workflow", "system"]
+        },
+        "localDependency": {
+            "title": "Local Dependencies",
+            "description": "Location of jar files to be added to the beanshell class loader",
+            "type": "array",
+            "items": { "type" : "string" }
+        }       
     }
 }
