@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-03/schema#",
     "id": "http://ns.taverna.org.uk/2010/activity/interaction.schema.json",
-    "title": Interaction activity configuration",
+    "title": "Interaction activity configuration",
     "type": "object",
     "properties": {
         "@context": {

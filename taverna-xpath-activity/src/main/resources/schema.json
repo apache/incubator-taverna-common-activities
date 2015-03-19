@@ -12,12 +12,12 @@
         "exampleXmlDocument": {
             "title": "Example XML document",
             "type": "string",
-            "required": false,
+            "required": false
         },
         "xpathExpression": {
             "title": "XPath expression",
             "type": "string",
-            "required": true,
+            "required": true
         },
         "xpathNamespaceMap": {
             "title": "XPath Namespace Map",
@@ -35,7 +35,7 @@
 		          	"required": true
            		},
            		"uri": {
-            		"title": "Namespace URI,
+            		"title": "Namespace URI",
             		"type": "string",
  		         	"required": true
             	}

@@ -22,7 +22,7 @@ package de.uni_luebeck.inb.knowarc.usecases;
 
 import java.nio.charset.Charset;
 
-import net.sf.taverna.t2.activities.externaltool.ExternalToolActivity;
+import org.apache.taverna.activities.externaltool.ExternalToolActivity;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
 import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
 

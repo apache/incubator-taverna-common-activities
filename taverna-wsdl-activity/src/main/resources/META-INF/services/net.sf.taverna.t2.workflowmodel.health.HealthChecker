@@ -1,4 +1,4 @@
-net.sf.taverna.t2.activities.wsdl.WSDLActivityHealthChecker
-net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterHealthChecker
-net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterHealthChecker
-net.sf.taverna.t2.activities.wsdl.WSDLActivityDescriptorChecker
+org.apache.taverna.activities.wsdl.WSDLActivityHealthChecker
+org.apache.taverna.activities.wsdl.xmlsplitter.XMLOutputSplitterHealthChecker
+org.apache.taverna.activities.wsdl.xmlsplitter.XMLInputSplitterHealthChecker
+org.apache.taverna.activities.wsdl.WSDLActivityDescriptorChecker

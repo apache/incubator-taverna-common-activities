@@ -1,0 +1,203 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one
+* or more contributor license agreements. See the NOTICE file
+* distributed with this work for additional information
+* regarding copyright ownership. The ASF licenses this file
+* to you under the Apache License, Version 2.0 (the
+* "License"); you may not use this file except in compliance
+* with the License. You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+
+package org.apache.taverna.activities.wsdl.xmlsplitter;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.taverna.wsdl.parser.ArrayTypeDescriptor;
+import org.apache.taverna.wsdl.parser.BaseTypeDescriptor;
+import org.apache.taverna.wsdl.parser.ComplexTypeDescriptor;
+import org.apache.taverna.wsdl.parser.TypeDescriptor;
+import org.apache.taverna.wsdl.xmlsplitter.XMLSplitterSerialisationHelper;
+
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.output.XMLOutputter;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+/**
+ * A helper class to facilitate in building an XMLSplitter configuration bean
+ * from the type descriptor XML, including setting up the ports.
+ *
+ * @author Stuart Owen
+ *
+ */
+public class XMLSplitterConfigurationBeanBuilder {
+
+	private static final JsonNodeFactory JSON_NODE_FACTORY = JsonNodeFactory.instance;
+
+	public static JsonNode buildBeanForInput(TypeDescriptor descriptor) throws JDOMException, IOException {
+		Element element = XMLSplitterSerialisationHelper.typeDescriptorToExtensionXML(descriptor);
+		return buildBeanForInput(element);
+	}
+
+	public static JsonNode buildBeanForOutput(TypeDescriptor descriptor) throws JDOMException, IOException {
+		Element element = XMLSplitterSerialisationHelper.typeDescriptorToExtensionXML(descriptor);
+		return buildBeanForOutput(element);
+	}
+
+	public static JsonNode buildBeanForInput(Element element) throws JDOMException, IOException {
+		ObjectNode bean = JSON_NODE_FACTORY.objectNode();
+		ArrayNode inputDefinitions = bean.arrayNode();
+		bean.put("inputPorts", inputDefinitions);
+		ArrayNode outputDefinitions = bean.arrayNode();
+		bean.put("outputPorts", outputDefinitions);
+
+		TypeDescriptor descriptor = XMLSplitterSerialisationHelper
+				.extensionXMLToTypeDescriptor(element);
+		ObjectNode outBean = outputDefinitions.addObject();
+		outBean.put("name", "output");
+		outBean.put("mimeType", "'text/xml'");
+		outBean.put("depth", 0);
+		outBean.put("granularDepth", 0);
+
+		if (descriptor instanceof ComplexTypeDescriptor) {
+			List<TypeDescriptor> elements = ((ComplexTypeDescriptor) descriptor).getElements();
+			String[] names = new String[elements.size()];
+			Class<?>[] types = new Class<?>[elements.size()];
+			TypeDescriptor.retrieveSignature(elements, names, types);
+			for (int i = 0; i < names.length; i++) {
+				ObjectNode portBean = inputDefinitions.addObject();
+				portBean.put("name", names[i]);
+				portBean.put("mimeType", TypeDescriptor.translateJavaType(types[i]));
+				portBean.put("depth", depthForDescriptor(elements.get(i)));
+			}
+
+			List<TypeDescriptor> attributes = ((ComplexTypeDescriptor) descriptor).getAttributes();
+			String[] elementNames = Arrays.copyOf(names, names.length);
+			Arrays.sort(elementNames);
+			String[] attributeNames = new String[attributes.size()];
+			Class<?>[] attributeTypes = new Class<?>[attributes.size()];
+			TypeDescriptor.retrieveSignature(attributes, attributeNames, attributeTypes);
+			for (int i = 0; i < attributeNames.length; i++) {
+				ObjectNode portBean = inputDefinitions.addObject();
+				if (Arrays.binarySearch(elementNames, attributeNames[i]) < 0) {
+					portBean.put("name", attributeNames[i]);
+				} else {
+					portBean.put("name", "1" + attributeNames[i]);
+				}
+				portBean.put("mimeType", TypeDescriptor.translateJavaType(attributeTypes[i]));
+				portBean.put("depth", depthForDescriptor(attributes.get(i)));
+			}
+		} else if (descriptor instanceof ArrayTypeDescriptor) {
+			ObjectNode portBean = inputDefinitions.addObject();
+			portBean.put("name", descriptor.getName());
+
+			if (((ArrayTypeDescriptor) descriptor).getElementType() instanceof BaseTypeDescriptor) {
+				portBean.put("mimeType", "l('text/plain')");
+			} else {
+				portBean.put("mimeType", "l('text/xml')");
+			}
+			portBean.put("depth", 1);
+		}
+
+		String wrappedType = new XMLOutputter().outputString(element);
+		bean.put("wrappedType", wrappedType);
+
+		return bean;
+	}
+
+
+	private static int depthForDescriptor(TypeDescriptor desc) {
+		if (desc instanceof ArrayTypeDescriptor && (!((ArrayTypeDescriptor)desc).isWrapped() || ((ArrayTypeDescriptor)desc).getElementType() instanceof BaseTypeDescriptor)) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+
+	public static JsonNode buildBeanForOutput(Element element)
+			throws JDOMException, IOException {
+		ObjectNode bean = JSON_NODE_FACTORY.objectNode();
+		ArrayNode inputDefinitions = bean.arrayNode();
+		bean.put("inputPorts", inputDefinitions);
+		ArrayNode outputDefinitions = bean.arrayNode();
+		bean.put("outputPorts", outputDefinitions);
+
+		TypeDescriptor descriptor = XMLSplitterSerialisationHelper
+				.extensionXMLToTypeDescriptor(element);
+
+		ObjectNode inBean = inputDefinitions.addObject();
+		inBean.put("name", "input");
+		inBean.put("mimeType", "'text/xml'");
+		inBean.put("depth", 0);
+
+		if (descriptor instanceof ComplexTypeDescriptor) {
+			List<TypeDescriptor> elements = ((ComplexTypeDescriptor) descriptor).getElements();
+			String[] names = new String[elements.size()];
+			Class<?>[] types = new Class<?>[elements.size()];
+			TypeDescriptor.retrieveSignature(elements, names, types);
+			for (int i = 0; i < names.length; i++) {
+				ObjectNode portBean = outputDefinitions.addObject();
+				portBean.put("name", names[i]);
+				portBean.put("mimeType", TypeDescriptor.translateJavaType(types[i]));
+				int depth = depthForDescriptor(elements.get(i));
+				portBean.put("depth", depth);
+				portBean.put("granularDepth", depth);
+			}
+
+
+			List<TypeDescriptor> attributes = ((ComplexTypeDescriptor) descriptor).getAttributes();
+			String[] elementNames = Arrays.copyOf(names, names.length);
+			Arrays.sort(elementNames);
+			String[] attributeNames = new String[attributes.size()];
+			Class<?>[] attributeTypes = new Class<?>[attributes.size()];
+			TypeDescriptor.retrieveSignature(attributes, attributeNames, attributeTypes);
+			for (int i = 0; i < attributeNames.length; i++) {
+				ObjectNode portBean = outputDefinitions.addObject();
+				if (Arrays.binarySearch(elementNames, attributeNames[i]) < 0) {
+					portBean.put("name", attributeNames[i]);
+				} else {
+					portBean.put("name", "1" + attributeNames[i]);
+				}
+				portBean.put("mimeType", TypeDescriptor
+						.translateJavaType(attributeTypes[i]));
+				int depth = depthForDescriptor(attributes.get(i));
+				portBean.put("depth", depth);
+				portBean.put("granularDepth", depth);
+			}
+		} else if (descriptor instanceof ArrayTypeDescriptor) {
+			ObjectNode portBean = outputDefinitions.addObject();
+			String name=descriptor.getName();
+			portBean.put("name", name);
+			portBean.put("depth", 1);
+			portBean.put("granularDepth", 1);
+			if (((ArrayTypeDescriptor) descriptor).getElementType() instanceof BaseTypeDescriptor) {
+				portBean.put("mimeType", "l('text/plain')");
+			} else {
+				portBean.put("mimeType", "l('text/xml')");
+			}
+		}
+
+
+		String wrappedType = new XMLOutputter().outputString(element);
+		bean.put("wrappedType", wrappedType);
+
+		return bean;
+	}
+
+}

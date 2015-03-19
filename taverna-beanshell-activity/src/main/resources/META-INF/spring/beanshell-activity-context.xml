@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="beanshellActivityHealthChecker" class="net.sf.taverna.t2.activities.beanshell.BeanshellActivityHealthChecker" />
+	<bean id="beanshellActivityHealthChecker" class="org.apache.taverna.activities.beanshell.BeanshellActivityHealthChecker" />
 
-	<bean id="beanshellActivityFactory" class="net.sf.taverna.t2.activities.beanshell.BeanshellActivityFactory">
+	<bean id="beanshellActivityFactory" class="org.apache.taverna.activities.beanshell.BeanshellActivityFactory">
 		<property name="applicationConfiguration" ref="applicationConfiguration" />
 	</bean>
 

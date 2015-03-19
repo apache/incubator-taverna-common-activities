@@ -44,7 +44,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 
-import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
+import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
 import net.sf.taverna.t2.reference.AbstractExternalReference;
 import net.sf.taverna.t2.reference.ErrorDocument;
 import net.sf.taverna.t2.reference.ErrorDocumentServiceException;

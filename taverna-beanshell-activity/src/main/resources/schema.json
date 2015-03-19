@@ -16,7 +16,7 @@
             "type": "string",
             "required": true,
             "default": ""
-        }
+        },
         "classLoaderSharing": {
             "title": "ClassLoader Sharing Policy",
             "description": "Policy for sharing class loaders across multiple beanshell activities",

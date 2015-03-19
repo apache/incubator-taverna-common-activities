@@ -5,7 +5,7 @@ package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
 import java.io.InputStream;
 
-import net.sf.taverna.t2.activities.externaltool.RetrieveLoginFromTaverna;
+import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
 import net.sf.taverna.t2.reference.AbstractExternalReference;
 import net.sf.taverna.t2.reference.DereferenceException;
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;

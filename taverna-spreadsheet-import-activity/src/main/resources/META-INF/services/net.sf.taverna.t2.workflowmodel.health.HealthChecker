@@ -1,1 +1,1 @@
-net.sf.taverna.t2.activities.spreadsheet.SpreadsheetImportHealthChecker
+org.apache.taverna.activities.spreadsheet.SpreadsheetImportHealthChecker

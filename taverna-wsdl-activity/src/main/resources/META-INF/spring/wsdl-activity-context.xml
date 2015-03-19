@@ -3,18 +3,18 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="wsdlActivityHealthChecker" class="net.sf.taverna.t2.activities.wsdl.WSDLActivityHealthChecker" />
-	<bean id="xmlInputSplitterHealthChecker" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterHealthChecker" />
-	<bean id="xmlOutputSplitterHealthChecker" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterHealthChecker" />
+	<bean id="wsdlActivityHealthChecker" class="org.apache.taverna.activities.wsdl.WSDLActivityHealthChecker" />
+	<bean id="xmlInputSplitterHealthChecker" class="org.apache.taverna.activities.wsdl.xmlsplitter.XMLInputSplitterHealthChecker" />
+	<bean id="xmlOutputSplitterHealthChecker" class="org.apache.taverna.activities.wsdl.xmlsplitter.XMLOutputSplitterHealthChecker" />
 
-	<bean id="wsdlActivityFactory" class="net.sf.taverna.t2.activities.wsdl.WSDLActivityFactory">
+	<bean id="wsdlActivityFactory" class="org.apache.taverna.activities.wsdl.WSDLActivityFactory">
 		<property name="credentialManager" ref="credentialManager" />
 		<property name="edits" ref="edits" />
 	</bean>
-	<bean id="xmlInputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLInputSplitterActivityFactory">
+	<bean id="xmlInputSplitterActivityFactory" class="org.apache.taverna.activities.wsdl.xmlsplitter.XMLInputSplitterActivityFactory">
 		<property name="edits" ref="edits" />
 	</bean>
-	<bean id="xmlOutputSplitterActivityFactory" class="net.sf.taverna.t2.activities.wsdl.xmlsplitter.XMLOutputSplitterActivityFactory">
+	<bean id="xmlOutputSplitterActivityFactory" class="org.apache.taverna.activities.wsdl.xmlsplitter.XMLOutputSplitterActivityFactory">
 		<property name="edits" ref="edits" />
 	</bean>
 

@@ -1,1 +1,1 @@
-net.sf.taverna.t2.activities.interaction.InteractionRunDeletionListener
+org.apache.taverna.activities.interaction.InteractionRunDeletionListener

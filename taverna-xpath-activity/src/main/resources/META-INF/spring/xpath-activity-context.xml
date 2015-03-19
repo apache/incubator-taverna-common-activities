@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="XPathActivityHealthChecker" class="net.sf.taverna.t2.activities.xpath.XPathActivityHealthChecker" />
+	<bean id="XPathActivityHealthChecker" class="org.apache.taverna.activities.xpath.XPathActivityHealthChecker" />
 
-	<bean id="xPathActivityFactory" class="net.sf.taverna.t2.activities.xpath.XPathActivityFactory">
+	<bean id="xPathActivityFactory" class="org.apache.taverna.activities.xpath.XPathActivityFactory">
 		<property name="edits" ref="edits" />
 	</bean>
 

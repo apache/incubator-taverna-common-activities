@@ -20,7 +20,7 @@
 
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
-import net.sf.taverna.t2.activities.externaltool.manager.InvocationMechanism;
+import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 
 public class SshNode {
 	

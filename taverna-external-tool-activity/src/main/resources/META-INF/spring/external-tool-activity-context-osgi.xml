@@ -8,13 +8,13 @@
 
 	<service ref="SshReference" interface="net.sf.taverna.t2.reference.ExternalReferenceSPI" />
 
-	<service ref="invocationGroupManager" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationGroupManager" />
+	<service ref="invocationGroupManager" interface="org.apache.taverna.activities.externaltool.manager.InvocationGroupManager" />
 
-	<service ref="LocalInvocationPersister" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister" />
-	<service ref="SshInvocationPersister" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister" />
+	<service ref="LocalInvocationPersister" interface="org.apache.taverna.activities.externaltool.manager.InvocationPersister" />
+	<service ref="SshInvocationPersister" interface="org.apache.taverna.activities.externaltool.manager.InvocationPersister" />
 
-	<service ref="LocalMechanismCreator" interface="net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator" />
-	<service ref="SshMechanismCreator" interface="net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator" />
+	<service ref="LocalMechanismCreator" interface="org.apache.taverna.activities.externaltool.manager.MechanismCreator" />
+	<service ref="SshMechanismCreator" interface="org.apache.taverna.activities.externaltool.manager.MechanismCreator" />
 
 	<service ref="ExternalToolRunDeletionListener" interface="net.sf.taverna.t2.workflowmodel.RunDeletionListener" />
 
@@ -23,16 +23,16 @@
 	<service ref="ExternalToolActivityHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
 	<service ref="ExternalToolActivityMimeTypeChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
 
-	<service ref="LocalInvocationCreator" interface="net.sf.taverna.t2.activities.externaltool.InvocationCreator" />
-	<service ref="SshInvocationCreator" interface="net.sf.taverna.t2.activities.externaltool.InvocationCreator" />
+	<service ref="LocalInvocationCreator" interface="org.apache.taverna.activities.externaltool.InvocationCreator" />
+	<service ref="SshInvocationCreator" interface="org.apache.taverna.activities.externaltool.InvocationCreator" />
 
 	<service ref="externalToolActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
 
-	<list id="invocationCreators" interface="net.sf.taverna.t2.activities.externaltool.InvocationCreator" cardinality="0..N" />
+	<list id="invocationCreators" interface="org.apache.taverna.activities.externaltool.InvocationCreator" cardinality="0..N" />
 
-	<list id="mechanismCreators" interface="net.sf.taverna.t2.activities.externaltool.manager.MechanismCreator" cardinality="0..N" />
+	<list id="mechanismCreators" interface="org.apache.taverna.activities.externaltool.manager.MechanismCreator" cardinality="0..N" />
 
-        <list id="invocationPersisters" interface="net.sf.taverna.t2.activities.externaltool.manager.InvocationPersister" cardinality="0..N" />
+        <list id="invocationPersisters" interface="org.apache.taverna.activities.externaltool.manager.InvocationPersister" cardinality="0..N" />
 
 	<reference id="credentialManager" interface="net.sf.taverna.t2.security.credentialmanager.CredentialManager" />
 

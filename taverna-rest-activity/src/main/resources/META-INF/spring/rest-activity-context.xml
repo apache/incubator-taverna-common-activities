@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="RESTActivityHealthChecker" class="net.sf.taverna.t2.activities.rest.RESTActivityHealthChecker" />
+	<bean id="RESTActivityHealthChecker" class="org.apache.taverna.activities.rest.RESTActivityHealthChecker" />
 
-	<bean id="restActivityFactory" class="net.sf.taverna.t2.activities.rest.RESTActivityFactory">
+	<bean id="restActivityFactory" class="org.apache.taverna.activities.rest.RESTActivityFactory">
 		<property name="credentialManager" ref="credentialManager" />
 		<property name="edits" ref="edits" />
 	</bean>
