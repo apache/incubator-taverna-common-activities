@@ -25,8 +25,8 @@ import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.T2Reference;
 
 /**
  * @author alanrw

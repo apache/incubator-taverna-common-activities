@@ -25,12 +25,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
-import net.sf.taverna.t2.workflowmodel.AbstractPort;
-import net.sf.taverna.t2.workflowmodel.Edits;
-import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
-import net.sf.taverna.t2.workflowmodel.processor.activity.impl.ActivityInputPortImpl;
-import net.sf.taverna.t2.workflowmodel.processor.activity.impl.ActivityOutputPortImpl;
+import org.apache.taverna.activities.testutils.ActivityInvoker;
+import org.apache.taverna.workflowmodel.AbstractPort;
+import org.apache.taverna.workflowmodel.Edits;
+import org.apache.taverna.workflowmodel.impl.EditsImpl;
+import org.apache.taverna.workflowmodel.processor.activity.impl.ActivityInputPortImpl;
+import org.apache.taverna.workflowmodel.processor.activity.impl.ActivityOutputPortImpl;
 
 import org.junit.Before;
 import org.junit.Test;

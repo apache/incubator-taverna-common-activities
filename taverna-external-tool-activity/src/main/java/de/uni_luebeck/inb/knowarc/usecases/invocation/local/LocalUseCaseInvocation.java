@@ -49,15 +49,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import net.sf.taverna.t2.reference.AbstractExternalReference;
-import net.sf.taverna.t2.reference.ErrorDocument;
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.Identified;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.ReferenceSet;
-import net.sf.taverna.t2.reference.ReferencedDataNature;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.reference.impl.external.file.FileReference;
+import org.apache.taverna.reference.AbstractExternalReference;
+import org.apache.taverna.reference.ErrorDocument;
+import org.apache.taverna.reference.ExternalReferenceSPI;
+import org.apache.taverna.reference.Identified;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.ReferenceSet;
+import org.apache.taverna.reference.ReferencedDataNature;
+import org.apache.taverna.reference.T2Reference;
+import org.apache.taverna.reference.impl.external.file.FileReference;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

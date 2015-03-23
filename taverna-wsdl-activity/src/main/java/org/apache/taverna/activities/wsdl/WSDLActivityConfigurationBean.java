@@ -21,8 +21,8 @@ package org.apache.taverna.activities.wsdl;
 
 import java.net.URI;
 
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * A standard Java Bean that provides the details required to configure a WSDLActivity.

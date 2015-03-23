@@ -22,8 +22,8 @@ package org.apache.taverna.activities.spreadsheet;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * A range of integer values.

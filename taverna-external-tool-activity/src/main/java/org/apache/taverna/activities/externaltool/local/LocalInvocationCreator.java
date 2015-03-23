@@ -24,8 +24,8 @@ import java.util.Map;
 
 import org.apache.taverna.activities.externaltool.InvocationCreator;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.T2Reference;
 
 import org.apache.log4j.Logger;
 

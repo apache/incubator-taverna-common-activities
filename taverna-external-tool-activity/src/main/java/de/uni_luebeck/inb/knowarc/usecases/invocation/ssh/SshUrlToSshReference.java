@@ -3,10 +3,10 @@
  */
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.ReferenceContext;
-import net.sf.taverna.t2.reference.ValueToReferenceConversionException;
-import net.sf.taverna.t2.reference.ValueToReferenceConverterSPI;
+import org.apache.taverna.reference.ExternalReferenceSPI;
+import org.apache.taverna.reference.ReferenceContext;
+import org.apache.taverna.reference.ValueToReferenceConversionException;
+import org.apache.taverna.reference.ValueToReferenceConverterSPI;
 import org.apache.taverna.security.credentialmanager.CredentialManager;
 
 /**

@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.taverna.activities.rest.RESTActivity.HTTP_METHOD;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * HTTP Request configuration bean.

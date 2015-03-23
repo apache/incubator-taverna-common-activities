@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 import org.dom4j.DocumentException;
 import org.dom4j.InvalidXPathException;

@@ -19,8 +19,8 @@
 
 package org.apache.taverna.activities.xpath;
 
-import net.sf.taverna.t2.visit.VisitKind;
-import net.sf.taverna.t2.visit.Visitor;
+import org.apache.taverna.visit.VisitKind;
+import org.apache.taverna.visit.Visitor;
 
 /**
  * A <code>XPathActivityHealthCheck</code> is a kind of visit that determines if

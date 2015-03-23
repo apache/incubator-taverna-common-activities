@@ -21,8 +21,8 @@
 package de.uni_luebeck.inb.knowarc.usecases;
 
 import org.apache.taverna.activities.externaltool.ExternalToolActivity;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * This subclass of script input is used to manage static content

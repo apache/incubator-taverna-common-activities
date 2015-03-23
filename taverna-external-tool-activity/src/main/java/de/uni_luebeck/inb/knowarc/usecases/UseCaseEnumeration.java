@@ -22,13 +22,12 @@ package de.uni_luebeck.inb.knowarc.usecases;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.taverna.t2.workflowmodel.serialization.DeserializationException;
+import org.apache.taverna.workflowmodel.serialization.DeserializationException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;

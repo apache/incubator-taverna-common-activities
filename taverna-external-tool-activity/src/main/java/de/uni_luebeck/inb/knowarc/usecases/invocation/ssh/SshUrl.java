@@ -3,7 +3,7 @@
  */
 package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 
-import net.sf.taverna.t2.reference.ReferencedDataNature;
+import org.apache.taverna.reference.ReferencedDataNature;
 
 /**
  * @author alanrw

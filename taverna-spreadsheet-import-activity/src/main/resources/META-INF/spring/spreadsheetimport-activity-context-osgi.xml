@@ -6,10 +6,10 @@
                                  http://www.springframework.org/schema/osgi
                                  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<service ref="spreadsheetImportActivityHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
+	<service ref="spreadsheetImportActivityHealthChecker" interface="org.apache.taverna.workflowmodel.health.HealthChecker" />
 
-	<service ref="spreadsheetImportActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
+	<service ref="spreadsheetImportActivityFactory" interface="org.apache.taverna.workflowmodel.processor.activity.ActivityFactory" />
 
-	<reference id="edits" interface="net.sf.taverna.t2.workflowmodel.Edits" />
+	<reference id="edits" interface="org.apache.taverna.workflowmodel.Edits" />
 
 </beans:beans>

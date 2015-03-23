@@ -27,13 +27,13 @@ import java.util.Map;
 
 import org.apache.taverna.activities.rest.HTTPRequestHandler.HTTPRequestResponse;
 import org.apache.taverna.activities.rest.URISignatureHandler.URISignatureParsingException;
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ErrorDocument;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import org.apache.taverna.invocation.InvocationContext;
+import org.apache.taverna.reference.ErrorDocument;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.T2Reference;
+import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
+import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.http.client.CredentialsProvider;
 import org.apache.log4j.Logger;

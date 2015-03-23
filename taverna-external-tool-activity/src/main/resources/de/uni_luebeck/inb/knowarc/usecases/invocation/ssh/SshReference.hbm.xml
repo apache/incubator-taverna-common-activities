@@ -6,7 +6,7 @@
 <hibernate-mapping>
 	<joined-subclass
 		name="de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshReference"
-		extends="net.sf.taverna.t2.reference.AbstractExternalReference">
+		extends="org.apache.taverna.reference.AbstractExternalReference">
 		<!-- Link to primary key from abstract superclass -->
 		<key column="bean_id" />
 		<!-- SshReference specific properties below here -->

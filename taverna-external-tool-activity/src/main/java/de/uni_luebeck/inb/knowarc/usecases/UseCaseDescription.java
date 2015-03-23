@@ -35,11 +35,11 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 
 import org.apache.taverna.activities.externaltool.ExternalToolActivity;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty.OrderPolicy;
-import net.sf.taverna.t2.workflowmodel.serialization.DeserializationException;
-import net.sf.taverna.t2.workflowmodel.utils.Tools;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty.OrderPolicy;
+import org.apache.taverna.workflowmodel.serialization.DeserializationException;
+import org.apache.taverna.workflowmodel.utils.Tools;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;

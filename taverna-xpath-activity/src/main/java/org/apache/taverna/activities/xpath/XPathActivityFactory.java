@@ -28,11 +28,11 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sf.taverna.t2.workflowmodel.Edits;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
+import org.apache.taverna.workflowmodel.Edits;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityFactory;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

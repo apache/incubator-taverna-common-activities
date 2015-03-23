@@ -29,21 +29,21 @@ import static org.apache.taverna.activities.xpath.XPathUtils.XPATH_EMPTY;
 import static org.apache.taverna.activities.xpath.XPathUtils.XPATH_INVALID;
 import static org.apache.taverna.activities.xpath.XPathUtils.isValid;
 import static org.apache.taverna.activities.xpath.XPathUtils.validateXPath;
-import static net.sf.taverna.t2.visit.VisitReport.getWorstStatus;
-import static net.sf.taverna.t2.visit.VisitReport.Status.OK;
-import static net.sf.taverna.t2.visit.VisitReport.Status.SEVERE;
-import static net.sf.taverna.t2.visit.VisitReport.Status.WARNING;
-import static net.sf.taverna.t2.workflowmodel.health.HealthCheck.NO_PROBLEM;
+import static org.apache.taverna.visit.VisitReport.getWorstStatus;
+import static org.apache.taverna.visit.VisitReport.Status.OK;
+import static org.apache.taverna.visit.VisitReport.Status.SEVERE;
+import static org.apache.taverna.visit.VisitReport.Status.WARNING;
+import static org.apache.taverna.workflowmodel.health.HealthCheck.NO_PROBLEM;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.taverna.t2.visit.VisitKind;
-import net.sf.taverna.t2.visit.VisitReport;
-import net.sf.taverna.t2.visit.VisitReport.Status;
-import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
+import org.apache.taverna.visit.VisitKind;
+import org.apache.taverna.visit.VisitReport;
+import org.apache.taverna.visit.VisitReport.Status;
+import org.apache.taverna.workflowmodel.health.HealthChecker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

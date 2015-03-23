@@ -24,8 +24,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.StringReader;
 
-import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
+import org.apache.taverna.workflowmodel.impl.EditsImpl;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
 import org.apache.taverna.wsdl.parser.BaseTypeDescriptor;
 import org.apache.taverna.wsdl.parser.ComplexTypeDescriptor;
 

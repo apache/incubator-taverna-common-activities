@@ -6,12 +6,12 @@ package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
 import java.io.InputStream;
 
 import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
-import net.sf.taverna.t2.reference.AbstractExternalReference;
-import net.sf.taverna.t2.reference.DereferenceException;
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.ReferenceContext;
+import org.apache.taverna.reference.AbstractExternalReference;
+import org.apache.taverna.reference.DereferenceException;
+import org.apache.taverna.reference.ExternalReferenceSPI;
+import org.apache.taverna.reference.ReferenceContext;
 import org.apache.taverna.security.credentialmanager.CredentialManager;
-import net.sf.taverna.t2.reference.ReferencedDataNature;
+import org.apache.taverna.reference.ReferencedDataNature;
 
 import org.apache.log4j.Logger;
 

@@ -40,11 +40,11 @@ import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrl;
 import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.Identified;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.ReferenceSet;
-import net.sf.taverna.t2.reference.T2Reference;
+import org.apache.taverna.reference.ExternalReferenceSPI;
+import org.apache.taverna.reference.Identified;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.ReferenceSet;
+import org.apache.taverna.reference.T2Reference;
 import org.apache.taverna.security.credentialmanager.CredentialManager;
 
 /**

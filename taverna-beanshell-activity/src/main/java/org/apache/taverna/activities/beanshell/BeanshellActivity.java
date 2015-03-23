@@ -24,13 +24,13 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.taverna.activities.dependencyactivity.AbstractAsynchronousDependencyActivity;
-import net.sf.taverna.t2.reference.ErrorDocumentService;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.ReferenceServiceException;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import org.apache.taverna.reference.ErrorDocumentService;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.ReferenceServiceException;
+import org.apache.taverna.reference.T2Reference;
+import org.apache.taverna.workflowmodel.OutputPort;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
+import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.log4j.Logger;
 

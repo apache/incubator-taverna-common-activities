@@ -22,8 +22,8 @@ package org.apache.taverna.activities.externaltool.manager;
 import java.util.List;
 
 import org.apache.taverna.activities.externaltool.ExternalToolActivity;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 import org.apache.log4j.Logger;
 

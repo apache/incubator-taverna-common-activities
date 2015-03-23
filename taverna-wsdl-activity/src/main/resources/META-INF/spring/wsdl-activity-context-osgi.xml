@@ -6,15 +6,15 @@
                                  http://www.springframework.org/schema/osgi
                                  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<service ref="wsdlActivityHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
-	<service ref="xmlInputSplitterHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
-	<service ref="xmlOutputSplitterHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
+	<service ref="wsdlActivityHealthChecker" interface="org.apache.taverna.workflowmodel.health.HealthChecker" />
+	<service ref="xmlInputSplitterHealthChecker" interface="org.apache.taverna.workflowmodel.health.HealthChecker" />
+	<service ref="xmlOutputSplitterHealthChecker" interface="org.apache.taverna.workflowmodel.health.HealthChecker" />
 
-	<service ref="wsdlActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
-	<service ref="xmlInputSplitterActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
-	<service ref="xmlOutputSplitterActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
+	<service ref="wsdlActivityFactory" interface="org.apache.taverna.workflowmodel.processor.activity.ActivityFactory" />
+	<service ref="xmlInputSplitterActivityFactory" interface="org.apache.taverna.workflowmodel.processor.activity.ActivityFactory" />
+	<service ref="xmlOutputSplitterActivityFactory" interface="org.apache.taverna.workflowmodel.processor.activity.ActivityFactory" />
 
 	<reference id="credentialManager" interface="org.apache.taverna.security.credentialmanager.CredentialManager" />
-	<reference id="edits" interface="net.sf.taverna.t2.workflowmodel.Edits" />
+	<reference id="edits" interface="org.apache.taverna.workflowmodel.Edits" />
 
 </beans:beans>

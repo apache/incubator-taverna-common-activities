@@ -23,8 +23,8 @@ package de.uni_luebeck.inb.knowarc.usecases;
 import java.nio.charset.Charset;
 
 import org.apache.taverna.activities.externaltool.ExternalToolActivity;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * Integrates inputs to the grid that come from the use case descriptions

@@ -23,20 +23,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.taverna.activities.wsdl.WSDLActivity;
-import net.sf.taverna.t2.workflowmodel.CompoundEdit;
-import net.sf.taverna.t2.workflowmodel.Dataflow;
-import net.sf.taverna.t2.workflowmodel.Edit;
-import net.sf.taverna.t2.workflowmodel.EditException;
-import net.sf.taverna.t2.workflowmodel.Edits;
-import net.sf.taverna.t2.workflowmodel.EventForwardingOutputPort;
-import net.sf.taverna.t2.workflowmodel.EventHandlingInputPort;
-import net.sf.taverna.t2.workflowmodel.InputPort;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.Processor;
-import net.sf.taverna.t2.workflowmodel.ProcessorInputPort;
-import net.sf.taverna.t2.workflowmodel.ProcessorOutputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
-import net.sf.taverna.t2.workflowmodel.utils.Tools;
+import org.apache.taverna.workflowmodel.CompoundEdit;
+import org.apache.taverna.workflowmodel.Dataflow;
+import org.apache.taverna.workflowmodel.Edit;
+import org.apache.taverna.workflowmodel.EditException;
+import org.apache.taverna.workflowmodel.Edits;
+import org.apache.taverna.workflowmodel.EventForwardingOutputPort;
+import org.apache.taverna.workflowmodel.EventHandlingInputPort;
+import org.apache.taverna.workflowmodel.InputPort;
+import org.apache.taverna.workflowmodel.OutputPort;
+import org.apache.taverna.workflowmodel.Processor;
+import org.apache.taverna.workflowmodel.ProcessorInputPort;
+import org.apache.taverna.workflowmodel.ProcessorOutputPort;
+import org.apache.taverna.workflowmodel.processor.activity.Activity;
+import org.apache.taverna.workflowmodel.utils.Tools;
 import org.apache.taverna.wsdl.parser.ArrayTypeDescriptor;
 import org.apache.taverna.wsdl.parser.TypeDescriptor;
 
@@ -212,7 +212,7 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 					"Unable to find the sink port when linking up "
 							+ sourcePortName + " to " + sinkPortName);
 
-		linkUpEditList.add(net.sf.taverna.t2.workflowmodel.utils.Tools.getCreateAndConnectDatalinkEdit(dataflow, source, sink, edits));
+		linkUpEditList.add(org.apache.taverna.workflowmodel.utils.Tools.getCreateAndConnectDatalinkEdit(dataflow, source, sink, edits));
 
 		linkUpEdit = new CompoundEdit(linkUpEditList);
 		linkUpEdit.doEdit();
@@ -222,9 +222,9 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 
 	private EventHandlingInputPort getSinkPort(Processor processor, Activity<?> activity,
 			String portName, List<Edit<?>> editList) {
-		InputPort activityPort = net.sf.taverna.t2.workflowmodel.utils.Tools.getActivityInputPort(activity, portName);
+		InputPort activityPort = org.apache.taverna.workflowmodel.utils.Tools.getActivityInputPort(activity, portName);
 		//check if processor port exists
-		EventHandlingInputPort input = net.sf.taverna.t2.workflowmodel.utils.Tools.getProcessorInputPort(processor, activity, activityPort);
+		EventHandlingInputPort input = org.apache.taverna.workflowmodel.utils.Tools.getProcessorInputPort(processor, activity, activityPort);
 		if (input == null) {
 			//port doesn't exist so create a processor port and map it
 			ProcessorInputPort processorInputPort =
@@ -238,9 +238,9 @@ public class AddXMLSplitterEdit implements Edit<Dataflow> {
 
 	private EventForwardingOutputPort getSourcePort(Processor processor, Activity<?> activity,
 			String portName, List<Edit<?>> editList) {
-		OutputPort activityPort = net.sf.taverna.t2.workflowmodel.utils.Tools.getActivityOutputPort(activity, portName);
+		OutputPort activityPort = org.apache.taverna.workflowmodel.utils.Tools.getActivityOutputPort(activity, portName);
 		//check if processor port exists
-		EventForwardingOutputPort output = net.sf.taverna.t2.workflowmodel.utils.Tools.getProcessorOutputPort(processor, activity, activityPort);
+		EventForwardingOutputPort output = org.apache.taverna.workflowmodel.utils.Tools.getProcessorOutputPort(processor, activity, activityPort);
 		if (output == null) {
 			//port doesn't exist so create a processor port and map it
 			ProcessorOutputPort processorOutputPort =

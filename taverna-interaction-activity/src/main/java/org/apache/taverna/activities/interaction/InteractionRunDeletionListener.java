@@ -19,7 +19,7 @@
 
 package org.apache.taverna.activities.interaction;
 
-import net.sf.taverna.t2.workflowmodel.RunDeletionListener;
+import org.apache.taverna.workflowmodel.RunDeletionListener;
 
 import org.apache.log4j.Logger;
 

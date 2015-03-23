@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.StringReader;
 
-import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
+import org.apache.taverna.workflowmodel.impl.EditsImpl;
 import org.apache.taverna.wsdl.parser.ComplexTypeDescriptor;
 
 import org.jdom.Element;

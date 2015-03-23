@@ -25,8 +25,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
-import net.sf.taverna.t2.visit.VisitReport.Status;
-import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
+import org.apache.taverna.visit.VisitReport.Status;
+import org.apache.taverna.workflowmodel.impl.EditsImpl;
 
 import org.junit.Before;
 import org.junit.Test;

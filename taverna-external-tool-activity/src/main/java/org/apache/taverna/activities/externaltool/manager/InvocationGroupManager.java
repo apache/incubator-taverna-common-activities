@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.taverna.t2.lang.observer.Observer;
+import org.apache.taverna.lang.observer.Observer;
 
 /**
  *

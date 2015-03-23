@@ -31,10 +31,10 @@ import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.taverna.security.credentialmanager.CredentialManager;
-import net.sf.taverna.t2.workflowmodel.Edits;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
+import org.apache.taverna.workflowmodel.Edits;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityFactory;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
 import org.apache.taverna.wsdl.parser.TypeDescriptor;
 import org.apache.taverna.wsdl.parser.UnknownOperationException;
 import org.apache.taverna.wsdl.parser.WSDLParser;

@@ -6,16 +6,16 @@
                                  http://www.springframework.org/schema/osgi
                                  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<service ref="interactionActivityHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
+	<service ref="interactionActivityHealthChecker" interface="org.apache.taverna.workflowmodel.health.HealthChecker" />
 
-	<service ref="interactionActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
+	<service ref="interactionActivityFactory" interface="org.apache.taverna.workflowmodel.processor.activity.ActivityFactory" />
 
 	<reference id="credentialManager" interface="org.apache.taverna.security.credentialmanager.CredentialManager" />
 
   <reference id="applicationConfiguration"
-         interface="uk.org.taverna.configuration.app.ApplicationConfiguration" />
+         interface="org.apache.taverna.configuration.app.ApplicationConfiguration" />
 
 		
-	<service ref="interactionRunDeletionListener" interface="net.sf.taverna.t2.workflowmodel.RunDeletionListener" />
+	<service ref="interactionRunDeletionListener" interface="org.apache.taverna.workflowmodel.RunDeletionListener" />
 
 </beans:beans>

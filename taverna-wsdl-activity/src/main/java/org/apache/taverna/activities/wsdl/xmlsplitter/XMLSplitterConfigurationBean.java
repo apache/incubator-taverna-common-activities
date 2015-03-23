@@ -21,9 +21,9 @@ package org.apache.taverna.activities.wsdl.xmlsplitter;
 
 import org.jdom.Element;
 
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 @ConfigurationBean(uri = "http://ns.taverna.org.uk/2010/activity/xml-splitter#Config")
 public class XMLSplitterConfigurationBean extends ActivityPortsDefinitionBean {

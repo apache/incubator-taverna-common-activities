@@ -6,11 +6,11 @@
                       http://www.springframework.org/schema/osgi
                       http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<service ref="RESTActivityHealthChecker" interface="net.sf.taverna.t2.workflowmodel.health.HealthChecker" />
+	<service ref="RESTActivityHealthChecker" interface="org.apache.taverna.workflowmodel.health.HealthChecker" />
 
-	<service ref="restActivityFactory" interface="net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory" />
+	<service ref="restActivityFactory" interface="org.apache.taverna.workflowmodel.processor.activity.ActivityFactory" />
 
 	<reference id="credentialManager" interface="org.apache.taverna.security.credentialmanager.CredentialManager" />
-	<reference id="edits" interface="net.sf.taverna.t2.workflowmodel.Edits" />
+	<reference id="edits" interface="org.apache.taverna.workflowmodel.Edits" />
 
 </beans:beans>

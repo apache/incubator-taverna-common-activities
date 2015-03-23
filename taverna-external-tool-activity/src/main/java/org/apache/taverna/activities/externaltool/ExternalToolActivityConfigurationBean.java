@@ -24,8 +24,8 @@ import java.util.List;
 import org.apache.taverna.activities.externaltool.manager.InvocationGroup;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.activities.externaltool.manager.MechanismCreator;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 
 @ConfigurationBean(uri = ExternalToolActivity.URI + "#Config")

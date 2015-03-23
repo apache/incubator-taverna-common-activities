@@ -22,10 +22,10 @@ package org.apache.taverna.activities.rest;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.taverna.t2.visit.VisitReport;
-import net.sf.taverna.t2.visit.VisitReport.Status;
-import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
-import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
+import org.apache.taverna.visit.VisitReport;
+import org.apache.taverna.visit.VisitReport.Status;
+import org.apache.taverna.workflowmodel.health.HealthCheck;
+import org.apache.taverna.workflowmodel.health.HealthChecker;
 
 /**
  * A {@link HealthChecker} for a {@link RESTActivity}.

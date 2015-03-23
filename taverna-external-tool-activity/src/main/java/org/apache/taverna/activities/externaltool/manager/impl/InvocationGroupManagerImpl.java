@@ -43,9 +43,9 @@ import org.apache.taverna.activities.externaltool.manager.InvocationMechanismCha
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanismRemovedEvent;
 import org.apache.taverna.activities.externaltool.manager.InvocationPersister;
 import org.apache.taverna.activities.externaltool.manager.MechanismCreator;
-import net.sf.taverna.t2.lang.observer.MultiCaster;
-import net.sf.taverna.t2.lang.observer.Observable;
-import net.sf.taverna.t2.lang.observer.Observer;
+import org.apache.taverna.lang.observer.MultiCaster;
+import org.apache.taverna.lang.observer.Observable;
+import org.apache.taverna.lang.observer.Observer;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;

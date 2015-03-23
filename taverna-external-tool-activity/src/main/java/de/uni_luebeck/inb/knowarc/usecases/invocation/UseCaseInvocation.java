@@ -34,16 +34,16 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.Identified;
-import net.sf.taverna.t2.reference.IdentifiedList;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.ReferenceServiceException;
-import net.sf.taverna.t2.reference.ReferenceSet;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.reference.impl.external.object.InlineByteArrayReferenceBuilder;
-import net.sf.taverna.t2.reference.impl.external.object.InlineStringReferenceBuilder;
+import org.apache.taverna.invocation.InvocationContext;
+import org.apache.taverna.reference.ExternalReferenceSPI;
+import org.apache.taverna.reference.Identified;
+import org.apache.taverna.reference.IdentifiedList;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.ReferenceServiceException;
+import org.apache.taverna.reference.ReferenceSet;
+import org.apache.taverna.reference.T2Reference;
+import org.apache.taverna.reference.impl.external.object.InlineByteArrayReferenceBuilder;
+import org.apache.taverna.reference.impl.external.object.InlineStringReferenceBuilder;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInputStatic;
 import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;

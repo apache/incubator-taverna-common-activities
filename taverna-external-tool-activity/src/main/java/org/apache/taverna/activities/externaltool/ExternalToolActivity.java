@@ -26,18 +26,18 @@ import java.util.Map;
 
 import org.apache.taverna.activities.externaltool.manager.InvocationGroup;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
-import net.sf.taverna.t2.annotation.Annotated;
-import net.sf.taverna.t2.annotation.annotationbeans.MimeType;
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
-import net.sf.taverna.t2.workflowmodel.EditException;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import org.apache.taverna.annotation.Annotated;
+import org.apache.taverna.annotation.annotationbeans.MimeType;
+import org.apache.taverna.reference.ExternalReferenceSPI;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.T2Reference;
+import org.apache.taverna.reference.WorkflowRunIdEntity;
+import org.apache.taverna.workflowmodel.EditException;
+import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
+import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.log4j.Logger;
 

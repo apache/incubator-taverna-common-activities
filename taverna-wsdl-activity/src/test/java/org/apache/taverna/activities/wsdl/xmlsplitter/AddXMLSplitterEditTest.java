@@ -21,13 +21,13 @@ package org.apache.taverna.activities.wsdl.xmlsplitter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import net.sf.taverna.t2.activities.testutils.LocationConstants;
+import org.apache.taverna.activities.testutils.LocationConstants;
 import org.apache.taverna.activities.wsdl.WSDLActivity;
-import net.sf.taverna.t2.workflowmodel.Edits;
-import net.sf.taverna.t2.workflowmodel.Processor;
-import net.sf.taverna.t2.workflowmodel.impl.DataflowImpl;
-import net.sf.taverna.t2.workflowmodel.impl.EditsImpl;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
+import org.apache.taverna.workflowmodel.Edits;
+import org.apache.taverna.workflowmodel.Processor;
+import org.apache.taverna.workflowmodel.impl.DataflowImpl;
+import org.apache.taverna.workflowmodel.impl.EditsImpl;
+import org.apache.taverna.workflowmodel.processor.activity.Activity;
 
 import org.junit.Before;
 import org.junit.Ignore;

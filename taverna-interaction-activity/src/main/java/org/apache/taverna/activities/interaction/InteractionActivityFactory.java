@@ -27,10 +27,10 @@ import org.apache.taverna.activities.interaction.jetty.InteractionJetty;
 import org.apache.taverna.activities.interaction.preference.InteractionPreference;
 import org.apache.taverna.activities.interaction.velocity.InteractionVelocity;
 import org.apache.taverna.security.credentialmanager.CredentialManager;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityFactory;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

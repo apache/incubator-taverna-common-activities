@@ -26,11 +26,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.apache.taverna.activities.dependencyactivity.AbstractAsynchronousDependencyActivity.FileExtFilter;
-import net.sf.taverna.t2.visit.VisitReport;
-import net.sf.taverna.t2.visit.VisitReport.Status;
-import net.sf.taverna.t2.workflowmodel.Processor;
-import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
-import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
+import org.apache.taverna.visit.VisitReport;
+import org.apache.taverna.visit.VisitReport.Status;
+import org.apache.taverna.workflowmodel.Processor;
+import org.apache.taverna.workflowmodel.health.HealthCheck;
+import org.apache.taverna.workflowmodel.health.HealthChecker;
 import bsh.ParseException;
 import bsh.Parser;
 

@@ -34,19 +34,19 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.reference.Identified;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.ReferenceServiceException;
-import net.sf.taverna.t2.reference.ReferenceSet;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.reference.ValueCarryingExternalReference;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.Port;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import org.apache.taverna.invocation.InvocationContext;
+import org.apache.taverna.reference.ExternalReferenceSPI;
+import org.apache.taverna.reference.Identified;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.ReferenceServiceException;
+import org.apache.taverna.reference.ReferenceSet;
+import org.apache.taverna.reference.T2Reference;
+import org.apache.taverna.reference.ValueCarryingExternalReference;
+import org.apache.taverna.workflowmodel.OutputPort;
+import org.apache.taverna.workflowmodel.Port;
+import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
+import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.log4j.Logger;
 

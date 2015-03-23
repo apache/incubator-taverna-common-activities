@@ -20,7 +20,7 @@
 package org.apache.taverna.activities.externaltool;
 
 import org.apache.taverna.activities.externaltool.manager.InvocationGroupManager;
-import net.sf.taverna.t2.workflowmodel.RunDeletionListener;
+import org.apache.taverna.workflowmodel.RunDeletionListener;
 
 import org.apache.log4j.Logger;
 

@@ -21,9 +21,9 @@ package org.apache.taverna.activities.interaction;
 
 import java.util.List;
 
-import net.sf.taverna.t2.visit.VisitReport;
-import net.sf.taverna.t2.workflowmodel.health.HealthChecker;
-import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
+import org.apache.taverna.visit.VisitReport;
+import org.apache.taverna.workflowmodel.health.HealthChecker;
+import org.apache.taverna.workflowmodel.health.RemoteHealthChecker;
 
 /**
  * Example health checker

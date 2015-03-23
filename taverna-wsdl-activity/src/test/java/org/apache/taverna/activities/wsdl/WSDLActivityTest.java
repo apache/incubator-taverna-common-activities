@@ -30,9 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.taverna.t2.activities.testutils.ActivityInvoker;
-import net.sf.taverna.t2.activities.testutils.LocationConstants;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
+import org.apache.taverna.activities.testutils.ActivityInvoker;
+import org.apache.taverna.activities.testutils.LocationConstants;
+import org.apache.taverna.workflowmodel.OutputPort;
 import org.apache.taverna.wsdl.parser.ComplexTypeDescriptor;
 
 import org.junit.Ignore;

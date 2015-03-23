@@ -31,8 +31,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.apache.taverna.activities.rest.RESTActivity.DATA_FORMAT;
 import org.apache.taverna.activities.rest.RESTActivity.HTTP_METHOD;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationBean;
-import net.sf.taverna.t2.workflowmodel.processor.config.ConfigurationProperty;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
+import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
  * Beans of this class store configuration information for REST activities.

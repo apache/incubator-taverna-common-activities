@@ -26,12 +26,12 @@ import java.util.List;
 import javax.wsdl.WSDLException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.taverna.t2.visit.VisitReport;
-import net.sf.taverna.t2.visit.VisitReport.Status;
-import net.sf.taverna.t2.workflowmodel.health.HealthCheck;
-import net.sf.taverna.t2.workflowmodel.health.RemoteHealthChecker;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
-import net.sf.taverna.t2.workflowmodel.processor.activity.DisabledActivity;
+import org.apache.taverna.visit.VisitReport;
+import org.apache.taverna.visit.VisitReport.Status;
+import org.apache.taverna.workflowmodel.health.HealthCheck;
+import org.apache.taverna.workflowmodel.health.RemoteHealthChecker;
+import org.apache.taverna.workflowmodel.processor.activity.Activity;
+import org.apache.taverna.workflowmodel.processor.activity.DisabledActivity;
 import org.apache.taverna.wsdl.parser.UnknownOperationException;
 import org.apache.taverna.wsdl.parser.WSDLParser;
 

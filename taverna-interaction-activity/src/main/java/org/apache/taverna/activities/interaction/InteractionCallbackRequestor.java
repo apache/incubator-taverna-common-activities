@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.taverna.t2.invocation.InvocationContext;
-import net.sf.taverna.t2.reference.ReferenceService;
-import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.reference.WorkflowRunIdEntity;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityOutputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import org.apache.taverna.invocation.InvocationContext;
+import org.apache.taverna.reference.ReferenceService;
+import org.apache.taverna.reference.T2Reference;
+import org.apache.taverna.reference.WorkflowRunIdEntity;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
+import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 /**
  * @author alanrw
