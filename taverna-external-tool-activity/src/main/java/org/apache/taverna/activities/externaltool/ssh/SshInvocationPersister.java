@@ -41,7 +41,7 @@ import org.apache.taverna.activities.externaltool.manager.InvocationPersister;
 * under the License.
 */
 
-import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import org.apache.taverna.security.credentialmanager.CredentialManager;
 
 import org.apache.log4j.Logger;
 

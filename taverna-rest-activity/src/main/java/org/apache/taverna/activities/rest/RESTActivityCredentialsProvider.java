@@ -25,8 +25,8 @@ import java.security.Principal;
 
 import javax.management.remote.JMXPrincipal;
 
-import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
-import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
+import org.apache.taverna.security.credentialmanager.CredentialManager;
+import org.apache.taverna.security.credentialmanager.UsernamePassword;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;

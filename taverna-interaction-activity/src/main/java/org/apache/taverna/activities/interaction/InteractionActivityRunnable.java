@@ -33,7 +33,7 @@ import org.apache.taverna.activities.interaction.atom.AtomUtils;
 import org.apache.taverna.activities.interaction.jetty.InteractionJetty;
 import org.apache.taverna.activities.interaction.preference.InteractionPreference;
 import org.apache.taverna.activities.interaction.velocity.InteractionVelocity;
-import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import org.apache.taverna.security.credentialmanager.CredentialManager;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.i18n.text.Normalizer;

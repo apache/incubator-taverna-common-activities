@@ -29,9 +29,9 @@ import org.apache.taverna.activities.interaction.InteractionUtils;
 import org.apache.taverna.activities.interaction.ResponseFeedListener;
 import org.apache.taverna.activities.interaction.feed.ShowRequestFeedListener;
 import org.apache.taverna.activities.interaction.preference.InteractionPreference;
-import net.sf.taverna.t2.security.credentialmanager.CMException;
-import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
-import net.sf.taverna.t2.security.credentialmanager.UsernamePassword;
+import org.apache.taverna.security.credentialmanager.CMException;
+import org.apache.taverna.security.credentialmanager.CredentialManager;
+import org.apache.taverna.security.credentialmanager.UsernamePassword;
 //import net.sf.taverna.t2.spi.SPIRegistry;
 import net.sf.webdav.WebdavServlet;
 

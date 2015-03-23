@@ -26,7 +26,7 @@ import org.apache.taverna.activities.interaction.jetty.InteractionJetty;
 import org.apache.taverna.activities.interaction.preference.InteractionPreference;
 import org.apache.taverna.activities.interaction.velocity.InteractionVelocity;
 import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import org.apache.taverna.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.taverna.activities.rest.URISignatureHandler.URISignatureParsingException;
-import net.sf.taverna.t2.security.credentialmanager.CredentialManager;
+import org.apache.taverna.security.credentialmanager.CredentialManager;
 import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityFactory;

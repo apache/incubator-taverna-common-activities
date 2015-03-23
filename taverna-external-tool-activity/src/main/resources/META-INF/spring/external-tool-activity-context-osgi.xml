@@ -34,7 +34,7 @@
 
         <list id="invocationPersisters" interface="org.apache.taverna.activities.externaltool.manager.InvocationPersister" cardinality="0..N" />
 
-	<reference id="credentialManager" interface="net.sf.taverna.t2.security.credentialmanager.CredentialManager" />
+	<reference id="credentialManager" interface="org.apache.taverna.security.credentialmanager.CredentialManager" />
 
 	<reference id="applicationConfiguration" interface="uk.org.taverna.configuration.app.ApplicationConfiguration" />
 
