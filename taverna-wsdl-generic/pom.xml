@@ -77,7 +77,7 @@
 		</dependency>
                 <dependency>
                     <groupId>org.apache.woden</groupId>
-                    <artifactId>woden</artifactId>
+                    <artifactId>woden-api</artifactId>
                     <version>1.0M9</version>
                 </dependency>
                 <dependency>
