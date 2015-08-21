@@ -24,11 +24,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.wsdl.WSDLException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.taverna.wsdl.parser.schema.XSModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.XmlSchemaType;
+import org.apache.ws.commons.schema.utils.XmlSchemaNamed;
 import org.xml.sax.SAXException;
 
 
@@ -83,7 +86,7 @@ public class WSDLParser {
      * @return a list of WSDLOperations for all operations for this service,
      */
     public List<String> getOperations() {
-        List<String> operations = new ArrayList<String>();
+        List<String> operations = new ArrayList();
         
         for (QName serviceName : parser.getServices()) {
             for (String portName : parser.getPorts(serviceName)) {
@@ -157,35 +160,58 @@ public class WSDLParser {
         return parser.getOperationStyle(null, operationName);
     }
 
+    public LinkedHashMap<String, XmlSchemaNamed> getInputParameters(String operationName) throws UnknownOperationException {
+        return parser.getInputParameters(null, operationName);
+    }
+    
+    public LinkedHashMap<String, XmlSchemaNamed> getOutputParameters(String operationName) throws UnknownOperationException {
+        return parser.getOutputParameters(null, operationName);
+    }
     /**
-     * Returns a List of the TypeDescriptors representing the parameters for the
-     * inputs to the service
+     * Returns a simple tree-based datatype model for the service input.
      *
      * @param operationName
-     * @return List of TypeDescriptor
+     * @return input data model
      * @throws UnknownOperationException if no operation matches the name
-     * @throws IOException
      *
      */
-    public List<TypeDescriptor> getOperationInputParameters(String operationName)
-            throws UnknownOperationException, IOException {
-
-        return TypeDescriptors.getDescriptors(parser.getInputParameters(null, operationName));
+    public XSModel getInputDataModel(String operationName)
+            throws UnknownOperationException {
+        
+        XSModel model = new XSModel(parser.getXmlSchemas());
+        LinkedHashMap<String, XmlSchemaNamed> input = parser.getInputParameters(null, operationName);
+        for (Map.Entry<String, XmlSchemaNamed> entry : input.entrySet()) {
+            XmlSchemaNamed o = entry.getValue();
+            if (o instanceof XmlSchemaElement) {
+                model.addGlobalElement(o.getQName());
+            } else if (o instanceof XmlSchemaType) {
+                model.addGlobalType(o.getQName(), new QName(entry.getKey()));
+            }
+        }
+        return model;
     }
 
     /**
-     * Returns a List of the TypeDescriptors representing the parameters for the
-     * outputs of the service
+     * Returns a simple tree-based datatype model for the service output.
      *
      * @param operationName
-     * @return List of TypeDescriptor
+     * @return output data model
      * @throws UnknownOperationException if no operation matches the name
-     * @throws IOException
      */
-    public List<TypeDescriptor> getOperationOutputParameters(
-            String operationName) throws UnknownOperationException, IOException {
-        
-        return TypeDescriptors.getDescriptors(parser.getOutputParameters(null, operationName));
+    public XSModel getOutputDataModel(
+        String operationName) throws UnknownOperationException {
+
+        XSModel model = new XSModel(parser.getXmlSchemas());
+        LinkedHashMap<String, XmlSchemaNamed> output = parser.getOutputParameters(null, operationName);
+        for (Map.Entry<String, XmlSchemaNamed> entry : output.entrySet()) {
+            XmlSchemaNamed o = entry.getValue();
+            if (o instanceof XmlSchemaElement) {
+                model.addGlobalElement(o.getQName());
+            } else if (o instanceof XmlSchemaType) {
+                model.addGlobalType(o.getQName(), new QName(entry.getKey()));
+            }
+        }
+        return model;
     }
 
     /**
@@ -219,9 +245,9 @@ public class WSDLParser {
         }
         
         // all these things are odd... there is no any wrapper for the 'document' style
-        LinkedHashMap<String, XmlSchemaObject> parameters = parser.getInputParameters(null, operationName);
+        LinkedHashMap<String, XmlSchemaNamed> parameters = parser.getInputParameters(null, operationName);
         if (parameters.size() > 0) {
-            XmlSchemaObject xmlSchemaObject = parameters.values().iterator().next();
+            XmlSchemaNamed xmlSchemaObject = parameters.values().iterator().next();
             if (xmlSchemaObject instanceof XmlSchemaElement) {
                 XmlSchemaElement element = (XmlSchemaElement)xmlSchemaObject;
                 return element.getQName();

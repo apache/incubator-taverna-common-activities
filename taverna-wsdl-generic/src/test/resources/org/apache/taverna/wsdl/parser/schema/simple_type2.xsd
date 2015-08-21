@@ -1,0 +1,15 @@
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:tns="http://example.com" 
+  targetNamespace="http://example.com"
+  attributeFormDefault="unqualified" 
+  elementFormDefault="qualified" 
+  version="1.0">
+
+  <xs:element name="surname">
+    <xs:simpleType>
+      <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+  </xs:element> 
+
+</xs:schema>

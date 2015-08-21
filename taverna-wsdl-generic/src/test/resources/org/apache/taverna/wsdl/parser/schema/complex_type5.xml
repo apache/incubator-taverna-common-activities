@@ -1,0 +1,5 @@
+<person xmlns="http://example.com">
+  <name>Napoleon</name>
+  <surname>Bonaparte</surname>
+  <hobby>war</hobby>
+</person>

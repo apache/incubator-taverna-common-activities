@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="title" type="xs:string"/>
+    <xs:element name="affiliation" type="xs:string"/>
+			
+    <xs:element name="author">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="first_name" type="xs:string"/>
+                <xs:element name="last_name" type="xs:string"/>
+                <xs:element ref="affiliation" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+	
+    <xs:element name="publication">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="title"/>
+                <xs:element name="journal" type="xs:string"/>
+                <xs:element ref="author" minOccurs="1" maxOccurs="unbounded"/>
+                
+            </xs:sequence>
+            <xs:attribute name="doi" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

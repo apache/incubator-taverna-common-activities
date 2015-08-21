@@ -1,0 +1,18 @@
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:tns="http://example.com" 
+  targetNamespace="http://example.com"
+  attributeFormDefault="unqualified" 
+  elementFormDefault="qualified" 
+  version="1.0">
+
+  <xs:element name="campaign">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="title" type="xs:string"/>
+        <xs:element name="date" type="xs:date"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

@@ -1,0 +1,29 @@
+<!--
+-->
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:tns="http://example.com" 
+  targetNamespace="http://example.com"
+  attributeFormDefault="unqualified" 
+  elementFormDefault="qualified" 
+  version="1.0">
+
+  <xs:element name="person" type="tns:person"/>
+  <xs:attributeGroup name="hobby">
+    <xs:attribute name="hobby" type="xs:string" />
+  </xs:attributeGroup>
+
+  <xs:complexType name="person">
+    <xs:complexContent>
+      <xs:extension base="tns:human">
+        <xs:attributeGroup ref="tns:hobby"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="human">
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="surname" type="xs:string"/>
+  </xs:complexType>
+
+</xs:schema>

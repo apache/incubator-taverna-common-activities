@@ -43,8 +43,5 @@ public class WSDLTestHelper implements LocationConstants {
 
 		return content;
 
-	}
-
-    
-
+    }
 }

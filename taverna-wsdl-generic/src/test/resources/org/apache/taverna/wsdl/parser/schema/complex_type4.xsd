@@ -1,0 +1,19 @@
+<!--
+-->
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+  xmlns:tns="http://example.com" 
+  targetNamespace="http://example.com"
+  attributeFormDefault="unqualified" 
+  elementFormDefault="qualified" 
+  version="1.0">
+
+  <xs:element name="person" type="tns:person"/>
+
+  <xs:complexType name="person">
+    <xs:sequence>
+      <xs:element name="hobby" type="xs:string" minOccurs="2" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

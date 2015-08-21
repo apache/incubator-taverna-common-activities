@@ -20,6 +20,7 @@
 package org.apache.taverna.wsdl.parser;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,8 +61,8 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
-import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
+import org.apache.ws.commons.schema.utils.XmlSchemaNamed;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
@@ -228,7 +229,6 @@ public class WSDL11Parser implements GenericWSDLParser {
     }
     
     @Deprecated
-    @Override
     public String getOperationEndpointLocation(String operationName) throws UnknownOperationException {
         return getSoapAddress(findPort(operationName));
     }
@@ -258,7 +258,6 @@ public class WSDL11Parser implements GenericWSDLParser {
      * 
      * @throws UnknownOperationException 
      */
-    @Override
     public QName getRPCRequestMethodName(String portName, String operationName) throws UnknownOperationException {
         if (portName == null) {
             portName = findPort(operationName);
@@ -296,7 +295,6 @@ public class WSDL11Parser implements GenericWSDLParser {
      * 
      * @throws UnknownOperationException 
      */
-    @Override
     public QName getRPCResponseMethodName(String portName, String operationName) throws UnknownOperationException {
         if (portName == null) {
             portName = findPort(operationName);
@@ -357,13 +355,18 @@ public class WSDL11Parser implements GenericWSDLParser {
         return null;
     }
     
+    @Override
+    public XmlSchemaCollection getXmlSchemas() {
+        return schemas;
+    }
+    
     @Deprecated
-    LinkedHashMap<String, XmlSchemaObject> getInputParameters(String operationName) throws UnknownOperationException {
+    LinkedHashMap<String, XmlSchemaNamed> getInputParameters(String operationName) throws UnknownOperationException {
         return getInputParameters(null, operationName);
     }
     
     @Override
-    public LinkedHashMap<String, XmlSchemaObject> getInputParameters(String portName, String operationName) throws UnknownOperationException {
+    public LinkedHashMap<String, XmlSchemaNamed> getInputParameters(String portName, String operationName) throws UnknownOperationException {
         if (portName == null) {
             portName = findPort(operationName);
         }
@@ -373,12 +376,12 @@ public class WSDL11Parser implements GenericWSDLParser {
     }
 
     @Deprecated
-    LinkedHashMap<String, XmlSchemaObject> getOutputParameters(String operationName) throws UnknownOperationException {
+    LinkedHashMap<String, XmlSchemaNamed> getOutputParameters(String operationName) throws UnknownOperationException {
         return getOutputParameters(null, operationName);
     }
     
     @Override
-    public LinkedHashMap<String, XmlSchemaObject> getOutputParameters(String portName, String operationName) throws UnknownOperationException {
+    public LinkedHashMap<String, XmlSchemaNamed> getOutputParameters(String portName, String operationName) throws UnknownOperationException {
         if (portName == null) {
             portName = findPort(operationName);
         }
@@ -387,11 +390,11 @@ public class WSDL11Parser implements GenericWSDLParser {
         return getParameters(parts);
     }
     
-    private LinkedHashMap<String, XmlSchemaObject> getParameters(List<Part> parts) {
-        LinkedHashMap<String, XmlSchemaObject> parameters = new LinkedHashMap<String, XmlSchemaObject>();
+    private LinkedHashMap<String, XmlSchemaNamed> getParameters(List<Part> parts) {
+        LinkedHashMap<String, XmlSchemaNamed> parameters = new LinkedHashMap<String, XmlSchemaNamed>();
         
         for (Part part : parts) {
-            XmlSchemaObject parameter = getParameter(part);
+            XmlSchemaNamed parameter = getParameter(part);
 
             if (parameter == null) {
                 logger.log(Level.WARNING, "can't find parameter type: {0}", part.getName());
@@ -480,8 +483,8 @@ public class WSDL11Parser implements GenericWSDLParser {
         return parts;
     }
     
-    private XmlSchemaObject getParameter(Part part) {
-        XmlSchemaObject parameter;
+    private XmlSchemaNamed getParameter(Part part) {
+        XmlSchemaNamed parameter;
         
         QName elementName = part.getElementName();
         if (elementName != null) {
@@ -809,7 +812,7 @@ public class WSDL11Parser implements GenericWSDLParser {
             WSDLFactory factory = WSDLFactory.newInstance();
             WSDLReader reader = factory.newWSDLReader();
             reader.setFeature("javax.wsdl.verbose", false);
-            Definition definition = reader.readWSDL(wsdlLocation);
+            Definition definition = reader.readWSDL(new WSDLLocatorImpl(new URL(wsdlLocation)));
 
             parser = new WSDL11Parser(definition);
             

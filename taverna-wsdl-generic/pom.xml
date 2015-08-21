@@ -9,12 +9,11 @@
 	</parent>
         
 	<artifactId>taverna-wsdl-generic</artifactId>
-        <!--
-        <version>2.1.1-incubating-SNAPSHOT</version>
-        -->
+        <version>3.0.0-incubating-SNAPSHOT</version>
+        
 	<packaging>bundle</packaging>
 	<name>Apache Taverna WSDL-generic Library</name>
-	<description>WSDL 1.1/2.0 generic parsing library</description>
+        <description>WSDL 1.1/2.0 handling classes bundled for Taverna 3 OSGi</description>
 
 	<build>
 		<plugins>
@@ -23,6 +22,30 @@
 				<artifactId>maven-bundle-plugin</artifactId>
 				<version>2.3.7</version>
 				<extensions>true</extensions>
+                                <configuration>
+                                        <instructions>
+                                                <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+                                                <Main-Class>org.apache.taverna.wsdl.invoker.CommandLineInvoker</Main-Class>
+                                                <Import-Package>
+                                                    javax.activation;version="0.0.0",
+                                                    javax.xml.bind;version="0.0.0",
+                                                    javax.xml.namespace;version="0.0.0",
+                                                    javax.xml.parsers;version="0.0.0",
+                                                    javax.xml.soap;version="0.0.0",
+                                                    javax.xml.transform;version="0.0.0",
+                                                    javax.xml.transform.dom;version="0.0.0",
+                                                    javax.xml.transform.stream;version="0.0.0",
+                                                    javax.xml.ws;version="0.0.0",
+                                                    javax.xml.ws.handler;version="0.0.0",
+                                                    javax.xml.ws.handler.soap;version="0.0.0",
+                                                    org.w3c.dom;version="0.0.0",
+                                                    org.w3c.dom.ls;version="0.0.0",
+                                                    org.xml.sax;version="0.0.0",
+                                                    *
+                                                </Import-Package>
+                                        </instructions>
+                                </configuration>
+
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -50,11 +73,19 @@
 					</execution>
 				</executions>
 			</plugin>
+		 <plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-compiler-plugin</artifactId>
+		  <version>2.3.2</version>
+		  <configuration>
+		   <source>1.7</source>
+		   <target>1.7</target>
+		  </configuration>
+		 </plugin>
 		</plugins>
 	</build>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -76,14 +107,14 @@
 			<version>${javax.wsdl.version}</version>
 		</dependency>
                 <dependency>
-                    <groupId>org.apache.woden</groupId>
-                    <artifactId>woden-api</artifactId>
-                    <version>1.0M9</version>
-                </dependency>
-                <dependency>
                         <groupId>org.apache.ws.xmlschema</groupId>
                         <artifactId>xmlschema-core</artifactId>
                         <version>2.1.0</version>
+                </dependency>
+                <dependency>
+                        <groupId>org.apache.woden</groupId>
+                        <artifactId>woden</artifactId>
+                        <version>1.0M9</version>
                 </dependency>
                 <dependency>
                         <groupId>org.apache.ws.security</groupId>

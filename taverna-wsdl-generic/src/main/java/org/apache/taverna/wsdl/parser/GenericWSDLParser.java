@@ -22,7 +22,8 @@ package org.apache.taverna.wsdl.parser;
 import java.util.LinkedHashMap;
 import java.util.List;
 import javax.xml.namespace.QName;
-import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.ws.commons.schema.utils.XmlSchemaNamed;
 
 /**
  * @author Dmitry Repchevsky
@@ -35,7 +36,7 @@ public interface GenericWSDLParser {
     List<String> getPorts(QName serviceName);
     List<String> getOperations(String portName);
     WSRF_Version isWSRFPort(String portName);
-    
+
     String getOperationStyle(String portName, String operationName) throws UnknownOperationException;
     String getSOAPActionURI(String portName, String operationName) throws UnknownOperationException;
     QName getRPCRequestMethodName(String portName, String operationName) throws UnknownOperationException;
@@ -47,6 +48,7 @@ public interface GenericWSDLParser {
     String getOperationEndpointLocation(String operationName) throws UnknownOperationException;
     String getOperationDocumentation(String portName, String operationName) throws UnknownOperationException;
     
-    LinkedHashMap<String, XmlSchemaObject> getInputParameters(String portName, String operationName) throws UnknownOperationException;
-    LinkedHashMap<String, XmlSchemaObject> getOutputParameters(String portName, String operationName) throws UnknownOperationException;
+    XmlSchemaCollection getXmlSchemas();
+    LinkedHashMap<String, XmlSchemaNamed> getInputParameters(String portName, String operationName) throws UnknownOperationException;
+    LinkedHashMap<String, XmlSchemaNamed> getOutputParameters(String portName, String operationName) throws UnknownOperationException;
 }

@@ -45,6 +45,7 @@ import org.apache.woden.wsdl20.BindingOperation;
 import org.apache.woden.wsdl20.Description;
 import org.apache.woden.wsdl20.ElementDeclaration;
 import org.apache.woden.wsdl20.Endpoint;
+import org.apache.woden.wsdl20.Interface;
 import org.apache.woden.wsdl20.InterfaceMessageReference;
 import org.apache.woden.wsdl20.InterfaceOperation;
 import org.apache.woden.wsdl20.Service;
@@ -54,7 +55,7 @@ import org.apache.woden.wsdl20.extensions.soap.SOAPConstants;
 import org.apache.woden.wsdl20.xml.DescriptionElement;
 import org.apache.woden.wsdl20.xml.DocumentationElement;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
-import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.utils.XmlSchemaNamed;
 import org.w3c.dom.Element;
 
 /**
@@ -82,7 +83,7 @@ public class WSDL20Parser implements GenericWSDLParser {
 
     @Override
     public List<QName> getServices() {
-        List<QName> services = new ArrayList<QName>();
+        List<QName> services = new ArrayList();
         for (Service service : description.getServices()) {
             services.add(service.getName());
         }
@@ -91,23 +92,16 @@ public class WSDL20Parser implements GenericWSDLParser {
 
     @Override
     public List<String> getPorts(QName serviceName) {
-        List<String> ports = new ArrayList<String>();
-        
-        Service service = description.getService(serviceName);
-        if (service != null) {
-            for (Endpoint endpoint : service.getEndpoints()) {
-                final NCName endpointName = endpoint.getName();
-                if (endpointName != null) {
-                    ports.add(endpointName.toString());
-                }
-            }
+        List<String> interfaces = new ArrayList();
+        for (Interface _interface : description.getInterfaces()) {
+            interfaces.add(_interface.getName().getLocalPart());
         }
-        return ports;
+        return interfaces;
     }
 
     @Override
     public List<String> getOperations(String portName) {
-        List<String> operations = new ArrayList<String>();
+        List<String> operations = new ArrayList();
         
         for (Service service : description.getServices()) {
             for (Endpoint endpoint : service.getEndpoints()) {
@@ -150,8 +144,7 @@ public class WSDL20Parser implements GenericWSDLParser {
     @Override
     public QName getRPCRequestMethodName(String portName, String operationName) throws UnknownOperationException {
         // NO RPC SUPPORT YET
-        return new QName(operationName);
-    }
+        return new QName(operationName);    }
 
     @Override
     public QName getRPCResponseMethodName(String portName, String operationName) throws UnknownOperationException {
@@ -200,6 +193,7 @@ public class WSDL20Parser implements GenericWSDLParser {
             }    
         }
         return null;
+
     }
 
     @Override
@@ -221,32 +215,36 @@ public class WSDL20Parser implements GenericWSDLParser {
                     } catch (TransformerException ex) {}
                 }
             }
-        } catch (TransformerFactoryConfigurationError ex) {}
-          catch (TransformerConfigurationException ex) {}
+        } catch (TransformerFactoryConfigurationError | TransformerConfigurationException ex) {}
         
         return writer.toString();
     }
 
     @Override
-    public LinkedHashMap<String, XmlSchemaObject> getInputParameters(String portName, String operationName) throws UnknownOperationException {
-        LinkedHashMap<String, XmlSchemaObject> parameters = new LinkedHashMap<String, XmlSchemaObject>();
+    public XmlSchemaCollection getXmlSchemas() {
+        return schemas;
+    }
+    
+    @Override
+    public LinkedHashMap<String, XmlSchemaNamed> getInputParameters(String portName, String operationName) throws UnknownOperationException {
+        LinkedHashMap<String, XmlSchemaNamed> parameters = new LinkedHashMap();
 
         BindingOperation bindingOperation = getBindingOperation(portName, operationName);
         InterfaceOperation interfaceOperation = bindingOperation.getInterfaceOperation();
-        
+
         // NOTE THAT THIS CODE IS NOT VALID FOR "RPC" STYLE
         for (InterfaceMessageReference input : interfaceOperation.getInterfaceMessageReferences()) {
             if (Direction.IN == input.getDirection()) {
                 ElementDeclaration element = input.getElementDeclaration();
-                parameters.put(element.getName().getLocalPart(), (XmlSchemaObject)element.getContent());
+                parameters.put(element.getName().getLocalPart(), (XmlSchemaNamed)element.getContent());
             }
         }
         return parameters;
     }
 
     @Override
-    public LinkedHashMap<String, XmlSchemaObject> getOutputParameters(String portName, String operationName) throws UnknownOperationException {
-        LinkedHashMap<String, XmlSchemaObject> parameters = new LinkedHashMap<String, XmlSchemaObject>();
+    public LinkedHashMap<String, XmlSchemaNamed> getOutputParameters(String portName, String operationName) throws UnknownOperationException {
+        LinkedHashMap<String, XmlSchemaNamed> parameters = new LinkedHashMap();
         
         BindingOperation bindingOperation = getBindingOperation(portName, operationName);
         InterfaceOperation interfaceOperation = bindingOperation.getInterfaceOperation();
@@ -254,8 +252,9 @@ public class WSDL20Parser implements GenericWSDLParser {
         // NOTE THAT THIS CODE IS NOT VALID FOR "RPC" STYLE
         for (InterfaceMessageReference output : interfaceOperation.getInterfaceMessageReferences()) {
             if (Direction.OUT == output.getDirection()) {
+                // TODO!!!
                 ElementDeclaration element = output.getElementDeclaration();
-                parameters.put(element.getName().getLocalPart(), (XmlSchemaObject)element.getContent());
+                parameters.put(element.getName().getLocalPart(), (XmlSchemaNamed)element.getContent());
             }
         }
         return parameters;
@@ -298,12 +297,12 @@ public class WSDL20Parser implements GenericWSDLParser {
 
         throw new UnknownOperationException("Unknown operation: " + operationName);
     }
-    
+
     public static synchronized WSDL20Parser getWSDL20Parser(String wsdlLocation) throws Exception {
         WSDL20Parser parser = null;
         
         if (parsers == null) {
-            parsers = new TreeMap<String, WSDL20Parser>();
+            parsers = new TreeMap();
         } else {
             parser = parsers.get(wsdlLocation);
         }
