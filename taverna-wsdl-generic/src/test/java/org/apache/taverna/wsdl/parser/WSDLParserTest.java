@@ -42,7 +42,7 @@ public class WSDLParserTest {
 	
     @Test
     public void getWSDL11fromSSLTest() throws Exception {
-        WSDL11Parser.getWSDL11Parser("https://transplantdb.bsc.es/registry/rest/service/94259BD285E07E855382DD197BC61D62");
+        WSDL11Parser.getWSDL11Parser("https://transplantdb.bsc.es/registry/rest/service/6E36427B278738C5AB51D0FEFB08A0BB");
     }
     
 	@Test
@@ -50,8 +50,7 @@ public class WSDLParserTest {
 		WSDLParser parser = new WSDLParser(wsdlResourcePath("eutils/eutils_lite.wsdl"));
                 List<String> operations = parser.getOperations("eUtilsServiceSoap");
 
-		assertEquals(
-				"wrong number of operations found (wsdl may have changed)", 12,
+		assertEquals("wrong number of operations found (wsdl may have changed)", 12,
 				operations.size());
 		assertEquals("wrong name for first operation", "run_eGquery", operations.get(0));
 		assertEquals("wrong style", "document", parser.getStyle());
