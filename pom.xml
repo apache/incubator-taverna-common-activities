@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.apache.taverna</groupId>
 		<artifactId>taverna-parent</artifactId>
-		<version>1-incubating-SNAPSHOT</version>
+		<version>2-incubating-SNAPSHOT</version>
 	</parent>
 	<groupId>org.apache.taverna.commonactivities</groupId>
 	<artifactId>taverna-common-activities</artifactId>
