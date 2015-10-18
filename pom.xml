@@ -13,7 +13,7 @@
 	<name>Apache Taverna Common Activities</name>
   <properties>
     <taverna.language.version>0.15.0-incubating</taverna.language.version>
-    <taverna.osgi.version>0.2.0-incubating-SNAPSHOT</taverna.osgi.version>
+    <taverna.osgi.version>0.2.1-incubating-SNAPSHOT</taverna.osgi.version>
     <taverna.engine.version>3.1.0-incubating-SNAPSHOT</taverna.engine.version>
   </properties>
 	<modules>

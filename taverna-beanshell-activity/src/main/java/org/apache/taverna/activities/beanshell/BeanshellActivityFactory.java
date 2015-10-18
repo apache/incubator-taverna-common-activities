@@ -27,7 +27,7 @@ import java.util.Set;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityFactory;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
-import uk.org.taverna.configuration.app.ApplicationConfiguration;
+import org.apache.taverna.configuration.app.ApplicationConfiguration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

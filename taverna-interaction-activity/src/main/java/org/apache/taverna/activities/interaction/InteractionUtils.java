@@ -38,7 +38,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import uk.org.taverna.configuration.app.ApplicationConfiguration;
+import org.apache.taverna.configuration.app.ApplicationConfiguration;
 
 /**
  * @author alanrw

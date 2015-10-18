@@ -55,7 +55,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import uk.org.taverna.configuration.app.ApplicationConfiguration;
+import org.apache.taverna.configuration.app.ApplicationConfiguration;
 
 
 /**

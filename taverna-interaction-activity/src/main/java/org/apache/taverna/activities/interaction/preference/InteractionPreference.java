@@ -31,7 +31,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import uk.org.taverna.configuration.app.ApplicationConfiguration;
+import org.apache.taverna.configuration.app.ApplicationConfiguration;
 
 /**
  * @author alanrw

@@ -36,7 +36,7 @@ import org.apache.taverna.workflowmodel.processor.activity.NestedDataflow;
 
 import org.apache.log4j.Logger;
 
-import uk.org.taverna.configuration.app.ApplicationConfiguration;
+import org.apache.taverna.configuration.app.ApplicationConfiguration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
