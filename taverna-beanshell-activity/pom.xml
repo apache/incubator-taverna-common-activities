@@ -20,6 +20,8 @@
         <configuration>
           <instructions>
             <Embed-Dependency>artifactId=bsh</Embed-Dependency>
+	    <Import-Package>!org.apache.bsf.*,!javax.swing.*,*</Import-Package>
+
           </instructions>
         </configuration>
       </plugin>
@@ -70,7 +72,22 @@
       <groupId>org.apache-extras.beanshell</groupId>
       <artifactId>bsh</artifactId>
       <version>${bsh.version}</version>
+      <optional>true</optional>
+<!-- NOTE: bsh is not really optional, but it is embedded in our jar as bsh is
+not yet available as a OSGi bundle -->
     </dependency>
+<!--
+    <dependency>
+      <groupId>org.apache.bsf</groupId>
+      <artifactId>bsf-api</artifactId>
+      <version>3.1</version>
+      <optional>true</optional>
+    </dependency>
+-->
+
+
+
+
   </dependencies>
 
 
