@@ -369,10 +369,8 @@ public class TypeDescriptors
      * Adds all elements found in a "all" particle to the list of elements
      */
     private void addElementTypeDescriptors(List<TypeDescriptor> elements, XmlSchemaAll all) {
-        for (XmlSchemaElement element : all.getItems()) {
-            TypeDescriptor elementTypeDescriptor = getElementDescriptor(element);
-            elements.add(elementTypeDescriptor);
-        }
+        List<XmlSchemaAllMember> items = all.getItems();
+        addElementTypeDescriptors(elements, items);
     }
 
     /*
@@ -380,7 +378,7 @@ public class TypeDescriptors
      */
 
     private void addElementTypeDescriptors(List<TypeDescriptor> elements, XmlSchemaChoice choice) {
-        List<XmlSchemaObject> items = choice.getItems();
+        List<XmlSchemaChoiceMember> items = choice.getItems();
         addElementTypeDescriptors(elements, items);
     }
 
