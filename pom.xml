@@ -15,6 +15,7 @@
     <taverna.language.version>0.15.0-incubating</taverna.language.version>
     <taverna.osgi.version>0.2.1-incubating-SNAPSHOT</taverna.osgi.version>
     <taverna.engine.version>3.1.0-incubating-SNAPSHOT</taverna.engine.version>
+    <wss4j.version>1.6.18</wss4j.version>
   </properties>
 	<modules>
     <module>taverna-beanshell-activity</module>
