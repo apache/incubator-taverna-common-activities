@@ -12,10 +12,26 @@
 	<packaging>pom</packaging>
 	<name>Apache Taverna Common Activities</name>
   <properties>
+
+		<!-- Taverna dependency versions -->
     <taverna.language.version>0.15.0-incubating</taverna.language.version>
     <taverna.osgi.version>0.2.1-incubating-SNAPSHOT</taverna.osgi.version>
     <taverna.engine.version>3.1.0-incubating-SNAPSHOT</taverna.engine.version>
-    <wss4j.version>1.6.18</wss4j.version>
+
+		<!-- Third-party dependency versios -->
+		<abdera.version>1.1.3</abdera.version>
+		<bsh.version>2.0b5</bsh.version>
+		<javax.wsdl.version>1.6.1</javax.wsdl.version>
+		<javacsv.version>2.0</javacsv.version>
+		<jsch.version>1.0.6.RELEASE</jsch.version>
+		<odfdom.version>0.7</odfdom.version>
+		<!-- <odfdom.version>0.8.8-incubating</odfdom.version>-->
+		<santuario.xmlsec.version>1.5.7</santuario.xmlsec.version>
+    <xmlschema.version>2.2.1</xmlschema.version>
+		<velocity.version>1.7</velocity.version>
+		<webdavservlet.version>2.0</webdavservlet.version>
+    <woden.version>1.0M10</woden.version>
+		<wss4j.version>1.6.18</wss4j.version>
   </properties>
 	<modules>
     <module>taverna-beanshell-activity</module>

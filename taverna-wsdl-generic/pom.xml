@@ -7,7 +7,7 @@
 		<artifactId>taverna-common-activities</artifactId>
 		<version>2.1.0-incubating-SNAPSHOT</version>
 	</parent>
-        
+
 	<artifactId>taverna-wsdl-generic</artifactId>
         <!--
         <version>2.1.1-incubating-SNAPSHOT</version>
@@ -78,12 +78,12 @@
                 <dependency>
                     <groupId>org.apache.woden</groupId>
                     <artifactId>woden-core</artifactId>
-                    <version>1.0M10</version>
+                    <version>${woden.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.ws.xmlschema</groupId>
                     <artifactId>xmlschema-core</artifactId>
-                    <version>2.2.1</version>
+                    <version>${xmlschema.version}</version>
                 </dependency>
                 <dependency>
                         <groupId>org.apache.ws.security</groupId>
