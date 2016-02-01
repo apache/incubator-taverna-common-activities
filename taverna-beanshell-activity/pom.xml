@@ -71,7 +71,7 @@
     <dependency>
       <groupId>org.apache-extras.beanshell</groupId>
       <artifactId>bsh</artifactId>
-      <version>${bsh.version}</version>
+      <version>2.0b6</version>
       <optional>true</optional>
 <!-- NOTE: bsh is not really optional, but it is embedded in our jar as bsh is
 not yet available as a OSGi bundle -->
@@ -89,6 +89,17 @@ not yet available as a OSGi bundle -->
 
 
   </dependencies>
+
+<repositories>
+ <repository>
+  <snapshots>
+   <enabled>false</enabled>
+  </snapshots>
+  <id>bintray-beanshell-Beanshell</id>
+  <name>bintray</name>
+  <url>http://dl.bintray.com/beanshell/Beanshell</url>
+ </repository>
+</repositories>
 
 
 </project>
