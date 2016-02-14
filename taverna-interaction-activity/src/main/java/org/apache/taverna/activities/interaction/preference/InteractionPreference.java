@@ -75,7 +75,7 @@ public class InteractionPreference {
 
 	private File getConfigFile() {
 		final File home = appConfig
-				.getApplicationHomeDir();
+				.getApplicationHomeDir().toFile();
 		final File config = new File(home, "conf");
 		if (!config.exists()) {
 			config.mkdir();

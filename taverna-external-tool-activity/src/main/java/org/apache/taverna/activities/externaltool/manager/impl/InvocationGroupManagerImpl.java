@@ -319,7 +319,7 @@ public class InvocationGroupManagerImpl implements Observable<InvocationManagerE
 	@Override
 	public File getInvocationManagerDirectory() {
 
-		File home = applicationConfiguration.getApplicationHomeDir();
+		File home = applicationConfiguration.getApplicationHomeDir().toFile();
 
 		File invocationManagerDirectory = new File(home,"externaltool");
 		if (!invocationManagerDirectory.exists()) {

@@ -114,7 +114,7 @@ public class InteractionUtils {
 
 	public File getInteractionServiceDirectory() {
 		final File workingDir = appConfig
-				.getApplicationHomeDir();
+				.getApplicationHomeDir().toFile();
 		final File interactionServiceDirectory = new File(workingDir,
 				"interactionService");
 		interactionServiceDirectory.mkdirs();
