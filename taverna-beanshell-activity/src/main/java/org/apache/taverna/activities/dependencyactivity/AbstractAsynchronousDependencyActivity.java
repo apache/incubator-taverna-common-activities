@@ -104,7 +104,7 @@ public abstract class AbstractAsynchronousDependencyActivity extends AbstractAsy
 
 	public AbstractAsynchronousDependencyActivity(ApplicationConfiguration applicationConfiguration) {
 		if (applicationConfiguration != null) {
-			libDir = new File(applicationConfiguration.getApplicationHomeDir(), "lib");
+			libDir = applicationConfiguration.getApplicationHomeDir().resolve("lib").toFile();
 		}
 	}
 
