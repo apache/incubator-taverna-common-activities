@@ -7,7 +7,7 @@
 		<version>2-incubating-SNAPSHOT</version>
 	</parent>
 	<groupId>org.apache.taverna.commonactivities</groupId>
-	<artifactId>taverna-common-activities</artifactId>
+	<artifactId>apache-taverna-common-activities</artifactId>
 	<version>2.1.0-incubating-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Apache Taverna Common Activities</name>
