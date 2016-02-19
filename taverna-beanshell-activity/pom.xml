@@ -3,31 +3,29 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-    <groupId>org.apache.taverna.commonactivities</groupId>
-    <artifactId>apache-taverna-common-activities</artifactId>
-    <version>2.1.0-incubating-SNAPSHOT</version>
+		<groupId>org.apache.taverna.commonactivities</groupId>
+		<artifactId>apache-taverna-common-activities</artifactId>
+		<version>2.1.0-incubating-SNAPSHOT</version>
 	</parent>
 	<artifactId>taverna-beanshell-activity</artifactId>
 	<packaging>bundle</packaging>
 	<name>Apache Taverna Beanshell Activity</name>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Embed-Dependency>artifactId=bsh</Embed-Dependency>
-	    <Import-Package>!org.apache.bsf.*,!javax.swing.*,*</Import-Package>
-
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Embed-Dependency>artifactId=bsh</Embed-Dependency>
+						<Import-Package>!org.apache.bsf.*,!javax.swing.*,*</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
 		<dependency>
@@ -48,7 +46,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
+			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -68,27 +66,28 @@
 			<version>${taverna.engine.version}</version>
 			<scope>test</scope>
 		</dependency>
-    <dependency>
-      <groupId>org.apache-extras.beanshell</groupId>
-      <artifactId>bsh</artifactId>
-      <version>${bsh.version}</version>
-      <optional>true</optional>
-<!-- NOTE: bsh is not really optional, but it is embedded in our jar as bsh is
-not yet available as a OSGi bundle -->
-    </dependency>
-<!--
-    <dependency>
-      <groupId>org.apache.bsf</groupId>
-      <artifactId>bsf-api</artifactId>
-      <version>3.1</version>
-      <optional>true</optional>
-    </dependency>
--->
+		<dependency>
+			<groupId>org.apache-extras.beanshell</groupId>
+			<artifactId>bsh</artifactId>
+			<version>${bsh.version}</version>
+			<optional>true</optional>
+			<!-- NOTE: bsh is not really optional, but it is embedded in our jar as 
+				bsh is not yet available as a OSGi bundle -->
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.apache.bsf</groupId>
+			<artifactId>bsf-api</artifactId>
+			<version>3.1</version>
+			<optional>true</optional>
+		</dependency>
+		-->
 
 
 
 
-  </dependencies>
+
+	</dependencies>
 
 
 </project>
