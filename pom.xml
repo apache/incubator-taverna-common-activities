@@ -53,6 +53,7 @@
 		<wss4j.version>1.6.18</wss4j.version>
 	</properties>
 	<modules>
+		<module>taverna-cwl-activity</module>
 		<module>taverna-beanshell-activity</module>
 		<module>taverna-external-tool-activity</module>
 		<module>taverna-interaction-activity</module>
