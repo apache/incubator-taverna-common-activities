@@ -71,6 +71,7 @@
 					<excludes combine.children="append">
 						<exclude>**/src/main/resources/META-INF/soap-encoding.xsd</exclude> <!-- W3C Software License (See NOTICE) -->
 						<exclude>**/src/test/resources/test-spreadsheet*</exclude> <!--  Our own test spreadsheets -->
+						<exclude>**/src/main/resources/json2.js</exclude><!-- public domain -->
 					</excludes>
 				</configuration>
 			</plugin>
