@@ -33,8 +33,6 @@ import org.junit.BeforeClass;
 
 public class WSDLTestHelper implements LocationConstants {
 
-
-	
 	// See https://github.com/taverna-extras/wsdl-generic-test-cases
 	//public static String TEST_CASES_URL = "https://github.com/taverna-extras/wsdl-generic-test-cases/archive/2016-04-28.zip";
 	public static String TEST_CASES_URL = "https://github.com/taverna-extras/wsdl-generic-test-cases/releases/download/2016-04-28/wsdl-generic-test-cases-2016-04-28.jar";
