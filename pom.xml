@@ -62,6 +62,19 @@
 		<module>taverna-wsdl-generic</module>
 		<module>taverna-xpath-activity</module>
 	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.rat</groupId>
+				<artifactId>apache-rat-plugin</artifactId>
+				<configuration>
+					<excludes combine.children="append">
+						<exclude>**/src/main/resources/META-INF/soap-encoding.xsd</exclude> <!-- W3C Software License (See NOTICE) -->
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>	
 	<scm>
 		<connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-taverna-common-activities.git</connection>
 		<developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-taverna-common-activities.git</developerConnection>
