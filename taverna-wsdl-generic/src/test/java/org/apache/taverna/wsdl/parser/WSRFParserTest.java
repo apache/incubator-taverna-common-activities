@@ -24,17 +24,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 
+import org.apache.taverna.wsdl.testutils.WSDLTestHelper;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Check that WSDLParser can detect WSRF.
  * Tests {@link WSDLParser#checkWSRF()}
- * 
- * @author Stian Soiland-Reyes
  *
  */
-public class WSRFParserTest {
+public class WSRFParserTest extends WSDLTestHelper {
 	
 	private URL counterServiceWSDL;
 	private WSDLParser wsdlParser;
@@ -42,7 +41,7 @@ public class WSRFParserTest {
 	@Before
 	public void findWSDL() {
 		String path = "wsrf/counterService/CounterService_.wsdl";
-		counterServiceWSDL = getClass().getResource(path);	
+		counterServiceWSDL = getResource(path);	
 		assertNotNull("Coult not find test WSDL " + path, counterServiceWSDL);
 	}
 	

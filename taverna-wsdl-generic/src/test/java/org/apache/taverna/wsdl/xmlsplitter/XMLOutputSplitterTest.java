@@ -40,7 +40,7 @@ public class XMLOutputSplitterTest extends WSDLTestHelper {
         WSDLParser parser = new WSDLParser(WSDLTestHelper.wsdlResourcePath("menagerie-complex-rpc.wsdl"));
 		TypeDescriptor descriptor = parser.getOperationOutputParameters("getComplexWithInternalList").get(0);
         XMLOutputSplitter splitter = new XMLOutputSplitter(descriptor, new String [] {"length","innerArray","innerList"}, new String [] {"text/plain","l('text/plain')","l('text/plain')"}, new String[] {"input"});
-        String inputXML=getResourceContentsString("getComplexWithInternalListResponse.xml");
+        String inputXML=getResourceAsString("getComplexWithInternalListResponse.xml");
         Map<String,String> inputMap = new HashMap<String,String>();
         inputMap.put("input", inputXML);
         Map<String,Object> outputMap = splitter.execute(inputMap);
@@ -70,7 +70,7 @@ public class XMLOutputSplitterTest extends WSDLTestHelper {
         WSDLParser parser = new WSDLParser(WSDLTestHelper.wsdlResourcePath("jws-online.wsdl"));
 		TypeDescriptor descriptor = parser.getOperationOutputParameters("getSteadyStateTable").get(0);
         XMLOutputSplitter splitter = new XMLOutputSplitter(descriptor, new String [] {"model","fluxNames","fluxVals"}, new String [] {"text/plain","l('text/plain')","l('text/plain')"}, new String[] {"input"});
-        String inputXML=getResourceContentsString("jws-splitter-input.xml");
+        String inputXML=getResourceAsString("jws-splitter-input.xml");
 
         Map<String,String> inputMap = new HashMap<String,String>();
         inputMap.put("input", inputXML);
