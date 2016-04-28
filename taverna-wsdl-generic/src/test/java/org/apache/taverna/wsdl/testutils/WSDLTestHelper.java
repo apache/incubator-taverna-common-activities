@@ -96,6 +96,7 @@ public class WSDLTestHelper implements LocationConstants {
 	}
 	
 	public static String wsdlResourcePath(String resourceName) throws Exception {
+		makeClassLoader();
 		return getResource(WSDL_RESOURCE_BASE+resourceName).toExternalForm();
 	}
 
