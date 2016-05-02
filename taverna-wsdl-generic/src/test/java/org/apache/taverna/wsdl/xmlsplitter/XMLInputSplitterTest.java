@@ -32,11 +32,11 @@ import org.apache.taverna.wsdl.testutils.WSDLTestHelper;
 
 import org.junit.Test;
 
-public class XMLInputSplitterTest implements LocationConstants {
+public class XMLInputSplitterTest extends WSDLTestHelper {
 
 	@Test
 	public void testExecute() throws Exception {
-		WSDLParser parser = new WSDLParser(WSDLTestHelper.wsdlResourcePath("eutils/eutils_lite.wsdl"));
+		WSDLParser parser = new WSDLParser(wsdlResourcePath("eutils/eutils_lite.wsdl"));
 		TypeDescriptor descriptor = parser.getOperationInputParameters("run_eInfo").get(0);
 		XMLInputSplitter splitter = new XMLInputSplitter(descriptor,new String[]{"db","tool","email"},new String[]{"text/plain","text/plain","text/plain"},new String[]{"output"});
 		Map<String,Object> inputMap = new HashMap<String, Object>();
@@ -54,7 +54,7 @@ public class XMLInputSplitterTest implements LocationConstants {
 	
 	@Test
 	public void testOptional() throws Exception {
-		WSDLParser parser = new WSDLParser(WSDLTestHelper.wsdlResourcePath("VSOi.wsdl"));
+		WSDLParser parser = new WSDLParser(wsdlResourcePath("VSOi.wsdl"));
 		TypeDescriptor descriptor = parser.getOperationInputParameters("Query").get(0);
 		XMLInputSplitter splitter = new XMLInputSplitter(descriptor,new String[]{"version","block"},new String[]{"text/plain","text/plain"},new String[]{"output"});
 		Map<String,Object> inputMap = new HashMap<String, Object>();
@@ -71,7 +71,7 @@ public class XMLInputSplitterTest implements LocationConstants {
 	
 	@Test
 	public void testNillable() throws Exception {
-		WSDLParser parser = new WSDLParser(WSDLTestHelper.wsdlResourcePath("VSOi.wsdl"));
+		WSDLParser parser = new WSDLParser(wsdlResourcePath("VSOi.wsdl"));
 		TypeDescriptor descriptor = parser.getOperationInputParameters("Query").get(0);
 		XMLInputSplitter splitter = new XMLInputSplitter(descriptor,new String[]{"version","block"},new String[]{"text/plain","text/plain"},new String[]{"output"});
 		Map<String,Object> inputMap = new HashMap<String, Object>();

@@ -29,7 +29,7 @@ the actual workflow execution.
 
 (c) 2007-2014 University of Manchester
 
-(c) 2014-2015 Apache Software Foundation
+(c) 2014-2016 Apache Software Foundation
 
 This product includes software developed at The
 [Apache Software Foundation](http://www.apache.org/).
@@ -131,12 +131,24 @@ for both object code and source code.
 
 The following provides more details on the included cryptographic software:
 
-* `taverna-rest-activity` uses Apache HttpComponents SSL support if
-  accessing `https://` connections.
-* `taverna-wsdl-generic` and `taverna-wsdl-activity` uses 
-  Java Secure Socket Extension (JSSE),
-  Apache WSS4J and  Apache XML Security for Java if accessing
-  secure SOAP Web Services.
-* This software relies on Apache Taverna Engine's Credential Manager for
+* [taverna-rest-activity](taverna-rest-activity)
+  depend on
+  [Apache HttpComponents](https://hc.apache.org/) Client,
+  which can be configured to initiate
+  `https://` connections.
+* [taverna-wsdl-generic](taverna-wsdl-generic)
+  and [taverna-wsdl-activity](taverna-wsdl-activity) uses
+  [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html)
+  (JSSE) and depend on
+  [Apache WSS4J](https://ws.apache.org/wss4j/),
+  [Apache XML Security for Java](https://santuario.apache.org/javaindex.html)
+  for accessing secure SOAP Web Services.
+* Apache Taverna Common Activities depends on the
+  [Apache Taverna Engine](http://taverna.incubator.apache.org/download/engine/)
+  Credential Manager API for
   management of username/password and client/server SSL certificates.
-
+* [taverna-interaction-activity](taverna-interaction-activity) depend on
+  [Jetty](http://www.eclipse.org/jetty/),
+  which includes UnixCrypt.java for one way cryptography, and can be
+  configured for SSL encryption using
+  [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html)

@@ -59,6 +59,14 @@
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>taverna-wsdl-generic</artifactId>
 			<version>${project.parent.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>taverna-wsdl-generic</artifactId>
+			<version>${project.parent.version}</version>			
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.taverna.engine</groupId>

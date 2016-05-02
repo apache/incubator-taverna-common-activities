@@ -32,7 +32,7 @@ import org.apache.taverna.wsdl.testutils.WSDLTestHelper;
 
 import org.junit.Test;
 
-public class WSDLParserTest {
+public class WSDLParserTest extends WSDLTestHelper {
 	
 	@Test
 	public void testGetOperations() throws Exception {
@@ -46,9 +46,6 @@ public class WSDLParserTest {
 		assertEquals("wrong style", "document", parser.getStyle());
 	}
 
-	private String wsdlResourcePath(String wsdlName) throws Exception {
-		return WSDLTestHelper.wsdlResourcePath(wsdlName);
-	}
 
 	@Test
 	public void testGetActionURI() throws Exception {
@@ -279,8 +276,7 @@ public class WSDLParserTest {
 
 	@Test
 	public void testGetOperationElementQName2() throws Exception {
-		URL tav744Url = getClass().getResource(
-				"/org/apache/taverna/wsdl/parser/TAV-744/InstrumentService__.wsdl");
+		URL tav744Url = getResource("TAV-744/InstrumentService__.wsdl");
 		WSDLParser parser = new WSDLParser(tav744Url.toExternalForm());
 		QName operationQName = parser.getOperationQname("getList");
 		assertEquals("operation element name is wrong", "GetListRequest",
