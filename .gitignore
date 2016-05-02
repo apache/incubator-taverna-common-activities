@@ -3,3 +3,8 @@
 .settings/
 target/
 .svn
+
+
+# remove emacs
+*~
+
