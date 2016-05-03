@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.usecases;
+package org.apache.taverna.activities.externaltool.desc;
 import java.util.ArrayList;
 
 import org.apache.taverna.activities.externaltool.ExternalToolActivity;
@@ -24,48 +24,59 @@ import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
 import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
 
 /**
- * Internal description of input
+ * Internal description of output
  */
-@ConfigurationBean(uri = ExternalToolActivity.URI + "#ScriptOutput")
-public class ScriptOutput {
-	private String path;
-	private boolean binary;
+@ConfigurationBean(uri = ExternalToolActivity.URI + "#ScriptInput")
+public class ScriptInputUser extends ScriptInput {
+
+	/**
+	 * This input may be fed from multiple ouputs.
+	 */
+	private boolean list = false;
+	/**
+	 * True if the data from a list input in taverna is concatenated into one single input file.
+	 */
+	private boolean concatenate = false;
+
 	private ArrayList<String> mime = new ArrayList<String>();
 
 	@Override
 	public String toString() {
-		return "Output[path: " + path + (binary ? ", binary" : "")
+		return "Input[tag: " + getTag() + (isFile() ? ", file" : "")
+				+ (isTempFile() ? ", tempfile" : "")
+				+ (isBinary() ? ", binary" : "") + (list ? ", list" : "")
+				+ (concatenate ? ", concatenate" : "")
 				+ " mime: " + mime.toString() + "]";
 	}
 
 	/**
-	 * @return the path
+	 * @return the list
 	 */
-	public final String getPath() {
-		return path;
+	public final boolean isList() {
+		return list;
 	}
 
 	/**
-	 * @param path the path to set
+	 * @param list the list to set
 	 */
-	@ConfigurationProperty(name = "path", label = "Path")
-	public final void setPath(String path) {
-		this.path = path;
+	@ConfigurationProperty(name = "list", label = "List")
+	public final void setList(boolean list) {
+		this.list = list;
 	}
 
 	/**
-	 * @return the binary
+	 * @return the concatenate
 	 */
-	public final boolean isBinary() {
-		return binary;
+	public final boolean isConcatenate() {
+		return concatenate;
 	}
 
 	/**
-	 * @param binary the binary to set
+	 * @param concatenate the concatenate to set
 	 */
-	@ConfigurationProperty(name = "binary", label = "Binary")
-	public final void setBinary(boolean binary) {
-		this.binary = binary;
+	@ConfigurationProperty(name = "concatenate", label = "Concatenate")
+	public final void setConcatenate(boolean concatenate) {
+		this.concatenate = concatenate;
 	}
 
 	/**

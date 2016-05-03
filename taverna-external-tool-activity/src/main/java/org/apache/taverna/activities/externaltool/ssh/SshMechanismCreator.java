@@ -27,10 +27,6 @@ import org.apache.taverna.activities.externaltool.manager.MechanismCreator;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
-
 /**
  * @author alanrw
  *

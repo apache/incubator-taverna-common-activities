@@ -15,22 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
+package org.apache.taverna.activities.externaltool.ssh;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.taverna.activities.externaltool.desc.RuntimeEnvironmentConstraint;
+import org.apache.taverna.activities.externaltool.invocation.AskUserForPw;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-
-import de.uni_luebeck.inb.knowarc.usecases.RuntimeEnvironmentConstraint;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
 
 public class SshPool {
 	

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
+package org.apache.taverna.activities.externaltool.ssh;
 
 import java.io.InputStream;
 

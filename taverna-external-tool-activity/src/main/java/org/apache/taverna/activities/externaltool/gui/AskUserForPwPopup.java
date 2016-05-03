@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.uni_luebeck.inb.knowarc.gui;
+package org.apache.taverna.activities.externaltool.gui;
 
 import javax.swing.JOptionPane;
 
-import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
+import org.apache.taverna.activities.externaltool.invocation.AskUserForPw;
+import org.apache.taverna.activities.externaltool.ssh.SshNode;
 
 public final class AskUserForPwPopup implements AskUserForPw {
 	private SshNode ret;

@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
+package org.apache.taverna.activities.externaltool.ssh;
 
 import org.apache.log4j.Logger;
+import org.apache.taverna.activities.externaltool.invocation.AskUserForPw;
 
 import com.jcraft.jsch.UIKeyboardInteractive;
 import com.jcraft.jsch.UserInfo;
-
-import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
 
 final class SshAutoLoginTrustEveryone implements UserInfo, UIKeyboardInteractive {
 	

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.usecases;
+package org.apache.taverna.activities.externaltool.desc;
 
 import org.apache.taverna.activities.externaltool.ExternalToolActivity;
 import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;

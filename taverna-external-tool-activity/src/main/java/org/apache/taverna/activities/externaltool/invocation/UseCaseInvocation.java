@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.usecases.invocation;
+package org.apache.taverna.activities.externaltool.invocation;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -31,7 +31,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-
+import org.apache.taverna.activities.externaltool.desc.ScriptInput;
+import org.apache.taverna.activities.externaltool.desc.ScriptInputStatic;
+import org.apache.taverna.activities.externaltool.desc.ScriptInputUser;
+import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
 import org.apache.taverna.invocation.InvocationContext;
 import org.apache.taverna.reference.ExternalReferenceSPI;
 import org.apache.taverna.reference.Identified;
@@ -42,10 +45,6 @@ import org.apache.taverna.reference.ReferenceSet;
 import org.apache.taverna.reference.T2Reference;
 import org.apache.taverna.reference.impl.external.object.InlineByteArrayReferenceBuilder;
 import org.apache.taverna.reference.impl.external.object.InlineStringReferenceBuilder;
-import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
-import de.uni_luebeck.inb.knowarc.usecases.ScriptInputStatic;
-import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 
 /**
  * An abstraction of various forms to bring job using the software that is
