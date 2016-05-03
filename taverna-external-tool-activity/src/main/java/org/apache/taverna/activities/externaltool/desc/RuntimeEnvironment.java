@@ -29,15 +29,14 @@ import org.apache.log4j.Logger;
  * to decide if one runtime environment is possibly compatible with another one
  * for the selection of queues to commit to.
  * 
- * To experiment/test these functions, run the following java -cp
- * target/taverna-knowarc-processor-0.1.7.jar
- * de.uni_luebeck.janitor.ldap.RuntimeEnvironment compare bla-1 foo-1 java -cp
- * target/taverna-knowarc-processor-0.1.7.jar
- * de.uni_luebeck.janitor.ldap.RuntimeEnvironment compare bla-1 bla-2 java -cp
- * target/taverna-knowarc-processor-0.1.7.jar
- * de.uni_luebeck.janitor.ldap.RuntimeEnvironment compare bla-1.2 bla-1
+ * To experiment/test these functions, run the following:
+ * <pre>
+ * java -cp target/taverna-external-tool-activity-2.1.0-incubating-SNAPSHOT.jar org.apache.taverna.activities.externaltool.desc.RuntimeEnvironment compare bla-1 foo-1 
  * 
- * @author Steffen Moeller
+ * java -cp target/taverna-external-tool-activity-2.1.0-incubating-SNAPSHOT.jar org.apache.taverna.activities.externaltool.desc.RuntimeEnvironment compare bla-1 bla-2 
+ * 
+ * java -cp target/taverna-external-tool-activity-2.1.0-incubating-SNAPSHOT.jar org.apache.taverna.activities.externaltool.desc.RuntimeEnvironment compare bla-1.2 bla-1
+ * </pre>
  */
 @SuppressWarnings("unchecked")
 public class RuntimeEnvironment implements Comparable {
