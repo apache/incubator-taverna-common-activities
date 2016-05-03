@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
+package org.apache.taverna.activities.externaltool.ssh;
 
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 

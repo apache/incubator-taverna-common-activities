@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.gui;
+package org.apache.taverna.activities.externaltool.gui;
 
 import java.util.ArrayList;
 import java.util.List;

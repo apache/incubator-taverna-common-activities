@@ -23,7 +23,7 @@
 <!-- Hibernate mapping for ssh reference bean -->
 <hibernate-mapping>
 	<joined-subclass
-		name="de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshReference"
+		name="org.apache.taverna.activities.externaltool.invocation.ssh.SshReference"
 		extends="org.apache.taverna.reference.AbstractExternalReference">
 		<!-- Link to primary key from abstract superclass -->
 		<key column="bean_id" />

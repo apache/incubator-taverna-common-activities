@@ -21,12 +21,12 @@ package org.apache.taverna.activities.externaltool;
 
 import java.util.List;
 
+import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
 import org.apache.taverna.activities.externaltool.manager.InvocationGroup;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.activities.externaltool.manager.MechanismCreator;
 import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
 import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 
 @ConfigurationBean(uri = ExternalToolActivity.URI + "#Config")
 public final class ExternalToolActivityConfigurationBean {

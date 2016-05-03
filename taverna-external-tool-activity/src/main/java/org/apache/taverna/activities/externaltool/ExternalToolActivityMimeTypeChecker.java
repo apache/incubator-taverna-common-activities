@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.taverna.activities.externaltool.desc.ScriptInputUser;
+import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
 import org.apache.taverna.visit.VisitReport;
 import org.apache.taverna.visit.VisitReport.Status;
 import org.apache.taverna.workflowmodel.Dataflow;
@@ -48,9 +50,6 @@ import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
 import org.apache.taverna.workflowmodel.utils.Tools;
 
 import org.apache.log4j.Logger;
-
-import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;
-import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
 
 /**
  * @author alanrw

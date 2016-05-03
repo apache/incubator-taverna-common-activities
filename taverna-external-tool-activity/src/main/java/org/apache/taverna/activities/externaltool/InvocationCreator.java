@@ -21,9 +21,8 @@ package org.apache.taverna.activities.externaltool;
 
 import java.util.Map;
 
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
-
+import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.reference.ReferenceService;
 import org.apache.taverna.reference.T2Reference;

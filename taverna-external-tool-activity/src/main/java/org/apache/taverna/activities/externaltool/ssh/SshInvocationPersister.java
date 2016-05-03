@@ -21,6 +21,7 @@ package org.apache.taverna.activities.externaltool.ssh;
 
 import java.io.File;
 
+import org.apache.taverna.activities.externaltool.invocation.InvocationException;
 import org.apache.taverna.activities.externaltool.manager.InvocationPersister;
 /*
 * Licensed to the Apache Software Foundation (ASF) under one
@@ -44,9 +45,6 @@ import org.apache.taverna.activities.externaltool.manager.InvocationPersister;
 import org.apache.taverna.security.credentialmanager.CredentialManager;
 
 import org.apache.log4j.Logger;
-
-import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
 /**
  * @author alanrw

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.usecases.invocation.local;
+package org.apache.taverna.activities.externaltool.local;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -47,6 +47,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import org.apache.taverna.activities.externaltool.desc.ScriptInput;
+import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
+import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.invocation.InvocationException;
+import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
+import org.apache.taverna.activities.externaltool.ssh.SshNode;
+import org.apache.taverna.activities.externaltool.ssh.SshNodeFactory;
+import org.apache.taverna.activities.externaltool.ssh.SshUrl;
 import org.apache.taverna.reference.AbstractExternalReference;
 import org.apache.taverna.reference.ErrorDocument;
 import org.apache.taverna.reference.ExternalReferenceSPI;
@@ -60,15 +68,6 @@ import org.apache.taverna.reference.impl.external.file.FileReference;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-
-import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
-import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrl;
 
 /**
  * The job is executed locally, i.e. not via the grid.

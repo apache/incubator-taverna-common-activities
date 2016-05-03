@@ -24,6 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.taverna.activities.externaltool.desc.ScriptInput;
+import org.apache.taverna.activities.externaltool.desc.ScriptInputUser;
+import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
+import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.invocation.InvocationException;
+import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationGroup;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.annotation.Annotated;
@@ -40,13 +46,6 @@ import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.apache.log4j.Logger;
-
-import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
-import de.uni_luebeck.inb.knowarc.usecases.ScriptInputUser;
-import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 
 /**
  * This is the main class of the use case activity plugin. Here we store the

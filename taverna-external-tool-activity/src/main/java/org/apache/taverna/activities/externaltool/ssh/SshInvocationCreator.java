@@ -25,19 +25,12 @@ import java.util.Map;
 
 import org.apache.taverna.activities.externaltool.InvocationCreator;
 import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
-
+import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
 import org.apache.log4j.Logger;
 
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
-
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshReference;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrl;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.reference.ExternalReferenceSPI;

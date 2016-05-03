@@ -22,8 +22,6 @@ package org.apache.taverna.activities.externaltool.local;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-
-import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationPersister;
 
 /**

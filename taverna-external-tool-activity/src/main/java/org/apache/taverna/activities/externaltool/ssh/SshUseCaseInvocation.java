@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.usecases.invocation.ssh;
+package org.apache.taverna.activities.externaltool.ssh;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -43,6 +43,12 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 
 import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
+import org.apache.taverna.activities.externaltool.desc.ScriptInput;
+import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
+import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.invocation.AskUserForPw;
+import org.apache.taverna.activities.externaltool.invocation.InvocationException;
+import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
 import org.apache.taverna.reference.AbstractExternalReference;
 import org.apache.taverna.reference.ErrorDocument;
 import org.apache.taverna.reference.ErrorDocumentServiceException;
@@ -62,13 +68,6 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
-
-import de.uni_luebeck.inb.knowarc.usecases.ScriptInput;
-import de.uni_luebeck.inb.knowarc.usecases.ScriptOutput;
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
 
 /**
  * The job is executed by connecting to a worker pc using ssh, i.e. not via the

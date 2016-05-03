@@ -16,17 +16,21 @@
  * limitations under the License.
  */
 
-package de.uni_luebeck.inb.knowarc.usecases.invocation;
+package org.apache.taverna.activities.externaltool.invocation;
 
-public interface AskUserForPw {
+public class InvocationException extends Exception {
 
-	// we will try keyfile first
-	public String getKeyfile();
-	public String getPassphrase();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 437316164959631591L;
 
-	// then username+password
-	public String getUsername();
-	public String getPassword();
+	public InvocationException(String string) {
+		super(string);
+	}
+	
+	public InvocationException(Exception e) {
+		super(e);
+	}
 
-	public void authenticationSucceeded();
 }

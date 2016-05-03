@@ -24,12 +24,7 @@ import java.util.List;
 
 import org.jdom.Element;
 import org.jdom.Text;
-
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
-
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
 
 /**
  * @author alanrw
