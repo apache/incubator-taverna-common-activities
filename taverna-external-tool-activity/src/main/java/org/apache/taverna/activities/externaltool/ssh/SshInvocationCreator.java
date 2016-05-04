@@ -54,16 +54,16 @@ public final class SshInvocationCreator implements InvocationCreator {
 
 	@Override
 	public boolean canHandle(String mechanismType) {
-		return mechanismType.equals(SshUseCaseInvocation.SSH_USE_CASE_INVOCATION_TYPE);
+		return mechanismType.equals(SshToolInvocation.SSH_USE_CASE_INVOCATION_TYPE);
 	}
 
 	@Override
 	public ToolInvocation convert(InvocationMechanism m, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 	    ExternalToolSshInvocationMechanism mechanism = (ExternalToolSshInvocationMechanism) m;
-		SshUseCaseInvocation result = null;
+		SshToolInvocation result = null;
 		try {
 		    SshNode chosenNode = chooseNode(mechanism.getNodes(), data, referenceService);
-		    result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString(), credentialManager), credentialManager);
+		    result = new SshToolInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString(), credentialManager), credentialManager);
 		} catch (JSchException e) {
 			logger.error("Null invocation", e);
 		} catch (SftpException e) {

@@ -41,7 +41,7 @@ public class SshMechanismCreator extends MechanismCreator {
 	 */
 	@Override
 	public boolean canHandle(String mechanismType) {
-		return mechanismType.equals(SshUseCaseInvocation.SSH_USE_CASE_INVOCATION_TYPE);
+		return mechanismType.equals(SshToolInvocation.SSH_USE_CASE_INVOCATION_TYPE);
 	}
 
 

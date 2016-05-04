@@ -39,7 +39,7 @@ public class ExternalToolSshInvocationMechanism extends InvocationMechanism {
 	 */
 	@Override
 	public String getType() {
-		return SshUseCaseInvocation.SSH_USE_CASE_INVOCATION_TYPE;
+		return SshToolInvocation.SSH_USE_CASE_INVOCATION_TYPE;
 	}
 
 	/**

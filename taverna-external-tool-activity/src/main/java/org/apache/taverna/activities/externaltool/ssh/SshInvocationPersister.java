@@ -62,7 +62,7 @@ public class SshInvocationPersister extends InvocationPersister {
 	 */
 	@Override
 	public void load(File directory) {
-		SshUseCaseInvocation.load(directory);
+		SshToolInvocation.load(directory);
 	}
 
 	/* (non-Javadoc)
@@ -70,13 +70,13 @@ public class SshInvocationPersister extends InvocationPersister {
 	 */
 	@Override
 	public void persist(File directory) {
-		SshUseCaseInvocation.persist(directory);
+		SshToolInvocation.persist(directory);
 	}
 
 	@Override
 	public void deleteRun(String runId) {
 		try {
-			SshUseCaseInvocation.cleanup(runId, credentialManager);
+			SshToolInvocation.cleanup(runId, credentialManager);
 		} catch (InvocationException e) {
 			logger.error(e);
 		}

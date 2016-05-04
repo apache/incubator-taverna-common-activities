@@ -75,9 +75,9 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
  * 
  * @author Hajo Krabbenhoeft
  */
-public class SshUseCaseInvocation extends ToolInvocation {
+public class SshToolInvocation extends ToolInvocation {
 
-	private static Logger logger = Logger.getLogger(SshUseCaseInvocation.class);
+	private static Logger logger = Logger.getLogger(SshToolInvocation.class);
 
 	private SshUrl location = null;
 
@@ -124,7 +124,7 @@ public class SshUseCaseInvocation extends ToolInvocation {
 		return null;
 	}
 
-	public SshUseCaseInvocation(UseCaseDescription desc, SshNode workerNodeA,
+	public SshToolInvocation(UseCaseDescription desc, SshNode workerNodeA,
 			AskUserForPw askUserForPwA, CredentialManager credentialManager)
 			throws JSchException, SftpException {
 		this.workerNode = workerNodeA;
