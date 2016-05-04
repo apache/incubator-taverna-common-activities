@@ -33,9 +33,9 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-public class UseCaseEnumeration {
+public class ToolDescriptionParser {
 
-	private static Logger logger = Logger.getLogger(UseCaseEnumeration.class);
+	private static Logger logger = Logger.getLogger(ToolDescriptionParser.class);
 
 	public static List<ToolDescription> readDescriptionsFromUrl(String xmlFileUrl) throws IOException {
 
