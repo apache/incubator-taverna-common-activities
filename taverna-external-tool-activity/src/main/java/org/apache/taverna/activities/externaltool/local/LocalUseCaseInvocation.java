@@ -51,7 +51,7 @@ import org.apache.taverna.activities.externaltool.desc.ScriptInput;
 import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
 import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
 import org.apache.taverna.activities.externaltool.invocation.InvocationException;
-import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
+import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.activities.externaltool.ssh.SshNode;
 import org.apache.taverna.activities.externaltool.ssh.SshNodeFactory;
 import org.apache.taverna.activities.externaltool.ssh.SshUrl;
@@ -73,7 +73,7 @@ import org.apache.log4j.Logger;
  * The job is executed locally, i.e. not via the grid.
  * @author Hajo Krabbenhoeft
  */
-public class LocalUseCaseInvocation extends UseCaseInvocation {
+public class LocalUseCaseInvocation extends ToolInvocation {
 
 	private static Logger logger = Logger.getLogger(LocalUseCaseInvocation.class);
 

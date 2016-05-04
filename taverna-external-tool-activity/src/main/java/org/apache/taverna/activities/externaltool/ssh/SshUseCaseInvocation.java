@@ -48,7 +48,7 @@ import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
 import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
 import org.apache.taverna.activities.externaltool.invocation.AskUserForPw;
 import org.apache.taverna.activities.externaltool.invocation.InvocationException;
-import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
+import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.reference.AbstractExternalReference;
 import org.apache.taverna.reference.ErrorDocument;
 import org.apache.taverna.reference.ErrorDocumentServiceException;
@@ -75,7 +75,7 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
  * 
  * @author Hajo Krabbenhoeft
  */
-public class SshUseCaseInvocation extends UseCaseInvocation {
+public class SshUseCaseInvocation extends ToolInvocation {
 
 	private static Logger logger = Logger.getLogger(SshUseCaseInvocation.class);
 

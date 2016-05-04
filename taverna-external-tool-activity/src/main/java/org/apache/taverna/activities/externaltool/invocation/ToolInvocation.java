@@ -53,7 +53,7 @@ import org.apache.taverna.reference.impl.external.object.InlineStringReferenceBu
  * @author Hajo Nils Krabbenhoeft with some contribution by
  * @author Steffen Moeller
  */
-public abstract class UseCaseInvocation {
+public abstract class ToolInvocation {
 	
 	private String runId;
 	
