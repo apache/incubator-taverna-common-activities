@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.taverna.activities.externaltool.InvocationCreator;
 import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.log4j.Logger;
 
@@ -58,7 +58,7 @@ public final class SshInvocationCreator implements InvocationCreator {
 	}
 
 	@Override
-	public ToolInvocation convert(InvocationMechanism m, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
+	public ToolInvocation convert(InvocationMechanism m, ToolDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 	    ExternalToolSshInvocationMechanism mechanism = (ExternalToolSshInvocationMechanism) m;
 		SshToolInvocation result = null;
 		try {

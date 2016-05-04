@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.taverna.activities.externaltool.InvocationCreator;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.reference.ReferenceService;
@@ -50,7 +50,7 @@ public final class LocalInvocationCreator implements
 	}
 
 	@Override
-	public ToolInvocation convert(InvocationMechanism m, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
+	public ToolInvocation convert(InvocationMechanism m, ToolDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 	    ExternalToolLocalInvocationMechanism mechanism = (ExternalToolLocalInvocationMechanism) m;
 		ToolInvocation result = null;
 		try {

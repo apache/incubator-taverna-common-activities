@@ -37,9 +37,9 @@ public class UseCaseEnumeration {
 
 	private static Logger logger = Logger.getLogger(UseCaseEnumeration.class);
 
-	public static List<UseCaseDescription> readDescriptionsFromUrl(String xmlFileUrl) throws IOException {
+	public static List<ToolDescription> readDescriptionsFromUrl(String xmlFileUrl) throws IOException {
 
-		List<UseCaseDescription> ret = new ArrayList<UseCaseDescription>();
+		List<ToolDescription> ret = new ArrayList<ToolDescription>();
 		URLConnection con = null;
 		try {
 			URL url = new URL(xmlFileUrl);
@@ -61,9 +61,9 @@ public class UseCaseEnumeration {
 
 	}
 	
-	public static List<UseCaseDescription> readDescriptionsFromStream(InputStream is) {
+	public static List<ToolDescription> readDescriptionsFromStream(InputStream is) {
 		
-		List<UseCaseDescription> ret = new ArrayList<UseCaseDescription>();
+		List<ToolDescription> ret = new ArrayList<ToolDescription>();
 
 		SAXBuilder builder = new SAXBuilder();
 		Document doc = null;
@@ -89,7 +89,7 @@ public class UseCaseEnumeration {
 			Element child = (Element) ochild;
 			if (child.getName().equalsIgnoreCase("program")) {
 					try {
-						ret.add(new UseCaseDescription(child));
+						ret.add(new ToolDescription(child));
 					} catch (DeserializationException e) {
 						logger.error(e);
 					}
@@ -98,10 +98,10 @@ public class UseCaseEnumeration {
 		return ret;
 	}
 
-	public static UseCaseDescription readDescriptionFromUrl(
+	public static ToolDescription readDescriptionFromUrl(
 			String repositoryUrl, String id) throws IOException {
-		List<UseCaseDescription> descriptions = readDescriptionsFromUrl(repositoryUrl);
-		for (UseCaseDescription usecase : descriptions) {
+		List<ToolDescription> descriptions = readDescriptionsFromUrl(repositoryUrl);
+		for (ToolDescription usecase : descriptions) {
 			if (usecase.getUsecaseid().equals(id)) {
 				return usecase;
 			}

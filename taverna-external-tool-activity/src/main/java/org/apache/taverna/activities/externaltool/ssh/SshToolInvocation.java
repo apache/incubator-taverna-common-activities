@@ -45,7 +45,7 @@ import java.util.regex.Matcher;
 import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
 import org.apache.taverna.activities.externaltool.desc.ScriptInput;
 import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.invocation.AskUserForPw;
 import org.apache.taverna.activities.externaltool.invocation.InvocationException;
 import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
@@ -124,7 +124,7 @@ public class SshToolInvocation extends ToolInvocation {
 		return null;
 	}
 
-	public SshToolInvocation(UseCaseDescription desc, SshNode workerNodeA,
+	public SshToolInvocation(ToolDescription desc, SshNode workerNodeA,
 			AskUserForPw askUserForPwA, CredentialManager credentialManager)
 			throws JSchException, SftpException {
 		this.workerNode = workerNodeA;

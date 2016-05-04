@@ -49,7 +49,7 @@ import java.util.regex.Matcher;
 
 import org.apache.taverna.activities.externaltool.desc.ScriptInput;
 import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.invocation.InvocationException;
 import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.activities.externaltool.ssh.SshNode;
@@ -93,7 +93,7 @@ public class LocalToolInvocation extends ToolInvocation {
 	
 	private static String LOCAL_INVOCATION_FILE = "localInvocations";
 
-	public LocalToolInvocation(UseCaseDescription desc, boolean retrieveData, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
+	public LocalToolInvocation(ToolDescription desc, boolean retrieveData, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
 
 		usecase = desc;
 		setRetrieveData(retrieveData);

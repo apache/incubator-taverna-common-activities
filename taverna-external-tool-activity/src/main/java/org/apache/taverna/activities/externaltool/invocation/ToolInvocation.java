@@ -34,7 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.taverna.activities.externaltool.desc.ScriptInput;
 import org.apache.taverna.activities.externaltool.desc.ScriptInputStatic;
 import org.apache.taverna.activities.externaltool.desc.ScriptInputUser;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.invocation.InvocationContext;
 import org.apache.taverna.reference.ExternalReferenceSPI;
 import org.apache.taverna.reference.Identified;
@@ -67,7 +67,7 @@ public abstract class ToolInvocation {
 				return actualOsCommand;
 			}
 
-	protected UseCaseDescription usecase;
+	protected ToolDescription usecase;
 	protected final HashMap<String, String> tags = new HashMap<String, String>();
 	protected int nTempFiles = 0;
 	private static int submissionID = 0;

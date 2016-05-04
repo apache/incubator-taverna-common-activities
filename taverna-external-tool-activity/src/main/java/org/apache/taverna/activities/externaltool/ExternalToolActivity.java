@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.taverna.activities.externaltool.desc.ScriptInput;
 import org.apache.taverna.activities.externaltool.desc.ScriptInputUser;
 import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.invocation.InvocationException;
 import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationGroup;
@@ -67,7 +67,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	private static Logger logger = Logger.getLogger(ExternalToolActivity.class);
 
 	private ExternalToolActivityConfigurationBean configurationBean;
-	private UseCaseDescription mydesc;
+	private ToolDescription mydesc;
 
 	private List<InvocationCreator> invocationCreators;
 
@@ -280,7 +280,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		this.invocationCreators = invocationCreators;
 	}
 
-	private ToolInvocation getInvocation(InvocationMechanism mechanism, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
+	private ToolInvocation getInvocation(InvocationMechanism mechanism, ToolDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 		ToolInvocation result = null;
 		InvocationCreator creator = null;
 		for (InvocationCreator c : invocationCreators) {
