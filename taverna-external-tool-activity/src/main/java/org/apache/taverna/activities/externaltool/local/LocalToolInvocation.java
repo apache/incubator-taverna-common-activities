@@ -73,9 +73,9 @@ import org.apache.log4j.Logger;
  * The job is executed locally, i.e. not via the grid.
  * @author Hajo Krabbenhoeft
  */
-public class LocalUseCaseInvocation extends ToolInvocation {
+public class LocalToolInvocation extends ToolInvocation {
 
-	private static Logger logger = Logger.getLogger(LocalUseCaseInvocation.class);
+	private static Logger logger = Logger.getLogger(LocalToolInvocation.class);
 
 	private final File tempDir;
 	
@@ -93,7 +93,7 @@ public class LocalUseCaseInvocation extends ToolInvocation {
 	
 	private static String LOCAL_INVOCATION_FILE = "localInvocations";
 
-	public LocalUseCaseInvocation(UseCaseDescription desc, boolean retrieveData, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
+	public LocalToolInvocation(UseCaseDescription desc, boolean retrieveData, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
 
 		usecase = desc;
 		setRetrieveData(retrieveData);

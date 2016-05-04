@@ -46,7 +46,7 @@ public final class LocalInvocationCreator implements
 
 	@Override
 	public boolean canHandle(String mechanismType) {
-		return mechanismType.equals(LocalUseCaseInvocation.LOCAL_USE_CASE_INVOCATION_TYPE);
+		return mechanismType.equals(LocalToolInvocation.LOCAL_USE_CASE_INVOCATION_TYPE);
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public final class LocalInvocationCreator implements
 	    ExternalToolLocalInvocationMechanism mechanism = (ExternalToolLocalInvocationMechanism) m;
 		ToolInvocation result = null;
 		try {
-		    result = new LocalUseCaseInvocation(description, mechanism.isRetrieveData(), mechanism.getDirectory(), mechanism.getShellPrefix(), mechanism.getLinkCommand());
+		    result = new LocalToolInvocation(description, mechanism.isRetrieveData(), mechanism.getDirectory(), mechanism.getShellPrefix(), mechanism.getLinkCommand());
 		} catch (IOException e) {
 			logger.error(e);
 		}

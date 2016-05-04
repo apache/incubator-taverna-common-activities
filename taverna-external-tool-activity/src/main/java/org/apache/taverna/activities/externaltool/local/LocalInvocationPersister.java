@@ -37,7 +37,7 @@ public class LocalInvocationPersister extends InvocationPersister {
 	 */
 	@Override
 	public void load(File directory) {
-		LocalUseCaseInvocation.load(directory);
+		LocalToolInvocation.load(directory);
 	}
 
 	/* (non-Javadoc)
@@ -45,12 +45,12 @@ public class LocalInvocationPersister extends InvocationPersister {
 	 */
 	@Override
 	public void persist(File directory) {
-		LocalUseCaseInvocation.persist(directory);
+		LocalToolInvocation.persist(directory);
 	}
 	
 	@Override
 	public void deleteRun(String runId) {
-			LocalUseCaseInvocation.cleanup(runId);
+			LocalToolInvocation.cleanup(runId);
 	}
 
 }
