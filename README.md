@@ -134,7 +134,7 @@ The following provides more details on the included cryptographic software:
 * [taverna-rest-activity](taverna-rest-activity)
   depend on
   [Apache HttpComponents](https://hc.apache.org/) Client,
-  which can be configured to initiate
+  and can be configured to initiate
   `https://` connections.
 * [taverna-wsdl-generic](taverna-wsdl-generic)
   and [taverna-wsdl-activity](taverna-wsdl-activity) uses
@@ -152,3 +152,4 @@ The following provides more details on the included cryptographic software:
   which includes UnixCrypt.java for one way cryptography, and can be
   configured for SSL encryption using
   [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html)
+
