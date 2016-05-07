@@ -38,7 +38,7 @@ Licensed under the
 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0), see the file
 [LICENSE](LICENSE) for details.
 
-The file [NOTICE](NOTICE) contain any additional attributions and
+The file [NOTICE](NOTICE) contains any additional attributions and
 details about embedded third-party libraries and source code.
 
 
@@ -46,10 +46,10 @@ details about embedded third-party libraries and source code.
 
 Please subscribe to and contact the
 [dev@taverna](http://taverna.incubator.apache.org/community/lists#dev mailing list)
-for any questions, suggestions and discussions about
+mailing list for any questions, suggestions and discussions about
 Apache Taverna.
 
-Bugs and feature plannings are tracked in the Jira
+Bugs and planned features are tracked in the Jira
 [Issue tracker](https://issues.apache.org/jira/browse/TAVERNA/component/12326811)
 under the `TAVERNA` component _Taverna Common Activities._ Feel free
 to add an issue!
@@ -69,7 +69,7 @@ sponsored by the [Apache Incubator PMC](http://incubator.apache.org/).
 
 [Incubation](http://incubator.apache.org/incubation/Process_Description.html)
 is required of all newly accepted projects until a further review
-indicates that the infrastructure, communications, and decision making process
+indicates that the infrastructure, communications, and decision-making process
 have stabilized in a manner consistent with other successful ASF projects.
 
 While incubation status is not necessarily a reflection of the completeness
@@ -80,7 +80,7 @@ fully endorsed by the ASF.
 
 ## Prerequisites
 
-* Java 1.7 or newer (tested with OpenJDK 1.8)
+* Java 1.8 or newer (tested with OpenJDK 1.8)
 * [Apache Maven](https://maven.apache.org/download.html) 3.2.5 or newer (older
   versions probably also work)
 
@@ -96,7 +96,7 @@ This will build each module and run their tests.
 
 ## Skipping tests
 
-To skip the tests (these can be timeconsuming), use:
+To skip the tests (these can be time-consuming), use:
 
     mvn clean install -DskipTests
 
@@ -132,12 +132,12 @@ for both object code and source code.
 The following provides more details on the included cryptographic software:
 
 * [taverna-rest-activity](taverna-rest-activity)
-  depend on
+  depends on
   [Apache HttpComponents](https://hc.apache.org/) Client,
   and can be configured to initiate
   `https://` connections.
 * [taverna-wsdl-generic](taverna-wsdl-generic)
-  and [taverna-wsdl-activity](taverna-wsdl-activity) uses
+  and [taverna-wsdl-activity](taverna-wsdl-activity) use
   [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html)
   (JSSE) and depend on
   [Apache WSS4J](https://ws.apache.org/wss4j/),
@@ -147,9 +147,9 @@ The following provides more details on the included cryptographic software:
   [Apache Taverna Engine](http://taverna.incubator.apache.org/download/engine/)
   Credential Manager API for
   management of username/password and client/server SSL certificates.
-* [taverna-interaction-activity](taverna-interaction-activity) depend on
+* [taverna-interaction-activity](taverna-interaction-activity) depends on
   [Jetty](http://www.eclipse.org/jetty/),
   which includes UnixCrypt.java for one way cryptography, and can be
   configured for SSL encryption using
-  [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html)
+  [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html).
 
