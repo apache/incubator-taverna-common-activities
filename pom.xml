@@ -75,6 +75,16 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>https://taverna.incubator.apache.org/javadoc/taverna-language/</link>
+                        <link>https://taverna.incubator.apache.org/javadoc/taverna-osgi/</link>
+                        <link>https://taverna.incubator.apache.org/javadoc/taverna-engine/</link>
+                    </links>
+                </configuration>
+            </plugin>
         </plugins>
     </build>    
     <scm>
