@@ -17,10 +17,10 @@
 
 # Apache Taverna Common Activities
 
-Launcher for running
+Common Activities to be invoked as part of 
 [Apache Taverna](http://taverna.incubator.apache.org/) workflows.
 
-Note that except for command line parsing, this module relies on other
+Note that this module relies on other
 [Apache Taverna modules](http://taverna.incubator.apache.org/code) for
 the actual workflow execution.
 
@@ -107,6 +107,7 @@ Apache Taverna project, you may not want to run the
 that enforces Apache headers in every source file - to disable it, try:
 
     mvn clean install -Drat.skip=true
+
 
 # Export restrictions
 
