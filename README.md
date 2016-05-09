@@ -18,18 +18,17 @@
 # Apache Taverna Common Activities
 
 Common Activities to be invoked as part of 
-[Apache Taverna](http://taverna.incubator.apache.org/) workflows.
+[Apache Taverna](https://taverna.incubator.apache.org/) workflows.
 
 Note that this module relies on other
-[Apache Taverna modules](http://taverna.incubator.apache.org/code) for
+[Apache Taverna modules](https://taverna.incubator.apache.org/code) for
 the actual workflow execution.
 
 
 ## License
 
-(c) 2007-2014 University of Manchester
-
-(c) 2014-2016 Apache Software Foundation
+* (c) 2007-2014 University of Manchester
+* (c) 2014-2016 Apache Software Foundation
 
 This product includes software developed at The
 [Apache Software Foundation](http://www.apache.org/).
@@ -45,7 +44,7 @@ details about embedded third-party libraries and source code.
 # Contribute
 
 Please subscribe to and contact the
-[dev@taverna](http://taverna.incubator.apache.org/community/lists#dev mailing list)
+[dev@taverna](https://taverna.incubator.apache.org/community/lists#dev mailing list)
 mailing list for any questions, suggestions and discussions about
 Apache Taverna.
 
@@ -107,6 +106,28 @@ Apache Taverna project, you may not want to run the
 that enforces Apache headers in every source file - to disable it, try:
 
     mvn clean install -Drat.skip=true
+
+# Modules
+
+Each module implement a particular type of 
+Taverna [Activity](https://taverna.incubator.apache.org/javadoc/taverna-engine/org/apache/taverna/workflowmodel/processor/activity/Activity.html).
+
+* [taverna-beanshell-activity](taverna-beanshell-activity/): Apache Taverna Beanshell Activity, 
+  runs [Beanshell](https://github.com/beanshell/beanshell/) scripts.
+* [taverna-external-tool-activity](taverna-external-tool-activity/): Apache Taverna External Tool Activity, 
+  run command line locally or over SSH
+* [taverna-interaction-activity](taverna-interaction-activity/): Apache Taverna Interaction Activity, 
+  ask questions to the user through a browser
+* [taverna-rest-activity](taverna-rest-activity/): Apache Taverna REST Activity, 
+  invoke [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) HTTP(S) web services based on a URI template.
+* [taverna-spreadsheet-import-activity](taverna-spreadsheet-import-activity/): Apache Taverna Spreadsheet Import Activity, 
+  imports from CSV, Excel and OpenOffice.
+* [taverna-wsdl-activity](taverna-wsdl-activity/): Apache Taverna WSDL Activity, 
+  invoke [WSDL](https://en.wikipedia.org/wiki/Web_Services_Description_Language)-described SOAP services.
+* [taverna-wsdl-generic](taverna-wsdl-generic/): Apache Taverna WSDL-generic Library, 
+  library for parsing WSDL and calling SOAP services
+* [taverna-xpath-activity](taverna-xpath-activity/): Apache Taverna XPath Activity, 
+  select XML fragments using [XPath](https://www.w3.org/TR/xpath/) expressions
 
 
 # Export restrictions
