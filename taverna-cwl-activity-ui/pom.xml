@@ -25,7 +25,7 @@
 		<artifactId>apache-taverna-common-activities</artifactId>
 		<version>2.1.0-incubating-SNAPSHOT</version>
 	</parent>
-	<artifactId>taverna-cwl-activity</artifactId>
+	<artifactId>taverna-cwl-activity-ui</artifactId>
 	<packaging>bundle</packaging>
 	<name>Apache Taverna CWL Activity</name>
 
