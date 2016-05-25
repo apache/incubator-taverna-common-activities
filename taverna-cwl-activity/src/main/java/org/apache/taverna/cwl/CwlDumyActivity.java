@@ -18,32 +18,30 @@ package org.apache.taverna.cwl;
 
 import java.util.Map;
 
-import org.apache.taverna.invocation.InvocationContext;
 import org.apache.taverna.reference.T2Reference;
 import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
-import org.apache.taverna.workflowmodel.processor.dispatch.events.DispatchErrorType;
 
 public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityConfigurationBean> implements AsynchronousActivity<CwlActivityConfigurationBean>{
 
 
 	@Override
 	public void configure(CwlActivityConfigurationBean arg0) throws ActivityConfigurationException {
-		// TODO Auto-generated method stub
+		removeInputs();
+		removeOutputs();
+		
 		
 	}
 
 	@Override
 	public void executeAsynch(Map<String, T2Reference> arg0, AsynchronousActivityCallback arg1) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public CwlActivityConfigurationBean getConfiguration() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
