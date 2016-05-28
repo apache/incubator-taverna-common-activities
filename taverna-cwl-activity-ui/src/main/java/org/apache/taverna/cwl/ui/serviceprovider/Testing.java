@@ -5,10 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.taverna.cwl.CwlActivityConfigurationBean;
+import org.apache.taverna.cwl.Type;
 import org.yaml.snakeyaml.Yaml;
 
 public class Testing {
@@ -18,7 +19,8 @@ public class Testing {
 	private static final String TYPE = "type";
 	private static final String ARRAY = "array";
 	private static final String FILE = "File";
-
+	private static final String ITEMS = "items";
+	static int i=0;
 	public static void main(String[] args) {
 		File[] cwlFiles = getCwlFiles();
 
@@ -42,35 +44,43 @@ public class Testing {
 	}
 
 	private static void getInputs(CwlActivityConfigurationBean configurationBean) {
-
+		
+		System.out.println(i);
+		i++;
 		Map cwlFile = configurationBean.getCwlConfigurations();
 
 		for (Object mainKey : cwlFile.keySet()) {
 
 			if (mainKey.equals(INPUTS)) {
 				ArrayList<Map> arrayList = (ArrayList<Map>) cwlFile.get(mainKey);
-				processInputs(arrayList);
+				
+				HashMap<String, Type> map = processInputs(arrayList);
+				for (String s:map.keySet()  ) {
+					if(map.get(s).getType().equals(FILE)) System.out.println("ID: "+s+" type : File");
+					
+					if(map.get(s).getType().equals(ARRAY)) System.out.println("ID :"+s+" type: Array items: "+map.get(s).getItems());
+				}
 			}
 		}
 
 	}
 
-	private static HashMap<String, String> processInputs(ArrayList<Map> inputs) {
+	private static HashMap<String, Type> processInputs(ArrayList<Map> inputs) {
 
-		HashMap<String, String> result = new HashMap<>();
+		HashMap<String, Type> result = new HashMap<>();
 		for (Map input : inputs) {
 			String currentInputId = (String) input.get(ID);
-			System.out.println(currentInputId);
 			Map typeConfigurations;
-			String type;
+			Type type = new Type();
 			try {
 				typeConfigurations = (Map) input.get(TYPE);
-				type = (String) typeConfigurations.get(TYPE);
-				System.out.println(type);
+				type.setType((String) typeConfigurations.get(TYPE));
+				type.setItems((String) typeConfigurations.get(ITEMS));
 			} catch (ClassCastException e) {
 				// This exception means type is described as single argument ex:
 				// type : File
-				type = (String) input.get(TYPE);
+				type.setType((String)input.get(TYPE));
+				type.setItems(null);
 			}
 			result.put(currentInputId, type);
 		}

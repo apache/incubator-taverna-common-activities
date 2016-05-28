@@ -36,34 +36,35 @@ public class CwlServiceProvider implements ServiceDescriptionProvider {
 
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
-		
-		//This is holding the CWL configuration beans
-		List<CwlServiceDesc>  result = new ArrayList<CwlServiceDesc>();
-		
-		File[] cwlFiles = getCwlFiles();
 
+		// This is holding the CWL configuration beans
+		List<CwlServiceDesc> result = new ArrayList<CwlServiceDesc>();
+
+		File[] cwlFiles = getCwlFiles();
+		
+		// Load the CWL file using SnakeYaml lib
+		Yaml cwlReader = new Yaml();
+		
 		for (File file : cwlFiles) {
 			Map cwlFile = null;
-			// Load the CWL file using SnakeYaml lib
-			Yaml cwlReader = new Yaml();
+
 			try {
 				cwlFile = (Map) cwlReader.load(new FileInputStream(file));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 			if (cwlFile != null) {
-				//Creating CWl service Description
+				// Creating CWl service Description
 				CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
 				cwlServiceDesc.setCwlConfiguration(cwlFile);
-				//add to the result
+				// add to the result
 				result.add(cwlServiceDesc);
-				//return the service description
+				// return the service description
 				callBack.partialResults(result);
 			}
 
 		}
 		callBack.finished();
-	
 
 	}
 

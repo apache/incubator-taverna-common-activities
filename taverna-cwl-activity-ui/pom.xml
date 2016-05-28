@@ -63,7 +63,8 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-<!-- =====================================These Dependencies were added later !!! =============================================================== -->
+		<!-- =====================================These Dependencies were added 
+			later !!! =============================================================== -->
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
@@ -74,12 +75,16 @@
 			<artifactId>activity-palette-api</artifactId>
 			<version>${t2.ui.api.version}</version>
 		</dependency>
-		
 
-	<!-- ==================================================================================================== -->
+		<dependency>
+			<artifactId>taverna-cwl-activity</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- ==================================================================================================== -->
 
 	</dependencies>
-	
+
 	<!-- Added these properties to configure new dependencies -->
 	<properties>
 		<t2.ui.api.version>1.5</t2.ui.api.version>
