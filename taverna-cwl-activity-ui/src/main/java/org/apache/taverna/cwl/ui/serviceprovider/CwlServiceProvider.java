@@ -21,11 +21,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
 
+import org.apache.taverna.cwl.Type;
 import org.yaml.snakeyaml.Yaml;
 
 import net.sf.taverna.t2.servicedescriptions.ServiceDescriptionProvider;
@@ -33,6 +35,18 @@ import net.sf.taverna.t2.servicedescriptions.ServiceDescriptionProvider;
 public class CwlServiceProvider implements ServiceDescriptionProvider {
 
 	private static final File cwlFilesLocation = new File("CWLFiles");
+	// CWLTYPES
+	private static final String FILE = "File";
+	private static final String INTEGER = "int";
+	private static final String DOUBLE = "double";
+	private static final String FLOAT = "float";
+	private static final String STRING = "string";
+
+	private static final String ITEMS = "items";
+	private static final String TYPE = "type";
+	private static final String ID = "id";
+	private static final String INPUTS = "inputs";
+	private static final String ARRAY = "array";
 
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
@@ -41,10 +55,10 @@ public class CwlServiceProvider implements ServiceDescriptionProvider {
 		List<CwlServiceDesc> result = new ArrayList<CwlServiceDesc>();
 
 		File[] cwlFiles = getCwlFiles();
-		
+
 		// Load the CWL file using SnakeYaml lib
 		Yaml cwlReader = new Yaml();
-		
+
 		for (File file : cwlFiles) {
 			Map cwlFile = null;
 
@@ -66,6 +80,89 @@ public class CwlServiceProvider implements ServiceDescriptionProvider {
 		}
 		callBack.finished();
 
+	}
+
+	private HashMap<String, Type> processInputs(ArrayList<Map> inputs) {
+
+		HashMap<String, Type> result = new HashMap<>();
+
+		for (Map input : inputs) {
+
+			String Id = (String) input.get(ID);
+			// This require for nested type definitions
+			Map typeConfigurations;
+			// this object holds the type and if it's an array then type of the
+			// elements in the array
+			Type type = null;
+			try {
+				/*
+				 * This part will go through nested type definitions
+				 * 
+				 * type : type : array items : boolean
+				 * 
+				 */
+
+				typeConfigurations = (Map) input.get(TYPE);
+
+				// Check type is defined or not
+				if (typeConfigurations != null) {
+					type = new Type();
+					type.setType((String) typeConfigurations.get(TYPE));
+					type.setItems((String) typeConfigurations.get(ITEMS));
+
+				}
+
+			} catch (ClassCastException e) {
+				/*
+				 * This exception means type is described as single argument ex:
+				 * type : File
+				 */
+				type = new Type();
+				type.setType((String) input.get(TYPE));
+				type.setItems(null);
+			}
+			//when processing the inputs from the HashMap  type should be checked for is it null or not 
+				result.put(Id, type);
+		}
+		return result;
+	}
+
+	public boolean isTavernaCompatible(Map cwlFile) {
+
+	
+		/*
+		 * in this method cwl tool is verified whether it's compatible with
+		 * Taverna or not
+		 */
+		ArrayList<Map> inputs = (ArrayList<Map>) cwlFile.get(INPUTS);
+
+		if (inputs != null) {
+
+			HashMap<String, Type> processedinputs = processInputs(inputs);
+
+			for (String inputId : processedinputs.keySet()) {
+				Type type = processedinputs.get(inputId);
+				if (type != null)
+					if (type.getItems() == null) {
+						String inputType = type.getType();
+						if (!(inputType.equals(DOUBLE) || inputType.equals(FILE) || inputType.equals(FLOAT)
+								|| inputType.equals(INTEGER) || inputType.equals(STRING)))
+							return false;
+
+					} else {
+						if (type.getType().equals(ARRAY)) {
+							String inputType = type.getItems();
+							if (!(inputType.equals(DOUBLE) || inputType.equals(FILE) || inputType.equals(FLOAT)
+									|| inputType.equals(INTEGER) || inputType.equals(STRING)))
+								return false;
+
+						}
+					}
+				else return false;
+			}
+		}
+		return true;
+		
 	}
 
 	@Override

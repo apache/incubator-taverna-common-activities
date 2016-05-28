@@ -5,7 +5,6 @@ cwlVersion: cwl:draft-3
 
 inputs:
   - id: reference
-    type: File
     inputBinding: { position: 2 }
 
   - id: reads

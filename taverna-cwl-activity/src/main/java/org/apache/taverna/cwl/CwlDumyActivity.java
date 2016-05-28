@@ -33,15 +33,24 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 	private static final String ID = "id";
 	private static final String TYPE = "type";
 	private static final String ARRAY = "array";
-	private static final String FILE = "File";
-	private static final String ITEMS = "items";
 
+	private static final String ITEMS = "items";
+	
+	//CWLTYPES
+	private static final String FILE = "File";
+	private static final String INTEGER="int";
+	private static final String DOUBLE="double";
+	private static final String FLOAT="float";
+	private static final String STRING="string";
+	
 	@Override
 	public void configure(CwlActivityConfigurationBean arg0) throws ActivityConfigurationException {
 		removeInputs();
 		removeOutputs();
 
 	}
+	
+	
 
 	private void getInputs(CwlActivityConfigurationBean configurationBean) {
 
@@ -58,6 +67,7 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 			for (String inputId : processedInputs.keySet()) {
 				if (processedInputs.get(inputId).getType().equals(FILE))
 					System.out.println("ID: " + inputId + " type : File");
+				
 
 				if (processedInputs.get(inputId).getType().equals(ARRAY))
 					System.out.println(
@@ -106,7 +116,6 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 
 	@Override
 	public void executeAsynch(Map<String, T2Reference> arg0, AsynchronousActivityCallback arg1) {
-
 	}
 
 	@Override
