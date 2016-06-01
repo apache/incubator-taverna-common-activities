@@ -94,45 +94,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 
 	}
 
-	private HashMap<String, Type> processInputs(ArrayList<Map> inputs) {
-
-		HashMap<String, Type> result = new HashMap<>();
-		for (Map input : inputs) {
-			String currentInputId = (String) input.get(ID);
-			Object typeConfigurations;
-			Type type = null;// this object holds the type of the input/output
-								// or if it's an array then the type of the
-								// elements in the array
-
-			try {
-
-				typeConfigurations = input.get(TYPE);
-				// if type :single argument
-				if (typeConfigurations.getClass() == String.class) {
-					type = new Type();
-					type.setType((String) typeConfigurations);
-					type.setItems(null);// set it to null so that later we can
-										// figure out this a single argument
-										// type
-
-					// type : defined as another map which contains type:
-				} else if (typeConfigurations.getClass() == LinkedHashMap.class) {
-
-					type = new Type();
-					type.setType((String) ((Map) typeConfigurations).get(TYPE));
-					type.setItems((String) ((Map) typeConfigurations).get(ITEMS));
-				}
-
-			} catch (ClassCastException e) {
-
-				System.out.println("Class cast exception !!!");
-			}
-			if (type != null)// see whether type is defined or not
-				result.put(currentInputId, type);
-
-		}
-		return result;
-	}
+	
 
 	@Override
 	public Icon getIcon() {

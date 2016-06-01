@@ -18,6 +18,7 @@ package org.apache.taverna.cwl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.taverna.reference.T2Reference;
@@ -25,6 +26,7 @@ import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousA
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
+
 
 public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityConfigurationBean>
 		implements AsynchronousActivity<CwlActivityConfigurationBean> {
@@ -44,16 +46,9 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 	private static final String STRING="string";
 	
 	@Override
-	public void configure(CwlActivityConfigurationBean arg0) throws ActivityConfigurationException {
+	public void configure(CwlActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
 		removeInputs();
 		removeOutputs();
-
-	}
-	
-	
-
-	private void getInputs(CwlActivityConfigurationBean configurationBean) {
-
 		Map cwlFile = configurationBean.getCwlConfigurations();
 
 		// Get all input objects in
@@ -66,54 +61,55 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 
 			for (String inputId : processedInputs.keySet()) {
 				if (processedInputs.get(inputId).getType().equals(FILE))
-					System.out.println("ID: " + inputId + " type : File");
-				
-
+					addInput(inputId, 0, true, null, String.class);
 				if (processedInputs.get(inputId).getType().equals(ARRAY))
-					System.out.println(
-							"ID :" + inputId + " type: Array items: " + processedInputs.get(inputId).getItems());
+					addInput(inputId, 1, true, null, byte[].class);
 			}
 
 		}
 	}
+	
+	
 
 	private HashMap<String, Type> processInputs(ArrayList<Map> inputs) {
 
 		HashMap<String, Type> result = new HashMap<>();
-
 		for (Map input : inputs) {
+			String currentInputId = (String) input.get(ID);
+			Object typeConfigurations;
+			Type type = null;// this object holds the type of the input/output
+								// or if it's an array then the type of the
+								// elements in the array
 
-			String Id = (String) input.get(ID);
-			// This require for nested type definitions
-			Map typeConfigurations;
-			// this object holds the type and if it's an array then type of the
-			// elements in the array
-			Type type = new Type();
 			try {
-				/*
-				 * This part will go through nested type definitions
-				 * 
-				 * type :
-				 *   type : array
-				 *   items : boolean
-				 *  
-				 */
-				
-				typeConfigurations = (Map) input.get(TYPE);
-				type.setType((String) typeConfigurations.get(TYPE));
-				type.setItems((String) typeConfigurations.get(ITEMS));
+
+				typeConfigurations = input.get(TYPE);
+				// if type :single argument
+				if (typeConfigurations.getClass() == String.class) {
+					type = new Type();
+					type.setType((String) typeConfigurations);
+					type.setItems(null);// set it to null so that later we can
+										// figure out this a single argument
+										// type
+
+					// type : defined as another map which contains type:
+				} else if (typeConfigurations.getClass() == LinkedHashMap.class) {
+
+					type = new Type();
+					type.setType((String) ((Map) typeConfigurations).get(TYPE));
+					type.setItems((String) ((Map) typeConfigurations).get(ITEMS));
+				}
+
 			} catch (ClassCastException e) {
-				/*This exception means type is described as single argument ex:
-				* type : File
-				*/
-				type.setType((String) input.get(TYPE));
-				type.setItems(null);
+
+				System.out.println("Class cast exception !!!");
 			}
-			result.put(Id, type);
+			if (type != null)// see whether type is defined or not
+				result.put(currentInputId, type);
+
 		}
 		return result;
 	}
-
 	@Override
 	public void executeAsynch(Map<String, T2Reference> arg0, AsynchronousActivityCallback arg1) {
 	}
