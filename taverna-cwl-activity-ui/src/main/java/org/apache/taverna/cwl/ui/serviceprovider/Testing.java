@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.taverna.cwl.CwlActivityConfigurationBean;
@@ -46,14 +47,14 @@ public class Testing {
 				CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
 				configurationBean.setCwlConfigurations(cwlFile);
 				// getInputs(configurationBean);
-				if (isTavernaCompatible(cwlFile))
+				if (isCompatible(cwlFile))
 					System.out.println(file.getName().split("\\.")[0]);
 			}
 
 		}
 	}
 
-	public static boolean isTavernaCompatible(Map cwlFile) {
+	public static boolean isCompatible(Map cwlFile) {
 
 		/*
 		 * in this method cwl tool is verified whether it's compatible with
@@ -83,34 +84,11 @@ public class Testing {
 
 						}
 					}
-				else return false;
+				else
+					return false;
 			}
 		}
 		return true;
-
-	}
-
-	private static void getInputs(CwlActivityConfigurationBean configurationBean) {
-
-		System.out.println(i);
-		i++;
-		Map cwlFile = configurationBean.getCwlConfigurations();
-
-		for (Object mainKey : cwlFile.keySet()) {
-
-			if (mainKey.equals(INPUTS)) {
-				ArrayList<Map> arrayList = (ArrayList<Map>) cwlFile.get(mainKey);
-
-				HashMap<String, Type> map = processInputs(arrayList);
-				for (String s : map.keySet()) {
-					if (map.get(s).getType().equals(FILE))
-						System.out.println("ID: " + s + " type : File");
-
-					if (map.get(s).getType().equals(ARRAY))
-						System.out.println("ID :" + s + " type: Array items: " + map.get(s).getItems());
-				}
-			}
-		}
 
 	}
 
@@ -119,31 +97,32 @@ public class Testing {
 		HashMap<String, Type> result = new HashMap<>();
 		for (Map input : inputs) {
 			String currentInputId = (String) input.get(ID);
-			Map typeConfigurations;
+			Object typeConfigurations;
 			Type type = null;
 
 			try {
 
-				typeConfigurations = (Map) input.get(TYPE);
-
-				if (typeConfigurations != null) {
+				typeConfigurations = input.get(TYPE);
+				//if type :single argument
+				if (typeConfigurations.getClass() == String.class) {
 					type = new Type();
-					type.setType((String) typeConfigurations.get(TYPE));
-					type.setItems((String) typeConfigurations.get(ITEMS));
+					type.setType((String) typeConfigurations);
+					type.setItems(null);
+					
+					//type : defined as another map which contains type: 
+				} else if (typeConfigurations.getClass() == LinkedHashMap.class) {
+					
+					type = new Type();
+					type.setType((String) ((Map) typeConfigurations).get(TYPE));
+					type.setItems((String) ((Map) typeConfigurations).get(ITEMS));
 				}
+
 			} catch (ClassCastException e) {
-				// This exception means type is described as single argument ex:
-				// type : File
 
-				type = new Type();
-				type.setType((String) input.get(TYPE));
-				type.setItems(null);
-			} catch (NullPointerException e) {
-
-				System.out.println("No type is defined");
+				System.out.println("Class cast exception !!!");
 			}
-
-			result.put(currentInputId, type);
+			if (type != null)//see whether type is defined or not
+				result.put(currentInputId, type);
 
 		}
 		return result;

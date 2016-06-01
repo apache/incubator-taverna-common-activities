@@ -5,6 +5,7 @@ cwlVersion: cwl:draft-3
 
 inputs:
   - id: reference
+    type: int
     inputBinding: { position: 2 }
 
   - id: reads

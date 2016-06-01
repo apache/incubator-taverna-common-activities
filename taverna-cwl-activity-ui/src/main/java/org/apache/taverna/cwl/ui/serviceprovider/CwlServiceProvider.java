@@ -20,8 +20,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,11 +32,17 @@ import javax.swing.Icon;
 import org.apache.taverna.cwl.Type;
 import org.yaml.snakeyaml.Yaml;
 
-import net.sf.taverna.t2.servicedescriptions.ServiceDescriptionProvider;
+import net.sf.taverna.t2.servicedescriptions.AbstractConfigurableServiceProvider;
+import net.sf.taverna.t2.servicedescriptions.ConfigurableServiceProvider;
 
-public class CwlServiceProvider implements ServiceDescriptionProvider {
+public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlServiceProviderConfig>
+		implements ConfigurableServiceProvider<CwlServiceProviderConfig> {
 
-	private static final File cwlFilesLocation = new File("CWLFiles");
+	CwlServiceProvider() {
+		super(new CwlServiceProviderConfig());
+	}
+
+	private File cwlFilesLocation;
 	// CWLTYPES
 	private static final String FILE = "File";
 	private static final String INTEGER = "int";
@@ -51,6 +59,8 @@ public class CwlServiceProvider implements ServiceDescriptionProvider {
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 
+		// get the location of the cwl tool from the workbench
+		cwlFilesLocation = new File(getConfiguration().getPath());
 		// This is holding the CWL configuration beans
 		List<CwlServiceDesc> result = new ArrayList<CwlServiceDesc>();
 
@@ -71,6 +81,8 @@ public class CwlServiceProvider implements ServiceDescriptionProvider {
 				// Creating CWl service Description
 				CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
 				cwlServiceDesc.setCwlConfiguration(cwlFile);
+				cwlServiceDesc.setToolName(file.getName().split("\\.")[0]);
+
 				// add to the result
 				result.add(cwlServiceDesc);
 				// return the service description
@@ -85,84 +97,41 @@ public class CwlServiceProvider implements ServiceDescriptionProvider {
 	private HashMap<String, Type> processInputs(ArrayList<Map> inputs) {
 
 		HashMap<String, Type> result = new HashMap<>();
-
 		for (Map input : inputs) {
+			String currentInputId = (String) input.get(ID);
+			Object typeConfigurations;
+			Type type = null;// this object holds the type of the input/output
+								// or if it's an array then the type of the
+								// elements in the array
 
-			String Id = (String) input.get(ID);
-			// This require for nested type definitions
-			Map typeConfigurations;
-			// this object holds the type and if it's an array then type of the
-			// elements in the array
-			Type type = null;
 			try {
-				/*
-				 * This part will go through nested type definitions
-				 * 
-				 * type : type : array items : boolean
-				 * 
-				 */
 
-				typeConfigurations = (Map) input.get(TYPE);
-
-				// Check type is defined or not
-				if (typeConfigurations != null) {
+				typeConfigurations = input.get(TYPE);
+				// if type :single argument
+				if (typeConfigurations.getClass() == String.class) {
 					type = new Type();
-					type.setType((String) typeConfigurations.get(TYPE));
-					type.setItems((String) typeConfigurations.get(ITEMS));
+					type.setType((String) typeConfigurations);
+					type.setItems(null);// set it to null so that later we can
+										// figure out this a single argument
+										// type
 
+					// type : defined as another map which contains type:
+				} else if (typeConfigurations.getClass() == LinkedHashMap.class) {
+
+					type = new Type();
+					type.setType((String) ((Map) typeConfigurations).get(TYPE));
+					type.setItems((String) ((Map) typeConfigurations).get(ITEMS));
 				}
 
 			} catch (ClassCastException e) {
-				/*
-				 * This exception means type is described as single argument ex:
-				 * type : File
-				 */
-				type = new Type();
-				type.setType((String) input.get(TYPE));
-				type.setItems(null);
+
+				System.out.println("Class cast exception !!!");
 			}
-			//when processing the inputs from the HashMap  type should be checked for is it null or not 
-				result.put(Id, type);
+			if (type != null)// see whether type is defined or not
+				result.put(currentInputId, type);
+
 		}
 		return result;
-	}
-
-	public boolean isTavernaCompatible(Map cwlFile) {
-
-	
-		/*
-		 * in this method cwl tool is verified whether it's compatible with
-		 * Taverna or not
-		 */
-		ArrayList<Map> inputs = (ArrayList<Map>) cwlFile.get(INPUTS);
-
-		if (inputs != null) {
-
-			HashMap<String, Type> processedinputs = processInputs(inputs);
-
-			for (String inputId : processedinputs.keySet()) {
-				Type type = processedinputs.get(inputId);
-				if (type != null)
-					if (type.getItems() == null) {
-						String inputType = type.getType();
-						if (!(inputType.equals(DOUBLE) || inputType.equals(FILE) || inputType.equals(FLOAT)
-								|| inputType.equals(INTEGER) || inputType.equals(STRING)))
-							return false;
-
-					} else {
-						if (type.getType().equals(ARRAY)) {
-							String inputType = type.getItems();
-							if (!(inputType.equals(DOUBLE) || inputType.equals(FILE) || inputType.equals(FLOAT)
-									|| inputType.equals(INTEGER) || inputType.equals(STRING)))
-								return false;
-
-						}
-					}
-				else return false;
-			}
-		}
-		return true;
-		
 	}
 
 	@Override
@@ -206,5 +175,11 @@ public class CwlServiceProvider implements ServiceDescriptionProvider {
 		};
 
 		return cwlFilesLocation.listFiles(fileNameFilter);
+	}
+
+	@Override
+	protected List<? extends Object> getIdentifyingData() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

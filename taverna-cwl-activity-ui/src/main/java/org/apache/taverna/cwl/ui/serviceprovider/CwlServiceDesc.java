@@ -29,6 +29,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationBean> {
 
 	private Map cwlConfiguration;
+	private String toolName;
 	@Override
 	public Class<? extends Activity<CwlActivityConfigurationBean>> getActivityClass() {
 		// TODO Auto-generated method stub
@@ -60,7 +61,7 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return null;
+		return toolName;
 	}
 
 	@Override
@@ -73,6 +74,14 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 	protected List<? extends Object> getIdentifyingData() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public String getToolName() {
+		return toolName;
+	}
+
+	public void setToolName(String toolName) {
+		this.toolName = toolName;
 	}
 
 }
