@@ -22,12 +22,10 @@ public class Testing {
 	private static final String ITEMS = "items";
 	static int i = 0;
 
-	// CWLTYPES
-	private static final String FILE = "File";
-	private static final String INTEGER = "int";
-	private static final String DOUBLE = "double";
-	private static final String FLOAT = "float";
-	private static final String STRING = "string";
+	
+	private static final int DEPTH_0 = 0;
+	private static final int DEPTH_1 = 1;
+	private static final int DEPTH_2 = 2;
 
 	public static void main(String[] args) {
 		File[] cwlFiles = getCwlFiles();
@@ -39,6 +37,11 @@ public class Testing {
 			Yaml cwlReader = new Yaml();
 			try {
 				cwlFile = (Map) cwlReader.load(new FileInputStream(file));
+				System.out.println(file.getName().split("\\.")[0]);
+				HashMap<String, Integer> map =processInputs(cwlFile);
+				for (String s : map.keySet()) {
+					//System.out.println(map.get(s));
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -46,88 +49,55 @@ public class Testing {
 				// Creating the CWL configuration bean
 				CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
 				configurationBean.setCwlConfigurations(cwlFile);
-				// getInputs(configurationBean);
-				if (isCompatible(cwlFile))
-					System.out.println(file.getName().split("\\.")[0]);
+			
+				
 			}
 
 		}
+		
+	
 	}
 
-	public static boolean isCompatible(Map cwlFile) {
+	private static HashMap<String, Integer> processInputs(Map cwlFile) {
+		
+		HashMap<String, Integer> result = new HashMap<>();
+		
+		// Get all input objects in
+		Object inputs = cwlFile.get(INPUTS);
+		if(inputs.getClass()==ArrayList.class){
+			
+			
+			for (Map input :( ArrayList<Map>)inputs) {
+				String currentInputId = (String) input.get(ID);
+				Object typeConfigurations;
+				try {
 
-		/*
-		 * in this method cwl tool is verified whether it's compatible with
-		 * Taverna or not
-		 */
-		ArrayList<Map> inputs = (ArrayList<Map>) cwlFile.get(INPUTS);
-
-		if (inputs != null) {
-
-			HashMap<String, Type> processedinputs = processInputs(inputs);
-
-			for (String inputId : processedinputs.keySet()) {
-				Type type = processedinputs.get(inputId);
-				if (type != null)
-					if (type.getItems() == null) {
-						String inputType = type.getType();
-						if (!(inputType.equals(DOUBLE) || inputType.equals(FILE) || inputType.equals(FLOAT)
-								|| inputType.equals(INTEGER) || inputType.equals(STRING)))
-							return false;
-
-					} else {
-						if (type.getType().equals(ARRAY)) {
-							String inputType = type.getItems();
-							if (!(inputType.equals(DOUBLE) || inputType.equals(FILE) || inputType.equals(FLOAT)
-									|| inputType.equals(INTEGER) || inputType.equals(STRING)))
-								return false;
-
+					typeConfigurations = input.get(TYPE);
+					// if type :single argument
+					if (typeConfigurations.getClass() == String.class) {
+						result.put(currentInputId, DEPTH_0);
+						// type : defined as another map which contains type:
+					} else if (typeConfigurations.getClass() == LinkedHashMap.class) {
+						String inputType = (String) ((Map) typeConfigurations).get(TYPE);
+						if (inputType.equals(ARRAY)){
+							result.put(currentInputId, DEPTH_1);
 						}
 					}
-				else
-					return false;
-			}
-		}
-		return true;
 
-	}
+				} catch (ClassCastException e) {
 
-	private static HashMap<String, Type> processInputs(ArrayList<Map> inputs) {
-
-		HashMap<String, Type> result = new HashMap<>();
-		for (Map input : inputs) {
-			String currentInputId = (String) input.get(ID);
-			Object typeConfigurations;
-			Type type = null;
-
-			try {
-
-				typeConfigurations = input.get(TYPE);
-				//if type :single argument
-				if (typeConfigurations.getClass() == String.class) {
-					type = new Type();
-					type.setType((String) typeConfigurations);
-					type.setItems(null);
-					
-					//type : defined as another map which contains type: 
-				} else if (typeConfigurations.getClass() == LinkedHashMap.class) {
-					
-					type = new Type();
-					type.setType((String) ((Map) typeConfigurations).get(TYPE));
-					type.setItems((String) ((Map) typeConfigurations).get(ITEMS));
+					System.out.println("Class cast exception !!!");
 				}
 
-			} catch (ClassCastException e) {
-
-				System.out.println("Class cast exception !!!");
 			}
-			if (type != null)//see whether type is defined or not
-				result.put(currentInputId, type);
-
+		}else if(inputs.getClass()==LinkedHashMap.class){
+			
+			for (Object parameter : ((Map) inputs).keySet()) {
+				if(parameter.toString().startsWith("$")) System.out.println("Exception");
+			}
 		}
 		return result;
 	}
-
 	private static File[] getCwlFiles() {
 		// Get the cwl files in the directory using the FileName Filter
 		FilenameFilter fileNameFilter = new FilenameFilter() {
