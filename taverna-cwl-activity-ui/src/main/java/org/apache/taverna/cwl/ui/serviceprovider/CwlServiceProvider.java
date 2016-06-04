@@ -20,16 +20,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.apache.taverna.cwl.Type;
 import org.yaml.snakeyaml.Yaml;
 
 import net.sf.taverna.t2.servicedescriptions.AbstractConfigurableServiceProvider;
