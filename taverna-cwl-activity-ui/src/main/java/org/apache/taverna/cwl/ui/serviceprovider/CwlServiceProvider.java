@@ -39,18 +39,6 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 	}
 
 	private File cwlFilesLocation;
-	// CWLTYPES
-	private static final String FILE = "File";
-	private static final String INTEGER = "int";
-	private static final String DOUBLE = "double";
-	private static final String FLOAT = "float";
-	private static final String STRING = "string";
-
-	private static final String ITEMS = "items";
-	private static final String TYPE = "type";
-	private static final String ID = "id";
-	private static final String INPUTS = "inputs";
-	private static final String ARRAY = "array";
 
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {

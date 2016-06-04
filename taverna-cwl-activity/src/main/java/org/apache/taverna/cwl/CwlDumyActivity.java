@@ -27,28 +27,26 @@ import org.apache.taverna.workflowmodel.processor.activity.ActivityConfiguration
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-
 public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityConfigurationBean>
 		implements AsynchronousActivity<CwlActivityConfigurationBean> {
 
 	private static final String INPUTS = "inputs";
+	private static final String OUTPUTS = "outputs";
 	private static final String ID = "id";
 	private static final String TYPE = "type";
 	private static final String ARRAY = "array";
 
-	
 	private static final int DEPTH_0 = 0;
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
-	
+
 	@Override
 	public void configure(CwlActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
 		removeInputs();
 		removeOutputs();
 		Map cwlFile = configurationBean.getCwlConfigurations();
-
 		HashMap<String, Integer> processedInputs;
-
+		HashMap<String, Integer> processedOutputs;
 		if (cwlFile != null) {
 			processedInputs = processInputs(cwlFile);
 
@@ -60,20 +58,31 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 					addInput(inputId, DEPTH_1, true, null, byte[].class);
 
 			}
+			processedOutputs = processOutputs(cwlFile);
+			for (String inputId : processedOutputs.keySet()) {
+				int depth = processedOutputs.get(inputId);
+				if (depth == DEPTH_0)
+					addOutput(inputId, DEPTH_0);
+				else if (depth == DEPTH_1)
+					addOutput(inputId, DEPTH_1);
 
+			}
 		}
-	}
-	
-	
 
-	private  HashMap<String, Integer> processInputs(Map cwlFile)  {
+	}
+
+	private HashMap<String, Integer> processOutputs(Map cwlFile) {
+		return process(cwlFile.get(OUTPUTS));
+	}
+
+	private HashMap<String, Integer> processInputs(Map cwlFile) {
+		return process(cwlFile.get(INPUTS));
+	}
+
+	private HashMap<String, Integer> process(Object inputs) {
 
 		HashMap<String, Integer> result = new HashMap<>();
 
-		// Get all input objects in
-		Object inputs = cwlFile.get(INPUTS);
-		
-		
 		if (inputs.getClass() == ArrayList.class) {
 
 			for (Map input : (ArrayList<Map>) inputs) {
@@ -99,8 +108,7 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 				}
 
 			}
-			
-			//See whether it contains an EXPRESSION
+			// see whether it's an EXPRESSION
 		} else if (inputs.getClass() == LinkedHashMap.class) {
 			for (Object parameter : ((Map) inputs).keySet()) {
 				if (parameter.toString().startsWith("$"))
@@ -109,6 +117,7 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 		}
 		return result;
 	}
+
 	@Override
 	public void executeAsynch(Map<String, T2Reference> arg0, AsynchronousActivityCallback arg1) {
 	}
