@@ -23,15 +23,13 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.taverna.activities.externaltool.InvocationCreator;
+import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.reference.ReferenceService;
 import org.apache.taverna.reference.T2Reference;
 
 import org.apache.log4j.Logger;
-
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocation;
 
 /**
  * @author alanrw

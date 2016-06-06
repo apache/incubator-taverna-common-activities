@@ -24,8 +24,6 @@ import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.jdom.Element;
 import org.jdom.Text;
 
-import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocation;
-
 /**
  * @author alanrw
  *

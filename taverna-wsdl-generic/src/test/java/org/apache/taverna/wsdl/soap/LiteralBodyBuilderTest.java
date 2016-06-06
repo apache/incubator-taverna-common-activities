@@ -37,12 +37,8 @@ import org.apache.taverna.wsdl.testutils.WSDLTestHelper;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
-public class LiteralBodyBuilderTest implements LocationConstants{
+public class LiteralBodyBuilderTest extends WSDLTestHelper {
 	
-	private String wsdlResourcePath(String wsdlName) throws Exception {
-		return WSDLTestHelper.wsdlResourcePath(wsdlName);
-	}
-
 	@Test
 	public void testUnqualifiedNamespaces() throws Exception {
 		BodyBuilder builder = createBuilder(wsdlResourcePath("whatizit.wsdl"), "queryPmid");
@@ -142,8 +138,8 @@ public class LiteralBodyBuilderTest implements LocationConstants{
 	
 	@Test 
 	public void testOperationElementNameTAV744() throws Exception {
-		URL tav744Url = getClass().getResource(
-				"/org/apache/taverna/wsdl/parser/TAV-744/InstrumentService__.wsdl");
+		URL tav744Url = getResource(
+				"TAV-744/InstrumentService__.wsdl");
 		
 		BodyBuilder builder = createBuilder(tav744Url.toExternalForm(), "getList");
 

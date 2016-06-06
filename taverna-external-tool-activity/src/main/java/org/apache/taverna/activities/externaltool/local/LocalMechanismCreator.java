@@ -20,8 +20,6 @@
 package org.apache.taverna.activities.externaltool.local;
 
 import org.jdom.Element;
-
-import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.activities.externaltool.manager.MechanismCreator;
 

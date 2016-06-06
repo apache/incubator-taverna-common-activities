@@ -27,5 +27,5 @@ package org.apache.taverna.wsdl.testutils;
  */
 public interface LocationConstants {
 	
-	public static final String WSDL_RESOURCE_BASE="/testwsdls/";
+	public static final String WSDL_RESOURCE_BASE="testwsdls/";
 }
