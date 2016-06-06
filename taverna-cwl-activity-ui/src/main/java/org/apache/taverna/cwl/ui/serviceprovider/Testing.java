@@ -42,36 +42,36 @@ public class Testing {
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
 
-	public static void main(String[] args) {
-		File[] cwlFiles = getCwlFiles();
-
-		for (File file : cwlFiles) {
-
-			Map cwlFile = null;
-			// Load the CWL file using SnakeYaml lib
-			Yaml cwlReader = new Yaml();
-			try {
-				cwlFile = (Map) cwlReader.load(new FileInputStream(file));
-				System.out.println(file.getName().split("\\.")[0]);
-				HashMap<String, Integer> map =processInputs(cwlFile);
-				for (String s : map.keySet()) {
-					//System.out.println(map.get(s));
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			if (cwlFile != null) {
-				// Creating the CWL configuration bean
-				CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
-				configurationBean.setCwlConfigurations(cwlFile);
-			
-				
-			}
-
-		}
-		
-	
-	}
+//	public static void main(String[] args) {
+//		File[] cwlFiles = getCwlFiles();
+//
+//		for (File file : cwlFiles) {
+//
+//			Map cwlFile = null;
+//			// Load the CWL file using SnakeYaml lib
+//			Yaml cwlReader = new Yaml();
+//			try {
+//				cwlFile = (Map) cwlReader.load(new FileInputStream(file));
+//				System.out.println(file.getName().split("\\.")[0]);
+//				HashMap<String, Integer> map =processInputs(cwlFile);
+//				for (String s : map.keySet()) {
+//					//System.out.println(map.get(s));
+//				}
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//			if (cwlFile != null) {
+//				// Creating the CWL configuration bean
+//				CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
+//				configurationBean.setCwlConfigurations(cwlFile);
+//			
+//				
+//			}
+//
+//		}
+//		
+//	
+//	}
 
 	private static HashMap<String, Integer> processInputs(Map cwlFile) {
 		

@@ -16,12 +16,14 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.ui.serviceprovider;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
 
 import org.apache.taverna.cwl.CwlActivityConfigurationBean;
+import org.apache.taverna.cwl.CwlDumyActivity;
 
 import net.sf.taverna.t2.servicedescriptions.ServiceDescription;
 import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
@@ -32,8 +34,7 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 	private String toolName;
 	@Override
 	public Class<? extends Activity<CwlActivityConfigurationBean>> getActivityClass() {
-		// TODO Auto-generated method stub
-		return null;
+		return (Class<? extends Activity<CwlActivityConfigurationBean>>) CwlDumyActivity.class;
 	}
 
 	@Override
@@ -54,26 +55,22 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 
 	@Override
 	public Icon getIcon() {
-		// TODO Auto-generated method stub
-		return null;
+		return CwlServiceIcon.getIcon();
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return toolName;
 	}
 
 	@Override
 	public List<? extends Comparable> getPath() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	protected List<? extends Object> getIdentifyingData() {
-		// TODO Auto-generated method stub
-		return null;
+		return Arrays.asList("CWL Services " + toolName);
 	}
 
 	public String getToolName() {

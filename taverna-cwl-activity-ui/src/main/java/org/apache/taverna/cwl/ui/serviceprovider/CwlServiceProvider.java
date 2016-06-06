@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,9 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 	CwlServiceProvider() {
 		super(new CwlServiceProviderConfig());
 	}
-
+	private static final String providerName ="CWL Services";
+	private static final URI providerId = URI
+			.create("http://cwl.com/2016/service-provider/cwlcommandlinetools");
 	private File cwlFilesLocation;
 
 	@Override
@@ -82,20 +85,17 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 
 	@Override
 	public Icon getIcon() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+		return providerId.toASCIIString();
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return providerName;
 	}
 
 	private File[] getCwlFiles() {
@@ -125,7 +125,6 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 
 	@Override
 	protected List<? extends Object> getIdentifyingData() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }
