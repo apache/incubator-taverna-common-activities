@@ -30,8 +30,21 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 
 public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationBean> {
 
+	private static final String DESCRIPTION = "description";
+
+	@Override
+	public String getDescription() {
+		String description = (String) cwlConfiguration.get(DESCRIPTION);
+
+		if (description == null)
+			return "";
+		else
+			return description;
+	}
+
 	private Map cwlConfiguration;
 	private String toolName;
+
 	@Override
 	public Class<? extends Activity<CwlActivityConfigurationBean>> getActivityClass() {
 		return (Class<? extends Activity<CwlActivityConfigurationBean>>) CwlDumyActivity.class;
@@ -39,7 +52,7 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 
 	@Override
 	public CwlActivityConfigurationBean getActivityConfiguration() {
-		//Creating the CWL configuration bean
+		// Creating the CWL configuration bean
 		CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
 		configurationBean.setCwlConfigurations(cwlConfiguration);
 		return configurationBean;
