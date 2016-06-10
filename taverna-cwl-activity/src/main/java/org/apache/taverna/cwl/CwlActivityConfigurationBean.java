@@ -22,12 +22,20 @@ public class CwlActivityConfigurationBean {
 //This class holds the object which is produced by the ServiceProvider and contains the configurations that are need for the CWLActivity 
 	
 	private Map cwlConfigurations;
-
+	private String toolName;
 	public Map getCwlConfigurations() {
 		return cwlConfigurations;
 	}
 
 	public void setCwlConfigurations(Map cwlConfigurations) {
 		this.cwlConfigurations = cwlConfigurations;
+	}
+
+	public String getToolName() {
+		return toolName;
+	}
+
+	public void setToolName(String toolName) {
+		this.toolName = toolName;
 	}
 }

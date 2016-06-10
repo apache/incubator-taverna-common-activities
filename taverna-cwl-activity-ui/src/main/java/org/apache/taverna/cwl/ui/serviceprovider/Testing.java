@@ -29,7 +29,7 @@ import org.apache.taverna.cwl.CwlActivityConfigurationBean;
 import org.yaml.snakeyaml.Yaml;
 
 public class Testing {
-	private static final File cwlFilesLocation = new File("CWLFiles");
+	private static final File cwlFilesLocation = new File("/home/maanadev/cwlToolsTesting");
 	private static final String INPUTS = "inputs";
 	private static final String ID = "id";
 	private static final String TYPE = "type";
@@ -72,7 +72,20 @@ public class Testing {
 //		
 //	
 //	}
-
+public static void main(String[] args) {
+	
+	File[] cwlFiles = getCwlFiles();
+	
+	Map cwlFile = null;
+	// Load the CWL file using SnakeYaml lib
+	Yaml cwlReader = new Yaml();
+	try {
+		cwlFile = (Map) cwlReader.load(new FileInputStream(cwlFiles[0]));
+		System.out.println(cwlFile.get("description"));
+	}catch(Exception e){
+		
+	}
+}
 	private static HashMap<String, Integer> processInputs(Map cwlFile) {
 		
 		HashMap<String, Integer> result = new HashMap<>();
