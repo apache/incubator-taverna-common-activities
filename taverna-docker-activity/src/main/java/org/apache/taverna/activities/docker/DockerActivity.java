@@ -19,6 +19,8 @@
 package org.apache.taverna.activities.docker;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.taverna.invocation.InvocationContext;
+import org.apache.taverna.reference.ReferenceService;
 import org.apache.taverna.reference.T2Reference;
 import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
@@ -31,18 +33,28 @@ import java.util.Map;
  */
 public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
-    @Override
-    public void configure(JsonNode jsonNode) throws ActivityConfigurationException {
+    private JsonNode activityConfig;
 
+    @Override
+    public void configure(JsonNode activityConfig) throws ActivityConfigurationException {
+      this.activityConfig = activityConfig;
     }
 
     @Override
     public JsonNode getConfiguration() {
-        return null;
+        return activityConfig;
     }
 
     @Override
-    public void executeAsynch(Map<String, T2Reference> map, AsynchronousActivityCallback asynchronousActivityCallback) {
+    public void executeAsynch(Map<String, T2Reference> map, final AsynchronousActivityCallback callback) {
+        callback.requestRun(new Runnable() {
+            @Override
+            public void run() {
+                InvocationContext context = callback.getContext();
+                ReferenceService referenceService = context.getReferenceService();
+                //TODO invoke container remote api and set final response result to callback.receiveResult();
 
+            }
+        });
     }
 }
