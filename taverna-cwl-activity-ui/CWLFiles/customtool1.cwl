@@ -24,19 +24,36 @@ cwlVersion: cwl:draft-3
 inputs:
   - id: input_1
     type: int
+    label: input 1 testing label
+    description: this is a short description of input 1
 
   - id: input_2
     type:
       type: array
       items: int
+    label: input 2 testing label
+    description: this is a short description of input 2
+    
   - id: input_3
     type: String
+    label: input 3 testing label
+    description: this is a short description of input 3
 
 outputs:
   - id: output_1
     type: int
+    label: output 1 testing label
+    description: this is a short description of output 1
 
   - id: ouput_2
     type: String
+    label: output 2 testing label
+    description: this is a short description of output 2
+    
+label: This is a short description of the tool
+
+description: |
+ This is a much longer description of the tool. This can be displayed in
+ the service detail panel	 	 
 
 basecommand: echo

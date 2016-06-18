@@ -29,7 +29,7 @@ import org.apache.taverna.cwl.CwlActivityConfigurationBean;
 import org.yaml.snakeyaml.Yaml;
 
 public class Testing {
-	private static final File cwlFilesLocation = new File("/home/maanadev/cwlTools");
+	private static final File cwlFilesLocation = new File("CWLFiles");
 	private static final String INPUTS = "inputs";
 	private static final String ID = "id";
 	private static final String TYPE = "type";
