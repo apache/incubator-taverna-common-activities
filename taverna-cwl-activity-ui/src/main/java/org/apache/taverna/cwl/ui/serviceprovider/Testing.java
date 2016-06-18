@@ -29,7 +29,7 @@ import org.apache.taverna.cwl.CwlActivityConfigurationBean;
 import org.yaml.snakeyaml.Yaml;
 
 public class Testing {
-	private static final File cwlFilesLocation = new File("/home/maanadev/cwlToolsTesting");
+	private static final File cwlFilesLocation = new File("/home/maanadev/cwlTools");
 	private static final String INPUTS = "inputs";
 	private static final String ID = "id";
 	private static final String TYPE = "type";
@@ -41,6 +41,7 @@ public class Testing {
 	private static final int DEPTH_0 = 0;
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
+	private static final String LABEL = "label";
 
 //	public static void main(String[] args) {
 //		File[] cwlFiles = getCwlFiles();
@@ -76,14 +77,15 @@ public static void main(String[] args) {
 	
 	File[] cwlFiles = getCwlFiles();
 	
-	Map cwlFile = null;
 	// Load the CWL file using SnakeYaml lib
-	Yaml cwlReader = new Yaml();
+	for(File file:cwlFiles)
 	try {
-		cwlFile = (Map) cwlReader.load(new FileInputStream(cwlFiles[0]));
-		System.out.println(cwlFile.get("description"));
+		Yaml cwlReader = new Yaml();
+		System.out.println(file.getName());
+		Map	cwlFile = (Map) cwlReader.load(new FileInputStream(file));
+		processInputs(cwlFile);
 	}catch(Exception e){
-		
+		System.out.println(e.getMessage());
 	}
 }
 	private static HashMap<String, Integer> processInputs(Map cwlFile) {
@@ -98,6 +100,9 @@ public static void main(String[] args) {
 			for (Map input :( ArrayList<Map>)inputs) {
 				String currentInputId = (String) input.get(ID);
 				Object typeConfigurations;
+				if(input.containsKey(LABEL)){
+					System.out.println(input.get(LABEL));
+				}
 				try {
 
 					typeConfigurations = input.get(TYPE);

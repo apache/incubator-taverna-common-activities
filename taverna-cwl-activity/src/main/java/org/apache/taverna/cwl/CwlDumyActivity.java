@@ -27,7 +27,6 @@ import org.apache.taverna.workflowmodel.processor.activity.ActivityConfiguration
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
-
 public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityConfigurationBean>
 		implements AsynchronousActivity<CwlActivityConfigurationBean> {
 
@@ -40,10 +39,10 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 	private static final int DEPTH_0 = 0;
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
+	private static final String LABEL = "label";
 	private HashMap<String, PortDetail> processedInputs;
 	private HashMap<String, PortDetail> processedOutputs;
-	
-	
+
 	public HashMap<String, PortDetail> getProcessedInputs() {
 		return processedInputs;
 	}
@@ -60,13 +59,12 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 		this.processedOutputs = processedOutputs;
 	}
 
-	
 	@Override
 	public void configure(CwlActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
 		removeInputs();
 		removeOutputs();
 		Map cwlFile = configurationBean.getCwlConfigurations();
-		
+
 		if (cwlFile != null) {
 			processedInputs = processInputs(cwlFile);
 
@@ -104,14 +102,23 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 		HashMap<String, PortDetail> result = new HashMap<>();
 
 		if (inputs.getClass() == ArrayList.class) {
-			PortDetail detail = new PortDetail();
+
 			for (Map input : (ArrayList<Map>) inputs) {
+				PortDetail detail = new PortDetail();
+
 				String currentInputId = (String) input.get(ID);
 				Object typeConfigurations;
+				//get the parameter description
 				if (input.containsKey(DESCRIPTION)) {
 					detail.setDescription((String) input.get(DESCRIPTION));
 				} else {
 					detail.setDescription(null);
+				}
+				//get the parameter label
+				if (input.containsKey(LABEL)) {
+					detail.setLabel((String) input.get(LABEL));
+				} else {
+					detail.setLabel(null);
 				}
 				try {
 
