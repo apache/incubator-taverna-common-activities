@@ -20,12 +20,14 @@ package org.apache.taverna.activities.docker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.taverna.invocation.InvocationContext;
+import org.apache.taverna.reference.ErrorDocument;
 import org.apache.taverna.reference.ReferenceService;
 import org.apache.taverna.reference.T2Reference;
 import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,6 +36,11 @@ import java.util.Map;
 public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
     private JsonNode activityConfig;
+    private DockerContainerConfiguration containerConfiguration;
+
+    public DockerActivity(DockerContainerConfiguration containerConfiguration) {
+        this.containerConfiguration = containerConfiguration;
+    }
 
     @Override
     public void configure(JsonNode activityConfig) throws ActivityConfigurationException {
@@ -50,9 +57,26 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
         callback.requestRun(new Runnable() {
             @Override
             public void run() {
+                Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
+                T2Reference responseBodyRef = null;
+
                 InvocationContext context = callback.getContext();
                 ReferenceService referenceService = context.getReferenceService();
-                //TODO invoke container remote api and set final response result to callback.receiveResult();
+
+                DockerHttpResponse response = RESTUtil.createContainer(containerConfiguration);
+                if(response != null && response.getStatusCode() == DockerHttpResponse.HTTP_201_CODE){
+                    responseBodyRef = referenceService.register(response.getBody(), 0, true, context);
+                } else {
+                    ErrorDocument errorDocument = referenceService.getErrorDocumentService().registerError(response.getBody(),0,context);
+                    responseBodyRef = referenceService.register(errorDocument, 0, true, context);
+                }
+
+                outputs.put("response_body", responseBodyRef);
+                T2Reference statusRef = referenceService.register(response.getStatusCode(), 0, true, context);
+                outputs.put("response_code", statusRef);
+                //TODO add any more useful parameters to the output
+
+                callback.receiveResult(outputs, new int[0]);
 
             }
         });

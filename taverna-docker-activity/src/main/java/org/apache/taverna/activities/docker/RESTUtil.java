@@ -23,29 +23,27 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.ssl.SSLContexts;
 import org.apache.log4j.Logger;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.security.cert.CertificateException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -64,45 +62,59 @@ public class RESTUtil {
     private static final String JSON_CONTENT_TYPE = "application/json";
 
     /**
+     *
+     */
+    private static final String DEFAULT_ERROR_MSG= "{\"type\";\"Internal server error\"}";
+
+
+    /**
      * Logger
      */
     private static Logger LOG = Logger.getLogger(RESTUtil.class);
 
 
-    public static boolean createContainer(DockerConfig dockerConfig) {
+    public static DockerHttpResponse createContainer(DockerContainerConfiguration dockerContainerConfiguration) {
+        String errMsg;
         try {
-            URL url = new URL(dockerConfig.getCreateContainerURL());
-            org.apache.http.conn.ssl.SSLSocketFactory factory = new org.apache.http.conn.ssl.SSLSocketFactory(SSLContext.getDefault());
-            Scheme https = new Scheme(DockerConfig.PROTOCOL,factory , url.getPort());
-            SchemeRegistry schemeRegistry = new SchemeRegistry();
-            schemeRegistry.register(https);
-            ClientConnectionManager connectionManager = new SingleClientConnManager(null, schemeRegistry);
+            ClientConnectionManager connectionManager = null;
+            URL url = new URL(dockerContainerConfiguration.getCreateContainerURL());
+            if(DockerContainerConfiguration.HTTP_OVER_SSL.equalsIgnoreCase(dockerContainerConfiguration.getProtocol())) {
+                org.apache.http.conn.ssl.SSLSocketFactory factory = new org.apache.http.conn.ssl.SSLSocketFactory(SSLContext.getDefault());
+                Scheme https = new Scheme(dockerContainerConfiguration.getProtocol(), factory, url.getPort());
+                SchemeRegistry schemeRegistry = new SchemeRegistry();
+                schemeRegistry.register(https);
+                connectionManager = new SingleClientConnManager(null, schemeRegistry);
+            }
+
             Map<String,String> headers = new HashMap<String,String>();
             headers.put(CONTENT_TYPE, JSON_CONTENT_TYPE);
-            DockerHttpResponse response = doPost(connectionManager,dockerConfig.getCreateContainerURL(), headers, dockerConfig.getCreateContainerPayload());
-            if(response.getStatusCode() == 201){
+            DockerHttpResponse response = doPost(connectionManager, dockerContainerConfiguration.getCreateContainerURL(), headers, dockerContainerConfiguration.getCreateContainerPayload());
+            if(response.getStatusCode() == DockerHttpResponse.HTTP_201_CODE){
                 JsonNode node = getJson(response.getBody());
                 LOG.info(String.format("Successfully created Docker container id: %s ", getDockerId(node)));
-                return true;
+                return response;
             }
 
         } catch (MalformedURLException e1) {
-            LOG.error(String.format("Malformed URL encountered. This can be due to invalid URL parts. " +
+            errMsg = String.format("Malformed URL encountered. This can be due to invalid URL parts. " +
                             "Docker Host=%s, Port=%d and Resource Path=%s",
-                    dockerConfig.getContainerHost(),
-                    dockerConfig.getRemoteAPIPort(),
-                    DockerConfig.CREATE_CONTAINER_RESOURCE_PATH), e1);
+                    dockerContainerConfiguration.getContainerHost(),
+                    dockerContainerConfiguration.getRemoteAPIPort(),
+                    DockerContainerConfiguration.CREATE_CONTAINER_RESOURCE_PATH);
+            LOG.error(errMsg, e1);
         } catch (NoSuchAlgorithmException e2) {
-            LOG.error("Failed to create SSLContext for invoking the REST service over https.", e2);
+            errMsg = "Failed to create SSLContext for invoking the REST service over https." + e2.getMessage();
+            LOG.error(dockerContainerConfiguration);
         } catch (IOException e3) {
-            LOG.error("Error occurred while reading the docker http response", e3);
+            errMsg = "Error occurred while reading the docker http response " + e3.getMessage();
+            LOG.error(errMsg, e3);
         }
-        return false;
+        return null;
     }
 
     private static DockerHttpResponse doPost(ClientConnectionManager connectionManager, String url, Map<String, String> headers, JsonNode payload) {
-        DefaultHttpClient httpClient = null;
-        CloseableHttpResponse response = null;
+        HttpClient httpClient = null;
+        HttpResponse response = null;
         DockerHttpResponse dockerResponse = null;
         HttpPost httpPost = null;
         try {
@@ -112,7 +124,8 @@ public class RESTUtil {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 httpPost.setHeader(new BasicHeader(entry.getKey(), entry.getValue()));
             }
-            httpClient = new DefaultHttpClient(connectionManager, null);
+            httpClient = connectionManager != null ? new DefaultHttpClient(connectionManager, null):HttpClients.createDefault();;
+
             response = httpClient.execute(httpPost);
             if (response != null) {
                 dockerResponse = new DockerHttpResponse(response.getAllHeaders(), response.getStatusLine().getStatusCode(),readBody(response.getEntity()).toString());
@@ -125,15 +138,24 @@ public class RESTUtil {
                     500,
                     "{\"error\":\"internal server error\", \"message\":\""+ e.getMessage() +"\"}");
         } finally {
+
             if(httpPost != null){
               httpPost.releaseConnection();
             }
             if (httpClient != null) {
-                httpClient.close();
+                if(httpClient instanceof DefaultHttpClient) {
+                    ((DefaultHttpClient) httpClient).close();
+                } else if(httpClient instanceof CloseableHttpClient){
+                    try {
+                        ((CloseableHttpClient) httpClient).close();
+                    } catch (IOException ignore) {}
+                }
             }
             if (response != null) {
                 try {
-                    response.close();
+                    if(response instanceof CloseableHttpResponse) {
+                        ((CloseableHttpResponse)response).close();
+                    }
                 } catch (IOException ignore) {}
             }
         }

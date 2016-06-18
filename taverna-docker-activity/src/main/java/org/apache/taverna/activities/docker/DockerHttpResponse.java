@@ -23,6 +23,8 @@ import org.apache.http.Header;
 
 public class DockerHttpResponse {
 
+    public static final int HTTP_201_CODE = 201;
+
     private Header[] headers;
 
     private int statusCode;

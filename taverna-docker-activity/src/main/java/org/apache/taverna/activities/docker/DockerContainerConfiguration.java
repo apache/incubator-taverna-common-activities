@@ -20,7 +20,7 @@ package org.apache.taverna.activities.docker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class DockerConfig {
+public class DockerContainerConfiguration {
 
     /**
      * Hold the hostname of the docker container.
@@ -48,19 +48,29 @@ public class DockerConfig {
     public static final String CREATE_CONTAINER_RESOURCE_PATH = "/containers/create";
 
     /**
+     * Identifier for Http over SSL protocol
+     */
+    public static final String HTTP_OVER_SSL = "https";
+
+    /**
      * Transport protocol
      */
-    public static final String PROTOCOL = "https";
+    private String protocol = "http";
 
-    public DockerConfig(String containerHost, int remoteAPIPort, JsonNode createContainerPayload) {
+    public DockerContainerConfiguration(String containerHost, int remoteAPIPort, String protocol, JsonNode createContainerPayload) {
         this.containerHost = containerHost;
         this.remoteAPIPort = remoteAPIPort;
+        this.protocol = protocol;
         this.createContainerPayload = createContainerPayload;
-        this.createContainerURL = PROTOCOL + "://" + containerHost +  ":" + remoteAPIPort + CREATE_CONTAINER_RESOURCE_PATH ;
+        this.createContainerURL = protocol + "://" + containerHost +  ":" + remoteAPIPort + CREATE_CONTAINER_RESOURCE_PATH ;
     }
 
     public String getContainerHost() {
         return containerHost;
+    }
+
+    public String getProtocol() {
+        return protocol;
     }
 
     public int getRemoteAPIPort() {
