@@ -21,11 +21,15 @@
 class: CommandLineTool
 cwlVersion: cwl:draft-3
 
+$namespaces:
+ edam: http://edamontology.org/
+  
 inputs:
   - id: input_1
     type: int
     label: input 1 testing label
     description: this is a short description of input 1
+    format: edam:format_2323
 
   - id: input_2
     type:

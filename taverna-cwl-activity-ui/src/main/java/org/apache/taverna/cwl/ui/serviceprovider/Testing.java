@@ -84,8 +84,6 @@ public static void main(String[] args) {
 	//	System.out.println(file.getName());
 		Map	cwlFile = (Map) cwlReader.load(new FileInputStream(file));
 		//processInputs(cwlFile);
-		if(file.getName().equals("bedtool-genomecov.cwl"))System.out.println(((String)(( ArrayList<Map>)cwlFile.get(INPUTS)).get(0).get("format")).split(":")[0]);
-		if(file.getName().equals("bedtool-genomecov.cwl"))System.out.println(((Map)(cwlFile.get("$namespaces"))).get("edam"));
 	}catch(Exception e){
 		System.out.println(e.getMessage());
 	}
