@@ -44,6 +44,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	private static final String TABLE_WIDTH = "100%";
 	private static final String TABLE_CELL_PADDING = "5%";
 
+	private static final String FORMAT = "format";
 	private final CwlActivityConfigurationBean configurationBean;
 	private final CwlDumyActivity activity;
 

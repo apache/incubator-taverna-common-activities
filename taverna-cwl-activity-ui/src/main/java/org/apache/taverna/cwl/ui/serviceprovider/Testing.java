@@ -81,9 +81,11 @@ public static void main(String[] args) {
 	for(File file:cwlFiles)
 	try {
 		Yaml cwlReader = new Yaml();
-		System.out.println(file.getName());
+	//	System.out.println(file.getName());
 		Map	cwlFile = (Map) cwlReader.load(new FileInputStream(file));
-		processInputs(cwlFile);
+		//processInputs(cwlFile);
+		if(file.getName().equals("bedtool-genomecov.cwl"))System.out.println(((String)(( ArrayList<Map>)cwlFile.get(INPUTS)).get(0).get("format")).split(":")[0]);
+		if(file.getName().equals("bedtool-genomecov.cwl"))System.out.println(((Map)(cwlFile.get("$namespaces"))).get("edam"));
 	}catch(Exception e){
 		System.out.println(e.getMessage());
 	}

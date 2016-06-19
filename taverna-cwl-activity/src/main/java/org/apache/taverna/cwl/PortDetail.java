@@ -23,6 +23,7 @@ public class PortDetail {
 	private int depth;
 	private String description;
 	private String label;
+	private String format;
 	public int getDepth() {
 		return depth;
 	}
@@ -40,6 +41,12 @@ public class PortDetail {
 	}
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	public String getFormat() {
+		return format;
+	}
+	public void setFormat(String format) {
+		this.format = format;
 	}
 	
 	

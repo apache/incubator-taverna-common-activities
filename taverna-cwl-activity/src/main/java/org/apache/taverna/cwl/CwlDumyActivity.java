@@ -40,8 +40,21 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
 	private static final String LABEL = "label";
+
+	private static final String NAMESPACES = "$namespaces";
+	// datatypes
+	private static final String FLOAT = "float";
+	private static final String NULL = "null";
+	private static final String BOOLEAN = "boolean";
+	private static final String INT = "int";
+	private static final String DOUBLE = "double";
+	private static final String STRING = "string";
+	private static final String FILE = "file";
+	private static final String FORMAT = "format";
+
 	private HashMap<String, PortDetail> processedInputs;
 	private HashMap<String, PortDetail> processedOutputs;
+	private LinkedHashMap nameSpace;
 
 	public HashMap<String, PortDetail> getProcessedInputs() {
 		return processedInputs;
@@ -59,11 +72,21 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 		this.processedOutputs = processedOutputs;
 	}
 
+	public void processNameSpace(Map cwlFile) {
+
+		if (cwlFile.containsKey(NAMESPACES)) {
+			nameSpace = (LinkedHashMap) cwlFile.get(NAMESPACES);
+		}
+
+	}
+
 	@Override
 	public void configure(CwlActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
 		removeInputs();
 		removeOutputs();
 		Map cwlFile = configurationBean.getCwlConfigurations();
+
+		processNameSpace(cwlFile);
 
 		if (cwlFile != null) {
 			processedInputs = processInputs(cwlFile);
@@ -97,6 +120,16 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 		return process(cwlFile.get(INPUTS));
 	}
 
+	public boolean isValidDataType(ArrayList typeConfigurations) {
+		for (Object type : typeConfigurations) {
+			if (!(((String) type).equals(FLOAT) || ((String) type).equals(NULL)) || (((String) type).equals(BOOLEAN))
+					|| (((String) type).equals(INT) || (((String) type).equals(DOUBLE)))
+					|| (((String) type).equals(STRING)) || (((String) type).equals(FILE)))
+				return false;
+		}
+		return true;
+	}
+
 	private HashMap<String, PortDetail> process(Object inputs) {
 
 		HashMap<String, PortDetail> result = new HashMap<>();
@@ -108,17 +141,29 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 
 				String currentInputId = (String) input.get(ID);
 				Object typeConfigurations;
-				//get the parameter description
+				// get the parameter description
 				if (input.containsKey(DESCRIPTION)) {
 					detail.setDescription((String) input.get(DESCRIPTION));
 				} else {
 					detail.setDescription(null);
 				}
-				//get the parameter label
+				// get the parameter label
 				if (input.containsKey(LABEL)) {
 					detail.setLabel((String) input.get(LABEL));
 				} else {
 					detail.setLabel(null);
+				}
+				// getting the format info
+				if (input.containsKey(FORMAT)) {
+					
+					String format[] = input.get(FORMAT).toString().split(":");
+					String namespaceKey = format[0];
+					String urlAppednd = format[1];
+					if (!nameSpace.isEmpty()) {
+						detail.setFormat(nameSpace.get(namespaceKey) + urlAppednd);
+					} else {
+						detail.setFormat(null);
+					}
 				}
 				try {
 
@@ -135,6 +180,12 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 							detail.setDepth(DEPTH_1);
 							result.put(currentInputId, detail);
 						}
+					} else if (typeConfigurations.getClass() == ArrayList.class) {
+						if (isValidDataType((ArrayList) typeConfigurations)) {
+							detail.setDepth(DEPTH_0);
+							result.put(currentInputId, detail);
+						}
+
 					}
 
 				} catch (ClassCastException e) {
