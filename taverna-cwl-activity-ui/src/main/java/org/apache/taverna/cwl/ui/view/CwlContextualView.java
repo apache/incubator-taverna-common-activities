@@ -29,6 +29,7 @@ import org.apache.taverna.cwl.CwlDumyActivity;
 import org.apache.taverna.cwl.PortDetail;
 import net.sf.taverna.t2.workbench.ui.actions.activity.HTMLBasedActivityContextualView;
 import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
+
 /*
  * This class is responsible for producing service detail panel for each tool
  * 
@@ -37,6 +38,11 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 
 	private static final String DESCRIPTION = "description";
 	private static final String LABEL = "label";
+	private static final String TABLE_COLOR = "59A9CB";// this is color in RGB
+														// hex value
+	private static final String TABLE_BORDER = "2";
+	private static final String TABLE_WIDTH = "100%";
+	private static final String TABLE_CELL_PADDING = "5%";
 
 	private final CwlActivityConfigurationBean configurationBean;
 	private final CwlDumyActivity activity;
@@ -85,7 +91,8 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	public Action getConfigureAction(final Frame owner) {
 		return null;
 	}
-	//format long description using html <p> tags 
+
+	// format long description using html <p> tags
 	private String paragraphToHtml(String summery, String paragraph) {
 
 		summery += "<tr><td colspan='2' align='left'>";
@@ -100,7 +107,8 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 
 	@Override
 	protected String getRawTableRowsHtml() {
-		String summery = "";
+		String summery = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" bgcolor=\""
+				+ TABLE_COLOR + "\" cellpadding=\"" + TABLE_CELL_PADDING + "\" >";
 
 		Map cwlFile = configurationBean.getCwlConfigurations();
 		String description = "";
@@ -151,7 +159,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 				}
 				summery += "<tr></tr>";
 			}
-
+		summery += "</table>";
 		return summery;
 	}
 
