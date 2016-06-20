@@ -84,6 +84,21 @@ fully endorsed by the ASF.
   versions probably also work)
 
 
+This code relies on other
+[Apache Taverna modules](https://taverna.incubator.apache.org/download/code/),
+which Maven shuold automatically
+download from
+[Apache's Maven repository](https://taverna.incubator.apache.org/download/maven/);
+however you might want to compile these yourself in the below order:
+
+* [taverna-language](https://taverna.incubator.apache.org/download/language/)
+* [taverna-osgi](https://taverna.incubator.apache.org/download/osgi/)
+* [taverna-engine](https://taverna.incubator.apache.org/download/engine/
+
+Please see the `<properties>` of this [pom.xml](pom.xml) to find the
+correct versions to build.
+
+
 # Building
 
 To build, use
