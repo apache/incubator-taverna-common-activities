@@ -16,6 +16,8 @@
  *******************************************************************************/
 package org.apache.taverna.cwl;
 
+import java.util.ArrayList;
+
 public class PortDetail {
 
 	
@@ -23,7 +25,7 @@ public class PortDetail {
 	private int depth;
 	private String description;
 	private String label;
-	private String format;
+	private ArrayList<String> format;
 	public int getDepth() {
 		return depth;
 	}
@@ -42,12 +44,15 @@ public class PortDetail {
 	public void setLabel(String label) {
 		this.label = label;
 	}
-	public String getFormat() {
+	public ArrayList<String> getFormat() {
 		return format;
 	}
-	public void setFormat(String format) {
+	public void setFormat(ArrayList<String> format) {
 		this.format = format;
 	}
 	
+	public void addFormat(String format){
+		this.format.add(format);
+	}
 	
 }

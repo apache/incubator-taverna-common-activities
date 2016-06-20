@@ -56,6 +56,7 @@ outputs:
     type: String
     label: output 2 testing label
     description: this is a short description of output 2
+    format: ["edam:format_2323", just a string]
     
 label: This is a short description of the tool
 

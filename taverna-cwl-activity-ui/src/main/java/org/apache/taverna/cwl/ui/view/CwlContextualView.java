@@ -19,6 +19,7 @@ package org.apache.taverna.cwl.ui.view;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Frame;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Action;
@@ -127,29 +128,13 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 		summery += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
 
 		HashMap<String, PortDetail> inputs = activity.getProcessedInputs();
+
 		if (inputs != null && !inputs.isEmpty())
 			for (String id : inputs.keySet()) {
-				
+
 				PortDetail detail = inputs.get(id);
-				
-				summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + detail.getDepth() + "</td></tr>";
-				
-				if (detail.getLabel() != null) {
-					summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
-				}
-				
-				if (detail.getDescription() != null) {
 
-					summery = paragraphToHtml(summery, detail.getDescription());
-
-				}
-				
-				if (detail.getFormat() != null) {
-					summery += "<tr><td  align ='left' colspan ='2'>Format: " + detail.getFormat() + "</td></tr>";
-				}
-				
-				// putting a space
-				summery += "<tr></tr>";
+				summery = extractSummery(summery, id, detail);
 			}
 
 		summery += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
@@ -161,24 +146,46 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 
 				PortDetail detail = outPuts.get(id);
 
-				summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + detail.getDepth() + "</td></tr>";
-
-				if (detail.getLabel() != null) {
-					summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
-				}
-
-				if (detail.getDescription() != null) {
-					summery = paragraphToHtml(summery, detail.getDescription());
-				}
-
-				if (detail.getFormat() != null) {
-					summery += "<tr><td  align ='left' colspan ='2'>Format: " + detail.getFormat() + "</td></tr>";
-				}
-
-				summery += "<tr></tr>";
+				summery = extractSummery(summery, id, detail);
 			}
 		summery += "</table>";
 		return summery;
 	}
 
+	private String extractSummery(String summery, String id, PortDetail detail) {
+
+		summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + detail.getDepth() + "</td></tr>";
+
+		if (detail.getLabel() != null) {
+			summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
+		}
+
+		if (detail.getDescription() != null) {
+
+			summery = paragraphToHtml(summery, detail.getDescription());
+
+		}
+
+		if (detail.getFormat() != null) {
+			summery += "<tr><td  align ='left' colspan ='2'>Format: ";
+			ArrayList<String> formats = detail.getFormat();
+
+			int Size = formats.size();
+
+			if (Size == 1) {
+				// single format
+				summery += formats.get(0);
+			} else {
+
+				// array of formats
+				for (int i = 0; i < (Size - 1); i++) {
+					summery += formats.get(i) + ", ";
+				}
+				summery += formats.get(Size - 1);
+			}
+			summery += "</td></tr>";
+		}
+		summery += "<tr></tr>";
+		return summery;
+	}
 }

@@ -27,6 +27,7 @@ import org.apache.taverna.workflowmodel.processor.activity.ActivityConfiguration
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
+
 public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityConfigurationBean>
 		implements AsynchronousActivity<CwlActivityConfigurationBean> {
 
@@ -208,33 +209,43 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 	private void extractFormat(Map input, PortDetail detail) {
 		if (input != null)
 			if (input.containsKey(FORMAT)) {
-				String formatInfo = input.get(FORMAT).toString();
 
-				if (formatInfo.startsWith(EXPRESSSION)) {
+				Object formatInfo = input.get(FORMAT);
 
-					detail.setFormat(formatInfo);
-				} else if (formatInfo.contains(COLON)) {
+				ArrayList<String> format = new ArrayList<>();
+				detail.setFormat(format);
 
-					String format[] = formatInfo.split(COLON);
-					String namespaceKey = format[0];
-					String urlAppned = format[1];
-					
-					if (!nameSpace.isEmpty()) {
-						if (nameSpace.containsKey(namespaceKey))
-							detail.setFormat(nameSpace.get(namespaceKey) + urlAppned);
-						else
-							//Can't figure out the format  defined
-							detail.setFormat(formatInfo);
-					} else {
-						//Can't figure out the format  defined
-						detail.setFormat(formatInfo);
+				if (formatInfo.getClass() == String.class) {
+
+					extractThisFormat(formatInfo.toString(), detail);
+				} else if (formatInfo.getClass() == ArrayList.class) {
+					for (Object eachFormat : (ArrayList) formatInfo) {
+						extractThisFormat(eachFormat.toString(), detail);
 					}
-				} else {
-					//Can't figure out the format  defined
-					detail.setFormat(formatInfo);
 				}
 
 			}
+	}
+	private void extractThisFormat(String formatInfoString, PortDetail detail) {
+		if (formatInfoString.startsWith("$")) {
+
+			 detail.addFormat(formatInfoString);
+		} else if (formatInfoString.contains(":")) {
+			String format[] = formatInfoString.split(":");
+			String namespaceKey = format[0];
+			String urlAppednd = format[1];
+			if (!nameSpace.isEmpty()) {
+				if (nameSpace.containsKey(namespaceKey))
+					detail.addFormat(nameSpace.get(namespaceKey) + urlAppednd);
+				else
+
+					detail.addFormat(formatInfoString);
+			} else {
+				 detail.addFormat(formatInfoString);
+			}
+		} else {
+			 detail.addFormat(formatInfoString);
+		}
 	}
 
 	@Override
