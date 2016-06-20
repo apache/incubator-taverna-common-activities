@@ -44,7 +44,6 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	private static final String TABLE_WIDTH = "100%";
 	private static final String TABLE_CELL_PADDING = "5%";
 
-	private static final String FORMAT = "format";
 	private final CwlActivityConfigurationBean configurationBean;
 	private final CwlDumyActivity activity;
 
@@ -130,16 +129,25 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 		HashMap<String, PortDetail> inputs = activity.getProcessedInputs();
 		if (inputs != null && !inputs.isEmpty())
 			for (String id : inputs.keySet()) {
+				
 				PortDetail detail = inputs.get(id);
+				
 				summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + detail.getDepth() + "</td></tr>";
+				
 				if (detail.getLabel() != null) {
 					summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
 				}
+				
 				if (detail.getDescription() != null) {
 
 					summery = paragraphToHtml(summery, detail.getDescription());
 
 				}
+				
+				if (detail.getFormat() != null) {
+					summery += "<tr><td  align ='left' colspan ='2'>Format: " + detail.getFormat() + "</td></tr>";
+				}
+				
 				// putting a space
 				summery += "<tr></tr>";
 			}
@@ -150,14 +158,23 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 
 		if (outPuts != null && !outPuts.isEmpty())
 			for (String id : outPuts.keySet()) {
+
 				PortDetail detail = outPuts.get(id);
+
 				summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + detail.getDepth() + "</td></tr>";
+
 				if (detail.getLabel() != null) {
 					summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
 				}
+
 				if (detail.getDescription() != null) {
 					summery = paragraphToHtml(summery, detail.getDescription());
 				}
+
+				if (detail.getFormat() != null) {
+					summery += "<tr><td  align ='left' colspan ='2'>Format: " + detail.getFormat() + "</td></tr>";
+				}
+
 				summery += "<tr></tr>";
 			}
 		summery += "</table>";

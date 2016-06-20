@@ -37,17 +37,20 @@ inputs:
       items: int
     label: input 2 testing label
     description: this is a short description of input 2
-    
+    format: $expression
+
   - id: input_3
     type: String
     label: input 3 testing label
     description: this is a short description of input 3
+    format: noNameSpace:testing
 
 outputs:
   - id: output_1
     type: int
     label: output 1 testing label
     description: this is a short description of output 1
+    format: just a string
 
   - id: ouput_2
     type: String

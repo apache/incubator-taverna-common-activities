@@ -40,7 +40,8 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
 	private static final String LABEL = "label";
-
+	private static final String EXPRESSSION = "$";
+	private static final String COLON = ":";
 	private static final String NAMESPACES = "$namespaces";
 	// datatypes
 	private static final String FLOAT = "float";
@@ -140,31 +141,14 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 				PortDetail detail = new PortDetail();
 
 				String currentInputId = (String) input.get(ID);
+
+				extractDescription(input, detail);
+
+				extractFormat(input, detail);
+
+				extractLabel(input, detail);
+
 				Object typeConfigurations;
-				// get the parameter description
-				if (input.containsKey(DESCRIPTION)) {
-					detail.setDescription((String) input.get(DESCRIPTION));
-				} else {
-					detail.setDescription(null);
-				}
-				// get the parameter label
-				if (input.containsKey(LABEL)) {
-					detail.setLabel((String) input.get(LABEL));
-				} else {
-					detail.setLabel(null);
-				}
-				// getting the format info
-				if (input.containsKey(FORMAT)) {
-					
-					String format[] = input.get(FORMAT).toString().split(":");
-					String namespaceKey = format[0];
-					String urlAppednd = format[1];
-					if (!nameSpace.isEmpty()) {
-						detail.setFormat(nameSpace.get(namespaceKey) + urlAppednd);
-					} else {
-						detail.setFormat(null);
-					}
-				}
 				try {
 
 					typeConfigurations = input.get(TYPE);
@@ -196,11 +180,61 @@ public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityCon
 			}
 		} else if (inputs.getClass() == LinkedHashMap.class) {
 			for (Object parameter : ((Map) inputs).keySet()) {
-				if (parameter.toString().startsWith("$"))
+				if (parameter.toString().startsWith(EXPRESSSION))
 					System.out.println("Exception");
 			}
 		}
 		return result;
+	}
+
+	private void extractLabel(Map input, PortDetail detail) {
+		if (input != null)
+			if (input.containsKey(LABEL)) {
+				detail.setLabel((String) input.get(LABEL));
+			} else {
+				detail.setLabel(null);
+			}
+	}
+
+	private void extractDescription(Map input, PortDetail detail) {
+		if (input != null)
+			if (input.containsKey(DESCRIPTION)) {
+				detail.setDescription((String) input.get(DESCRIPTION));
+			} else {
+				detail.setDescription(null);
+			}
+	}
+
+	private void extractFormat(Map input, PortDetail detail) {
+		if (input != null)
+			if (input.containsKey(FORMAT)) {
+				String formatInfo = input.get(FORMAT).toString();
+
+				if (formatInfo.startsWith(EXPRESSSION)) {
+
+					detail.setFormat(formatInfo);
+				} else if (formatInfo.contains(COLON)) {
+
+					String format[] = formatInfo.split(COLON);
+					String namespaceKey = format[0];
+					String urlAppned = format[1];
+					
+					if (!nameSpace.isEmpty()) {
+						if (nameSpace.containsKey(namespaceKey))
+							detail.setFormat(nameSpace.get(namespaceKey) + urlAppned);
+						else
+							//Can't figure out the format  defined
+							detail.setFormat(formatInfo);
+					} else {
+						//Can't figure out the format  defined
+						detail.setFormat(formatInfo);
+					}
+				} else {
+					//Can't figure out the format  defined
+					detail.setFormat(formatInfo);
+				}
+
+			}
 	}
 
 	@Override
