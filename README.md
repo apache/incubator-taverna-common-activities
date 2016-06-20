@@ -93,7 +93,7 @@ however you might want to compile these yourself in the below order:
 
 * [taverna-language](https://taverna.incubator.apache.org/download/language/)
 * [taverna-osgi](https://taverna.incubator.apache.org/download/osgi/)
-* [taverna-engine](https://taverna.incubator.apache.org/download/engine/
+* [taverna-engine](https://taverna.incubator.apache.org/download/engine/)
 
 Please see the `<properties>` of this [pom.xml](pom.xml) to find the
 correct versions to build.
