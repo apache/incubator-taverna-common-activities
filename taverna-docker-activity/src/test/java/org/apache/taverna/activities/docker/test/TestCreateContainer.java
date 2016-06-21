@@ -20,7 +20,7 @@
 package org.apache.taverna.activities.docker.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.taverna.activities.docker.DockerContainerConfiguration;
+import org.apache.taverna.activities.docker.DockerContainerConfigurationImpl;
 import org.apache.taverna.activities.docker.DockerHttpResponse;
 import org.apache.taverna.activities.docker.RESTUtil;
 import org.junit.Test;
@@ -29,15 +29,16 @@ import java.io.IOException;
 
 public class TestCreateContainer{
 
-    @Test
-    public void testCreateContainer(){
-        try {
-            String payload = "{\"Hostname\":\"192.168.99.100\", \"User\":\"foo\", \"Memory\":0, \"MemorySwap\":0,\"AttachStdin\":false, \"AttachStdout\":true,\"Attachstderr\":true,\"PortSpecs\":null,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":null, \"Cmd\":[\"date\"], \"Image\":\"ubuntu\",\"Tag\":\"latest\",\"Volumes\":{\"/tmp\":{} },\"WorkingDir\":\"\",\"DisableNetwork\":false, \"ExposedPorts\":{\"22/tcp\": {} }}";
-            DockerContainerConfiguration config = new DockerContainerConfiguration("192.168.99.100",2376,"https",new ObjectMapper().readTree(payload));
-            DockerHttpResponse res = RESTUtil.createContainer(config);
-            System.out.println(">>>" + res.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
+//    @Test
+//    public void testCreateContainer(){
+//        try {
+//             String payload = "{\"Image\":\"6fae60ef3446\", \"ExposedPorts\":{\"8080/tcp\":{}}}";
+//             DockerContainerConfigurationImpl config = new DockerContainerConfigurationImpl("192.168.99.100",2376,"https",new ObjectMapper().readTree(payload));
+//            DockerHttpResponse res = RESTUtil.createContainer(config);
+//            System.out.println(">>>" + res.toString());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

@@ -21,8 +21,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="dockerActivityFactory" class="org.apache.taverna.activities.docker.DockerActivityFactory">
-		<property name="dockerContainerConfiguration" ref="dockerContainerConfiguration" />
-	</bean>
+    <bean id="dockerConfiguration"
+          class="org.apache.taverna.activities.docker.DockerContainerConfigurationImpl">
+        <constructor-arg name="configurationManager" ref="configurationManager" />
+    </bean>
 
 </beans>

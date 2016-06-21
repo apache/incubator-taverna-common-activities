@@ -24,5 +24,6 @@
                       http://www.springframework.org/schema/osgi
                       http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-	<reference id="dockerContainerConfiguration" interface="org.apache.taverna.activities.docker.DockerContainerConfiguration" />
+    <reference id="configurationManager" interface="org.apache.taverna.configuration.ConfigurationManager" />
+
 </beans:beans>

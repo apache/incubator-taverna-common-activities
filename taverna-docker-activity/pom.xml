@@ -45,7 +45,12 @@
 			<artifactId>taverna-app-configuration-api</artifactId>
 			<version>${taverna.osgi.version}</version>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>org.apache.taverna.osgi</groupId>
+            <artifactId>taverna-configuration-api</artifactId>
+            <version>${taverna.osgi.version}</version>
+        </dependency>
+        <dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>

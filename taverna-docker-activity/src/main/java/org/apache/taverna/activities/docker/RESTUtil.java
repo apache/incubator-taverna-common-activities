@@ -73,14 +73,14 @@ public class RESTUtil {
     private static Logger LOG = Logger.getLogger(RESTUtil.class);
 
 
-    public static DockerHttpResponse createContainer(DockerContainerConfiguration dockerContainerConfiguration) {
+    public static DockerHttpResponse createContainer(DockerContainerConfigurationImpl dockerContainerConfigurationImpl) {
         String errMsg;
         try {
             ClientConnectionManager connectionManager = null;
-            URL url = new URL(dockerContainerConfiguration.getCreateContainerURL());
-            if(DockerContainerConfiguration.HTTP_OVER_SSL.equalsIgnoreCase(dockerContainerConfiguration.getProtocol())) {
+            URL url = new URL(dockerContainerConfigurationImpl.getCreateContainerURL());
+            if(DockerContainerConfigurationImpl.HTTP_OVER_SSL.equalsIgnoreCase(dockerContainerConfigurationImpl.getProtocol())) {
                 org.apache.http.conn.ssl.SSLSocketFactory factory = new org.apache.http.conn.ssl.SSLSocketFactory(SSLContext.getDefault());
-                Scheme https = new Scheme(dockerContainerConfiguration.getProtocol(), factory, url.getPort());
+                Scheme https = new Scheme(dockerContainerConfigurationImpl.getProtocol(), factory, url.getPort());
                 SchemeRegistry schemeRegistry = new SchemeRegistry();
                 schemeRegistry.register(https);
                 connectionManager = new SingleClientConnManager(null, schemeRegistry);
@@ -88,7 +88,7 @@ public class RESTUtil {
 
             Map<String,String> headers = new HashMap<String,String>();
             headers.put(CONTENT_TYPE, JSON_CONTENT_TYPE);
-            DockerHttpResponse response = doPost(connectionManager, dockerContainerConfiguration.getCreateContainerURL(), headers, dockerContainerConfiguration.getCreateContainerPayload());
+            DockerHttpResponse response = doPost(connectionManager, dockerContainerConfigurationImpl.getCreateContainerURL(), headers, dockerContainerConfigurationImpl.getCreateContainerPayload());
             if(response.getStatusCode() == DockerHttpResponse.HTTP_201_CODE){
                 JsonNode node = getJson(response.getBody());
                 LOG.info(String.format("Successfully created Docker container id: %s ", getDockerId(node)));
@@ -98,13 +98,13 @@ public class RESTUtil {
         } catch (MalformedURLException e1) {
             errMsg = String.format("Malformed URL encountered. This can be due to invalid URL parts. " +
                             "Docker Host=%s, Port=%d and Resource Path=%s",
-                    dockerContainerConfiguration.getContainerHost(),
-                    dockerContainerConfiguration.getRemoteAPIPort(),
-                    DockerContainerConfiguration.CREATE_CONTAINER_RESOURCE_PATH);
+                    dockerContainerConfigurationImpl.getContainerHost(),
+                    dockerContainerConfigurationImpl.getRemoteAPIPort(),
+                    DockerContainerConfigurationImpl.CREATE_CONTAINER_RESOURCE_PATH);
             LOG.error(errMsg, e1);
         } catch (NoSuchAlgorithmException e2) {
             errMsg = "Failed to create SSLContext for invoking the REST service over https." + e2.getMessage();
-            LOG.error(dockerContainerConfiguration);
+            LOG.error(dockerContainerConfigurationImpl);
         } catch (IOException e3) {
             errMsg = "Error occurred while reading the docker http response " + e3.getMessage();
             LOG.error(errMsg, e3);

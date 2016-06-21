@@ -36,9 +36,9 @@ import java.util.Map;
 public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
     private JsonNode activityConfig;
-    private DockerContainerConfiguration containerConfiguration;
+    private DockerContainerConfigurationImpl containerConfiguration;
 
-    public DockerActivity(DockerContainerConfiguration containerConfiguration) {
+    public DockerActivity(DockerContainerConfigurationImpl containerConfiguration) {
         this.containerConfiguration = containerConfiguration;
     }
 
