@@ -5,9 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+public class CWLUtil {
 
-public class Utility {
-	
 	private static final String INPUTS = "inputs";
 	private static final String OUTPUTS = "outputs";
 	private static final String ID = "id";
@@ -20,16 +19,21 @@ public class Utility {
 
 	private static final String FLOAT = "float";
 	private static final String NULL = "null";
+	private static final String BOOLEAN = "boolean";
+	private static final String INT = "int";
+	private static final String DOUBLE = "double";
+	private static final String STRING = "string";
 	private static final String LABEL = "label";
+	private static final String FILE = "file";
 	private static final String FORMAT = "format";
 	private LinkedHashMap nameSpace;
 	private Map cwlFile;
-	
-	
-	public Utility(Map cwlFile) {
+
+	public CWLUtil(Map cwlFile) {
 		this.cwlFile = cwlFile;
 		processNameSpace();
 	}
+
 	public void processNameSpace() {
 
 		if (cwlFile.containsKey("$namespaces")) {
@@ -37,19 +41,23 @@ public class Utility {
 		}
 
 	}
-	
-	public HashMap<String, Integer> processInputDepths(){
+
+	public HashMap<String, Integer> processInputDepths() {
 		return process(cwlFile.get(INPUTS));
 	}
-	public HashMap<String, Integer> processOutputDepths(){
+
+	public HashMap<String, Integer> processOutputDepths() {
 		return process(cwlFile.get(OUTPUTS));
 	}
-	public  HashMap<String, PortDetail> processInputDetails(){
+
+	public HashMap<String, PortDetail> processInputDetails() {
 		return processdetails(cwlFile.get(INPUTS));
 	}
-	public  HashMap<String, PortDetail> processOutputDetails(){
+
+	public HashMap<String, PortDetail> processOutputDetails() {
 		return processdetails(cwlFile.get(OUTPUTS));
 	}
+
 	private HashMap<String, Integer> process(Object inputs) {
 
 		HashMap<String, Integer> result = new HashMap<>();
@@ -59,14 +67,12 @@ public class Utility {
 			for (Map input : (ArrayList<Map>) inputs) {
 				String currentInputId = (String) input.get(ID);
 
-
 				Object typeConfigurations;
 				try {
 
 					typeConfigurations = input.get(TYPE);
 					// if type :single argument
 					if (typeConfigurations.getClass() == String.class) {
-						
 
 						result.put(currentInputId, DEPTH_0);
 						// type : defined as another map which contains type:
@@ -97,6 +103,7 @@ public class Utility {
 		}
 		return result;
 	}
+
 	private HashMap<String, PortDetail> processdetails(Object inputs) {
 
 		HashMap<String, PortDetail> result = new HashMap<>();
@@ -113,7 +120,6 @@ public class Utility {
 
 				extractLabel(input, detail);
 				result.put(currentInputId, detail);
-				
 
 			}
 		} else if (inputs.getClass() == LinkedHashMap.class) {
@@ -124,6 +130,7 @@ public class Utility {
 		}
 		return result;
 	}
+
 	private void extractLabel(Map input, PortDetail detail) {
 		if (input != null)
 			if (input.containsKey(LABEL)) {
@@ -153,20 +160,20 @@ public class Utility {
 
 				if (formatInfo.getClass() == String.class) {
 
-					extractThisFormat(formatInfo.toString(), detail);
+					figureOutFormats(formatInfo.toString(), detail);
 				} else if (formatInfo.getClass() == ArrayList.class) {
 					for (Object eachFormat : (ArrayList) formatInfo) {
-						extractThisFormat(eachFormat.toString(), detail);
+						figureOutFormats(eachFormat.toString(), detail);
 					}
 				}
 
 			}
 	}
 
-	private void extractThisFormat(String formatInfoString, PortDetail detail) {
+	private void figureOutFormats(String formatInfoString, PortDetail detail) {
 		if (formatInfoString.startsWith("$")) {
 
-			 detail.addFormat(formatInfoString);
+			detail.addFormat(formatInfoString);
 		} else if (formatInfoString.contains(":")) {
 			String format[] = formatInfoString.split(":");
 			String namespaceKey = format[0];
@@ -175,18 +182,23 @@ public class Utility {
 				if (nameSpace.containsKey(namespaceKey))
 					detail.addFormat(nameSpace.get(namespaceKey) + urlAppednd);
 				else
-
+					// can't figure out the format
 					detail.addFormat(formatInfoString);
 			} else {
-				 detail.addFormat(formatInfoString);
+				// can't figure out the format
+				detail.addFormat(formatInfoString);
 			}
 		} else {
-			 detail.addFormat(formatInfoString);
+			// can't figure out the format
+			detail.addFormat(formatInfoString);
 		}
 	}
+
 	public boolean isValidDataType(ArrayList typeConfigurations) {
 		for (Object type : typeConfigurations) {
-			if (!(((String) type).equals(FLOAT) || ((String) type).equals(NULL)))
+			if (!(((String) type).equals(FLOAT) || ((String) type).equals(NULL) || ((String) type).equals(BOOLEAN)
+					|| ((String) type).equals(INT) || ((String) type).equals(STRING) || ((String) type).equals(DOUBLE)
+					|| ((String) type).equals(FILE)))
 				return false;
 		}
 		return true;

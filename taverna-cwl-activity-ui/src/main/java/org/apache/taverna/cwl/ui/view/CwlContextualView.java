@@ -27,7 +27,9 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.apache.taverna.cwl.CwlActivityConfigurationBean;
 import org.apache.taverna.cwl.CwlDumyActivity;
-import org.apache.taverna.cwl.PortDetail;
+import org.apache.taverna.cwl.utilities.PortDetail;
+import org.apache.taverna.cwl.utilities.CWLUtil;
+
 import net.sf.taverna.t2.workbench.ui.actions.activity.HTMLBasedActivityContextualView;
 import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 
@@ -48,10 +50,12 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	private final CwlActivityConfigurationBean configurationBean;
 	private final CwlDumyActivity activity;
 
+	private CWLUtil cwlutil;
 	public CwlContextualView(CwlDumyActivity activity) {
 		super((Activity) activity);
 		this.activity = activity;
 		this.configurationBean = activity.getConfiguration();
+		cwlutil = new CWLUtil(configurationBean.getCwlConfigurations());
 		super.initView();
 	}
 
@@ -114,58 +118,52 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 		Map cwlFile = configurationBean.getCwlConfigurations();
 		String description = "";
 
+		if (cwlFile.containsKey("description")) {
+			description = (String) cwlFile.get("description");
+			summery = paragraphToHtml(summery, description);
+
+		}
 		if (cwlFile.containsKey(LABEL)) {
 			summery += "<tr><th colspan='2' align='left'>Label</th></tr>";
 			summery += "<tr><td colspan='2' align='left'>" + (String) cwlFile.get(LABEL) + "</td></tr>";
 		}
-		if (cwlFile.containsKey(DESCRIPTION)) {
-
-			description = (String) cwlFile.get(DESCRIPTION);
-			summery = paragraphToHtml(summery, description);
-
-		}
-
 		summery += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
 
-		HashMap<String, PortDetail> inputs = activity.getProcessedInputs();
-
-		if (inputs != null && !inputs.isEmpty())
+		HashMap<String, PortDetail> inputs = cwlutil.processInputDetails();
+		HashMap<String, Integer> inputDepths = cwlutil.processInputDepths();
+		
+		if ((inputs != null && !inputs.isEmpty())&&(inputDepths != null && !inputDepths.isEmpty()))
 			for (String id : inputs.keySet()) {
-
 				PortDetail detail = inputs.get(id);
-
-				summery = extractSummery(summery, id, detail);
+				if(inputDepths.containsKey(id))
+				summery = extractSummery(summery, id, detail,inputDepths.get(id));
 			}
 
 		summery += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
 
-		HashMap<String, PortDetail> outPuts = activity.getProcessedOutputs();
-
-		if (outPuts != null && !outPuts.isEmpty())
+		HashMap<String, PortDetail> outPuts = cwlutil.processOutputDetails();
+		HashMap<String, Integer> outputDepths = cwlutil.processOutputDepths();
+		
+		if ((outPuts != null && !outPuts.isEmpty())&&(outputDepths != null && !outputDepths.isEmpty()))
 			for (String id : outPuts.keySet()) {
-
 				PortDetail detail = outPuts.get(id);
-
-				summery = extractSummery(summery, id, detail);
+				if(outputDepths.containsKey(id))
+					summery = extractSummery(summery, id, detail,outputDepths.get(id));
 			}
 		summery += "</table>";
 		return summery;
 	}
 
-	private String extractSummery(String summery, String id, PortDetail detail) {
-
-		summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + detail.getDepth() + "</td></tr>";
-
+	private String extractSummery(String summery, String id, PortDetail detail,int depth) {
+		summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + depth+ "</td></tr>";
 		if (detail.getLabel() != null) {
 			summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
 		}
-
 		if (detail.getDescription() != null) {
 
 			summery = paragraphToHtml(summery, detail.getDescription());
 
 		}
-
 		if (detail.getFormat() != null) {
 			summery += "<tr><td  align ='left' colspan ='2'>Format: ";
 			ArrayList<String> formats = detail.getFormat();
@@ -173,11 +171,8 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 			int Size = formats.size();
 
 			if (Size == 1) {
-				// single format
 				summery += formats.get(0);
 			} else {
-
-				// array of formats
 				for (int i = 0; i < (Size - 1); i++) {
 					summery += formats.get(i) + ", ";
 				}
