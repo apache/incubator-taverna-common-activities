@@ -14,28 +14,23 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  *******************************************************************************/
-package org.apache.taverna.cwl;
+package org.apache.taverna.cwl.ui.view;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
-public class CwlActivityConfigurationBean {
-//This class holds the object which is produced by the ServiceProvider and contains the configurations that are need for the CWLActivity 
-	
-	private Map cwlConfigurations;
-	private String toolName;
-	public Map getCwlConfigurations() {
-		return cwlConfigurations;
+import org.apache.taverna.cwl.CwlDumyActivity;
+
+import net.sf.taverna.t2.workbench.ui.views.contextualviews.ContextualView;
+import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ContextualViewFactory;
+
+public class CwlActivityContextViewFactory implements ContextualViewFactory<CwlDumyActivity> {
+
+	public boolean canHandle(Object selection) {
+		return selection instanceof CwlDumyActivity;
 	}
 
-	public void setCwlConfigurations(Map cwlConfigurations) {
-		this.cwlConfigurations = cwlConfigurations;
-	}
-
-	public String getToolName() {
-		return toolName;
-	}
-
-	public void setToolName(String toolName) {
-		this.toolName = toolName;
+	public List<ContextualView> getViews(CwlDumyActivity selection) {
+		return Arrays.<ContextualView> asList(new CwlContextualView(selection));
 	}
 }

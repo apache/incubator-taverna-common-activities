@@ -41,6 +41,7 @@ public class Testing {
 	private static final int DEPTH_0 = 0;
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
+	private static final String LABEL = "label";
 
 //	public static void main(String[] args) {
 //		File[] cwlFiles = getCwlFiles();
@@ -72,7 +73,21 @@ public class Testing {
 //		
 //	
 //	}
-
+public static void main(String[] args) {
+	
+	File[] cwlFiles = getCwlFiles();
+	
+	// Load the CWL file using SnakeYaml lib
+	for(File file:cwlFiles)
+	try {
+		Yaml cwlReader = new Yaml();
+	//	System.out.println(file.getName());
+		Map	cwlFile = (Map) cwlReader.load(new FileInputStream(file));
+		//processInputs(cwlFile);
+	}catch(Exception e){
+		System.out.println(e.getMessage());
+	}
+}
 	private static HashMap<String, Integer> processInputs(Map cwlFile) {
 		
 		HashMap<String, Integer> result = new HashMap<>();
@@ -85,6 +100,9 @@ public class Testing {
 			for (Map input :( ArrayList<Map>)inputs) {
 				String currentInputId = (String) input.get(ID);
 				Object typeConfigurations;
+				if(input.containsKey(LABEL)){
+					System.out.println(input.get(LABEL));
+				}
 				try {
 
 					typeConfigurations = input.get(TYPE);

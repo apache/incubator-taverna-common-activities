@@ -35,8 +35,8 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 	@Override
 	public String getDescription() {
 		String description = (String) cwlConfiguration.get(DESCRIPTION);
-
-		if (description == null)
+		//see  whether description is too long
+		if (description == null || (description.length()>40))
 			return "";
 		else
 			return description;
@@ -55,6 +55,7 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 		// Creating the CWL configuration bean
 		CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
 		configurationBean.setCwlConfigurations(cwlConfiguration);
+		configurationBean.setToolName(toolName);
 		return configurationBean;
 	}
 
