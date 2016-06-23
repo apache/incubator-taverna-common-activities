@@ -18,18 +18,20 @@ package org.apache.taverna.cwl.ui.serviceprovider;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-import org.apache.taverna.cwl.CwlActivityConfigurationBean;
 import org.yaml.snakeyaml.Yaml;
 
+
 public class Testing {
-	private static final File cwlFilesLocation = new File("CWLFiles");
 	private static final String INPUTS = "inputs";
 	private static final String ID = "id";
 	private static final String TYPE = "type";
@@ -37,122 +39,51 @@ public class Testing {
 	private static final String ITEMS = "items";
 	static int i = 0;
 
-	
 	private static final int DEPTH_0 = 0;
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
 	private static final String LABEL = "label";
-
-//	public static void main(String[] args) {
-//		File[] cwlFiles = getCwlFiles();
-//
-//		for (File file : cwlFiles) {
-//
-//			Map cwlFile = null;
-//			// Load the CWL file using SnakeYaml lib
-//			Yaml cwlReader = new Yaml();
-//			try {
-//				cwlFile = (Map) cwlReader.load(new FileInputStream(file));
-//				System.out.println(file.getName().split("\\.")[0]);
-//				HashMap<String, Integer> map =processInputs(cwlFile);
-//				for (String s : map.keySet()) {
-//					//System.out.println(map.get(s));
-//				}
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//			if (cwlFile != null) {
-//				// Creating the CWL configuration bean
-//				CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
-//				configurationBean.setCwlConfigurations(cwlFile);
-//			
-//				
-//			}
-//
-//		}
-//		
-//	
-//	}
-public static void main(String[] args) {
 	
-	File[] cwlFiles = getCwlFiles();
-	
-	// Load the CWL file using SnakeYaml lib
-	for(File file:cwlFiles)
-	try {
-		Yaml cwlReader = new Yaml();
-	//	System.out.println(file.getName());
-		Map	cwlFile = (Map) cwlReader.load(new FileInputStream(file));
-		//processInputs(cwlFile);
-	}catch(Exception e){
-		System.out.println(e.getMessage());
+	interface my{
+		public void printName();
 	}
-}
-	private static HashMap<String, Integer> processInputs(Map cwlFile) {
+	public void print(){
+		System.out.println("ok");
+	}
+	public static Yaml getReader(){
+		Yaml reader = new Yaml();
+		return reader;
+	}
+	public static void main(String[] args) {
+
+		Path path1 = Paths.get("/home/maanadev/cwlTools");
+		Path path2 = path1.normalize();
+
+		boolean pathExits = Files.exists(path2, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
+
 		
-		HashMap<String, Integer> result = new HashMap<>();
+		try {
+			DirectoryStream<Path> stream = Files.newDirectoryStream(path2,"*.cwl");
+			Stream<Path> parrale = StreamSupport.stream(stream.spliterator(), true);
 		
-		// Get all input objects in
-		Object inputs = cwlFile.get(INPUTS);
-		if(inputs.getClass()==ArrayList.class){
 			
 			
-			for (Map input :( ArrayList<Map>)inputs) {
-				String currentInputId = (String) input.get(ID);
-				Object typeConfigurations;
-				if(input.containsKey(LABEL)){
-					System.out.println(input.get(LABEL));
-				}
+//			stream.forEach(path->System.out.println(path));
+			parrale.forEach(path->{
+				Yaml reader =getReader();
 				try {
-
-					typeConfigurations = input.get(TYPE);
-					// if type :single argument
-					if (typeConfigurations.getClass() == String.class) {
-						result.put(currentInputId, DEPTH_0);
-						// type : defined as another map which contains type:
-					} else if (typeConfigurations.getClass() == LinkedHashMap.class) {
-						String inputType = (String) ((Map) typeConfigurations).get(TYPE);
-						if (inputType.equals(ARRAY)){
-							result.put(currentInputId, DEPTH_1);
-						}
-					}
-
-				} catch (ClassCastException e) {
-
-					System.out.println("Class cast exception !!!");
+					Map map=(Map) reader.load(new FileInputStream(path.toFile()));
+					System.out.println(map);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+			}); 
 
-			}
-		}else if(inputs.getClass()==LinkedHashMap.class){
-			
-			for (Object parameter : ((Map) inputs).keySet()) {
-				if(parameter.toString().startsWith("$")) System.out.println("Exception");
-			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return result;
+
 	}
-	private static File[] getCwlFiles() {
-		// Get the cwl files in the directory using the FileName Filter
-		FilenameFilter fileNameFilter = new FilenameFilter() {
 
-			@Override
-			public boolean accept(File dir, String name) {
-				if (name.lastIndexOf('.') > 0) {
-					// get last index for '.' char
-					int lastIndex = name.lastIndexOf('.');
-
-					// get extension
-					String str = name.substring(lastIndex);
-
-					// match path name extension
-					if (str.equals(".cwl")) {
-						return true;
-					}
-				}
-				return false;
-			}
-		};
-
-		return cwlFilesLocation.listFiles(fileNameFilter);
-	}
 }
