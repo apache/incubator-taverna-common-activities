@@ -20,10 +20,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.swing.Icon;
 
@@ -38,50 +45,55 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 	CwlServiceProvider() {
 		super(new CwlServiceProviderConfig());
 	}
-	private static final String providerName ="CWL Services";
-	private static final URI providerId = URI
-			.create("http://cwl.com/2016/service-provider/cwlcommandlinetools");
-	private File cwlFilesLocation;
+
+	private static final String providerName = "CWL Services";
+	private static final URI providerId = URI.create("http://cwl.com/2016/service-provider/cwlcommandlinetools");
 
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 
 		// get the location of the cwl tool from the workbench
-		cwlFilesLocation = new File(getConfiguration().getPath());
+		Path path = Paths.get(getConfiguration().getPath());
+		//figure out the dots in the path ex: /maanadev/../cwltools
+		Path normalizedPath = path.normalize();
 		// This is holding the CWL configuration beans
 		List<CwlServiceDesc> result = new ArrayList<CwlServiceDesc>();
 
-		File[] cwlFiles = getCwlFiles();
-
-		// Load the CWL file using SnakeYaml lib
-		Yaml cwlReader = new Yaml();
-
-		for (File file : cwlFiles) {
-			Map cwlFile = null;
-
+		DirectoryStream<Path> stream = null;
+		try {
+			stream = Files.newDirectoryStream(normalizedPath, "*.cwl");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//create stream with parallel capabilities 
+		Stream<Path> paralleStream = StreamSupport.stream(stream.spliterator(), true);
+		
+		paralleStream.forEach(p -> {
+			Yaml reader = getYamlReader();
 			try {
-				cwlFile = (Map) cwlReader.load(new FileInputStream(file));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			if (cwlFile != null) {
+				Map cwlFile = (Map) reader.load(new FileInputStream(path.toFile()));
 				// Creating CWl service Description
-				CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
-				cwlServiceDesc.setCwlConfiguration(cwlFile);
-				cwlServiceDesc.setToolName(file.getName().split("\\.")[0]);
+				CwlServiceDesc cwlServiceDesc = createCWLDesc(p, cwlFile);
 
 				// add to the result
 				result.add(cwlServiceDesc);
 				// return the service description
 				callBack.partialResults(result);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+		});
 
-		}
 		callBack.finished();
 
 	}
 
-	
+	private CwlServiceDesc createCWLDesc(Path p, Map cwlFile) {
+		CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
+		cwlServiceDesc.setCwlConfiguration(cwlFile);
+		cwlServiceDesc.setToolName(p.getFileName().toString().split("\\.")[0]);
+		return cwlServiceDesc;
+	}
 
 	@Override
 	public Icon getIcon() {
@@ -98,33 +110,13 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 		return providerName;
 	}
 
-	private File[] getCwlFiles() {
-		// Get the .cwl files in the directory using the FileName Filter
-		FilenameFilter fileNameFilter = new FilenameFilter() {
-
-			@Override
-			public boolean accept(File dir, String name) {
-				if (name.lastIndexOf('.') > 0) {
-					// get last index for '.' char
-					int lastIndex = name.lastIndexOf('.');
-
-					// get extension
-					String str = name.substring(lastIndex);
-
-					// match path name extension
-					if (str.equals(".cwl")) {
-						return true;
-					}
-				}
-				return false;
-			}
-		};
-
-		return cwlFilesLocation.listFiles(fileNameFilter);
-	}
-
 	@Override
 	protected List<? extends Object> getIdentifyingData() {
 		return null;
+	}
+
+	public Yaml getYamlReader() {
+		Yaml reader = new Yaml();
+		return reader;
 	}
 }
