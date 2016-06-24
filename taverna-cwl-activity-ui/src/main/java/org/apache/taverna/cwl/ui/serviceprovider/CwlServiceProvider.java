@@ -16,10 +16,7 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.ui.serviceprovider;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.DirectoryStream;
@@ -79,6 +76,8 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 				result.add(cwlServiceDesc);
 				// return the service description
 				callBack.partialResults(result);
+				//emptying the list
+				result.clear();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
