@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -53,8 +54,6 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 		Path path = Paths.get(getConfiguration().getPath());
 		//figure out the dots in the path ex: /maanadev/../cwltools
 		Path normalizedPath = path.normalize();
-		// This is holding the CWL configuration beans
-		List<CwlServiceDesc> result = new ArrayList<CwlServiceDesc>();
 
 		DirectoryStream<Path> stream = null;
 		try {
@@ -67,20 +66,20 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 		
 		paralleStream.forEach(p -> {
 			Yaml reader = getYamlReader();
-			try {
-				Map cwlFile = (Map) reader.load(new FileInputStream(path.toFile()));
-				// Creating CWl service Description
-				CwlServiceDesc cwlServiceDesc = createCWLDesc(p, cwlFile);
-
-				// add to the result
-				result.add(cwlServiceDesc);
-				// return the service description
-				callBack.partialResults(result);
-				//emptying the list
-				result.clear();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+	
+				Map cwlFile;
+				try {
+					cwlFile = (Map) reader.load(new FileInputStream(path.toFile()));
+					// Creating CWl service Description
+					CwlServiceDesc cwlServiceDesc = createCWLDesc(p, cwlFile);
+					// return the service description
+					callBack.partialResults(Arrays.asList(cwlServiceDesc));
+					
+				} catch (IOException e) {
+					callBack.warning("Io Exception");
+				}
+			
+			
 		});
 
 		callBack.finished();
