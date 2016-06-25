@@ -26,6 +26,8 @@ public interface DockerContainerConfiguration {
 
     public String getCmd();
 
+    public DockerRemoteConfig getDockerRemoteConfig();
+
     //TODO add all remaining getters
 
 }

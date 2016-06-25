@@ -122,12 +122,23 @@ public class DockerContainerConfigurationImpl extends AbstractConfigurable  impl
     public static final String NETWORKING_CONFIG = "networkingConfig";
 
 
+    private DockerRemoteConfig dockerRemoteConfig;
+
+
     public DockerContainerConfigurationImpl(ConfigurationManager configurationManager){
         super(configurationManager);
     }
 
     public DockerContainerConfigurationImpl(){
         super(null);
+    }
+
+    public DockerRemoteConfig getDockerRemoteConfig() {
+        return dockerRemoteConfig;
+    }
+
+    public void setDockerRemoteConfig(DockerRemoteConfig dockerRemoteConfig) {
+        this.dockerRemoteConfig = dockerRemoteConfig;
     }
 
     public String getName() {

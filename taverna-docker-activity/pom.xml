@@ -92,12 +92,18 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>org.apache.taverna.engine</groupId>-->
-			<!--<artifactId>taverna-activity-test-utils</artifactId>-->
-			<!--<version>${taverna.engine.version}</version>-->
-			<!--<scope>test</scope>-->
-		<!--</dependency>-->
+		<dependency>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-activity-test-utils</artifactId>
+			<version>${taverna.engine.version}</version>
+			<scope>test</scope>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                    <artifactId>jackson-jaxrs-json-provider</artifactId>
+                </exclusion>
+            </exclusions>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.taverna.engine</groupId>
 			<artifactId>taverna-workflowmodel-impl</artifactId>

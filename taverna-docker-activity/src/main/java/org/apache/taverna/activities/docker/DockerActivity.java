@@ -45,27 +45,27 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
     private DockerContainerConfiguration containerConfiguration;
 
-    private static final String ACTION = "action";
+    public static final String ACTION = "action";
 
-    private static final String INSPECT = "inspect";
+    public static final String INSPECT = "inspect";
 
-    private static final String CREATE_CONTAINER = "create-container";
+    public static final String CREATE_CONTAINER = "create-container";
 
-    private static final String START_CONTAINER = "start-container";
+    public static final String START_CONTAINER = "start-container";
 
-    private static final String STOP_CONTAINER = "stop-container";
+    public static final String STOP_CONTAINER = "stop-container";
 
-    private static final String LIST_CONTAINERS = "list-containers";
+    public static final String LIST_CONTAINERS = "list-containers";
 
-    private static final String OUT_CONTAINER_ID = "container-id";
+    public static final String OUT_CONTAINER_ID = "container-id";
 
-    private static final String OUT_IMAGE_ID = "container-id";
+    public static final String OUT_IMAGE_ID = "container-id";
 
-    private static final String OUT_IMAGE_AUTHOR = "image-author";
+    public static final String OUT_IMAGE_AUTHOR = "image-author";
 
-    private static final String OUT_IMAGE_CONTAINER = "image-container";
+    public static final String OUT_IMAGE_CONTAINER = "image-container";
 
-    private static final String IN_IMAGE_NAME = "image-name";
+    public static final String IN_IMAGE_NAME = "image-name";
 
     private static Logger LOG = Logger.getLogger(DockerActivity.class);
 

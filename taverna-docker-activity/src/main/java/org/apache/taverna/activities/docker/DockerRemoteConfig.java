@@ -25,7 +25,6 @@ public class DockerRemoteConfig {
     private String registryPassword;
     private String registryEmail;
     private String registryUrl;
-    private String dockerConfig;
     private String dockerCertPath;
     private boolean dockerTlsVerify;
     private String apiVersion = "1.21";
@@ -68,14 +67,6 @@ public class DockerRemoteConfig {
 
     public void setRegistryUrl(String registryUrl) {
         this.registryUrl = registryUrl;
-    }
-
-    public String getDockerConfig() {
-        return dockerConfig;
-    }
-
-    public void setDockerConfig(String dockerConfig) {
-        this.dockerConfig = dockerConfig;
     }
 
     public String getDockerCertPath() {

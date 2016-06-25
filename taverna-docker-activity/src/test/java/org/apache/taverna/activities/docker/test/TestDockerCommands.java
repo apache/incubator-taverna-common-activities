@@ -27,6 +27,7 @@ import org.apache.taverna.activities.docker.RemoteClient;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.List;
 
 public class TestDockerCommands {
@@ -39,14 +40,6 @@ public class TestDockerCommands {
 
     private static final String DOCKER_LOGIN_SUCCESS = "Login Succeeded";
 
-    public static void main(String[] args) {
-        TestDockerCommands commands = new TestDockerCommands();
-        commands.testLogin();
-//        commands.testInspectImage();
-        commands.testListContainers();
-//      commands.testCreateContainer();
-    }
-
     public TestDockerCommands(){
         DockerContainerConfigurationImpl containerConfiguration = new DockerContainerConfigurationImpl(new TestConfigurationManager());
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.NAME,CONTAINER_NAME);
@@ -57,11 +50,12 @@ public class TestDockerCommands {
         remoteConfig.setDockerHost("tcp://192.168.99.100:2376");
         remoteConfig.setApiVersion("1.21");
         remoteConfig.setDockerTlsVerify(true);
-        remoteConfig.setDockerCertPath("/Users/Nadeesh/Documents/docker/");
-        remoteConfig.setDockerConfig("/home/user/.docker");
-        remoteConfig.setRegistryUrl("https://registry-1.docker.io/v2/library/busybox/manifests/latest");
+
+        // You need to copy your valid certificate file to resources directory in this test module as follows.
+        remoteConfig.setDockerCertPath(new File("src/test/resources/cert").getAbsolutePath());
+        remoteConfig.setRegistryUrl("https://registry-1.docker.io/v2");
+        containerConfiguration.setDockerRemoteConfig(remoteConfig);
         remoteClient = new RemoteClient(containerConfiguration);
-        remoteClient.init(remoteConfig);
     }
 
     @Test

@@ -50,13 +50,10 @@ public class RemoteClient {
 
     public RemoteClient(DockerContainerConfiguration containerConfig) {
         this.containerConfig = containerConfig;
+        init(containerConfig.getDockerRemoteConfig());
     }
 
-    public DockerRemoteConfig getRemoteConfig() {
-        return remoteConfig;
-    }
-
-    public void init(DockerRemoteConfig remoteConfig) {
+    private void init(DockerRemoteConfig remoteConfig) {
         this.remoteConfig = remoteConfig;
         DockerClientConfig config = config();
         dockerClient = DockerClientBuilder.getInstance(config).build();
@@ -139,10 +136,6 @@ public class RemoteClient {
 
         if(remoteConfig.getDockerCertPath() != null){
             builder.withDockerCertPath(remoteConfig.getDockerCertPath());
-        }
-
-        if(remoteConfig.getDockerConfig() != null){
-            builder.withDockerConfig(remoteConfig.getDockerConfig());
         }
 
         if(remoteConfig.getRegistryUrl() != null){
