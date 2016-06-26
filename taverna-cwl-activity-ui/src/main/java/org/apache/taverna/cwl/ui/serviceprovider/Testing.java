@@ -56,34 +56,43 @@ public class Testing {
 	}
 	public static void main(String[] args) {
 
-		Path path1 = Paths.get("/home/maanadev/cwlTools");
-		Path path2 = path1.normalize();
+//		Path path1 = Paths.get("/home/maanadev/cwlTools");
+//		Path path2 = path1.normalize();
+//
+//		boolean pathExits = Files.exists(path2, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
+//
+//		
+//		try {
+//			DirectoryStream<Path> stream = Files.newDirectoryStream(path2,"*.cwl");
+//			Stream<Path> parrale = StreamSupport.stream(stream.spliterator(), true);
+//		
+//			
+//			
+////			stream.forEach(path->System.out.println(path));
+//			parrale.forEach(path->{
+//				Yaml reader =getReader();
+//				try {
+//					Map map=(Map) reader.load(new FileInputStream(path.toFile()));
+//					System.out.println(map);
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}); 
+//
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
-		boolean pathExits = Files.exists(path2, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
-
+		String s=" 1 2 3 ";
+		System.out.println(s);
+		System.out.println(s.replaceAll("\\s", ""));
 		
-		try {
-			DirectoryStream<Path> stream = Files.newDirectoryStream(path2,"*.cwl");
-			Stream<Path> parrale = StreamSupport.stream(stream.spliterator(), true);
+		s= " 1_2_3";
+		System.out.println(s);
+		System.out.println(s.replaceAll("_", ""));
 		
-			
-			
-//			stream.forEach(path->System.out.println(path));
-			parrale.forEach(path->{
-				Yaml reader =getReader();
-				try {
-					Map map=(Map) reader.load(new FileInputStream(path.toFile()));
-					System.out.println(map);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}); 
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		
 	}
 
 }
