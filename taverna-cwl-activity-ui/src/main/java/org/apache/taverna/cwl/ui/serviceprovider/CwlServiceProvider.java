@@ -23,7 +23,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import java.util.stream.StreamSupport;
 
 import javax.swing.Icon;
 
+import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
 import net.sf.taverna.t2.servicedescriptions.AbstractConfigurableServiceProvider;
@@ -39,7 +39,9 @@ import net.sf.taverna.t2.servicedescriptions.ConfigurableServiceProvider;
 
 public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlServiceProviderConfig>
 		implements ConfigurableServiceProvider<CwlServiceProviderConfig> {
-
+	
+	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
+	
 	CwlServiceProvider() {
 		super(new CwlServiceProviderConfig());
 	}
@@ -59,7 +61,8 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 		try {
 			stream = Files.newDirectoryStream(normalizedPath, "*.cwl");
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.warn("Path is not correct !");
+			return;
 		}
 		//create stream with parallel capabilities 
 		Stream<Path> paralleStream = StreamSupport.stream(stream.spliterator(), true);
@@ -76,7 +79,9 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 					callBack.partialResults(Arrays.asList(cwlServiceDesc));
 					
 				} catch (IOException e) {
-					callBack.warning("Io Exception");
+					
+					logger.warn("File not Found !");
+					
 				}
 			
 			
