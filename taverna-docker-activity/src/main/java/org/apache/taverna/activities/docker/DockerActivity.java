@@ -19,6 +19,12 @@
 package org.apache.taverna.activities.docker;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.InspectImageResponse;
+import org.apache.log4j.Logger;
 import org.apache.taverna.invocation.InvocationContext;
 import org.apache.taverna.reference.ErrorDocument;
 import org.apache.taverna.reference.ReferenceService;
@@ -35,49 +41,95 @@ import java.util.Map;
  */
 public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
-    private JsonNode activityConfig;
-    private DockerContainerConfigurationImpl containerConfiguration;
+    private JsonNode json;
 
-    public DockerActivity(DockerContainerConfigurationImpl containerConfiguration) {
+    private DockerContainerConfiguration containerConfiguration;
+
+    public static final String ACTION = "action";
+
+    public static final String INSPECT = "inspect";
+
+    public static final String CREATE_CONTAINER = "create-container";
+
+    public static final String START_CONTAINER = "start-container";
+
+    public static final String STOP_CONTAINER = "stop-container";
+
+    public static final String LIST_CONTAINERS = "list-containers";
+
+    public static final String OUT_CONTAINER_ID = "container-id";
+
+    public static final String OUT_IMAGE_ID = "container-id";
+
+    public static final String OUT_IMAGE_AUTHOR = "image-author";
+
+    public static final String OUT_IMAGE_CONTAINER = "image-container";
+
+    public static final String IN_IMAGE_NAME = "image-name";
+
+    private static Logger LOG = Logger.getLogger(DockerActivity.class);
+
+
+    public DockerActivity(DockerContainerConfiguration containerConfiguration) {
         this.containerConfiguration = containerConfiguration;
     }
 
     @Override
-    public void configure(JsonNode activityConfig) throws ActivityConfigurationException {
-      this.activityConfig = activityConfig;
+    public void configure(JsonNode json) throws ActivityConfigurationException {
+      this.json = json;
     }
 
     @Override
     public JsonNode getConfiguration() {
-        return activityConfig;
+        return json;
     }
 
     @Override
-    public void executeAsynch(Map<String, T2Reference> map, final AsynchronousActivityCallback callback) {
+    public void executeAsynch(final Map<String, T2Reference> map, final AsynchronousActivityCallback callback) {
         callback.requestRun(new Runnable() {
             @Override
             public void run() {
+
                 Map<String, T2Reference> outputs = new HashMap<String, T2Reference>();
                 T2Reference responseBodyRef = null;
-
                 InvocationContext context = callback.getContext();
                 ReferenceService referenceService = context.getReferenceService();
+                String action = map.get(ACTION).getLocalPart();
 
-                DockerHttpResponse response = RESTUtil.createContainer(containerConfiguration);
-                if(response != null && response.getStatusCode() == DockerHttpResponse.HTTP_201_CODE){
-                    responseBodyRef = referenceService.register(response.getBody(), 0, true, context);
-                } else {
-                    ErrorDocument errorDocument = referenceService.getErrorDocumentService().registerError(response.getBody(),0,context);
-                    responseBodyRef = referenceService.register(errorDocument, 0, true, context);
+                JsonNodeFactory factory = new ObjectMapper().getNodeFactory();
+                ObjectNode outJson = factory.objectNode();
+
+                RemoteClient remoteClient = new RemoteClient(containerConfiguration);
+                try {
+                    if (CREATE_CONTAINER.equalsIgnoreCase(action)) {
+
+                        CreateContainerResponse response = remoteClient.createContainer();
+                        outJson.put(OUT_CONTAINER_ID, response.getId());
+
+                    } else if (INSPECT.equalsIgnoreCase(action)) {
+
+                        String imageName = map.get(IN_IMAGE_NAME).getLocalPart();
+                        InspectImageResponse response = remoteClient.inspect(imageName);
+                        outJson.put(OUT_IMAGE_ID, response.getId());
+                        outJson.put(OUT_IMAGE_AUTHOR, response.getAuthor());
+                        outJson.put(OUT_IMAGE_CONTAINER, response.getContainer());
+
+                    } else if (START_CONTAINER.equalsIgnoreCase(action)) {
+                        // TODO
+                    } else if (STOP_CONTAINER.equalsIgnoreCase(action)) {
+                        // TODO
+                    } else if (LIST_CONTAINERS.equalsIgnoreCase(action)) {
+                        // TODO
+                    }
+                    //TODO add any more supporting actions
+                    responseBodyRef = referenceService.register(outJson.toString(), 0, true, context);
+                } catch (Exception e){
+                    String log = "Error occurred while executing remote docker commands " + e.getMessage();
+                    LOG.error(log ,e);
+                    responseBodyRef = referenceService.register("{\"error\",\"" + log + "\"}", 0, true, context);
                 }
-
                 outputs.put("response_body", responseBodyRef);
-                T2Reference statusRef = referenceService.register(response.getStatusCode(), 0, true, context);
-                outputs.put("response_code", statusRef);
-                //TODO add any more useful parameters to the output
-
                 callback.receiveResult(outputs, new int[0]);
-
             }
         });
     }

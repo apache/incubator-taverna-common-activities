@@ -20,6 +20,8 @@ package org.apache.taverna.activities.docker;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dockerjava.api.model.*;
+import com.github.dockerjava.core.command.CreateContainerCmdImpl;
 import org.apache.taverna.configuration.AbstractConfigurable;
 import org.apache.taverna.configuration.Configurable;
 import org.apache.taverna.configuration.ConfigurationManager;
@@ -30,68 +32,225 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DockerContainerConfigurationImpl extends AbstractConfigurable {
+public class DockerContainerConfigurationImpl extends AbstractConfigurable  implements DockerContainerConfiguration{
 
     /**
-     * Key for Remote host
+     * String Values
      */
-    public static final String CONTAINER_REMOTE_HOST = "key-cnt-host";
+    public static final String NAME = "name";
+
+    public static final String HOST_NAME = "hostName";
+
+    public static final String DOMAIN_NAME = "domainName";
+
+    public static final String USER = "user";
+
+    public static final String IMAGE = "image";
+
+    public static final String WORKING_DIR = "workingDir";
+
+    public static final String MAC_ADDRESS = "macAddress";
+
+    public static final String STOP_SIGNAL = "stopSignal";
+
+    public static final String IPV4_ADDRESS = "ipv4Address";
+
+    public static final String IPV6_ADDRESS = "ipv6Address";
 
     /**
-     * Key for transport protocol
+     * Boolean values
      */
-    public static final String PROTOCOL = "key-cnt-protocol";
+
+    public static final String ATTACH_STDIN = "attachStdin";
+
+    public static final String ATTACH_STDOUT = "attachStdout";
+
+    public static final String ATTACH_STDERR =  "attachStderr";
+
+    public static final String TTY = "tty";
+
+    public static final String STDIN_OPEN = "stdinOpen";
+
+    public static final String STDIN_ONCE = "stdInOnce";
+
+    public static final String NETWORK_DISABLED = "networkDisabled";
 
     /**
-     * Key for Remote port
+     * String Arrays
      */
-    public static final String CONTAINER_REMOTE_PORT = "key-cnt-port";
+    public static final String PORT_SPECS = "portSpecs";
+
+    public static final String ENV = "env";
+
+    public static final String CMD = "cmd";
+
+    public static final String ENTRY_POINT = "entrypoint";
 
     /**
-     * Key for create container payload. Here we accept entire JSON payload as the value of this key in hash map.
+     * Type Volumes[]
      */
-    public static final String CONTAINER_CREATE_PAYLOAD = "key-cnt-create-payload";
+    public static final String VOLUMES = "volumes";
 
     /**
-     * Docker remote REST resource path for creating a container
+     * Type Bindings[]
      */
-    public static final String CREATE_CONTAINER_RESOURCE_PATH = "/containers/create";
+    public static final String BINDINGS = "bindings";
 
     /**
-     * Identifier for Http over SSL protocol
+     * List<String> aliases
      */
-    public static final String HTTP_OVER_SSL = "https";
+    public static final String ALIASES = "aliases";
 
     /**
-     * Transport protocol
+     * Type ExposedPorts[]
      */
-    private String protocol = "http";
+    public static final String EXPOSED_PORTS = "exposedPorts";
 
+    /**
+     * Type Map<String,String>
+     */
+    public static final String LABELS = "labels";
+
+    /**
+     * Type HostConfig
+     */
+    public static final String HOST_CONFIG = "hostConfig";
+
+    /**
+     * Type CreateContainerCmdImpl.NetworkingConfig
+     */
+    public static final String NETWORKING_CONFIG = "networkingConfig";
+
+
+    private DockerRemoteConfig dockerRemoteConfig;
 
 
     public DockerContainerConfigurationImpl(ConfigurationManager configurationManager){
         super(configurationManager);
-
     }
 
-    public String getContainerHost() {
-        return getInternalPropertyMap().get(CONTAINER_REMOTE_HOST);
+    public DockerContainerConfigurationImpl(){
+        super(null);
     }
 
-    public String getProtocol() {
-        return getInternalPropertyMap().get(PROTOCOL);
+    public DockerRemoteConfig getDockerRemoteConfig() {
+        return dockerRemoteConfig;
     }
 
-    public int getRemoteAPIPort() {
-        return Integer.parseInt(getInternalPropertyMap().get(CONTAINER_REMOTE_PORT));
+    public void setDockerRemoteConfig(DockerRemoteConfig dockerRemoteConfig) {
+        this.dockerRemoteConfig = dockerRemoteConfig;
     }
 
-    public JsonNode getCreateContainerPayload() throws IOException {
-      return new ObjectMapper().readTree(getInternalPropertyMap().get(CONTAINER_CREATE_PAYLOAD));
+    public String getName() {
+       return this.getInternalPropertyMap().get(NAME);
     }
 
-    public String getCreateContainerURL() {
-       return getProtocol() + "://" + getContainerHost() +  ":" + getRemoteAPIPort() + CREATE_CONTAINER_RESOURCE_PATH;
+    public String getHostName() {
+        return HOST_NAME;
+    }
+
+    public String getDomainName() {
+        return DOMAIN_NAME;
+    }
+
+    public String getUser() {
+        return USER;
+    }
+
+    public String getImage() {
+        return this.getInternalPropertyMap().get(IMAGE);
+    }
+
+    public String getWorkingDir() {
+        return WORKING_DIR;
+    }
+
+    public String getMacAddress() {
+        return MAC_ADDRESS;
+    }
+
+    public String getStopSignal() {
+        return STOP_SIGNAL;
+    }
+
+    public String getIpv4Address() {
+        return IPV4_ADDRESS;
+    }
+
+    public String getIpv6Address() {
+        return IPV6_ADDRESS;
+    }
+
+    public String getAttachStdin() {
+        return ATTACH_STDIN;
+    }
+
+    public String getAttachStdout() {
+        return ATTACH_STDOUT;
+    }
+
+    public String getAttachStderr() {
+        return ATTACH_STDERR;
+    }
+
+    public String getTty() {
+        return TTY;
+    }
+
+    public String getStdinOpen() {
+        return STDIN_OPEN;
+    }
+
+    public String getStdinOnce() {
+        return STDIN_ONCE;
+    }
+
+    public String getNetworkDisabled() {
+        return NETWORK_DISABLED;
+    }
+
+    public String getPortSpecs() {
+        return PORT_SPECS;
+    }
+
+    public String getEnv() {
+        return ENV;
+    }
+
+    public String getCmd() {
+        return this.getInternalPropertyMap().get(CMD);
+    }
+
+    public String getEntryPoint() {
+        return ENTRY_POINT;
+    }
+
+    public String getVolumes() {
+        return VOLUMES;
+    }
+
+    public String getBindings() {
+        return BINDINGS;
+    }
+
+    public String getAliases() {
+        return ALIASES;
+    }
+
+    public String getExposedPorts() {
+        return EXPOSED_PORTS;
+    }
+
+    public String getLabels() {
+        return LABELS;
+    }
+
+    public String getHostConfig() {
+        return HOST_CONFIG;
+    }
+
+    public String getNetworkingConfig() {
+        return NETWORKING_CONFIG;
     }
 
     @Override

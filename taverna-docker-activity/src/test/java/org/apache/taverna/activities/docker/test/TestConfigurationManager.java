@@ -16,36 +16,20 @@
 * specific language governing permissions and limitations
 * under the License.
 */
+package org.apache.taverna.activities.docker.test;
 
-package org.apache.taverna.activities.docker;
+import org.apache.taverna.configuration.Configurable;
+import org.apache.taverna.configuration.ConfigurationManager;
 
-import org.apache.http.Header;
+public class TestConfigurationManager implements ConfigurationManager {
 
-public class DockerHttpResponse {
+    @Override
+    public void store(Configurable configurable) throws Exception {
 
-    public static final int HTTP_201_CODE = 201;
-
-    private Header[] headers;
-
-    private int statusCode;
-
-    private String body;
-
-    public DockerHttpResponse(Header[] headers, int statusCode, String body) {
-        this.headers = headers;
-        this.statusCode = statusCode;
-        this.body = body;
     }
 
-    public Header[] getHeaders() {
-        return headers;
-    }
+    @Override
+    public void populate(Configurable configurable) throws Exception {
 
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public String getBody() {
-        return body;
     }
 }

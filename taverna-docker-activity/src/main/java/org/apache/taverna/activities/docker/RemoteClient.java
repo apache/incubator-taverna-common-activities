@@ -1,0 +1,160 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one
+* or more contributor license agreements. See the NOTICE file
+* distributed with this work for additional information
+* regarding copyright ownership. The ASF licenses this file
+* to you under the Apache License, Version 2.0 (the
+* "License"); you may not use this file except in compliance
+* with the License. You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+package org.apache.taverna.activities.docker;
+
+
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.InspectImageResponse;
+import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.Info;
+import com.github.dockerjava.api.model.SearchItem;
+import com.github.dockerjava.core.DockerClientBuilder;
+import com.github.dockerjava.core.DockerClientConfig;
+import org.apache.log4j.Logger;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+
+public class RemoteClient {
+
+    /**
+     * Docker client
+     */
+    private DockerClient dockerClient;
+
+    private DockerContainerConfiguration containerConfig;
+
+    private DockerRemoteConfig remoteConfig;
+
+    private static Logger LOG = Logger.getLogger(RemoteClient.class);
+
+
+    public RemoteClient(DockerContainerConfiguration containerConfig) {
+        this.containerConfig = containerConfig;
+        init(containerConfig.getDockerRemoteConfig());
+    }
+
+    private void init(DockerRemoteConfig remoteConfig) {
+        this.remoteConfig = remoteConfig;
+        DockerClientConfig config = config();
+        dockerClient = DockerClientBuilder.getInstance(config).build();
+    }
+
+    /**
+     * Login to the Docker
+     * @return Status of the login response
+     */
+    public String login(){
+        return dockerClient.authCmd().exec().getStatus();
+    }
+
+    /**
+     *
+     * @param name Image Name/Id
+     * @return Complete docker response
+     */
+    public InspectImageResponse inspect(String name){
+        return dockerClient.inspectImageCmd(name).exec();
+    }
+
+    /**
+     * This creates a container based on the inout params. Docker command "docker ps -a" will show you all created containers.
+     * @return complete docker response
+     */
+    public CreateContainerResponse createContainer(){
+        CreateContainerResponse response = buildCreateContainerCmd().exec();
+        return response;
+    }
+
+    /**
+     * @return List all containers
+     */
+    public List<Container> listContainers(){
+        return dockerClient.listContainersCmd().withShowAll(true).exec();
+    }
+
+    /**
+     * @return Docker Info response from docker
+     */
+    public Info info(){
+        return dockerClient.infoCmd().exec();
+    }
+
+    /**
+     * @param containerId To be start
+     */
+    public void startContainer(String containerId){
+        dockerClient.startContainerCmd(containerId).exec();
+    }
+
+    /**
+     * @param containerId to be stopped
+     */
+    public void stopContainer(String containerId){
+        dockerClient.stopContainerCmd(containerId).exec();
+    }
+
+    /**
+     * @param term Search term for images (ex: image name)
+     * @return List of Images
+     */
+    public  List<SearchItem>  searchImages(String term){
+      return dockerClient.searchImagesCmd(term).exec();
+    }
+
+    private CreateContainerCmd buildCreateContainerCmd(){
+        CreateContainerCmd createCmd = dockerClient.createContainerCmd(containerConfig.getImage());
+        createCmd.withCmd(containerConfig.getCmd());
+        createCmd.withName(containerConfig.getName());
+        return createCmd;
+    }
+
+    private DockerClientConfig config() {
+        DockerClientConfig.DockerClientConfigBuilder builder = DockerClientConfig.createDefaultConfigBuilder();
+        builder.withDockerHost(remoteConfig.getDockerHost());
+        builder.withDockerTlsVerify(remoteConfig.isDockerTlsVerify());
+        builder.withApiVersion(remoteConfig.getApiVersion());
+
+        if(remoteConfig.getDockerCertPath() != null){
+            builder.withDockerCertPath(remoteConfig.getDockerCertPath());
+        }
+
+        if(remoteConfig.getRegistryUrl() != null){
+            builder.withRegistryUrl(remoteConfig.getRegistryUrl());
+        }
+
+        if(remoteConfig.getRegistryUsername() != null){
+            builder.withRegistryUsername(remoteConfig.getRegistryUsername());
+        }
+
+        if(remoteConfig.getRegistryPassword() != null){
+            builder.withRegistryPassword(remoteConfig.getRegistryPassword());
+        }
+
+        if(remoteConfig.getRegistryEmail() != null){
+            builder.withRegistryEmail(remoteConfig.getRegistryEmail());
+        }
+
+        return builder.build();
+    }
+
+    }
