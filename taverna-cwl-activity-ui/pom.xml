@@ -45,12 +45,7 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.taverna.engine</groupId>
-			<artifactId>taverna-activity-test-utils</artifactId>
-			<version>${taverna.engine.version}</version>
-			<scope>test</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.taverna.engine</groupId>
 			<artifactId>taverna-workflowmodel-impl</artifactId>
