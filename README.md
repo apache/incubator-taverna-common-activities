@@ -83,7 +83,6 @@ fully endorsed by the ASF.
 * [Apache Maven](https://maven.apache.org/download.html) 3.2.5 or newer (older
   versions probably also work)
 
-
 This code relies on other
 [Apache Taverna modules](https://taverna.incubator.apache.org/download/code/),
 which Maven shuold automatically
