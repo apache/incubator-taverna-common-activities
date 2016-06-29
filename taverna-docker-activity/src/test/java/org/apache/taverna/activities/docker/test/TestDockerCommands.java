@@ -40,7 +40,7 @@ public class TestDockerCommands {
 
     private static final String DOCKER_LOGIN_SUCCESS = "Login Succeeded";
 
-    public TestDockerCommands(){
+    public TestDockerCommands() {
         DockerContainerConfigurationImpl containerConfiguration = new DockerContainerConfigurationImpl(new TestConfigurationManager());
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.NAME,CONTAINER_NAME);
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.IMAGE,IMAGE_NAME);
@@ -83,13 +83,4 @@ public class TestDockerCommands {
         }
     }
 
-    /**
-     * Corresponding docker command > docker images --no-trunc | head
-     */
-    @Test
-    public void testInspectImage1(){
-        InspectImageResponse response = remoteClient.inspect(IMAGE_NAME);
-        System.out.println(response.getId());
-        Assert.assertNotNull(response.getId());
-    }
 }

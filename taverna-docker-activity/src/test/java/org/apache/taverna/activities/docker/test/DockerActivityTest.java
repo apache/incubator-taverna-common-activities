@@ -22,25 +22,16 @@ package org.apache.taverna.activities.docker.test;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.taverna.activities.docker.DockerActivity;
-import org.apache.taverna.activities.docker.DockerContainerConfiguration;
 import org.apache.taverna.activities.docker.DockerContainerConfigurationImpl;
 import org.apache.taverna.activities.docker.DockerRemoteConfig;
 import org.apache.taverna.activities.testutils.ActivityInvoker;
-import org.apache.taverna.reference.T2Reference;
-import org.apache.taverna.workflowmodel.AbstractPort;
-import org.apache.taverna.workflowmodel.Edits;
-import org.apache.taverna.workflowmodel.impl.EditsImpl;
-import org.apache.taverna.workflowmodel.processor.activity.impl.ActivityInputPortImpl;
-import org.apache.taverna.workflowmodel.processor.activity.impl.ActivityOutputPortImpl;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class DockerActivityTest {
 
@@ -51,6 +42,7 @@ public class DockerActivityTest {
 	private ObjectNode activityConfiguration;
 
     private DockerContainerConfigurationImpl containerConfiguration;
+
 
 	@Before
 	public void setup() throws Exception {
@@ -87,9 +79,10 @@ public class DockerActivityTest {
         inputs.put(DockerActivity.IN_IMAGE_NAME, IMAGE_NAME);
 
 		Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
-		expectedOutputs.put("response_body", T2Reference.class);
+		expectedOutputs.put(DockerActivity.RESPONSE_BODY_KEY, String.class);
 
 		Map<String,Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputs);
-        System.out.println(outputs.size());
+        System.out.println(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
+        Assert.assertNotNull(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
 	}
 }

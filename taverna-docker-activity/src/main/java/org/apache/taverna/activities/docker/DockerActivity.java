@@ -67,6 +67,8 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
     public static final String IN_IMAGE_NAME = "image-name";
 
+    public static final String RESPONSE_BODY_KEY = "response_body";
+
     private static Logger LOG = Logger.getLogger(DockerActivity.class);
 
 
@@ -94,13 +96,12 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
                 T2Reference responseBodyRef = null;
                 InvocationContext context = callback.getContext();
                 ReferenceService referenceService = context.getReferenceService();
-                String action = map.get(ACTION).getLocalPart();
+                String action = getRenderedParam(referenceService,context, map.get(ACTION));
 
                 JsonNodeFactory factory = new ObjectMapper().getNodeFactory();
                 ObjectNode outJson = factory.objectNode();
 
                 RemoteClient remoteClient = new RemoteClient(containerConfiguration);
-                try {
                     if (CREATE_CONTAINER.equalsIgnoreCase(action)) {
 
                         CreateContainerResponse response = remoteClient.createContainer();
@@ -108,7 +109,7 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
                     } else if (INSPECT.equalsIgnoreCase(action)) {
 
-                        String imageName = map.get(IN_IMAGE_NAME).getLocalPart();
+                        String imageName = getRenderedParam(referenceService, context, map.get(IN_IMAGE_NAME));
                         InspectImageResponse response = remoteClient.inspect(imageName);
                         outJson.put(OUT_IMAGE_ID, response.getId());
                         outJson.put(OUT_IMAGE_AUTHOR, response.getAuthor());
@@ -123,14 +124,16 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
                     }
                     //TODO add any more supporting actions
                     responseBodyRef = referenceService.register(outJson.toString(), 0, true, context);
-                } catch (Exception e){
-                    String log = "Error occurred while executing remote docker commands " + e.getMessage();
-                    LOG.error(log ,e);
-                    responseBodyRef = referenceService.register("{\"error\",\"" + log + "\"}", 0, true, context);
-                }
-                outputs.put("response_body", responseBodyRef);
+
+                outputs.put(RESPONSE_BODY_KEY, responseBodyRef);
                 callback.receiveResult(outputs, new int[0]);
             }
         });
+    }
+
+
+    private String getRenderedParam(ReferenceService referenceService, InvocationContext context, T2Reference key){
+        return (String) referenceService.renderIdentifier(key, String.class, context);
+
     }
 }
