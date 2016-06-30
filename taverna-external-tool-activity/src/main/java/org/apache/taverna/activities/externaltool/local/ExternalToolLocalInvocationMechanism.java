@@ -53,7 +53,7 @@ public class ExternalToolLocalInvocationMechanism extends
 
 	@Override
 	public String getType() {
-		return LocalUseCaseInvocation.LOCAL_USE_CASE_INVOCATION_TYPE;
+		return LocalToolInvocation.LOCAL_USE_CASE_INVOCATION_TYPE;
 	}
 
 	@Override

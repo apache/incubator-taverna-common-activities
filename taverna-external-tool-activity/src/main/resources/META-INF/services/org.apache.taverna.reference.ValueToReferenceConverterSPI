@@ -1,3 +1,3 @@
 # Implementation classes of ValueToReferenceConverterSPI go here, one per line
-org.apache.taverna.activities.externaltool.invocation.ssh.SshUrlToSshReference
+org.apache.taverna.activities.externaltool.ssh.SshUrlToSshReference
 

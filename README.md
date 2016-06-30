@@ -17,19 +17,18 @@
 
 # Apache Taverna Common Activities
 
-Launcher for running
-[Apache Taverna](http://taverna.incubator.apache.org/) workflows.
+Common Activities to be invoked as part of 
+[Apache Taverna](https://taverna.incubator.apache.org/) workflows.
 
-Note that except for command line parsing, this module relies on other
-[Apache Taverna modules](http://taverna.incubator.apache.org/code) for
+Note that this module relies on other
+[Apache Taverna modules](https://taverna.incubator.apache.org/code) for
 the actual workflow execution.
 
 
 ## License
 
-(c) 2007-2014 University of Manchester
-
-(c) 2014-2016 Apache Software Foundation
+* (c) 2007-2014 University of Manchester
+* (c) 2014-2016 Apache Software Foundation
 
 This product includes software developed at The
 [Apache Software Foundation](http://www.apache.org/).
@@ -38,18 +37,18 @@ Licensed under the
 [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0), see the file
 [LICENSE](LICENSE) for details.
 
-The file [NOTICE](NOTICE) contain any additional attributions and
+The file [NOTICE](NOTICE) contains any additional attributions and
 details about embedded third-party libraries and source code.
 
 
 # Contribute
 
 Please subscribe to and contact the
-[dev@taverna](http://taverna.incubator.apache.org/community/lists#dev mailing list)
-for any questions, suggestions and discussions about
+[dev@taverna](https://taverna.incubator.apache.org/community/lists#dev mailing list)
+mailing list for any questions, suggestions and discussions about
 Apache Taverna.
 
-Bugs and feature plannings are tracked in the Jira
+Bugs and planned features are tracked in the Jira
 [Issue tracker](https://issues.apache.org/jira/browse/TAVERNA/component/12326811)
 under the `TAVERNA` component _Taverna Common Activities._ Feel free
 to add an issue!
@@ -69,7 +68,7 @@ sponsored by the [Apache Incubator PMC](http://incubator.apache.org/).
 
 [Incubation](http://incubator.apache.org/incubation/Process_Description.html)
 is required of all newly accepted projects until a further review
-indicates that the infrastructure, communications, and decision making process
+indicates that the infrastructure, communications, and decision-making process
 have stabilized in a manner consistent with other successful ASF projects.
 
 While incubation status is not necessarily a reflection of the completeness
@@ -80,9 +79,23 @@ fully endorsed by the ASF.
 
 ## Prerequisites
 
-* Java 1.7 or newer (tested with OpenJDK 1.8)
+* Java 1.8 or newer (tested with OpenJDK 1.8)
 * [Apache Maven](https://maven.apache.org/download.html) 3.2.5 or newer (older
   versions probably also work)
+
+This code relies on other
+[Apache Taverna modules](https://taverna.incubator.apache.org/download/code/),
+which Maven shuold automatically
+download from
+[Apache's Maven repository](https://taverna.incubator.apache.org/download/maven/);
+however you might want to compile these yourself in the below order:
+
+* [taverna-language](https://taverna.incubator.apache.org/download/language/)
+* [taverna-osgi](https://taverna.incubator.apache.org/download/osgi/)
+* [taverna-engine](https://taverna.incubator.apache.org/download/engine/)
+
+Please see the `<properties>` of this [pom.xml](pom.xml) to find the
+correct versions to build.
 
 
 # Building
@@ -94,9 +107,19 @@ To build, use
 This will build each module and run their tests.
 
 
+## Building on Windows
+
+If you are building on Windows, ensure you unpack this source code
+to a folder with a [short path name](http://stackoverflow.com/questions/1880321/why-does-the-260-character-path-length-limit-exist-in-windows) 
+lenght, e.g. `C:\src` - as 
+Windows has a [limitation on the total path length](https://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx#maxpath) 
+which might otherwise
+prevent this code from building successfully.
+
+
 ## Skipping tests
 
-To skip the tests (these can be timeconsuming), use:
+To skip the tests (these can be time-consuming), use:
 
     mvn clean install -DskipTests
 
@@ -107,6 +130,29 @@ Apache Taverna project, you may not want to run the
 that enforces Apache headers in every source file - to disable it, try:
 
     mvn clean install -Drat.skip=true
+
+# Modules
+
+Each module implement a particular type of 
+Taverna [Activity](https://taverna.incubator.apache.org/javadoc/taverna-engine/org/apache/taverna/workflowmodel/processor/activity/Activity.html).
+
+* [taverna-beanshell-activity](taverna-beanshell-activity/): Apache Taverna Beanshell Activity, 
+  runs [Beanshell](https://github.com/beanshell/beanshell/) scripts.
+* [taverna-external-tool-activity](taverna-external-tool-activity/): Apache Taverna External Tool Activity, 
+  run command line locally or over SSH
+* [taverna-interaction-activity](taverna-interaction-activity/): Apache Taverna Interaction Activity, 
+  ask questions to the user through a browser
+* [taverna-rest-activity](taverna-rest-activity/): Apache Taverna REST Activity, 
+  invoke [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) HTTP(S) web services based on a URI template.
+* [taverna-spreadsheet-import-activity](taverna-spreadsheet-import-activity/): Apache Taverna Spreadsheet Import Activity, 
+  imports from CSV, Excel and OpenOffice.
+* [taverna-wsdl-activity](taverna-wsdl-activity/): Apache Taverna WSDL Activity, 
+  invoke [WSDL](https://en.wikipedia.org/wiki/Web_Services_Description_Language)-described SOAP services.
+* [taverna-wsdl-generic](taverna-wsdl-generic/): Apache Taverna WSDL-generic Library, 
+  library for parsing WSDL and calling SOAP services
+* [taverna-xpath-activity](taverna-xpath-activity/): Apache Taverna XPath Activity, 
+  select XML fragments using [XPath](https://www.w3.org/TR/xpath/) expressions
+
 
 # Export restrictions
 
@@ -132,12 +178,12 @@ for both object code and source code.
 The following provides more details on the included cryptographic software:
 
 * [taverna-rest-activity](taverna-rest-activity)
-  depend on
+  depends on
   [Apache HttpComponents](https://hc.apache.org/) Client,
-  which can be configured to initiate
+  and can be configured to initiate
   `https://` connections.
 * [taverna-wsdl-generic](taverna-wsdl-generic)
-  and [taverna-wsdl-activity](taverna-wsdl-activity) uses
+  and [taverna-wsdl-activity](taverna-wsdl-activity) use
   [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html)
   (JSSE) and depend on
   [Apache WSS4J](https://ws.apache.org/wss4j/),
@@ -147,8 +193,9 @@ The following provides more details on the included cryptographic software:
   [Apache Taverna Engine](http://taverna.incubator.apache.org/download/engine/)
   Credential Manager API for
   management of username/password and client/server SSL certificates.
-* [taverna-interaction-activity](taverna-interaction-activity) depend on
+* [taverna-interaction-activity](taverna-interaction-activity) depends on
   [Jetty](http://www.eclipse.org/jetty/),
   which includes UnixCrypt.java for one way cryptography, and can be
   configured for SSL encryption using
-  [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html)
+  [Java Secure Socket Extension](https://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html).
+

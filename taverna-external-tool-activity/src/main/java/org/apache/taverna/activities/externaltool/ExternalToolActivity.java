@@ -27,9 +27,9 @@ import java.util.Map;
 import org.apache.taverna.activities.externaltool.desc.ScriptInput;
 import org.apache.taverna.activities.externaltool.desc.ScriptInputUser;
 import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.invocation.InvocationException;
-import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
+import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationGroup;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.annotation.Annotated;
@@ -67,7 +67,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 	private static Logger logger = Logger.getLogger(ExternalToolActivity.class);
 
 	private ExternalToolActivityConfigurationBean configurationBean;
-	private UseCaseDescription mydesc;
+	private ToolDescription mydesc;
 
 	private List<InvocationCreator> invocationCreators;
 
@@ -215,7 +215,7 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 
 			public void run() {
 				ReferenceService referenceService = callback.getContext().getReferenceService();
-				UseCaseInvocation invoke = null;
+				ToolInvocation invoke = null;
 
 				/**
 				 * Note that retrying needs to be either done via Taverna's retry mechanism or as part of the specific invocation
@@ -280,8 +280,8 @@ public class ExternalToolActivity extends AbstractAsynchronousActivity<ExternalT
 		this.invocationCreators = invocationCreators;
 	}
 
-	private UseCaseInvocation getInvocation(InvocationMechanism mechanism, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
-		UseCaseInvocation result = null;
+	private ToolInvocation getInvocation(InvocationMechanism mechanism, ToolDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
+		ToolInvocation result = null;
 		InvocationCreator creator = null;
 		for (InvocationCreator c : invocationCreators) {
 			if (c.canHandle(mechanism.getType())) {
