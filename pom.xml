@@ -54,6 +54,7 @@
     <modules>
         <module>taverna-cwl-activity</module>
         <module>taverna-cwl-activity-ui</module>
+	<module>taverna-cwl-utilities</module>
         <module>taverna-beanshell-activity</module>
         <module>taverna-external-tool-activity</module>
         <module>taverna-interaction-activity</module>
