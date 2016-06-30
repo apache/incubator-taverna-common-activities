@@ -49,9 +49,9 @@ import java.util.regex.Matcher;
 
 import org.apache.taverna.activities.externaltool.desc.ScriptInput;
 import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.invocation.InvocationException;
-import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
+import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.activities.externaltool.ssh.SshNode;
 import org.apache.taverna.activities.externaltool.ssh.SshNodeFactory;
 import org.apache.taverna.activities.externaltool.ssh.SshUrl;
@@ -73,9 +73,9 @@ import org.apache.log4j.Logger;
  * The job is executed locally, i.e. not via the grid.
  * @author Hajo Krabbenhoeft
  */
-public class LocalUseCaseInvocation extends UseCaseInvocation {
+public class LocalToolInvocation extends ToolInvocation {
 
-	private static Logger logger = Logger.getLogger(LocalUseCaseInvocation.class);
+	private static Logger logger = Logger.getLogger(LocalToolInvocation.class);
 
 	private final File tempDir;
 	
@@ -93,7 +93,7 @@ public class LocalUseCaseInvocation extends UseCaseInvocation {
 	
 	private static String LOCAL_INVOCATION_FILE = "localInvocations";
 
-	public LocalUseCaseInvocation(UseCaseDescription desc, boolean retrieveData, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
+	public LocalToolInvocation(ToolDescription desc, boolean retrieveData, String mainTempDirectory, String shellPrefix, String linkCommand) throws IOException {
 
 		usecase = desc;
 		setRetrieveData(retrieveData);

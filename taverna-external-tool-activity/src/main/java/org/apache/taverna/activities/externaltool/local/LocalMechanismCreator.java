@@ -34,7 +34,7 @@ public class LocalMechanismCreator extends MechanismCreator {
 	 */
 	@Override
 	public boolean canHandle(String mechanismType) {
-		return mechanismType.equals(LocalUseCaseInvocation.LOCAL_USE_CASE_INVOCATION_TYPE);
+		return mechanismType.equals(LocalToolInvocation.LOCAL_USE_CASE_INVOCATION_TYPE);
 	}
 
 	public InvocationMechanism convert(Element detailsElement,

@@ -45,10 +45,10 @@ import java.util.regex.Matcher;
 import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
 import org.apache.taverna.activities.externaltool.desc.ScriptInput;
 import org.apache.taverna.activities.externaltool.desc.ScriptOutput;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.invocation.AskUserForPw;
 import org.apache.taverna.activities.externaltool.invocation.InvocationException;
-import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
+import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.reference.AbstractExternalReference;
 import org.apache.taverna.reference.ErrorDocument;
 import org.apache.taverna.reference.ErrorDocumentServiceException;
@@ -75,9 +75,9 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
  * 
  * @author Hajo Krabbenhoeft
  */
-public class SshUseCaseInvocation extends UseCaseInvocation {
+public class SshToolInvocation extends ToolInvocation {
 
-	private static Logger logger = Logger.getLogger(SshUseCaseInvocation.class);
+	private static Logger logger = Logger.getLogger(SshToolInvocation.class);
 
 	private SshUrl location = null;
 
@@ -124,7 +124,7 @@ public class SshUseCaseInvocation extends UseCaseInvocation {
 		return null;
 	}
 
-	public SshUseCaseInvocation(UseCaseDescription desc, SshNode workerNodeA,
+	public SshToolInvocation(ToolDescription desc, SshNode workerNodeA,
 			AskUserForPw askUserForPwA, CredentialManager credentialManager)
 			throws JSchException, SftpException {
 		this.workerNode = workerNodeA;

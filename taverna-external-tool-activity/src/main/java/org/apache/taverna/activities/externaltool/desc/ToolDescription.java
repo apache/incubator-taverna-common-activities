@@ -51,9 +51,9 @@ import org.apache.commons.lang.StringUtils;
  * Class representation of XML-description of UseCases
  */
 @ConfigurationBean(uri = ExternalToolActivity.URI + "#ToolDescription")
-public class UseCaseDescription {
+public class ToolDescription {
 
-	private static Logger logger = Logger.getLogger(UseCaseDescription.class);
+	private static Logger logger = Logger.getLogger(ToolDescription.class);
 
 	/**
 	 * Identifier for the retrieval of this UseCase in the sharedRepository
@@ -122,7 +122,7 @@ public class UseCaseDescription {
 	/**
 	 * Default constructor to make xstream happy
 	 */
-	public UseCaseDescription() {
+	public ToolDescription() {
 		
 	}
 
@@ -131,7 +131,7 @@ public class UseCaseDescription {
 	 *
 	 * @param usecaseid
 	 */
-	public UseCaseDescription(String usecaseid) {
+	public ToolDescription(String usecaseid) {
 		this.setUsecaseid(usecaseid);
 	}
 
@@ -140,7 +140,7 @@ public class UseCaseDescription {
 	 * getClass().getClassLoader().getResourceAsStream("..") to load a usecase
 	 * from your program jar
 	 */
-	public UseCaseDescription(InputStream programAsStream) throws DeserializationException {
+	public ToolDescription(InputStream programAsStream) throws DeserializationException {
 		SAXBuilder builder = new SAXBuilder();
 		Document doc;
 		try {
@@ -157,12 +157,12 @@ public class UseCaseDescription {
 	/**
 	 * Constructor, expects an XML-root to dissect.
 	 */
-	public UseCaseDescription(Element programNode) throws DeserializationException {
+	public ToolDescription(Element programNode) throws DeserializationException {
 		readFromXmlElement(programNode);
 	}
 
 /**
- * Produce an XML description of the UseCaseDescription
+ * Produce an XML description of the ToolDescription
  */
 	public Element writeToXMLElement() {
 		Element programNode = new Element("program");
@@ -307,7 +307,7 @@ public class UseCaseDescription {
 		return programNode;
 	}
 	/**
-	 * Specifies the UseCaseDescription from the root of an XML description
+	 * Specifies the ToolDescription from the root of an XML description
 	 * which is accessible online.
 	 *
 	 * @param programNode
@@ -533,7 +533,7 @@ public class UseCaseDescription {
 	 * @throws DeserializationException
 	 */
 	public static void main(String[] argv) throws MalformedURLException, IOException, DeserializationException {
-		UseCaseDescription d = new UseCaseDescription(new URL(argv[0]).openStream());
+		ToolDescription d = new ToolDescription(new URL(argv[0]).openStream());
 		logger.info(d.getCommand());
 	}
 

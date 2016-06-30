@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.apache.taverna.activities.externaltool.InvocationCreator;
 import org.apache.taverna.activities.externaltool.RetrieveLoginFromTaverna;
-import org.apache.taverna.activities.externaltool.desc.UseCaseDescription;
-import org.apache.taverna.activities.externaltool.invocation.UseCaseInvocation;
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
+import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.log4j.Logger;
 
 import com.jcraft.jsch.JSchException;
@@ -54,16 +54,16 @@ public final class SshInvocationCreator implements InvocationCreator {
 
 	@Override
 	public boolean canHandle(String mechanismType) {
-		return mechanismType.equals(SshUseCaseInvocation.SSH_USE_CASE_INVOCATION_TYPE);
+		return mechanismType.equals(SshToolInvocation.SSH_USE_CASE_INVOCATION_TYPE);
 	}
 
 	@Override
-	public UseCaseInvocation convert(InvocationMechanism m, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
+	public ToolInvocation convert(InvocationMechanism m, ToolDescription description, Map<String, T2Reference> data, ReferenceService referenceService) {
 	    ExternalToolSshInvocationMechanism mechanism = (ExternalToolSshInvocationMechanism) m;
-		SshUseCaseInvocation result = null;
+		SshToolInvocation result = null;
 		try {
 		    SshNode chosenNode = chooseNode(mechanism.getNodes(), data, referenceService);
-		    result = new SshUseCaseInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString(), credentialManager), credentialManager);
+		    result = new SshToolInvocation(description, chosenNode, new RetrieveLoginFromTaverna(new SshUrl(chosenNode).toString(), credentialManager), credentialManager);
 		} catch (JSchException e) {
 			logger.error("Null invocation", e);
 		} catch (SftpException e) {

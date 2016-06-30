@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>org.apache.taverna.commonactivities</groupId>
 		<artifactId>apache-taverna-common-activities</artifactId>
-		<version>2.1.0-incubating-SNAPSHOT</version>
+		<version>2.1.1-incubating-SNAPSHOT</version>
 	</parent>
 	<artifactId>taverna-cwl-activity-ui</artifactId>
 	<packaging>bundle</packaging>
