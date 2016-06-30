@@ -21,9 +21,8 @@ package org.apache.taverna.activities.externaltool;
 
 import java.util.Map;
 
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.UseCaseInvocation;
-
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
+import org.apache.taverna.activities.externaltool.invocation.ToolInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.reference.ReferenceService;
 import org.apache.taverna.reference.T2Reference;
@@ -36,6 +35,6 @@ public interface InvocationCreator {
 	
 	public boolean canHandle(String mechanismType);
 	
-	public UseCaseInvocation convert(InvocationMechanism mechanism, UseCaseDescription description, Map<String, T2Reference> data, ReferenceService referenceService);
+	public ToolInvocation convert(InvocationMechanism mechanism, ToolDescription description, Map<String, T2Reference> data, ReferenceService referenceService);
 
 }

@@ -200,3 +200,13 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+---------------------------------------------------------
+taverna-wsdl-generic/src/main/resources/META-INF/soap-encoding.xsd
+is licensed by the W3C Software License
+http://www.w3.org/Consortium/Legal/copyright-software-19980720
+---------------------------------------------------------
+./taverna-interaction-activity/src/main/resources/json2.js
+is Public Domain, see https://github.com/douglascrockford/JSON-js/
+and http://www.json.org/js.html
+---------------------------------------------------------

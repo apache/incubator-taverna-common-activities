@@ -22,8 +22,6 @@ package org.apache.taverna.activities.externaltool.local;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-
-import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocation;
 import org.apache.taverna.activities.externaltool.manager.InvocationPersister;
 
 /**
@@ -39,7 +37,7 @@ public class LocalInvocationPersister extends InvocationPersister {
 	 */
 	@Override
 	public void load(File directory) {
-		LocalUseCaseInvocation.load(directory);
+		LocalToolInvocation.load(directory);
 	}
 
 	/* (non-Javadoc)
@@ -47,12 +45,12 @@ public class LocalInvocationPersister extends InvocationPersister {
 	 */
 	@Override
 	public void persist(File directory) {
-		LocalUseCaseInvocation.persist(directory);
+		LocalToolInvocation.persist(directory);
 	}
 	
 	@Override
 	public void deleteRun(String runId) {
-			LocalUseCaseInvocation.cleanup(runId);
+			LocalToolInvocation.cleanup(runId);
 	}
 
 }

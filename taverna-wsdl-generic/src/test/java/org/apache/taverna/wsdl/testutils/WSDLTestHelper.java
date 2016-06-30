@@ -19,30 +19,83 @@
 
 package org.apache.taverna.wsdl.testutils;
 
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import org.apache.taverna.wsdl.parser.WSDLParserTest;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
 
 public class WSDLTestHelper implements LocationConstants {
+
+	// See https://github.com/taverna-extras/wsdl-generic-test-cases
+	//public static String TEST_CASES_URL = "https://github.com/taverna-extras/wsdl-generic-test-cases/archive/2016-04-28.zip";
+	public static String TEST_CASES_URL = "https://github.com/taverna-extras/wsdl-generic-test-cases/releases/download/2016-04-28/wsdl-generic-test-cases-2016-04-28.jar";
+	//public static String TEST_CASES_URL = "file:///tmp/1/wsdl-generic-test-cases-2016-04-28.jar";
+
+	// Folder within JAR - e.g. wsdl-generic-test-cases-2016-04-28/
+	public static String PREFIX = "";
 	
-	public static String wsdlResourcePath(String resourceName) throws Exception {
-		return WSDLParserTest.class.getResource(WSDL_RESOURCE_BASE+resourceName).toExternalForm();
+	private static final String README_MD = "README.md";
+	
+	private static URLClassLoader classLoader;
+	
+	@BeforeClass
+	public static void makeClassLoader() throws MalformedURLException {
+		if (classLoader == null) {
+			URL[] urls = new URL[] { new URL(TEST_CASES_URL) } ;
+			classLoader = URLClassLoader.newInstance(urls);
+		}
+		
+		Assume.assumeNotNull(getResource(README_MD));
 	}
 
-    public String getResourceContentsString(String resourceName) throws Exception {
-		InputStream stream = WSDLTestHelper.class.getResourceAsStream("/"+resourceName);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-		String content="";
-		String line="";
-		while( (line = reader.readLine()) != null) {
-			content+=line;
-		}
-
-		reader.close();
-
-		return content;
-
+	@Before
+	public void setThreadClassLoader() {
+		Thread.currentThread().setContextClassLoader(classLoader);
+	}
+	
+//	@Test
+//	public void getReadmeUrl() throws Exception {
+//		URL u = getResource(README_MD);
+//		assertNotNull(u);
+//		System.out.println(u);
+//		
+//	}
+//
+//	@Test
+//	public void getReadme() throws Exception {
+//		InputStream s = getResourceAsStream(README_MD);
+//		assertNotNull(s);
+//		IOUtils.copy(s, System.out);
+//	}
+//	
+//	@Test
+//	public void getReadmeString() throws Exception {
+//		String s = getResourceAsString(README_MD);
+//		assertTrue(s.length() > 0);
+//		System.out.println(s);
+//	}
+	
+	
+	public static URL getResource(String path) { 
+		return classLoader.getResource(PREFIX + path);
+	}
+	public static InputStream getResourceAsStream(String path) { 
+		return classLoader.getResourceAsStream(PREFIX + path);
+	}
+	public static String getResourceAsString(String path) throws IOException {
+		return IOUtils.toString(getResource(path), StandardCharsets.UTF_8);
+	}
+	
+	public static String wsdlResourcePath(String resourceName) throws Exception {
+		makeClassLoader();
+		return getResource(WSDL_RESOURCE_BASE+resourceName).toExternalForm();
 	}
 
     

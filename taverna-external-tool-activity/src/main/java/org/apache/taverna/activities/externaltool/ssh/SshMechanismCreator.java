@@ -27,10 +27,6 @@ import org.apache.taverna.activities.externaltool.manager.MechanismCreator;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNode;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshNodeFactory;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
-
 /**
  * @author alanrw
  *
@@ -45,7 +41,7 @@ public class SshMechanismCreator extends MechanismCreator {
 	 */
 	@Override
 	public boolean canHandle(String mechanismType) {
-		return mechanismType.equals(SshUseCaseInvocation.SSH_USE_CASE_INVOCATION_TYPE);
+		return mechanismType.equals(SshToolInvocation.SSH_USE_CASE_INVOCATION_TYPE);
 	}
 
 
