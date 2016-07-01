@@ -31,10 +31,21 @@
 
 	<dependencies>
         <dependency>
+            <groupId>org.glassfish.jersey.connectors</groupId>
+            <artifactId>jersey-apache-connector</artifactId>
+            <version>2.11</version>
+            <exclusions>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                    <artifactId>jackson-jaxrs-json-provider</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java</artifactId>
             <version>3.0.0</version>
-            <scope>compile</scope>
+            <!--<scope>compile</scope>-->
             <exclusions>
                 <exclusion>  <!-- declare the exclusion here -->
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -62,6 +73,11 @@
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>
                     <artifactId>jackson-jaxrs-json-provider</artifactId>
                 </exclusion>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+
             </exclusions>
 		</dependency>
 		<dependency>
@@ -96,7 +112,7 @@
 			<groupId>org.apache.taverna.engine</groupId>
 			<artifactId>taverna-activity-test-utils</artifactId>
 			<version>${taverna.engine.version}</version>
-			<scope>test</scope>
+			<!--<scope>test</scope>-->
             <exclusions>
                 <exclusion>  <!-- declare the exclusion here -->
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -108,7 +124,7 @@
 			<groupId>org.apache.taverna.engine</groupId>
 			<artifactId>taverna-workflowmodel-impl</artifactId>
 			<version>${taverna.engine.version}</version>
-			<scope>test</scope>
+			<!--<scope>test</scope>-->
             <exclusions>
                 <exclusion>  <!-- declare the exclusion here -->
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -116,11 +132,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-		<!--<dependency>-->
-			<!--<groupId>com.fasterxml.jackson.core</groupId>-->
-			<!--<artifactId>jackson-databind</artifactId>-->
-			<!--<version>2.7.4</version>-->
-        <!--</dependency>-->
         <dependency>
                 <groupId>com.fasterxml.jackson.jaxrs</groupId>
                 <artifactId>jackson-jaxrs-json-provider</artifactId>
@@ -152,6 +163,10 @@
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>fluent-hc</artifactId>
                 </exclusion>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                    <artifactId>jackson-jaxrs-json-provider</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -166,6 +181,10 @@
                 <exclusion>
                     <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpcore-nio</artifactId>
+                </exclusion>
+                <exclusion>  <!-- declare the exclusion here -->
+                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                    <artifactId>jackson-jaxrs-json-provider</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
