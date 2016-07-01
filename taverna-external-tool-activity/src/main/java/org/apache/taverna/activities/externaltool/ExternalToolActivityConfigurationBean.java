@@ -21,12 +21,12 @@ package org.apache.taverna.activities.externaltool;
 
 import java.util.List;
 
+import org.apache.taverna.activities.externaltool.desc.ToolDescription;
 import org.apache.taverna.activities.externaltool.manager.InvocationGroup;
 import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.apache.taverna.activities.externaltool.manager.MechanismCreator;
 import org.apache.taverna.workflowmodel.processor.config.ConfigurationBean;
 import org.apache.taverna.workflowmodel.processor.config.ConfigurationProperty;
-import de.uni_luebeck.inb.knowarc.usecases.UseCaseDescription;
 
 @ConfigurationBean(uri = ExternalToolActivity.URI + "#Config")
 public final class ExternalToolActivityConfigurationBean {
@@ -43,7 +43,7 @@ public final class ExternalToolActivityConfigurationBean {
 
 	protected String repositoryUrl;
 	protected String externaltoolid;
-	protected UseCaseDescription useCaseDescription = null;
+	protected ToolDescription useCaseDescription = null;
 	private boolean edited = false;
 
 	private List<MechanismCreator> mechanismCreators;
@@ -106,7 +106,7 @@ public final class ExternalToolActivityConfigurationBean {
 	/**
 	 * @return the useCaseDescription
 	 */
-	public UseCaseDescription getUseCaseDescription() {
+	public ToolDescription getUseCaseDescription() {
 		return useCaseDescription;
 	}
 
@@ -114,7 +114,7 @@ public final class ExternalToolActivityConfigurationBean {
 	 * @param useCaseDescription the useCaseDescription to set
 	 */
 	@ConfigurationProperty(name = "toolDescription", label = "Tool Description")
-	public void setUseCaseDescription(UseCaseDescription useCaseDescription) {
+	public void setUseCaseDescription(ToolDescription useCaseDescription) {
 		this.useCaseDescription = useCaseDescription;
 	}
 

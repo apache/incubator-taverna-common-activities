@@ -21,6 +21,7 @@ package org.apache.taverna.activities.externaltool.ssh;
 
 import java.io.File;
 
+import org.apache.taverna.activities.externaltool.invocation.InvocationException;
 import org.apache.taverna.activities.externaltool.manager.InvocationPersister;
 /*
 * Licensed to the Apache Software Foundation (ASF) under one
@@ -45,9 +46,6 @@ import org.apache.taverna.security.credentialmanager.CredentialManager;
 
 import org.apache.log4j.Logger;
 
-import de.uni_luebeck.inb.knowarc.usecases.invocation.InvocationException;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUseCaseInvocation;
-
 /**
  * @author alanrw
  *
@@ -64,7 +62,7 @@ public class SshInvocationPersister extends InvocationPersister {
 	 */
 	@Override
 	public void load(File directory) {
-		SshUseCaseInvocation.load(directory);
+		SshToolInvocation.load(directory);
 	}
 
 	/* (non-Javadoc)
@@ -72,13 +70,13 @@ public class SshInvocationPersister extends InvocationPersister {
 	 */
 	@Override
 	public void persist(File directory) {
-		SshUseCaseInvocation.persist(directory);
+		SshToolInvocation.persist(directory);
 	}
 
 	@Override
 	public void deleteRun(String runId) {
 		try {
-			SshUseCaseInvocation.cleanup(runId, credentialManager);
+			SshToolInvocation.cleanup(runId, credentialManager);
 		} catch (InvocationException e) {
 			logger.error(e);
 		}

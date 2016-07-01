@@ -21,7 +21,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
                       http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="SshReference" class="de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshReference">
+	<bean id="SshReference" class="org.apache.taverna.activities.externaltool.ssh.SshReference">
 		<property name="credentialManager" ref="credentialManager" />
 	</bean>
 
@@ -37,7 +37,7 @@
 		<property name="invocationGroupManager" ref="invocationGroupManager" />
 	</bean>
 
-	<bean id="SshUrlToSshReference" class="de.uni_luebeck.inb.knowarc.usecases.invocation.ssh.SshUrlToSshReference">
+	<bean id="SshUrlToSshReference" class="org.apache.taverna.activities.externaltool.ssh.SshUrlToSshReference">
 		<property name="credentialManager" ref="credentialManager" />
 	</bean>
 

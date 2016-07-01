@@ -24,8 +24,6 @@ import org.apache.taverna.activities.externaltool.manager.InvocationMechanism;
 import org.jdom.Element;
 import org.jdom.Text;
 
-import de.uni_luebeck.inb.knowarc.usecases.invocation.local.LocalUseCaseInvocation;
-
 /**
  * @author alanrw
  *
@@ -55,7 +53,7 @@ public class ExternalToolLocalInvocationMechanism extends
 
 	@Override
 	public String getType() {
-		return LocalUseCaseInvocation.LOCAL_USE_CASE_INVOCATION_TYPE;
+		return LocalToolInvocation.LOCAL_USE_CASE_INVOCATION_TYPE;
 	}
 
 	@Override

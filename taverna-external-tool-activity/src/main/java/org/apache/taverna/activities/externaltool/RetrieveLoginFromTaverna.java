@@ -21,10 +21,10 @@ package org.apache.taverna.activities.externaltool;
 
 import java.net.URI;
 
+import org.apache.taverna.activities.externaltool.invocation.AskUserForPw;
 import org.apache.taverna.security.credentialmanager.CMException;
 import org.apache.taverna.security.credentialmanager.CredentialManager;
 import org.apache.taverna.security.credentialmanager.UsernamePassword;
-import de.uni_luebeck.inb.knowarc.usecases.invocation.AskUserForPw;
 
 public class RetrieveLoginFromTaverna implements AskUserForPw {
 	private final String url;

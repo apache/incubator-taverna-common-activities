@@ -19,12 +19,18 @@
 
 package org.apache.taverna.activities.wsdl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
@@ -33,15 +39,13 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
+
 import org.apache.taverna.wsdl.parser.WSDLParser;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.apache.taverna.wsdl.testutils.WSDLTestHelper;
 import org.junit.Before;
 import org.junit.Test;
 
-public class WSRFActivityTest {
+public class WSRFActivityTest extends WSDLTestHelper {
 
 	public class DummyInvoker extends T2WSDLSOAPInvoker {
 
@@ -65,7 +69,7 @@ public class WSRFActivityTest {
 	@Before
 	public void makeWSDLParser() throws Exception {
 		String path = "wsrf/counterService/CounterService_.wsdl";
-		counterServiceWSDL = getClass().getResource(path);
+		counterServiceWSDL = getResource(path);
 		assertNotNull("Coult not find test WSDL " + path, counterServiceWSDL);
 		wsdlParser = new WSDLParser(counterServiceWSDL.toExternalForm());
 	}

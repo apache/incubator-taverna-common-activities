@@ -18,66 +18,91 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.apache.taverna</groupId>
-		<artifactId>apache-taverna-parent</artifactId>
-		<version>2-incubating</version>
-	</parent>
-	<groupId>org.apache.taverna.commonactivities</groupId>
-	<artifactId>apache-taverna-common-activities</artifactId>
-	<version>2.1.0-incubating-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>Apache Taverna Common Activities</name>
-	<properties>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.taverna</groupId>
+        <artifactId>apache-taverna-parent</artifactId>
+        <version>2-incubating</version>
+    </parent>
+    <groupId>org.apache.taverna.commonactivities</groupId>
+    <artifactId>apache-taverna-common-activities</artifactId>
+    <version>2.1.1-incubating-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Apache Taverna Common Activities</name>
+    <properties>
 
-		<!-- Taverna dependency versions -->
-		<taverna.language.version>0.15.0-incubating</taverna.language.version>
-		<taverna.osgi.version>0.2.1-incubating</taverna.osgi.version>
-		<taverna.engine.version>3.1.0-incubating-SNAPSHOT</taverna.engine.version>
+        <!-- Taverna dependency versions -->
+        <taverna.language.version>0.15.0-incubating</taverna.language.version>
+        <taverna.osgi.version>0.2.1-incubating</taverna.osgi.version>
+        <taverna.engine.version>3.1.0-incubating</taverna.engine.version>
 
-		<!-- Third-party dependency versios -->
-		<abdera.version>1.1.3</abdera.version>
-		<bsh.version>2.0b6</bsh.version>
-		<javax.wsdl.version>1.6.1</javax.wsdl.version>
-		<javacsv.version>2.0</javacsv.version>
-		<jsch.version>1.0.6.RELEASE</jsch.version>
-		<odfdom.version>0.7</odfdom.version>
-		<!-- <odfdom.version>0.8.8-incubating</odfdom.version> -->
-		<santuario.xmlsec.version>1.5.7</santuario.xmlsec.version>
-		<xmlschema.version>2.2.1</xmlschema.version>
-		<velocity.version>1.7</velocity.version>
-		<webdavservlet.version>2.0</webdavservlet.version>
-		<woden.version>1.0M10</woden.version>
-		<wss4j.version>1.6.18</wss4j.version>
-	</properties>
-	<modules>
-		<module>taverna-docker-activity</module>
-		<module>taverna-beanshell-activity</module>
-		<module>taverna-external-tool-activity</module>
-		<module>taverna-interaction-activity</module>
-		<module>taverna-rest-activity</module>
-		<module>taverna-spreadsheet-import-activity</module>
-		<module>taverna-wsdl-activity</module>
-		<module>taverna-wsdl-generic</module>
-		<module>taverna-xpath-activity</module>
-	</modules>
-	<scm>
-		<connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-taverna-common-activities.git</connection>
-		<developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-taverna-common-activities.git</developerConnection>
-		<url>https://github.com/apache/incubator-taverna-common-activities</url>
-		<tag>HEAD</tag>
-	</scm>
-	<repositories>
-		<repository>
-			<id>apache.snapshots</id>
-			<name>Apache Snapshot Repository</name>
-			<url>http://repository.apache.org/snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-	</repositories>
+        <!-- Third-party dependency versios -->
+        <abdera.version>1.1.3</abdera.version>
+        <bsh.version>2.0b6</bsh.version>
+        <servicemix.javax.wsdl.version>1.6.3_1</servicemix.javax.wsdl.version>
+        <javacsv.version>2.0</javacsv.version>
+        <jsch.version>1.0.6.RELEASE</jsch.version>
+        <odfdom.version>0.7</odfdom.version>
+        <!-- <odfdom.version>0.8.8-incubating</odfdom.version> -->
+        <santuario.xmlsec.version>1.5.7</santuario.xmlsec.version>
+        <xmlschema.version>2.2.1</xmlschema.version>
+        <velocity.version>1.7</velocity.version>
+        <webdavservlet.version>2.0</webdavservlet.version>
+        <woden.version>1.0M10</woden.version>
+        <wss4j.version>1.6.18</wss4j.version>
+    </properties>
+    <modules>
+        <module>taverna-docker-activity</module>
+        <module>taverna-beanshell-activity</module>
+        <module>taverna-external-tool-activity</module>
+        <module>taverna-interaction-activity</module>
+        <module>taverna-rest-activity</module>
+        <module>taverna-spreadsheet-import-activity</module>
+        <module>taverna-wsdl-activity</module>
+        <module>taverna-wsdl-generic</module>
+        <module>taverna-xpath-activity</module>
+    </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes combine.children="append">
+                        <exclude>**/src/main/resources/META-INF/soap-encoding.xsd</exclude> <!-- W3C Software License (See NOTICE) -->
+                        <exclude>**/src/test/resources/test-spreadsheet*</exclude> <!--  Our own test spreadsheets -->
+                        <exclude>**/src/main/resources/json2.js</exclude><!-- public domain -->
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <links>
+                        <link>https://taverna.incubator.apache.org/javadoc/taverna-language/</link>
+                        <link>https://taverna.incubator.apache.org/javadoc/taverna-osgi/</link>
+                        <link>https://taverna.incubator.apache.org/javadoc/taverna-engine/</link>
+                    </links>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>    
+    <scm>
+        <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-taverna-common-activities.git</connection>
+        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-taverna-common-activities.git</developerConnection>
+        <url>https://github.com/apache/incubator-taverna-common-activities</url>
+        <tag>HEAD</tag>
+    </scm>
+    <repositories>
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Snapshot Repository</name>
+            <url>https://repository.apache.org/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
 </project>
