@@ -16,9 +16,10 @@
  *******************************************************************************/
 package org.apache.taverna.cwl;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class CwlActivityConfigurationBean {
+public class CwlActivityConfigurationBean implements Serializable {
 //This class holds the object which is produced by the ServiceProvider and contains the configurations that are need for the CWLActivity 
 	
 	private Map cwlConfigurations;

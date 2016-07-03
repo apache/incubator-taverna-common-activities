@@ -61,7 +61,6 @@
 		<module>taverna-wsdl-generic</module>
 		<module>taverna-xpath-activity</module>
    		 <module>taverna-cwl-activity-ui</module>
-   		 
    		 <module>taverna-cwl-utilities</module>
 	</modules>
 
