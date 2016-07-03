@@ -45,10 +45,7 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 	private Map cwlConfiguration;
 	private String toolName;
 
-	@Override
-	public Class<? extends Activity<CwlActivityConfigurationBean>> getActivityClass() {
-		return (Class<? extends Activity<CwlActivityConfigurationBean>>) CwlDumyActivity.class;
-	}
+	
 
 	@Override
 	public CwlActivityConfigurationBean getActivityConfiguration() {
@@ -93,6 +90,12 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 
 	public void setToolName(String toolName) {
 		this.toolName = toolName;
+	}
+
+	@Override
+	public Class<? extends Activity<CwlActivityConfigurationBean>> getActivityClass() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

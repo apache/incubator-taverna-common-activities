@@ -45,12 +45,7 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.taverna.engine</groupId>
-			<artifactId>taverna-activity-test-utils</artifactId>
-			<version>${taverna.engine.version}</version>
-			<scope>test</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.taverna.engine</groupId>
 			<artifactId>taverna-workflowmodel-impl</artifactId>
@@ -70,22 +65,45 @@
 			<artifactId>snakeyaml</artifactId>
 			<version>1.17</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sf.taverna.t2.ui-api</groupId>
-			<artifactId>activity-palette-api</artifactId>
-			<version>${t2.ui.api.version}</version>
-		</dependency>
 
+		<dependency>
+			<groupId>org.apache.taverna.commonactivities</groupId>
+			<artifactId>taverna-cwl-utilities</artifactId>
+			<version>2.1.0-incubating-SNAPSHOT</version>
+			<type>bundle</type>
+		</dependency>
 		<dependency>
 			<artifactId>taverna-cwl-activity</artifactId>
 			<groupId>${project.groupId}</groupId>
 			<version>${project.version}</version>
 		</dependency>
+			
+		<dependency>
+			<groupId>net.sf.taverna.t2.ui-api</groupId>
+			<artifactId>activity-palette-api</artifactId>
+			<version>${t2.ui.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.ui-api</groupId>
+			<artifactId>menu-api</artifactId>
+			<version>${t2.ui.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.ui-api</groupId>
+			<artifactId>contextual-views-api</artifactId>
+			<version>${t2.ui.api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.taverna.t2.ui-impl</groupId>
+			<artifactId>activity-tools</artifactId>
+			<version>${t2.ui.impl.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>net.sf.taverna.t2.taverna-workbench</groupId>
 			<artifactId>workbench-dev</artifactId>
 			<version>${t2.workbench.version}</version>
-			<scope>test</scope>
+	
 
 			<exclusions>
 
@@ -174,16 +192,11 @@
 		</dependency>
 		<!-- ==================================================================================================== -->
 
-		<dependency>
-			<groupId>org.apache.taverna.commonactivities</groupId>
-			<artifactId>taverna-cwl-utilities</artifactId>
-			<version>2.1.0-incubating-SNAPSHOT</version>
-			<type>bundle</type>
-		</dependency>
 	</dependencies>
 
 	<!-- Added these properties to configure new dependencies -->
 	<properties>
+		<t2.ui.impl.version>1.5</t2.ui.impl.version>
 		<t2.ui.api.version>1.5</t2.ui.api.version>
 		<t2.workbench.version>2.5.0</t2.workbench.version>
 	</properties>
