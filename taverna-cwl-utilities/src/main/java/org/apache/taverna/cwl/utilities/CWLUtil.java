@@ -34,6 +34,10 @@ public class CWLUtil {
 		processNameSpace();
 	}
 
+	public LinkedHashMap getNameSpace() {
+		return nameSpace;
+	}
+
 	public void processNameSpace() {
 
 		if (cwlFile.containsKey("$namespaces")) {
@@ -58,7 +62,7 @@ public class CWLUtil {
 		return processdetails(cwlFile.get(OUTPUTS));
 	}
 
-	private HashMap<String, Integer> process(Object inputs) {
+	public HashMap<String, Integer> process(Object inputs) {
 
 		HashMap<String, Integer> result = new HashMap<>();
 
@@ -131,7 +135,7 @@ public class CWLUtil {
 		return result;
 	}
 
-	private void extractLabel(Map input, PortDetail detail) {
+	public  void extractLabel(Map input, PortDetail detail) {
 		if (input != null)
 			if (input.containsKey(LABEL)) {
 				detail.setLabel((String) input.get(LABEL));
@@ -140,7 +144,7 @@ public class CWLUtil {
 			}
 	}
 
-	private void extractDescription(Map input, PortDetail detail) {
+	public void extractDescription(Map input, PortDetail detail) {
 		if (input != null)
 			if (input.containsKey(DESCRIPTION)) {
 				detail.setDescription((String) input.get(DESCRIPTION));
@@ -149,7 +153,7 @@ public class CWLUtil {
 			}
 	}
 
-	private void extractFormat(Map input, PortDetail detail) {
+	public void extractFormat(Map input, PortDetail detail) {
 		if (input != null)
 			if (input.containsKey(FORMAT)) {
 
@@ -170,7 +174,7 @@ public class CWLUtil {
 			}
 	}
 
-	private void figureOutFormats(String formatInfoString, PortDetail detail) {
+	public void figureOutFormats(String formatInfoString, PortDetail detail) {
 		if (formatInfoString.startsWith("$")) {
 
 			detail.addFormat(formatInfoString);

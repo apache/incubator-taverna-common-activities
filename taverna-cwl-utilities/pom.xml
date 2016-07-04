@@ -20,5 +20,12 @@
 	<artifactId>taverna-cwl-utilities</artifactId>
 	<packaging>bundle</packaging>
 	<name>Apache Taverna CWL Activity</name>
+<dependencies>
 
+<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.17</version>
+		</dependency>
+</dependencies>
 </project>
