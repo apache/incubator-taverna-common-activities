@@ -46,7 +46,9 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	private static final String TABLE_BORDER = "2";
 	private static final String TABLE_WIDTH = "100%";
 	private static final String TABLE_CELL_PADDING = "5%";
-
+	private static final String SPACE = " ";
+	private static final String LINE_BREAK="\n";
+	private static final int MAX_LINE_LENG = 80;
 	private final CwlActivityConfigurationBean configurationBean;
 	private final CwlDumyActivity activity;
 
@@ -187,15 +189,15 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 
 	private String formatParagraph(String paragraph) {
 		String result = "";
-		for (String line : paragraph.split("[\n|\r]")) {
+		for (String line : paragraph.split(LINE_BREAK)) {
 
-			while (line.length() > 80) {
-				int lastSpaceIndex = line.lastIndexOf(" ", 80);
-				String firstHalf = line.substring(0, lastSpaceIndex) + "\n";
+			while (line.length() > MAX_LINE_LENG) {
+				int lastSpaceIndex = line.lastIndexOf(SPACE, MAX_LINE_LENG);
+				String firstHalf = line.substring(0, lastSpaceIndex) + LINE_BREAK;
 				line = line.substring(lastSpaceIndex + 1);
 				result += (firstHalf);
 			}
-			result += (line + "\n");
+			result += (line + LINE_BREAK);
 
 		}
 		return result;
