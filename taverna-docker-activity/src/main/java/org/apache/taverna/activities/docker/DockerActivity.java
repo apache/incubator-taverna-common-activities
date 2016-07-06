@@ -105,6 +105,7 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
                     if (CREATE_CONTAINER.equalsIgnoreCase(action)) {
 
                         CreateContainerResponse response = remoteClient.createContainer();
+                        System.out.println("+++++" + response.toString());
                         outJson.put(OUT_CONTAINER_ID, response.getId());
 
                     } else if (INSPECT.equalsIgnoreCase(action)) {
@@ -115,11 +116,13 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
                         outJson.put(OUT_IMAGE_AUTHOR, response.getAuthor());
                         outJson.put(OUT_IMAGE_CONTAINER, response.getContainer());
 
+                    } else if (LIST_CONTAINERS.equalsIgnoreCase(action)) {
+
+                        // TODO
+
                     } else if (START_CONTAINER.equalsIgnoreCase(action)) {
                         // TODO
                     } else if (STOP_CONTAINER.equalsIgnoreCase(action)) {
-                        // TODO
-                    } else if (LIST_CONTAINERS.equalsIgnoreCase(action)) {
                         // TODO
                     }
                     //TODO add any more supporting actions
