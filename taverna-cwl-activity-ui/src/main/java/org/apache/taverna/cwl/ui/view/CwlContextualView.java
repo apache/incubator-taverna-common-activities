@@ -51,6 +51,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	private final CwlDumyActivity activity;
 
 	private CWLUtil cwlutil;
+
 	public CwlContextualView(CwlDumyActivity activity) {
 		super((Activity) activity);
 		this.activity = activity;
@@ -101,7 +102,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	private String paragraphToHtml(String summery, String paragraph) {
 
 		summery += "<tr><td colspan='2' align='left'>";
-
+		paragraph = formatParagraph(paragraph);
 		for (String line : paragraph.split("[\n|\r]"))
 			summery += "<p>" + line + "</p>";
 
@@ -118,8 +119,8 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 		Map cwlFile = configurationBean.getCwlConfigurations();
 		String description = "";
 
-		if (cwlFile.containsKey("description")) {
-			description = (String) cwlFile.get("description");
+		if (cwlFile.containsKey(DESCRIPTION)) {
+			description = (String) cwlFile.get(DESCRIPTION);
 			summery = paragraphToHtml(summery, description);
 
 		}
@@ -131,31 +132,31 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 
 		HashMap<String, PortDetail> inputs = cwlutil.processInputDetails();
 		HashMap<String, Integer> inputDepths = cwlutil.processInputDepths();
-		
-		if ((inputs != null && !inputs.isEmpty())&&(inputDepths != null && !inputDepths.isEmpty()))
+
+		if ((inputs != null && !inputs.isEmpty()) && (inputDepths != null && !inputDepths.isEmpty()))
 			for (String id : inputs.keySet()) {
 				PortDetail detail = inputs.get(id);
-				if(inputDepths.containsKey(id))
-				summery = extractSummery(summery, id, detail,inputDepths.get(id));
+				if (inputDepths.containsKey(id))
+					summery = extractSummery(summery, id, detail, inputDepths.get(id));
 			}
 
 		summery += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
 
 		HashMap<String, PortDetail> outPuts = cwlutil.processOutputDetails();
 		HashMap<String, Integer> outputDepths = cwlutil.processOutputDepths();
-		
-		if ((outPuts != null && !outPuts.isEmpty())&&(outputDepths != null && !outputDepths.isEmpty()))
+
+		if ((outPuts != null && !outPuts.isEmpty()) && (outputDepths != null && !outputDepths.isEmpty()))
 			for (String id : outPuts.keySet()) {
 				PortDetail detail = outPuts.get(id);
-				if(outputDepths.containsKey(id))
-					summery = extractSummery(summery, id, detail,outputDepths.get(id));
+				if (outputDepths.containsKey(id))
+					summery = extractSummery(summery, id, detail, outputDepths.get(id));
 			}
 		summery += "</table>";
 		return summery;
 	}
 
-	private String extractSummery(String summery, String id, PortDetail detail,int depth) {
-		summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + depth+ "</td></tr>";
+	private String extractSummery(String summery, String id, PortDetail detail, int depth) {
+		summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + depth + "</td></tr>";
 		if (detail.getLabel() != null) {
 			summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
 		}
@@ -183,4 +184,21 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 		summery += "<tr></tr>";
 		return summery;
 	}
+
+	private String formatParagraph(String paragraph) {
+		String result = "";
+		for (String line : paragraph.split("[\n|\r]")) {
+
+			while (line.length() > 80) {
+				int lastSpaceIndex = line.lastIndexOf(" ", 80);
+				String firstHalf = line.substring(0, lastSpaceIndex) + "\n";
+				line = line.substring(lastSpaceIndex + 1);
+				result += (firstHalf);
+			}
+			result += (line + "\n");
+
+		}
+		return result;
+	}
+
 }

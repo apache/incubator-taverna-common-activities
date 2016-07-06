@@ -30,7 +30,6 @@ import java.util.stream.StreamSupport;
 
 import org.yaml.snakeyaml.Yaml;
 
-
 public class Testing {
 	private static final String INPUTS = "inputs";
 	private static final String ID = "id";
@@ -43,56 +42,72 @@ public class Testing {
 	private static final int DEPTH_1 = 1;
 	private static final int DEPTH_2 = 2;
 	private static final String LABEL = "label";
-	
-	interface my{
+
+	interface my {
 		public void printName();
 	}
-	public void print(){
+
+	public void print() {
 		System.out.println("ok");
 	}
-	public static Yaml getReader(){
+
+	public static Yaml getReader() {
 		Yaml reader = new Yaml();
 		return reader;
 	}
+
 	public static void main(String[] args) {
 
-//		Path path1 = Paths.get("/home/maanadev/cwlTools");
-//		Path path2 = path1.normalize();
-//
-//		boolean pathExits = Files.exists(path2, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
-//
-//		
-//		try {
-//			DirectoryStream<Path> stream = Files.newDirectoryStream(path2,"*.cwl");
-//			Stream<Path> parrale = StreamSupport.stream(stream.spliterator(), true);
-//		
-//			
-//			
-////			stream.forEach(path->System.out.println(path));
-//			parrale.forEach(path->{
-//				Yaml reader =getReader();
+		Path path1 = Paths.get("/home/maanadev/cwlTools");
+		Path path2 = path1.normalize();
+
+		boolean pathExits = Files.exists(path2, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
+
+		File file = new File("/home/maanadev/cwlTools", "ucsc-liftOver.cwl");
+		
+		Yaml reader = getReader();
+		Map map = null ;
+		try {
+			map= (Map) reader.load(new FileInputStream(file));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//			stream.forEach(path -> {
+//				Yaml reader = getReader();
 //				try {
-//					Map map=(Map) reader.load(new FileInputStream(path.toFile()));
-//					System.out.println(map);
+//					Map map = (Map) reader.load(new FileInputStream(path.toFile()));
 //				} catch (Exception e) {
 //					// TODO Auto-generated catch block
 //					e.printStackTrace();
 //				}
-//			}); 
-//
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-
-		String s=" 1 2 3 ";
-		System.out.println(s);
-		System.out.println(s.replaceAll("\\s", ""));
-		
-		s= " 1_2_3";
-		System.out.println(s);
-		System.out.println(s.replaceAll("_", ""));
-		
-		
-	}
-
+//			});
+			// parrale.forEach(path->{
+			// Yaml reader =getReader();
+			// try {
+			// Map map=(Map) reader.load(new FileInputStream(path.toFile()));
+			// System.out.println(map);
+			// } catch (Exception e) {
+			// // TODO Auto-generated catch block
+			// e.printStackTrace();
+			// }
+			// });
+String finall="";
+String line="";
+			
+		for(String s: map.get("description").toString().split("[\n|\r]")){
+			
+			while(s.length()>80){
+				int lastSpaceIndex = s.lastIndexOf(" ",80);
+				String firstHalf =s.substring(0, lastSpaceIndex)+"\n";
+				s=s.substring(lastSpaceIndex+1);
+				finall+=(firstHalf);
+			}
+			finall+=s+"\n";
+			
+		}
+			System.out.println(finall);	
+		}
+	
+	
 }

@@ -62,6 +62,11 @@ label: This is a short description of the tool
 
 description: |
  This is a much longer description of the tool. This can be displayed in
- the service detail panel	 	 
+ the service detail panel. A Command Line Tool is a non-interactive executable 
+ program that reads some input, performs a computation, and terminates after 
+ producing some output. Command line programs are a flexible unit of code sharing
+ and reuse, unfortunately the syntax and input/output semantics among command 
+ line programs is extremely heterogeneous. A common layer for describing the 
+ syntax and semantics of programs can reduce this incidental complexity by providing a consistent way to connect programs together.	 	 
 
 basecommand: echo
