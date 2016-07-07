@@ -52,7 +52,7 @@ public class DockerActivityTest {
     public static void main(String[] args) throws Exception {
         DockerActivityTest test = new DockerActivityTest();
         test.setup();
-        test.testCreateContainer();
+        test.testListContainers();
     }
 
     @Before
@@ -97,7 +97,7 @@ public class DockerActivityTest {
 	}
 
     /**
-     * Tests a simple script (String output = input + "_returned") to ensure the script is invoked correctly.
+     * Creates container with a given container configuration
      * @throws Exception
      */
     @Test
@@ -128,6 +128,22 @@ public class DockerActivityTest {
         Container containerNew = getContainerFromId(remoteClient.listContainers(), id);
         Assert.assertNotNull(containerNew);
 
+    }
+
+    @Test
+    public void testListContainers() throws Exception {
+        DockerActivity activity = new DockerActivity(containerConfiguration);
+        activity.configure(activityConfiguration);
+
+        Map<String,Object> inputs = new HashMap<String,Object>();
+        inputs.put(DockerActivity.ACTION, DockerActivity.LIST_CONTAINERS);
+
+        Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
+        expectedOutputs.put(DockerActivity.RESPONSE_BODY_KEY, String.class);
+
+        Map<String,Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputs);
+        System.out.println(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
+        Assert.assertNotNull(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
     }
 
     private Container getContainerFromName(List<Container> list, String name){
