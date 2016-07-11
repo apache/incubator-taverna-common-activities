@@ -40,7 +40,7 @@ inputs:
     format: $expression
 
   - id: input_3
-    type: String
+    type: ["null",int]
     label: input 3 testing label
     description: this is a short description of input 3
     format: noNameSpace:testing
@@ -68,5 +68,5 @@ description: |
  and reuse, unfortunately the syntax and input/output semantics among command 
  line programs is extremely heterogeneous. A common layer for describing the 
  syntax and semantics of programs can reduce this incidental complexity by providing a consistent way to connect programs together.	 	 
-
+ 
 basecommand: echo

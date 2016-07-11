@@ -16,86 +16,71 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.ui.serviceprovider;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.apache.taverna.cwl.CwlActivityConfigurationBean;
 import org.apache.taverna.cwl.CwlDumyActivity;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 import net.sf.taverna.t2.servicedescriptions.ServiceDescription;
 import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 
-public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationBean> {
+public class CwlServiceDesc extends ServiceDescription<JsonNode > {
 
 	private static final String DESCRIPTION = "description";
 
 	@Override
 	public String getDescription() {
-		String description = (String) cwlConfiguration.get(DESCRIPTION);
-		//see  whether description is too long
-		if (description == null || (description.length()>40))
-			return "";
-		else
-			return description;
-	}
-
-	private Map cwlConfiguration;
-	private String toolName;
-
 	
-
-	@Override
-	public CwlActivityConfigurationBean getActivityConfiguration() {
-		// Creating the CWL configuration bean
-		CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
-		configurationBean.setCwlConfigurations(cwlConfiguration);
-		configurationBean.setToolName(toolName);
-		return configurationBean;
+		//see  whether description is too long
+		if (cwlConfiguration.has(DESCRIPTION)){
+			String description = cwlConfiguration.path(DESCRIPTION).asText();
+				if((description.length()<40))return description;
+				else return "";
+		}
+		else
+			return "";
 	}
 
-	public Map getCwlConfiguration() {
-		return cwlConfiguration;
-	}
+	private JsonNode cwlConfiguration;
 
-	public void setCwlConfiguration(Map cwlConfiguration) {
+	public void setCwlConfiguration(JsonNode cwlConfiguration) {
+		//set yaml parse CWL tool content
 		this.cwlConfiguration = cwlConfiguration;
 	}
 
+	private String toolName;
+
+	@Override
+	public Class<? extends Activity<JsonNode>> getActivityClass() {
+		
+		return (Class<? extends Activity<JsonNode>>) CwlDumyActivity.class;
+	}
+	@Override
+	public JsonNode getActivityConfiguration() {
+		return cwlConfiguration;
+	}
 	@Override
 	public Icon getIcon() {
-		return CwlServiceIcon.getIcon();
+		return  CwlServiceIcon.getIcon();
 	}
-
 	@Override
 	public String getName() {
 		return toolName;
 	}
-
 	@Override
 	public List<? extends Comparable> getPath() {
 		return null;
 	}
-
 	@Override
 	protected List<? extends Object> getIdentifyingData() {
-		return Arrays.asList("CWL Services " + toolName);
-	}
-
-	public String getToolName() {
-		return toolName;
+		return null;
 	}
 
 	public void setToolName(String toolName) {
 		this.toolName = toolName;
-	}
-
-	@Override
-	public Class<? extends Activity<CwlActivityConfigurationBean>> getActivityClass() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

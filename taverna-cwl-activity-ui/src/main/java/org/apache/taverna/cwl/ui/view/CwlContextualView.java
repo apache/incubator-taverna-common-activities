@@ -21,13 +21,15 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import org.apache.taverna.cwl.CwlActivityConfigurationBean;
 import org.apache.taverna.cwl.CwlDumyActivity;
+import org.apache.taverna.cwl.ui.serviceprovider.CwlServiceProvider;
 import org.apache.taverna.cwl.utilities.PortDetail;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import org.apache.taverna.cwl.utilities.CWLUtil;
 
 import net.sf.taverna.t2.workbench.ui.actions.activity.HTMLBasedActivityContextualView;
@@ -37,7 +39,7 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
  * This class is responsible for producing service detail panel for each tool
  * 
  * */
-public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivityConfigurationBean> {
+public class CwlContextualView extends HTMLBasedActivityContextualView<JsonNode> {
 
 	private static final String DESCRIPTION = "description";
 	private static final String LABEL = "label";
@@ -49,7 +51,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	private static final String SPACE = " ";
 	private static final String LINE_BREAK="\n";
 	private static final int MAX_LINE_LENG = 80;
-	private final CwlActivityConfigurationBean configurationBean;
+	private final JsonNode configurationNode;
 	private final CwlDumyActivity activity;
 
 	private CWLUtil cwlutil;
@@ -57,8 +59,8 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 	public CwlContextualView(CwlDumyActivity activity) {
 		super((Activity) activity);
 		this.activity = activity;
-		this.configurationBean = activity.getConfiguration();
-		cwlutil = new CWLUtil(configurationBean.getCwlConfigurations());
+		this.configurationNode = activity.getConfiguration();
+		cwlutil = new CWLUtil(configurationNode.path(CwlServiceProvider.MAP));
 		super.initView();
 	}
 
@@ -77,7 +79,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 
 	@Override
 	public String getViewTitle() {
-		return configurationBean.getToolName();
+		return configurationNode.get(CwlServiceProvider.TOOL_NAME).asText();
 	}
 
 	/**
@@ -118,17 +120,17 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 		String summery = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" bgcolor=\""
 				+ TABLE_COLOR + "\" cellpadding=\"" + TABLE_CELL_PADDING + "\" >";
 
-		Map cwlFile = configurationBean.getCwlConfigurations();
+		JsonNode cwlFile = configurationNode.get(CwlServiceProvider.MAP);
 		String description = "";
 
-		if (cwlFile.containsKey(DESCRIPTION)) {
-			description = (String) cwlFile.get(DESCRIPTION);
+		if (cwlFile.has(DESCRIPTION)) {
+			description = cwlFile.get(DESCRIPTION).asText();
 			summery = paragraphToHtml(summery, description);
 
 		}
-		if (cwlFile.containsKey(LABEL)) {
+		if (cwlFile.has(LABEL)) {
 			summery += "<tr><th colspan='2' align='left'>Label</th></tr>";
-			summery += "<tr><td colspan='2' align='left'>" + (String) cwlFile.get(LABEL) + "</td></tr>";
+			summery += "<tr><td colspan='2' align='left'>" +  cwlFile.get(LABEL).asText() + "</td></tr>";
 		}
 		summery += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
 

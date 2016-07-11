@@ -30,27 +30,32 @@ import org.junit.Before;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class CWLUtilTest {
-	Map cwlFile;
+	JsonNode cwlFile;
 	CWLUtil cwlUtil;
-	Map input;
+	JsonNode input;
 
 	@Before
 	public void setUp() throws Exception {
 		Yaml reader = new Yaml();
 		Path path = Paths.get("CWLFiles", "customtool1.cwl");
-		cwlFile = (Map) reader.load(new FileInputStream(path.toFile()));
+		ObjectMapper mapper = new  ObjectMapper();
+		cwlFile = mapper.valueToTree(reader.load(new FileInputStream(path.toFile()))); 
+
 		cwlUtil = new CWLUtil(cwlFile);
-		input = ((ArrayList<Map>) cwlFile.get("inputs")).get(0);
+		input =  cwlFile.get("inputs").get(0);
 	}
 
 	@Test
 	public void processNameSpaceTest() {
-		LinkedHashMap nameSpace = cwlUtil.getNameSpace();
+		JsonNode nameSpace = cwlUtil.getNameSpace();
 
 		assertEquals(1, nameSpace.size());
-		assertTrue(nameSpace.containsKey("edam"));
-		assertEquals("http://edamontology.org/", nameSpace.get("edam"));
+		assertTrue(nameSpace.has("edam"));
+		assertEquals("http://edamontology.org/", nameSpace.get("edam").asText());
 	}
 
 	@Test
@@ -96,7 +101,7 @@ public class CWLUtilTest {
 	@Test
 	public void processTest() {
 
-		HashMap<String, Integer> actual = cwlUtil.process(((ArrayList<Map>) cwlFile.get("inputs")));
+		HashMap<String, Integer> actual = cwlUtil.process( cwlFile.get("inputs"));
 
 		HashMap<String, Integer> expected = new HashMap<>();
 		expected.put("input_1", 0);
@@ -106,7 +111,7 @@ public class CWLUtilTest {
 			assertEquals(input.getValue(), actual.get(input.getKey()));
 		}
 		
-		actual = cwlUtil.process(((ArrayList<Map>) cwlFile.get("outputs")));
+		actual = cwlUtil.process((cwlFile.get("outputs")));
 		expected = new HashMap<>();
 		expected.put("output_1", 0);
 		expected.put("output_2", 0);

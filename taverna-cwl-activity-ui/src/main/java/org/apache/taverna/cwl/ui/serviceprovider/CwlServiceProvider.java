@@ -34,12 +34,18 @@ import javax.swing.Icon;
 import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import net.sf.taverna.t2.servicedescriptions.AbstractConfigurableServiceProvider;
 import net.sf.taverna.t2.servicedescriptions.ConfigurableServiceProvider;
 
 public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlServiceProviderConfig>
 		implements ConfigurableServiceProvider<CwlServiceProviderConfig> {
 	
+	public static final String  TOOL_NAME="toolName";
+	public static final String  MAP ="map";
 	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
 	
 	CwlServiceProvider() {
@@ -73,8 +79,9 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 				Map cwlFile;
 				try {
 					cwlFile = (Map) reader.load(new FileInputStream(path.toFile()));
+					JsonNode config = createJsonNode(p,cwlFile);
 					// Creating CWl service Description
-					CwlServiceDesc cwlServiceDesc = createCWLDesc(p, cwlFile);
+					CwlServiceDesc cwlServiceDesc = createCWLDesc(config);
 					// return the service description
 					callBack.partialResults(Arrays.asList(cwlServiceDesc));
 					
@@ -91,10 +98,19 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 
 	}
 
-	private CwlServiceDesc createCWLDesc(Path p, Map cwlFile) {
+	private JsonNode createJsonNode(Path p, Map cwlFile) {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root = mapper.createObjectNode();
+		JsonNode map =mapper.valueToTree(cwlFile);
+		((ObjectNode )root).put(TOOL_NAME,p.getFileName().toString().split("\\.")[0]);
+		((ObjectNode )root).put(MAP,map);
+		return root;
+	}
+
+	private CwlServiceDesc createCWLDesc(JsonNode node) {
 		CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
-		cwlServiceDesc.setCwlConfiguration(cwlFile);
-		cwlServiceDesc.setToolName(p.getFileName().toString().split("\\.")[0]);
+		cwlServiceDesc.setCwlConfiguration(node);
+		cwlServiceDesc.setToolName(node.get(CwlServiceProvider.TOOL_NAME).asText());
 		return cwlServiceDesc;
 	}
 

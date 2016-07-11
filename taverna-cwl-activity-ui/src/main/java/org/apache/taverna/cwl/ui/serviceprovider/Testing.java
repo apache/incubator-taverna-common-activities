@@ -19,16 +19,23 @@ package org.apache.taverna.cwl.ui.serviceprovider;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.Writer;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
+import org.apache.jena.atlas.iterator.Iter;
+import org.openjena.atlas.json.JsonObject;
+import org.springframework.util.SystemPropertyUtils;
 import org.yaml.snakeyaml.Yaml;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Testing {
 	private static final String INPUTS = "inputs";
@@ -43,71 +50,31 @@ public class Testing {
 	private static final int DEPTH_2 = 2;
 	private static final String LABEL = "label";
 
-	interface my {
-		public void printName();
-	}
-
-	public void print() {
-		System.out.println("ok");
-	}
-
-	public static Yaml getReader() {
-		Yaml reader = new Yaml();
-		return reader;
-	}
-
 	public static void main(String[] args) {
-
-		Path path1 = Paths.get("/home/maanadev/cwlTools");
-		Path path2 = path1.normalize();
-
-		boolean pathExits = Files.exists(path2, new LinkOption[] { LinkOption.NOFOLLOW_LINKS });
-
-		File file = new File("/home/maanadev/cwlTools", "ucsc-liftOver.cwl");
 		
-		Yaml reader = getReader();
-		Map map = null ;
+		Yaml reader = new Yaml();
+		Map cwlFile = null;
 		try {
-			map= (Map) reader.load(new FileInputStream(file));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//			stream.forEach(path -> {
-//				Yaml reader = getReader();
-//				try {
-//					Map map = (Map) reader.load(new FileInputStream(path.toFile()));
-//				} catch (Exception e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			});
-			// parrale.forEach(path->{
-			// Yaml reader =getReader();
-			// try {
-			// Map map=(Map) reader.load(new FileInputStream(path.toFile()));
-			// System.out.println(map);
-			// } catch (Exception e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
-			// });
-String finall="";
-String line="";
+			cwlFile = (Map) reader.load(new FileInputStream(new File("CWLFiles/customtool1.cwl")));
 			
-		for(String s: map.get("description").toString().split("[\n|\r]")){
+		} catch (IOException e) {
 			
-			while(s.length()>80){
-				int lastSpaceIndex = s.lastIndexOf(" ",80);
-				String firstHalf =s.substring(0, lastSpaceIndex)+"\n";
-				s=s.substring(lastSpaceIndex+1);
-				finall+=(firstHalf);
-			}
-			finall+=s+"\n";
 			
-		}
-			System.out.println(finall);	
 		}
 	
-	
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode node = mapper.createObjectNode();
+		JsonNode node2 =mapper.valueToTree(cwlFile);
+		System.out.println(node2.get("class"));
+//
+//		((ObjectNode )node).put("toolName","asdsa");((ObjectNode )node).put("asda", node2);
+////		System.out.println(((ObjectNode )node).path("asda"));
+//			Iterator<JsonNode> i=	node.get("asda").get(INPUTS).iterator();
+//			
+//			
+////		System.out.println(node.get("asda").get(INPUTS).get(2).get("type"));
+//		
+//		for(JsonNode nodse :node.get("asda").get(INPUTS).get(2).get("type") )System.out.println(nodse.asText());
+//		
+	}
 }

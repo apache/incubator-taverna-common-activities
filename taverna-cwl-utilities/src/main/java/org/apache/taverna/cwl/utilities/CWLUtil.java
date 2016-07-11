@@ -2,8 +2,12 @@ package org.apache.taverna.cwl.utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Iterator;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 public class CWLUtil {
 
@@ -26,22 +30,22 @@ public class CWLUtil {
 	private static final String LABEL = "label";
 	private static final String FILE = "file";
 	private static final String FORMAT = "format";
-	private LinkedHashMap nameSpace;
-	private Map cwlFile;
+	private JsonNode nameSpace;
+	private JsonNode cwlFile;
 
-	public CWLUtil(Map cwlFile) {
+	public CWLUtil(JsonNode cwlFile) {
 		this.cwlFile = cwlFile;
 		processNameSpace();
 	}
 
-	public LinkedHashMap getNameSpace() {
+	public JsonNode getNameSpace() {
 		return nameSpace;
 	}
 
 	public void processNameSpace() {
 
-		if (cwlFile.containsKey("$namespaces")) {
-			nameSpace = (LinkedHashMap) cwlFile.get("$namespaces");
+		if (cwlFile.has("$namespaces")) {
+			nameSpace = cwlFile.path("$namespaces");
 		}
 
 	}
@@ -62,32 +66,34 @@ public class CWLUtil {
 		return processdetails(cwlFile.get(OUTPUTS));
 	}
 
-	public HashMap<String, Integer> process(Object inputs) {
+	public HashMap<String, Integer> process(JsonNode inputs) {
 
 		HashMap<String, Integer> result = new HashMap<>();
 
-		if (inputs.getClass() == ArrayList.class) {
+		if (inputs.getClass() == ArrayNode.class) {
+			Iterator<JsonNode> iterator = inputs.iterator();
 
-			for (Map input : (ArrayList<Map>) inputs) {
-				String currentInputId = (String) input.get(ID);
+			while (iterator.hasNext()) {
+				JsonNode input = iterator.next();
+				String currentInputId =  input.get(ID).asText();
 
-				Object typeConfigurations;
+				JsonNode typeConfigurations;
 				try {
 
 					typeConfigurations = input.get(TYPE);
 					// if type :single argument
-					if (typeConfigurations.getClass() == String.class) {
+					if (typeConfigurations.getClass() == TextNode.class) {
 
 						result.put(currentInputId, DEPTH_0);
 						// type : defined as another map which contains type:
-					} else if (typeConfigurations.getClass() == LinkedHashMap.class) {
-						String inputType = (String) ((Map) typeConfigurations).get(TYPE);
+					} else if (typeConfigurations.getClass() == ObjectNode.class) {
+						String inputType = typeConfigurations.get(TYPE).asText();
 						if (inputType.equals(ARRAY)) {
 							result.put(currentInputId, DEPTH_1);
 
 						}
-					} else if (typeConfigurations.getClass() == ArrayList.class) {
-						if (isValidDataType((ArrayList) typeConfigurations)) {
+					} else if (typeConfigurations.getClass() == ArrayNode.class) {
+						if (isValidDataType(typeConfigurations)) {
 							result.put(currentInputId, DEPTH_0);
 						}
 
@@ -99,24 +105,27 @@ public class CWLUtil {
 				}
 
 			}
-		} else if (inputs.getClass() == LinkedHashMap.class) {
-			for (Object parameter : ((Map) inputs).keySet()) {
-				if (parameter.toString().startsWith("$"))
+		} else if (inputs.getClass() == ObjectNode.class) {
+			for (JsonNode parameter :inputs) {
+				if (parameter.asText().startsWith("$"))
 					System.out.println("Exception");
 			}
+			
+			
+			
 		}
 		return result;
 	}
 
-	private HashMap<String, PortDetail> processdetails(Object inputs) {
+	private HashMap<String, PortDetail> processdetails(JsonNode inputs) {
 
 		HashMap<String, PortDetail> result = new HashMap<>();
 
-		if (inputs.getClass() == ArrayList.class) {
+		if (inputs.getClass() == ArrayNode.class) {
 
-			for (Map input : (ArrayList<Map>) inputs) {
+			for (JsonNode input :inputs) {
 				PortDetail detail = new PortDetail();
-				String currentInputId = (String) input.get(ID);
+				String currentInputId = input.get(ID).asText();
 
 				extractDescription(input, detail);
 
@@ -126,48 +135,48 @@ public class CWLUtil {
 				result.put(currentInputId, detail);
 
 			}
-		} else if (inputs.getClass() == LinkedHashMap.class) {
-			for (Object parameter : ((Map) inputs).keySet()) {
-				if (parameter.toString().startsWith("$"))
+		} else if (inputs.getClass() == ObjectNode.class) {
+			for (JsonNode parameter :inputs) {
+				if (parameter.asText().startsWith("$"))
 					System.out.println("Exception");
 			}
 		}
 		return result;
 	}
 
-	public  void extractLabel(Map input, PortDetail detail) {
+	public void extractLabel(JsonNode input, PortDetail detail) {
 		if (input != null)
-			if (input.containsKey(LABEL)) {
-				detail.setLabel((String) input.get(LABEL));
+			if (input.has(LABEL)) {
+				detail.setLabel(input.get(LABEL).asText());
 			} else {
 				detail.setLabel(null);
 			}
 	}
 
-	public void extractDescription(Map input, PortDetail detail) {
+	public void extractDescription(JsonNode input, PortDetail detail) {
 		if (input != null)
-			if (input.containsKey(DESCRIPTION)) {
-				detail.setDescription((String) input.get(DESCRIPTION));
+			if (input.has(DESCRIPTION)) {
+				detail.setDescription(input.get(DESCRIPTION).asText());
 			} else {
 				detail.setDescription(null);
 			}
 	}
 
-	public void extractFormat(Map input, PortDetail detail) {
+	public void extractFormat(JsonNode input, PortDetail detail) {
 		if (input != null)
-			if (input.containsKey(FORMAT)) {
+			if (input.has(FORMAT)) {
 
-				Object formatInfo = input.get(FORMAT);
+				JsonNode formatInfo = input.get(FORMAT);
 
 				ArrayList<String> format = new ArrayList<>();
 				detail.setFormat(format);
 
-				if (formatInfo.getClass() == String.class) {
+				if (formatInfo.getClass() == TextNode.class) {
 
-					figureOutFormats(formatInfo.toString(), detail);
-				} else if (formatInfo.getClass() == ArrayList.class) {
-					for (Object eachFormat : (ArrayList) formatInfo) {
-						figureOutFormats(eachFormat.toString(), detail);
+					figureOutFormats(formatInfo.asText(), detail);
+				} else if (formatInfo.getClass() == ArrayNode.class) {
+					for (JsonNode eachFormat : formatInfo) {
+						figureOutFormats(eachFormat.asText(), detail);
 					}
 				}
 
@@ -182,27 +191,24 @@ public class CWLUtil {
 			String format[] = formatInfoString.split(":");
 			String namespaceKey = format[0];
 			String urlAppednd = format[1];
-			if (!nameSpace.isEmpty()) {
-				if (nameSpace.containsKey(namespaceKey))
-					detail.addFormat(nameSpace.get(namespaceKey) + urlAppednd);
+		
+				if (nameSpace.has(namespaceKey))
+					detail.addFormat(nameSpace.get(namespaceKey).asText() + urlAppednd);
 				else
 					// can't figure out the format
 					detail.addFormat(formatInfoString);
-			} else {
-				// can't figure out the format
-				detail.addFormat(formatInfoString);
-			}
+		
 		} else {
 			// can't figure out the format
 			detail.addFormat(formatInfoString);
 		}
 	}
 
-	public boolean isValidDataType(ArrayList typeConfigurations) {
-		for (Object type : typeConfigurations) {
-			if (!(((String) type).equals(FLOAT) || ((String) type).equals(NULL) || ((String) type).equals(BOOLEAN)
-					|| ((String) type).equals(INT) || ((String) type).equals(STRING) || ((String) type).equals(DOUBLE)
-					|| ((String) type).equals(FILE)))
+	public boolean isValidDataType(JsonNode typeConfigurations) {
+		for (JsonNode  type : typeConfigurations) {
+			if (!( type.asText().equals(FLOAT) ||  type.asText().equals(NULL) ||  type.asText().equals(BOOLEAN)
+					||  type.asText().equals(INT) ||  type.asText().equals(STRING) ||  type.asText().equals(DOUBLE)
+					||  type.asText().equals(FILE)))
 				return false;
 		}
 		return true;

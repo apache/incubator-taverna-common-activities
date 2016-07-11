@@ -16,75 +16,30 @@
  *******************************************************************************/
 package org.apache.taverna.cwl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.taverna.cwl.utilities.CWLUtil;
 import org.apache.taverna.reference.T2Reference;
 import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
-import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
+import com.fasterxml.jackson.databind.JsonNode;
 
-
-public class CwlDumyActivity extends AbstractAsynchronousActivity<CwlActivityConfigurationBean>
-		implements AsynchronousActivity<CwlActivityConfigurationBean> {
-
-	private static final int DEPTH_0 = 0;
-	private static final int DEPTH_1 = 1;
-	private static final int DEPTH_2 = 2;
-
-	//all processes are done here
-	private CWLUtil cwlUtil;
-	
-
-
+public class CwlDumyActivity extends AbstractAsynchronousActivity<JsonNode> {
+	private JsonNode conf;	
 	@Override
-	public void configure(CwlActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
-		removeInputs();
-		removeOutputs();
-		
-		 
-		 
-		Map cwlFile = configurationBean.getCwlConfigurations();
-		cwlUtil = new CWLUtil(cwlFile);
-		
-
-		if (cwlFile != null) {
-			//get the processed data
-			HashMap<String, Integer>  processedInputs= cwlUtil.processInputDepths();
-			for (String inputId : processedInputs.keySet()) {
-				int depth = processedInputs.get(inputId);
-				if (depth == DEPTH_0)
-					addInput(inputId, DEPTH_0, true, null, String.class);
-				else if (depth == DEPTH_1)
-					addInput(inputId, DEPTH_1, true, null, byte[].class);
-
-			}
-			//get the processed data
-			HashMap<String, Integer>  processedOutputs = cwlUtil.processOutputDepths();
-			for (String inputId : processedOutputs.keySet()) {
-				int depth = processedOutputs.get(inputId);
-				if (depth == DEPTH_0)
-					addOutput(inputId, DEPTH_0);
-				else if (depth == DEPTH_1)
-					addOutput(inputId, DEPTH_1);
-
-			}
-		}
-
+	public void configure(JsonNode conf) throws ActivityConfigurationException {
+		this.conf=conf;
 	}
 
 	@Override
-	public void executeAsynch(Map<String, T2Reference> arg0, AsynchronousActivityCallback arg1) {
+	public JsonNode getConfiguration() {
+		return conf;
 	}
 
 	@Override
-	public CwlActivityConfigurationBean getConfiguration() {
-		return null;
+	public void executeAsynch(Map<String, T2Reference> data, AsynchronousActivityCallback callback) {
+		
 	}
 
 }
