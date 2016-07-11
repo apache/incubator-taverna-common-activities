@@ -47,20 +47,16 @@ public class DockerActivityTest {
 	private ObjectNode activityConfiguration;
 
     private DockerContainerConfigurationImpl containerConfiguration;
-
-
-    public static void main(String[] args) throws Exception {
-        DockerActivityTest test = new DockerActivityTest();
-        test.setup();
-        test.testListContainers();
-    }
+    
 
     @Before
 	public void setup() throws Exception {
         activityConfiguration = JsonNodeFactory.instance.objectNode();
 
         containerConfiguration = new DockerContainerConfigurationImpl(new TestConfigurationManager());
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.CMD,"env");
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.CMD,"python,app.py");
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.EXPOSED_PORTS, "5000");
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.BINDINGS, "32772");
 
         DockerRemoteConfig remoteConfig = new DockerRemoteConfig();
         remoteConfig.setDockerHost("tcp://192.168.99.100:2376");
@@ -137,6 +133,24 @@ public class DockerActivityTest {
 
         Map<String,Object> inputs = new HashMap<String,Object>();
         inputs.put(DockerActivity.ACTION, DockerActivity.LIST_CONTAINERS);
+
+        Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
+        expectedOutputs.put(DockerActivity.RESPONSE_BODY_KEY, String.class);
+
+        Map<String,Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputs);
+        System.out.println(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
+        Assert.assertNotNull(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
+    }
+
+    @Test
+    public void testStartContainer() throws Exception {
+        String id = "9e7a5252c1a948149c4e0ca6b4ef7945c9ef11b27cfa251b37abc7d43391680d";
+        DockerActivity activity = new DockerActivity(containerConfiguration);
+        activity.configure(activityConfiguration);
+        Map<String,Object> inputs = new HashMap<String,Object>();
+        inputs.put(DockerActivity.ACTION, DockerActivity.START_CONTAINER);
+        inputs.put(DockerActivity.CONTAINER_ID, id);
+        inputs.put(DockerActivity.IN_CONTAINER_START_CMD, "python app.py");
 
         Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
         expectedOutputs.put(DockerActivity.RESPONSE_BODY_KEY, String.class);

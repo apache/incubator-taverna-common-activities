@@ -61,15 +61,17 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
     public static final String LIST_CONTAINERS = "list-containers";
 
-    public static final String OUT_CONTAINER_ID = "container-id";
+    public static final String CONTAINER_ID = "container-id";
 
-    public static final String OUT_IMAGE_ID = "container-id";
+    public static final String OUT_IMAGE_ID = "image-id";
 
     public static final String OUT_IMAGE_AUTHOR = "image-author";
 
     public static final String OUT_IMAGE_CONTAINER = "image-container";
 
     public static final String IN_IMAGE_NAME = "image-name";
+
+    public static final String IN_CONTAINER_START_CMD = "cnt-start-cmd";
 
     public static final String RESPONSE_BODY_KEY = "response_body";
 
@@ -111,7 +113,7 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
                     outJson = factory.objectNode();
                     CreateContainerResponse response = remoteClient.createContainer();
-                    ((ObjectNode)outJson).put(OUT_CONTAINER_ID, response.getId());
+                    ((ObjectNode)outJson).put(CONTAINER_ID, response.getId());
 
                 } else if (INSPECT.equalsIgnoreCase(action)) {
 
@@ -131,7 +133,12 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
                     }
 
                 } else if (START_CONTAINER.equalsIgnoreCase(action)) {
-                        //TODO
+
+                    String id = getRenderedParam(referenceService, context, map.get(CONTAINER_ID));
+                    remoteClient.startContainer(id);
+                    outJson = factory.objectNode();
+                    ((ObjectNode)outJson).put("started", id);
+
                 } else if (STOP_CONTAINER.equalsIgnoreCase(action)) {
 
                     // TODO

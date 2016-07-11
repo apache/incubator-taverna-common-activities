@@ -23,9 +23,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectImageResponse;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.Info;
-import com.github.dockerjava.api.model.SearchItem;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.DockerClientConfig;
 import org.apache.log4j.Logger;
@@ -102,8 +100,8 @@ public class RemoteClient {
     /**
      * @param containerId To be start
      */
-    public void startContainer(String containerId){
-        dockerClient.startContainerCmd(containerId).exec();
+    public Void startContainer( String containerId){
+       return dockerClient.startContainerCmd(containerId).exec();
     }
 
     /**
@@ -121,10 +119,21 @@ public class RemoteClient {
       return dockerClient.searchImagesCmd(term).exec();
     }
 
+
+    public void deleteContainer(String id){
+        dockerClient.removeContainerCmd(id).exec();
+    }
+
     private CreateContainerCmd buildCreateContainerCmd(){
         CreateContainerCmd createCmd = dockerClient.createContainerCmd(containerConfig.getImage());
         createCmd.withCmd(containerConfig.getCmd());
         createCmd.withName(containerConfig.getName());
+        Ports portBindings = new Ports();
+        for(int i=0; i< containerConfig.getBindings().length; i++){
+            portBindings.bind(containerConfig.getExposedPorts()[i], containerConfig.getBindings()[i]);
+        }
+        createCmd.withExposedPorts(containerConfig.getExposedPorts());
+        createCmd.withPortBindings(portBindings);
         return createCmd;
     }
 

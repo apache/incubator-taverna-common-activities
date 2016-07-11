@@ -27,12 +27,9 @@ import org.apache.taverna.configuration.Configurable;
 import org.apache.taverna.configuration.ConfigurationManager;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class DockerContainerConfigurationImpl extends AbstractConfigurable  implements DockerContainerConfiguration{
+public class DockerContainerConfigurationImpl extends AbstractConfigurable implements DockerContainerConfiguration{
 
     /**
      * String Values
@@ -83,6 +80,8 @@ public class DockerContainerConfigurationImpl extends AbstractConfigurable  impl
     public static final String ENV = "env";
 
     public static final String CMD = "cmd";
+
+    public static final String CMD_DELIMITER = ",";
 
     public static final String ENTRY_POINT = "entrypoint";
 
@@ -217,8 +216,8 @@ public class DockerContainerConfigurationImpl extends AbstractConfigurable  impl
         return ENV;
     }
 
-    public String getCmd() {
-        return this.getInternalPropertyMap().get(CMD);
+    public String[] getCmd() {
+        return this.getInternalPropertyMap().get(CMD).split(CMD_DELIMITER);
     }
 
     public String getEntryPoint() {
@@ -229,16 +228,30 @@ public class DockerContainerConfigurationImpl extends AbstractConfigurable  impl
         return VOLUMES;
     }
 
-    public String getBindings() {
-        return BINDINGS;
+    public Ports.Binding[] getBindings() {
+       String bindingsStr = this.getInternalPropertyMap().get(BINDINGS);
+        List<Ports.Binding> bindingList = new ArrayList<Ports.Binding>();
+        if(bindingsStr != null) {
+            for(String bind : bindingsStr.split(",")){
+             bindingList.add(Ports.Binding.bindPort(Integer.valueOf(bind)));
+          }
+        }
+        return bindingList.toArray(new Ports.Binding[0]);
     }
 
     public String getAliases() {
         return ALIASES;
     }
 
-    public String getExposedPorts() {
-        return EXPOSED_PORTS;
+    public ExposedPort[] getExposedPorts() {
+       String exposedPortStr =  this.getInternalPropertyMap().get(EXPOSED_PORTS);
+        List<ExposedPort> exposedPortList = new ArrayList<ExposedPort>();
+        if(exposedPortStr != null){
+            for(String portStr: exposedPortStr.split(",")){
+                exposedPortList.add(ExposedPort.tcp(Integer.valueOf(portStr)));
+            }
+        }
+        return exposedPortList.toArray(new ExposedPort[0]);
     }
 
     public String getLabels() {

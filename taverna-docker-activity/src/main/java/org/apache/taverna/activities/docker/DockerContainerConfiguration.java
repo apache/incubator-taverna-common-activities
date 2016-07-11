@@ -18,16 +18,23 @@
 */
 package org.apache.taverna.activities.docker;
 
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.Ports;
+
 public interface DockerContainerConfiguration {
 
     public String getName();
 
     public String getImage();
 
-    public String getCmd();
+    public String[] getCmd();
 
     public DockerRemoteConfig getDockerRemoteConfig();
 
-    //TODO add all remaining getters
+    public ExposedPort[] getExposedPorts();
+
+    public Ports.Binding[] getBindings();
+
+        //TODO add all remaining getters
 
 }
