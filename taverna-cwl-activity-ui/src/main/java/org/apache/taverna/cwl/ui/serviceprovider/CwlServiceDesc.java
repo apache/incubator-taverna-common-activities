@@ -55,8 +55,8 @@ public class CwlServiceDesc extends ServiceDescription<JsonNode > {
 
 	@Override
 	public Class<? extends Activity<JsonNode>> getActivityClass() {
-		
-		return (Class<? extends Activity<JsonNode>>) CwlDumyActivity.class;
+		//should fix this
+		return null;
 	}
 	@Override
 	public JsonNode getActivityConfiguration() {
