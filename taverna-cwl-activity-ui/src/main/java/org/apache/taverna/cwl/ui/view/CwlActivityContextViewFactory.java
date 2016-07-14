@@ -16,21 +16,26 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.ui.view;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.taverna.cwl.CwlDumyActivity;
+import org.apache.taverna.scufl2.api.activity.Activity;
+import org.apache.taverna.workbench.ui.views.contextualviews.ContextualView;
+import org.apache.taverna.workbench.ui.views.contextualviews.activity.ContextualViewFactory;
 
-import net.sf.taverna.t2.workbench.ui.views.contextualviews.ContextualView;
-import net.sf.taverna.t2.workbench.ui.views.contextualviews.activity.ContextualViewFactory;
+public class CwlActivityContextViewFactory implements ContextualViewFactory<Activity> {
+	public static final URI ACTIVITY_TYPE = URI.create("https://taverna.apache.org/ns/2016/activity/cwl");
+	
 
-public class CwlActivityContextViewFactory implements ContextualViewFactory<CwlDumyActivity> {
-
-	public boolean canHandle(Object selection) {
-		return selection instanceof CwlDumyActivity;
+	@Override
+	public List<ContextualView> getViews(Activity selection) {
+		return Arrays.<ContextualView> asList(new CwlContextualView(selection));
 	}
 
-	public List<ContextualView> getViews(CwlDumyActivity selection) {
-		return Arrays.<ContextualView> asList(new CwlContextualView(selection));
+
+	@Override
+	public boolean canHandle(Object selection) {
+		return selection instanceof Activity && ((Activity) selection).getType().equals(ACTIVITY_TYPE);
 	}
 }

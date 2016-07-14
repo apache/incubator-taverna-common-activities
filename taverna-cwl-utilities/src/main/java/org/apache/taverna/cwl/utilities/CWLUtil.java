@@ -3,6 +3,7 @@ package org.apache.taverna.cwl.utilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -50,25 +51,25 @@ public class CWLUtil {
 
 	}
 
-	public HashMap<String, Integer> processInputDepths() {
+	public Map<String, Integer> processInputDepths() {
 		return process(cwlFile.get(INPUTS));
 	}
 
-	public HashMap<String, Integer> processOutputDepths() {
+	public Map<String, Integer> processOutputDepths() {
 		return process(cwlFile.get(OUTPUTS));
 	}
 
-	public HashMap<String, PortDetail> processInputDetails() {
+	public Map<String, PortDetail> processInputDetails() {
 		return processdetails(cwlFile.get(INPUTS));
 	}
 
-	public HashMap<String, PortDetail> processOutputDetails() {
+	public Map<String, PortDetail> processOutputDetails() {
 		return processdetails(cwlFile.get(OUTPUTS));
 	}
 
-	public HashMap<String, Integer> process(JsonNode inputs) {
+	public Map<String, Integer> process(JsonNode inputs) {
 
-		HashMap<String, Integer> result = new HashMap<>();
+		Map<String, Integer> result = new HashMap<>();
 
 		if (inputs.getClass() == ArrayNode.class) {
 			Iterator<JsonNode> iterator = inputs.iterator();
@@ -117,9 +118,9 @@ public class CWLUtil {
 		return result;
 	}
 
-	private HashMap<String, PortDetail> processdetails(JsonNode inputs) {
+	private Map<String, PortDetail> processdetails(JsonNode inputs) {
 
-		HashMap<String, PortDetail> result = new HashMap<>();
+		Map<String, PortDetail> result = new HashMap<>();
 
 		if (inputs.getClass() == ArrayNode.class) {
 

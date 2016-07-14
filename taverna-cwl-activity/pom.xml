@@ -71,7 +71,11 @@
 			<version>${jackson.version}</version>
 		</dependency>
 
-
+ <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-activity-palette-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
 
 
 		<dependency>
@@ -81,6 +85,22 @@
 			<type>bundle</type>
 		</dependency>
 	</dependencies>
-
+<!-- Added these properties to configure new dependencies -->
+	<properties>
+	<taverna.language.version>0.15.1-incubating</taverna.language.version>
+		<taverna.osgi.version>0.2.1-incubating</taverna.osgi.version>
+		<taverna.workbench.version>3.1.0-incubating-SNAPSHOT</taverna.workbench.version>
+	</properties>
+	<repositories>
+	<repository>
+			<id>apache.snapshots</id>
+			<name>Apache Snapshot Repository</name>
+			<url>http://repository.apache.org/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		
+	</repositories>
 
 </project>

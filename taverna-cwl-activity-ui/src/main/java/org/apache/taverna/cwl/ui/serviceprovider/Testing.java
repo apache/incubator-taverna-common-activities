@@ -26,7 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.jena.atlas.iterator.Iter;
-import org.openjena.atlas.json.JsonObject;
 import org.springframework.util.SystemPropertyUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -55,7 +54,7 @@ public class Testing {
 		Yaml reader = new Yaml();
 		Map cwlFile = null;
 		try {
-			cwlFile = (Map) reader.load(new FileInputStream(new File("CWLFiles/customtool1.cwl")));
+			cwlFile = (Map) reader.load(new FileInputStream(new File(Testing.class.getResource("/CWLFiles/customtool1.cwl").getPath())));
 			
 		} catch (IOException e) {
 			

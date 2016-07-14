@@ -18,9 +18,10 @@
 */
 package org.apache.taverna.cwl;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -33,6 +34,7 @@ import org.apache.taverna.workflowmodel.processor.activity.ActivityInputPort;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityOutputPort;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CwlActivityFactory implements ActivityFactory {
 	private static Logger logger = Logger.getLogger(CwlActivityFactory.class);
@@ -40,6 +42,7 @@ public class CwlActivityFactory implements ActivityFactory {
 	private static final int DEPTH_1 = 1;
 	private Edits edits;
 
+	private static final String  CONFIG ="config";
 	@Override
 	public Activity<?> createActivity() {
 		CwlDumyActivity activity = new CwlDumyActivity();
@@ -49,23 +52,28 @@ public class CwlActivityFactory implements ActivityFactory {
 
 	@Override
 	public URI getActivityType() {
-		return null;
+		return CwlDumyActivity.ACTIVITY_TYPE;
 	}
 
-	@Override
+	@Override // FIXME
 	public JsonNode getActivityConfigurationSchema() {
-		return null;
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {//FIXME What is schema
+			return objectMapper.readTree(getClass().getResource("/schema.json"));
+		} catch (IOException e) {
+			return objectMapper.createObjectNode();
+		}
 	}
 
 	@Override
 	public Set<ActivityInputPort> getInputPorts(JsonNode configuration) throws ActivityConfigurationException {
-		CWLUtil cwlUtil = new CWLUtil(configuration.path("map"));
+		CWLUtil cwlUtil = new CWLUtil(configuration.get(CONFIG).path("map"));
 
 		Set<ActivityInputPort> inputs = new HashSet<>();
 			
 	
 			//get the processed data
-			HashMap<String, Integer>  processedInputs= cwlUtil.processInputDepths();
+		Map<String, Integer>  processedInputs= cwlUtil.processInputDepths();
 			for (String inputId : processedInputs.keySet()) {
 				int depth = processedInputs.get(inputId);
 				if (depth == DEPTH_0)
@@ -79,13 +87,13 @@ public class CwlActivityFactory implements ActivityFactory {
 
 	@Override
 	public Set<ActivityOutputPort> getOutputPorts(JsonNode configuration) throws ActivityConfigurationException {
-		CWLUtil cwlUtil = new CWLUtil(configuration.path("map"));
+		CWLUtil cwlUtil = new CWLUtil(configuration.get(CONFIG).path("map"));
 
 		Set<ActivityOutputPort> outputs = new HashSet<>();
 		
 		
 		//get the processed data
-		HashMap<String, Integer>  processedOutputs = cwlUtil.processOutputDepths();
+		Map<String, Integer>  processedOutputs = cwlUtil.processOutputDepths();
 		for (String inputId : processedOutputs.keySet()) {
 			int depth = processedOutputs.get(inputId);
 			if (depth == DEPTH_0)

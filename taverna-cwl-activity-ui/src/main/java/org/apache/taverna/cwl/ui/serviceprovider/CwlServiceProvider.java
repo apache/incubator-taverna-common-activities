@@ -32,32 +32,45 @@ import java.util.stream.StreamSupport;
 import javax.swing.Icon;
 
 import org.apache.log4j.Logger;
+import org.apache.taverna.scufl2.api.common.Visitor;
+import org.apache.taverna.scufl2.api.configurations.Configuration;
+import org.apache.taverna.servicedescriptions.AbstractConfigurableServiceProvider;
+import org.apache.taverna.servicedescriptions.ConfigurableServiceProvider;
+import org.apache.taverna.servicedescriptions.ServiceDescriptionProvider;
 import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import net.sf.taverna.t2.servicedescriptions.AbstractConfigurableServiceProvider;
-import net.sf.taverna.t2.servicedescriptions.ConfigurableServiceProvider;
-
-public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlServiceProviderConfig>
-		implements ConfigurableServiceProvider<CwlServiceProviderConfig> {
+public class CwlServiceProvider extends AbstractConfigurableServiceProvider
+		implements ConfigurableServiceProvider{
 	
 	public static final String  TOOL_NAME="toolName";
 	public static final String  MAP ="map";
 	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
 	
 	CwlServiceProvider() {
-		super(new CwlServiceProviderConfig());
+		super( defaultConfig());
 	}
 
 	private static final String providerName = "CWL Services";
-	private static final URI providerId = URI.create("http://cwl.com/2016/service-provider/cwlcommandlinetools");
-
+	private static final URI providerId = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");	// FIXME ask what to do
+	
+	
+	
+	private static Configuration defaultConfig() {
+		Configuration c = new Configuration();
+		ObjectNode conf = c.getJsonAsObjectNode();
+		conf.put("osgiServiceUri", "http://localhost:8080/geoserver/ows");	// FIXME ask what to do
+		conf.put("processIdentifier", "gs:StringConcatWPS");
+		return c;
+	}
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 
+		// FIXME ask what to do
+		
 		// get the location of the cwl tool from the workbench
 		Path path = Paths.get(getConfiguration().getPath());
 		//figure out the dots in the path ex: /maanadev/../cwltools
@@ -77,8 +90,8 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 			Yaml reader = getYamlReader();
 	
 				Map cwlFile;
-				try {
-					cwlFile = (Map) reader.load(new FileInputStream(path.toFile()));
+				try (FileInputStream file =new FileInputStream(path.toFile())){
+					cwlFile = (Map) reader.load(file);
 					JsonNode config = createJsonNode(p,cwlFile);
 					// Creating CWl service Description
 					CwlServiceDesc cwlServiceDesc = createCWLDesc(config);
@@ -128,7 +141,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 	public String getName() {
 		return providerName;
 	}
-
+	// FIXME ask what to do
 	@Override
 	protected List<? extends Object> getIdentifyingData() {
 		return null;
@@ -137,5 +150,21 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 	public Yaml getYamlReader() {
 		Yaml reader = new Yaml();
 		return reader;
+	}
+	@Override
+	public ServiceDescriptionProvider newInstance() {
+		return new CwlServiceProvider();
+	}
+	@Override
+	public URI getType() {
+		return providerId;
+	}
+	@Override
+	public void setType(URI arg0) {
+		
+	}
+	@Override
+	public boolean accept(Visitor arg0) {
+		return false;
 	}
 }

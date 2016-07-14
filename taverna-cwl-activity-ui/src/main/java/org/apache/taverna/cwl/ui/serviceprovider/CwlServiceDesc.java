@@ -16,71 +16,88 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.ui.serviceprovider;
 
+import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Icon;
 
-import org.apache.taverna.cwl.CwlDumyActivity;
+import org.apache.taverna.scufl2.api.configurations.Configuration;
+import org.apache.taverna.servicedescriptions.ServiceDescription;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import net.sf.taverna.t2.servicedescriptions.ServiceDescription;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
-
-public class CwlServiceDesc extends ServiceDescription<JsonNode > {
+public class CwlServiceDesc extends ServiceDescription {
 
 	private static final String DESCRIPTION = "description";
+	public static final String  CONFIG ="config";
+	public static final URI ACTIVITY_TYPE = URI.create("https://taverna.apache.org/ns/2016/activity/cwl");
+
+	@Override
+	public Configuration getActivityConfiguration() {
+		Configuration c = new Configuration();
+		c.setType(ACTIVITY_TYPE.resolve("#Config"));	// FIXME ask what to do
+		ObjectNode json = c.getJsonAsObjectNode();
+		json.put(CONFIG, cwlConfiguration);
+		return c;
+	}
 
 	@Override
 	public String getDescription() {
-	
-		//see  whether description is too long
-		if (cwlConfiguration.has(DESCRIPTION)){
+
+		// see whether description is too long
+		if (cwlConfiguration.has(DESCRIPTION)) {
 			String description = cwlConfiguration.path(DESCRIPTION).asText();
-				if((description.length()<40))return description;
-				else return "";
-		}
-		else
+			if ((description.length() < 40))
+				return description;
+			else
+				return "";
+		} else
 			return "";
 	}
 
 	private JsonNode cwlConfiguration;
 
 	public void setCwlConfiguration(JsonNode cwlConfiguration) {
-		//set yaml parse CWL tool content
 		this.cwlConfiguration = cwlConfiguration;
 	}
 
-	private String toolName;
+	
 
 	@Override
-	public Class<? extends Activity<JsonNode>> getActivityClass() {
-		//should fix this
-		return null;
-	}
-	@Override
-	public JsonNode getActivityConfiguration() {
-		return cwlConfiguration;
-	}
-	@Override
 	public Icon getIcon() {
-		return  CwlServiceIcon.getIcon();
+		return CwlServiceIcon.getIcon();
 	}
+
 	@Override
 	public String getName() {
 		return toolName;
 	}
+
 	@Override
-	public List<? extends Comparable> getPath() {
+	protected List<? extends Object> getIdentifyingData() {	// FIXME ask what to do
+		return Arrays.<Object>asList(toolName);
+	}
+
+	
+
+	@Override
+	public URI getActivityType() {
+		return ACTIVITY_TYPE;
+	}
+
+	@Override
+	public List<? extends Comparable<?>> getPath() {	// FIXME ask what to do
 		return null;
 	}
-	@Override
-	protected List<? extends Object> getIdentifyingData() {
-		return null;
+	private String toolName;
+	
+	public String getToolName() {
+		return toolName;
 	}
 
 	public void setToolName(String toolName) {
 		this.toolName = toolName;
 	}
-
 }

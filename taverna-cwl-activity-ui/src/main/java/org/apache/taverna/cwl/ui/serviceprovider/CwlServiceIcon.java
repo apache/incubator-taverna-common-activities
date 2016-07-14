@@ -16,34 +16,42 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.ui.serviceprovider;
 
+import java.net.URI;
+
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import org.apache.taverna.cwl.CwlDumyActivity;
-
-import net.sf.taverna.t2.workbench.activityicons.ActivityIconSPI;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
+import org.apache.taverna.workbench.activityicons.ActivityIconSPI;
 
 public class CwlServiceIcon implements ActivityIconSPI {
 	private static Icon icon;
 
-	@Override
-	public int canProvideIconScore(Activity<?> activity) {
-		if (activity instanceof CwlDumyActivity) {
-			return DEFAULT_ICON;
-		}
-		return NO_ICON;
-	}
-
-	@Override
-	public Icon getIcon(Activity<?> arg0) {
-		return getIcon();
-	}
+	public static final URI ACTIVITY_TYPE = URI.create("https://taverna.apache.org/ns/2016/activity/cwl");
+	
 
 	public static Icon getIcon() {
 		if (icon == null) {
 			icon = new ImageIcon("/Icon/cwl-logo-header.png");
 		}
 		return icon;
+	}
+
+
+
+
+	@Override
+	public int canProvideIconScore(URI activityType) {
+		if (ACTIVITY_TYPE.equals(activityType)) {
+			return DEFAULT_ICON;
+		}
+		return NO_ICON;
+	}
+
+
+
+
+	@Override
+	public Icon getIcon(URI activityType) {
+		return getIcon();
 	}
 }

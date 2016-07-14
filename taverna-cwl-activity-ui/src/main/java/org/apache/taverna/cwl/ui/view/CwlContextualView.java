@@ -21,25 +21,30 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.apache.taverna.cwl.CwlDumyActivity;
+import org.apache.taverna.cwl.ui.serviceprovider.CwlServiceDesc;
 import org.apache.taverna.cwl.ui.serviceprovider.CwlServiceProvider;
 import org.apache.taverna.cwl.utilities.PortDetail;
+import org.apache.taverna.scufl2.api.activity.Activity;
+import org.apache.taverna.scufl2.api.configurations.Configuration;
+import org.apache.taverna.workbench.configuration.colour.ColourManager;
+import org.apache.taverna.workbench.ui.actions.activity.HTMLBasedActivityContextualView;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 import org.apache.taverna.cwl.utilities.CWLUtil;
 
-import net.sf.taverna.t2.workbench.ui.actions.activity.HTMLBasedActivityContextualView;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 
 /*
  * This class is responsible for producing service detail panel for each tool
  * 
  * */
-public class CwlContextualView extends HTMLBasedActivityContextualView<JsonNode> {
+public class CwlContextualView extends HTMLBasedActivityContextualView {
 
 	private static final String DESCRIPTION = "description";
 	private static final String LABEL = "label";
@@ -51,16 +56,28 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<JsonNode>
 	private static final String SPACE = " ";
 	private static final String LINE_BREAK="\n";
 	private static final int MAX_LINE_LENG = 80;
-	private final JsonNode configurationNode;
-	private final CwlDumyActivity activity;
+	private static ColourManager colourManager;
+	
+	
+	public static ColourManager getColourManager() {
+		return colourManager;
+	}
 
+	public static void setColourManager(ColourManager colourManager) {
+		CwlContextualView.colourManager = colourManager;
+	}
+
+	private final Configuration configurationNode;
+	private final Activity activity;
+	private JsonNode CwlMap;
 	private CWLUtil cwlutil;
 
-	public CwlContextualView(CwlDumyActivity activity) {
-		super((Activity) activity);
+	public CwlContextualView(Activity activity) {
+		super( activity, colourManager);// FIXME ask colourManager
 		this.activity = activity;
 		this.configurationNode = activity.getConfiguration();
-		cwlutil = new CWLUtil(configurationNode.path(CwlServiceProvider.MAP));
+		CwlMap=configurationNode.getJsonAsObjectNode().get(CwlServiceDesc.CONFIG).get(CwlServiceProvider.MAP);
+		cwlutil = new CWLUtil(CwlMap);
 		super.initView();
 	}
 
@@ -79,7 +96,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<JsonNode>
 
 	@Override
 	public String getViewTitle() {
-		return configurationNode.get(CwlServiceProvider.TOOL_NAME).asText();
+		return CwlMap.get(CwlServiceProvider.TOOL_NAME).asText();
 	}
 
 	/**
@@ -120,22 +137,21 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<JsonNode>
 		String summery = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" bgcolor=\""
 				+ TABLE_COLOR + "\" cellpadding=\"" + TABLE_CELL_PADDING + "\" >";
 
-		JsonNode cwlFile = configurationNode.get(CwlServiceProvider.MAP);
 		String description = "";
 
-		if (cwlFile.has(DESCRIPTION)) {
-			description = cwlFile.get(DESCRIPTION).asText();
+		if (CwlMap.has(DESCRIPTION)) {
+			description = CwlMap.get(DESCRIPTION).asText();
 			summery = paragraphToHtml(summery, description);
 
 		}
-		if (cwlFile.has(LABEL)) {
+		if (CwlMap.has(LABEL)) {
 			summery += "<tr><th colspan='2' align='left'>Label</th></tr>";
-			summery += "<tr><td colspan='2' align='left'>" +  cwlFile.get(LABEL).asText() + "</td></tr>";
+			summery += "<tr><td colspan='2' align='left'>" +  CwlMap.get(LABEL).asText() + "</td></tr>";
 		}
 		summery += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
 
-		HashMap<String, PortDetail> inputs = cwlutil.processInputDetails();
-		HashMap<String, Integer> inputDepths = cwlutil.processInputDepths();
+		Map<String, PortDetail> inputs = cwlutil.processInputDetails();
+		Map<String, Integer> inputDepths = cwlutil.processInputDepths();
 
 		if ((inputs != null && !inputs.isEmpty()) && (inputDepths != null && !inputDepths.isEmpty()))
 			for (String id : inputs.keySet()) {
@@ -146,8 +162,8 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<JsonNode>
 
 		summery += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
 
-		HashMap<String, PortDetail> outPuts = cwlutil.processOutputDetails();
-		HashMap<String, Integer> outputDepths = cwlutil.processOutputDepths();
+		Map<String, PortDetail> outPuts = cwlutil.processOutputDetails();
+		Map<String, Integer> outputDepths = cwlutil.processOutputDepths();
 
 		if ((outPuts != null && !outPuts.isEmpty()) && (outputDepths != null && !outputDepths.isEmpty()))
 			for (String id : outPuts.keySet()) {

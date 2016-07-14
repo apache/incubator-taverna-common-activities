@@ -41,9 +41,8 @@ public class CWLUtilTest {
 	@Before
 	public void setUp() throws Exception {
 		Yaml reader = new Yaml();
-		Path path = Paths.get("CWLFiles", "customtool1.cwl");
 		ObjectMapper mapper = new  ObjectMapper();
-		cwlFile = mapper.valueToTree(reader.load(new FileInputStream(path.toFile()))); 
+		cwlFile = mapper.valueToTree(reader.load(new FileInputStream(CWLUtilTest.class.getResource("/CWLFiles/customtool1.cwl").getPath()))); 
 
 		cwlUtil = new CWLUtil(cwlFile);
 		input =  cwlFile.get("inputs").get(0);
@@ -101,7 +100,7 @@ public class CWLUtilTest {
 	@Test
 	public void processTest() {
 
-		HashMap<String, Integer> actual = cwlUtil.process( cwlFile.get("inputs"));
+		Map<String, Integer> actual = cwlUtil.process( cwlFile.get("inputs"));
 
 		HashMap<String, Integer> expected = new HashMap<>();
 		expected.put("input_1", 0);
