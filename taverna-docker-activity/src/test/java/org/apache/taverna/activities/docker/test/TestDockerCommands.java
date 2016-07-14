@@ -21,10 +21,13 @@ package org.apache.taverna.activities.docker.test;
 
 import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Container;
+import org.apache.taverna.activities.docker.DockerActivity;
 import org.apache.taverna.activities.docker.DockerContainerConfigurationImpl;
 import org.apache.taverna.activities.docker.DockerRemoteConfig;
 import org.apache.taverna.activities.docker.RemoteClient;
 import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -36,24 +39,27 @@ public class TestDockerCommands {
 
     private static final String IMAGE_NAME = "training/webapp";
 
-    private static final String CONTAINER_NAME = "test-container";
+    private static final String CONTAINER_NAME = "test-container-0";
 
     private static final String DOCKER_LOGIN_SUCCESS = "Login Succeeded";
 
-    public TestDockerCommands() {
+    @Before
+    public void setup(){
+        Assume.assumeTrue(new File(DockerActivityTest.CERT_PATH).list().length > 0);
+
         DockerContainerConfigurationImpl containerConfiguration = new DockerContainerConfigurationImpl(new TestConfigurationManager());
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.NAME,CONTAINER_NAME);
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.IMAGE,IMAGE_NAME);
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.CMD,"env");
 
         DockerRemoteConfig remoteConfig = new DockerRemoteConfig();
-        remoteConfig.setDockerHost("tcp://192.168.99.100:2376");
+        remoteConfig.setDockerHost(DockerActivityTest.DOCKER_REMOTE);
         remoteConfig.setApiVersion("1.21");
         remoteConfig.setDockerTlsVerify(true);
 
         // You need to copy your valid certificate file to resources directory in this test module as follows.
-        remoteConfig.setDockerCertPath(new File("src/test/resources/cert").getAbsolutePath());
-        remoteConfig.setRegistryUrl("https://registry-1.docker.io/v2");
+        remoteConfig.setDockerCertPath(new File(DockerActivityTest.CERT_PATH).getAbsolutePath());
+        remoteConfig.setRegistryUrl(DockerActivityTest.DOCKER_REGISTRY);
         containerConfiguration.setDockerRemoteConfig(remoteConfig);
         remoteClient = new RemoteClient(containerConfiguration);
     }

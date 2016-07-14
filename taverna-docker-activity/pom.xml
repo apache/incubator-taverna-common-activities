@@ -112,7 +112,7 @@
 			<groupId>org.apache.taverna.engine</groupId>
 			<artifactId>taverna-activity-test-utils</artifactId>
 			<version>${taverna.engine.version}</version>
-			<!--<scope>test</scope>-->
+			<scope>test</scope>
             <exclusions>
                 <exclusion>  <!-- declare the exclusion here -->
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -124,7 +124,7 @@
 			<groupId>org.apache.taverna.engine</groupId>
 			<artifactId>taverna-workflowmodel-impl</artifactId>
 			<version>${taverna.engine.version}</version>
-			<!--<scope>test</scope>-->
+			<scope>test</scope>
             <exclusions>
                 <exclusion>  <!-- declare the exclusion here -->
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>

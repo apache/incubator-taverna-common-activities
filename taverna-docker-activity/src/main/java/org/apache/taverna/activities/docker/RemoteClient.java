@@ -45,7 +45,6 @@ public class RemoteClient {
 
     private static Logger LOG = Logger.getLogger(RemoteClient.class);
 
-
     public RemoteClient(DockerContainerConfiguration containerConfig) {
         this.containerConfig = containerConfig;
         init(containerConfig.getDockerRemoteConfig());

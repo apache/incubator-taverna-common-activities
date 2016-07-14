@@ -22,7 +22,6 @@ package org.apache.taverna.activities.docker.test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Container;
 import org.apache.taverna.activities.docker.DockerActivity;
 import org.apache.taverna.activities.docker.DockerContainerConfigurationImpl;
@@ -30,6 +29,7 @@ import org.apache.taverna.activities.docker.DockerRemoteConfig;
 import org.apache.taverna.activities.docker.RemoteClient;
 import org.apache.taverna.activities.testutils.ActivityInvoker;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,28 +47,37 @@ public class DockerActivityTest {
 	private ObjectNode activityConfiguration;
 
     private DockerContainerConfigurationImpl containerConfiguration;
-    
+
+    public static final String CERT_PATH = "src/test/resources/cert";
+
+    public static final String DOCKER_REMOTE = "tcp://192.168.99.100:2376";
+
+    public static final String DOCKER_REGISTRY = "https://registry-1.docker.io/v2";
+
+
 
     @Before
 	public void setup() throws Exception {
-        activityConfiguration = JsonNodeFactory.instance.objectNode();
+        Assume.assumeTrue(new File(DockerActivityTest.CERT_PATH).list().length > 0);
 
+        activityConfiguration = JsonNodeFactory.instance.objectNode();
         containerConfiguration = new DockerContainerConfigurationImpl(new TestConfigurationManager());
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.CMD,"python,app.py");
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.EXPOSED_PORTS, "5000");
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.BINDINGS, "32772");
 
         DockerRemoteConfig remoteConfig = new DockerRemoteConfig();
-        remoteConfig.setDockerHost("tcp://192.168.99.100:2376");
+        remoteConfig.setDockerHost(DOCKER_REMOTE);
         remoteConfig.setApiVersion("1.21");
         remoteConfig.setDockerTlsVerify(true);
 
         // You need to copy your valid certificate file to resources directory in this test module as follows.
-        remoteConfig.setDockerCertPath(new File("src/test/resources/cert").getAbsolutePath());
-        remoteConfig.setRegistryUrl("https://registry-1.docker.io/v2");
+        remoteConfig.setDockerCertPath(new File(CERT_PATH).getAbsolutePath());
+        remoteConfig.setRegistryUrl(DOCKER_REGISTRY);
         containerConfiguration.setDockerRemoteConfig(remoteConfig);
 
     }
+
 
 	/**
 	 * Tests a simple script (String output = input + "_returned") to ensure the script is invoked correctly.
