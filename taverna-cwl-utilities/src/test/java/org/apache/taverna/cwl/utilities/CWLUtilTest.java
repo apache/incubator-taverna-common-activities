@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import org.junit.Before;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
@@ -41,7 +42,7 @@ public class CWLUtilTest {
 		Yaml reader = new Yaml();
 		ObjectMapper mapper = new  ObjectMapper();
 		cwlFile = mapper.valueToTree(reader.load(new FileInputStream(CWLUtilTest.class.getResource("/CWLFiles/customtool1.cwl").getPath()))); 
-
+	
 		cwlUtil = new CWLUtil(cwlFile);
 		input =  cwlFile.get("inputs").get(0);
 	}

@@ -43,37 +43,35 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class CwlServiceProvider extends AbstractConfigurableServiceProvider
-		implements ConfigurableServiceProvider{
+public class CwlServiceProvider extends AbstractConfigurableServiceProvider implements ConfigurableServiceProvider {
+
+	public static final String TOOL_NAME = "toolName";
+	public static final String CWL_CONF = "cwl_conf";
+	public static final String CWL_PATH = "cwl_path";
+
+	public static final String DEFAULT_PATH_1 = "/usr/share/commonwl/";
+	public static final String DEFAULT_PATH_2 = "/usr/local/share/commonwl/";
+	public static final String DEFAULT_PATH_3 = "$HOME/.local/share/commonwl";
 	
-	public static final String  TOOL_NAME="toolName";
-	public static final String  CWL_CONF ="cwl_conf";
-	public static final String  CWL_PATH ="cwl_path";
 	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
-	
+
 	CwlServiceProvider() {
-		super( defaultConfig());
+		super(getDefaultConfiguration());
 	}
 
 	private static final String providerName = "CWL Services";
-	private static final URI providerId = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");	
+	private static final URI providerId = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");
+
 	
-	
-	
-	private static Configuration defaultConfig() {
-		Configuration c = new Configuration();
-		ObjectNode conf = c.getJsonAsObjectNode();
-		conf.put("path", "");
-		return c;
-	}
+
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 
-	//TODO default and configurable provider
-		
+		// TODO default and configurable provider
+
 		// get the location of the cwl tool from the workbench
 		Path path = getPath();
-		//figure out the dots in the path ex: /maanadev/../cwltools
+		// figure out the dots in the path ex: /maanadev/../cwltools
 		Path normalizedPath = path.normalize();
 
 		DirectoryStream<Path> stream = null;
@@ -83,33 +81,33 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider
 			logger.warn("Path is not correct !");
 			return;
 		}
-		//create stream with parallel capabilities 
+		// create stream with parallel capabilities
 		Stream<Path> paralleStream = StreamSupport.stream(stream.spliterator(), true);
-		
+
 		paralleStream.forEach(p -> {
 			Yaml reader = getYamlReader();
-	
-				Map cwlFile;
-				try (FileInputStream file =new FileInputStream(path.toFile())){
-					cwlFile = (Map) reader.load(file);
-					JsonNode config = createJsonNode(p,cwlFile);
-					// Creating CWl service Description
-					CwlServiceDesc cwlServiceDesc = createCWLDesc(config);
-					// return the service description
-					callBack.partialResults(Arrays.asList(cwlServiceDesc));
-					
-				} catch (IOException e) {
-					
-					logger.warn("File not Found !");
-					
-				}
-			
-			
+
+			Map cwlFile;
+			try (FileInputStream file = new FileInputStream(path.toFile())) {
+				cwlFile = (Map) reader.load(file);
+				JsonNode config = createJsonNode(p, cwlFile);
+				// Creating CWl service Description
+				CwlServiceDesc cwlServiceDesc = createCWLDesc(config);
+				// return the service description
+				callBack.partialResults(Arrays.asList(cwlServiceDesc));
+
+			} catch (IOException e) {
+
+				logger.warn("File not Found !");
+
+			}
+
 		});
 
 		callBack.finished();
 
 	}
+
 	private Path getPath() {
 		return Paths.get(getConfiguration().getJsonAsObjectNode().get("path").asText());
 	}
@@ -117,10 +115,10 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider
 	private JsonNode createJsonNode(Path p, Map cwlFile) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.createObjectNode();
-		JsonNode cwl_map =mapper.valueToTree(cwlFile);
-		((ObjectNode )root).put(TOOL_NAME,p.getFileName().toString().split("\\.")[0]);
-		((ObjectNode )root).put(CWL_CONF,cwl_map);
-		((ObjectNode )root).put(CWL_PATH,p.toString());
+		JsonNode cwl_map = mapper.valueToTree(cwlFile);
+		((ObjectNode) root).put(TOOL_NAME, p.getFileName().toString().split("\\.")[0]);
+		((ObjectNode) root).put(CWL_CONF, cwl_map);
+		((ObjectNode) root).put(CWL_PATH, p.toString());
 		return root;
 	}
 
@@ -155,20 +153,32 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider
 		Yaml reader = new Yaml();
 		return reader;
 	}
+
 	@Override
 	public ServiceDescriptionProvider newInstance() {
 		return new CwlServiceProvider();
 	}
+
 	@Override
 	public URI getType() {
 		return providerId;
 	}
+
 	@Override
 	public void setType(URI arg0) {
-		
+
 	}
+
 	@Override
 	public boolean accept(Visitor arg0) {
 		return false;
+	}
+
+	
+	private static Configuration getDefaultConfiguration() {
+		Configuration c = new Configuration();
+		ObjectNode conf = c.getJsonAsObjectNode();
+		conf.put("path", "");
+		return c;
 	}
 }
