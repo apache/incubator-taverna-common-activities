@@ -9,8 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.apache.taverna.cwl.utilities.CWLUtilTest;
-import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
@@ -52,7 +50,7 @@ public class CwlActivityFactoryTest {
 		}
 		
 	}
-	@Test
+	@Test //FIXME 
 	public void testgetInputPorts() {
 		
 //		try {

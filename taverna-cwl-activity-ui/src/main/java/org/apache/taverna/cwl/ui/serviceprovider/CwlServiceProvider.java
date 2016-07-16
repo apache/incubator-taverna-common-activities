@@ -56,6 +56,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
 
 	CwlServiceProvider() {
+		//FIXME
 		super(getDefaultConfiguration());
 	}
 
