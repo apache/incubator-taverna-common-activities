@@ -112,35 +112,41 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 		return null;
 	}
 
-	// format long description using html <p> tags
-	private String paragraphToHtml(String summery, String paragraph) {
+	/**
+	 * This method creates HTML representation of the String paragraph
+	 * @param summary
+	 * @param paragraph
+	 * @return
+	 */
+	private String paragraphToHtml(String summary, String paragraph) {
 
-		summery += "<tr><td colspan='2' align='left'>";
+		summary += "<tr><td colspan='2' align='left'>";
 		paragraph = formatParagraph(paragraph);
 		for (String line : paragraph.split("[\n|\r]"))
-			summery += "<p>" + line + "</p>";
+			summary += "<p>" + line + "</p>";
 
-		summery += "</td></tr>";
+		summary += "</td></tr>";
 
-		return summery;
+		return summary;
 	}
 
 	@Override
 	protected String getRawTableRowsHtml() {
-		String summery = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" cellpadding=\"" + TABLE_CELL_PADDING + "\" >";
+		String summary = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" cellpadding=\"" + TABLE_CELL_PADDING + "\" >";
 
 		String description = "";
-
+		//Get the CWL tooll Description
 		if (CwlMap.has(DESCRIPTION)) {
 			description = CwlMap.get(DESCRIPTION).asText();
-			summery = paragraphToHtml(summery, description);
+			summary = paragraphToHtml(summary, description);
 
 		}
+		//Get the CWL tool Label
 		if (CwlMap.has(LABEL)) {
-			summery += "<tr><th colspan='2' align='left'>Label</th></tr>";
-			summery += "<tr><td colspan='2' align='left'>" + CwlMap.get(LABEL).asText() + "</td></tr>";
+			summary += "<tr><th colspan='2' align='left'>Label</th></tr>";
+			summary += "<tr><td colspan='2' align='left'>" + CwlMap.get(LABEL).asText() + "</td></tr>";
 		}
-		summery += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
+		summary += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
 
 		Map<String, PortDetail> inputs = cwlutil.processInputDetails();
 		Map<String, Integer> inputDepths = cwlutil.processInputDepths();
@@ -149,10 +155,10 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 			for (String id : inputs.keySet()) {
 				PortDetail detail = inputs.get(id);
 				if (inputDepths.containsKey(id))
-					summery = extractSummery(summery, id, detail, inputDepths.get(id));
+					summary = extractSummary(summary, id, detail, inputDepths.get(id));
 			}
 
-		summery += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
+		summary += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
 
 		Map<String, PortDetail> outPuts = cwlutil.processOutputDetails();
 		Map<String, Integer> outputDepths = cwlutil.processOutputDepths();
@@ -161,42 +167,55 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 			for (String id : outPuts.keySet()) {
 				PortDetail detail = outPuts.get(id);
 				if (outputDepths.containsKey(id))
-					summery = extractSummery(summery, id, detail, outputDepths.get(id));
+					summary = extractSummary(summary, id, detail, outputDepths.get(id));
 			}
-		summery += "</table>";
-		return summery;
+		summary += "</table>";
+		return summary;
 	}
-
-	private String extractSummery(String summery, String id, PortDetail detail, int depth) {
-		summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + depth + "</td></tr>";
+/**
+ * This method creates the HTML tags and details of each input/output for service detail panel
+ * 
+ * @param summary current String summary
+ * @param id input/output Id
+ * @param detail PortDetail object of the input/output
+ * @param depth depth of the input/output
+ * @return
+ */
+	private String extractSummary(String summary, String id, PortDetail detail, int depth) {
+		summary += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + depth + "</td></tr>";
 		if (detail.getLabel() != null) {
-			summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
+			summary += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
 		}
 		if (detail.getDescription() != null) {
 
-			summery = paragraphToHtml(summery, detail.getDescription());
+			summary = paragraphToHtml(summary, detail.getDescription());
 
 		}
 		if (detail.getFormat() != null) {
-			summery += "<tr><td  align ='left' colspan ='2'>Format: ";
+			summary += "<tr><td  align ='left' colspan ='2'>Format: ";
 			ArrayList<String> formats = detail.getFormat();
 
 			int Size = formats.size();
 
 			if (Size == 1) {
-				summery += formats.get(0);
+				summary += formats.get(0);
 			} else {
 				for (int i = 0; i < (Size - 1); i++) {
-					summery += formats.get(i) + ", ";
+					summary += formats.get(i) + ", ";
 				}
-				summery += formats.get(Size - 1);
+				summary += formats.get(Size - 1);
 			}
-			summery += "</td></tr>";
+			summary += "</td></tr>";
 		}
-		summery += "<tr></tr>";
-		return summery;
+		summary += "<tr></tr>";
+		return summary;
 	}
-
+/**
+ * This method makes max length of a line in the paragraph into MAX_LINE_LENG.
+ * But if the line not contains a single space it's not going to be as it's.
+ * @param paragraph paragraph to be formated 
+ * @return
+ */
 	private String formatParagraph(String paragraph) {
 		String result = "";
 		for (String line : paragraph.split(LINE_BREAK)) {
