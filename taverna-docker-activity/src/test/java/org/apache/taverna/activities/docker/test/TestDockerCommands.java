@@ -21,10 +21,7 @@ package org.apache.taverna.activities.docker.test;
 
 import com.github.dockerjava.api.command.InspectImageResponse;
 import com.github.dockerjava.api.model.Container;
-import org.apache.taverna.activities.docker.DockerActivity;
-import org.apache.taverna.activities.docker.DockerContainerConfigurationImpl;
-import org.apache.taverna.activities.docker.DockerRemoteConfig;
-import org.apache.taverna.activities.docker.RemoteClient;
+import org.apache.taverna.activities.docker.*;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -47,10 +44,10 @@ public class TestDockerCommands {
     public void setup(){
         Assume.assumeTrue(new File(DockerActivityTest.CERT_PATH).list().length > 0);
 
-        DockerContainerConfigurationImpl containerConfiguration = new DockerContainerConfigurationImpl(new TestConfigurationManager());
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.NAME,CONTAINER_NAME);
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.IMAGE,IMAGE_NAME);
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.CMD,"env");
+        DockerContainerConfiguration containerConfiguration = new DockerContainerConfigurationImpl(new TestConfigurationManager());
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.NAME,CONTAINER_NAME);
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.IMAGE,IMAGE_NAME);
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.CMD,"env");
 
         DockerRemoteConfig remoteConfig = new DockerRemoteConfig();
         remoteConfig.setDockerHost(DockerActivityTest.DOCKER_REMOTE);

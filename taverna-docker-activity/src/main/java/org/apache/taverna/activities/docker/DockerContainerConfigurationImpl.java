@@ -18,108 +18,12 @@
 */
 package org.apache.taverna.activities.docker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dockerjava.api.model.*;
-import com.github.dockerjava.core.command.CreateContainerCmdImpl;
 import org.apache.taverna.configuration.AbstractConfigurable;
-import org.apache.taverna.configuration.Configurable;
 import org.apache.taverna.configuration.ConfigurationManager;
-
-import java.io.IOException;
 import java.util.*;
 
 public class DockerContainerConfigurationImpl extends AbstractConfigurable implements DockerContainerConfiguration{
-
-    /**
-     * String Values
-     */
-    public static final String NAME = "name";
-
-    public static final String HOST_NAME = "hostName";
-
-    public static final String DOMAIN_NAME = "domainName";
-
-    public static final String USER = "user";
-
-    public static final String IMAGE = "image";
-
-    public static final String WORKING_DIR = "workingDir";
-
-    public static final String MAC_ADDRESS = "macAddress";
-
-    public static final String STOP_SIGNAL = "stopSignal";
-
-    public static final String IPV4_ADDRESS = "ipv4Address";
-
-    public static final String IPV6_ADDRESS = "ipv6Address";
-
-    /**
-     * Boolean values
-     */
-
-    public static final String ATTACH_STDIN = "attachStdin";
-
-    public static final String ATTACH_STDOUT = "attachStdout";
-
-    public static final String ATTACH_STDERR =  "attachStderr";
-
-    public static final String TTY = "tty";
-
-    public static final String STDIN_OPEN = "stdinOpen";
-
-    public static final String STDIN_ONCE = "stdInOnce";
-
-    public static final String NETWORK_DISABLED = "networkDisabled";
-
-    /**
-     * String Arrays
-     */
-    public static final String PORT_SPECS = "portSpecs";
-
-    public static final String ENV = "env";
-
-    public static final String CMD = "cmd";
-
-    public static final String CMD_DELIMITER = ",";
-
-    public static final String ENTRY_POINT = "entrypoint";
-
-    /**
-     * Type Volumes[]
-     */
-    public static final String VOLUMES = "volumes";
-
-    /**
-     * Type Bindings[]
-     */
-    public static final String BINDINGS = "bindings";
-
-    /**
-     * List<String> aliases
-     */
-    public static final String ALIASES = "aliases";
-
-    /**
-     * Type ExposedPorts[]
-     */
-    public static final String EXPOSED_PORTS = "exposedPorts";
-
-    /**
-     * Type Map<String,String>
-     */
-    public static final String LABELS = "labels";
-
-    /**
-     * Type HostConfig
-     */
-    public static final String HOST_CONFIG = "hostConfig";
-
-    /**
-     * Type CreateContainerCmdImpl.NetworkingConfig
-     */
-    public static final String NETWORKING_CONFIG = "networkingConfig";
-
 
     private DockerRemoteConfig dockerRemoteConfig;
 

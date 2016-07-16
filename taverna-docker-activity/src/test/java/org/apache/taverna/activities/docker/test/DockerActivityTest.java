@@ -23,10 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dockerjava.api.model.Container;
-import org.apache.taverna.activities.docker.DockerActivity;
-import org.apache.taverna.activities.docker.DockerContainerConfigurationImpl;
-import org.apache.taverna.activities.docker.DockerRemoteConfig;
-import org.apache.taverna.activities.docker.RemoteClient;
+import org.apache.taverna.activities.docker.*;
 import org.apache.taverna.activities.testutils.ActivityInvoker;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -46,7 +43,7 @@ public class DockerActivityTest {
 
 	private ObjectNode activityConfiguration;
 
-    private DockerContainerConfigurationImpl containerConfiguration;
+    private DockerContainerConfiguration containerConfiguration;
 
     public static final String CERT_PATH = "src/test/resources/cert";
 
@@ -62,9 +59,9 @@ public class DockerActivityTest {
 
         activityConfiguration = JsonNodeFactory.instance.objectNode();
         containerConfiguration = new DockerContainerConfigurationImpl(new TestConfigurationManager());
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.CMD,"python,app.py");
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.EXPOSED_PORTS, "5000");
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.BINDINGS, "32772");
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.CMD,"python,app.py");
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.EXPOSED_PORTS, "5000");
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.BINDINGS, "32772");
 
         DockerRemoteConfig remoteConfig = new DockerRemoteConfig();
         remoteConfig.setDockerHost(DOCKER_REMOTE);
@@ -85,7 +82,7 @@ public class DockerActivityTest {
 	 */
 	@Test
 	public void testInspectImage() throws Exception {
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.IMAGE,IMAGE_NAME);
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.IMAGE,IMAGE_NAME);
         DockerActivity activity = new DockerActivity(containerConfiguration);
         activity.configure(activityConfiguration);
 
@@ -115,8 +112,8 @@ public class DockerActivityTest {
             return;
         }
 
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.IMAGE,IMAGE_NAME);
-        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfigurationImpl.NAME, CONTAINER_NAME);
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.IMAGE,IMAGE_NAME);
+        containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.NAME, CONTAINER_NAME);
         DockerActivity activity = new DockerActivity(containerConfiguration);
         activity.configure(activityConfiguration);
 
@@ -129,7 +126,8 @@ public class DockerActivityTest {
         Map<String,Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputs);
         System.out.println(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
         Assert.assertNotNull(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
-        String id = new ObjectMapper().readTree((String)outputs.get(DockerActivity.RESPONSE_BODY_KEY)).get("container-id").textValue();
+        String id = new ObjectMapper().readTree((String)outputs.get(DockerActivity.RESPONSE_BODY_KEY)).
+                                       get("container-id").textValue();
         Container containerNew = getContainerFromId(remoteClient.listContainers(), id);
         Assert.assertNotNull(containerNew);
 
