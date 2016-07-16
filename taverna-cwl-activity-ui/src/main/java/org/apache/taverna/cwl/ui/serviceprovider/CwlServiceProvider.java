@@ -47,7 +47,8 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider
 		implements ConfigurableServiceProvider{
 	
 	public static final String  TOOL_NAME="toolName";
-	public static final String  MAP ="map";
+	public static final String  CWL_CONF ="cwl_conf";
+	public static final String  CWL_PATH ="cwl_path";
 	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
 	
 	CwlServiceProvider() {
@@ -55,24 +56,23 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider
 	}
 
 	private static final String providerName = "CWL Services";
-	private static final URI providerId = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");	// FIXME ask what to do
+	private static final URI providerId = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");	
 	
 	
 	
 	private static Configuration defaultConfig() {
 		Configuration c = new Configuration();
 		ObjectNode conf = c.getJsonAsObjectNode();
-		conf.put("osgiServiceUri", "http://localhost:8080/geoserver/ows");	// FIXME ask what to do
-		conf.put("processIdentifier", "gs:StringConcatWPS");
+		conf.put("path", "");
 		return c;
 	}
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 
-		// FIXME ask what to do
+	//TODO default and configurable provider
 		
 		// get the location of the cwl tool from the workbench
-		Path path = Paths.get(getConfiguration().getPath());
+		Path path = getPath();
 		//figure out the dots in the path ex: /maanadev/../cwltools
 		Path normalizedPath = path.normalize();
 
@@ -110,13 +110,17 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider
 		callBack.finished();
 
 	}
+	private Path getPath() {
+		return Paths.get(getConfiguration().getJsonAsObjectNode().get("path").asText());
+	}
 
 	private JsonNode createJsonNode(Path p, Map cwlFile) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.createObjectNode();
-		JsonNode map =mapper.valueToTree(cwlFile);
+		JsonNode cwl_map =mapper.valueToTree(cwlFile);
 		((ObjectNode )root).put(TOOL_NAME,p.getFileName().toString().split("\\.")[0]);
-		((ObjectNode )root).put(MAP,map);
+		((ObjectNode )root).put(CWL_CONF,cwl_map);
+		((ObjectNode )root).put(CWL_PATH,p.toString());
 		return root;
 	}
 
@@ -141,10 +145,10 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider
 	public String getName() {
 		return providerName;
 	}
-	// FIXME ask what to do
+
 	@Override
 	protected List<? extends Object> getIdentifyingData() {
-		return null;
+		return Arrays.<Object> asList(getPath());
 	}
 
 	public Yaml getYamlReader() {

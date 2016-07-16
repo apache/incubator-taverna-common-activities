@@ -18,24 +18,21 @@ package org.apache.taverna.cwl;
 
 import java.net.URI;
 import java.util.Map;
-
 import org.apache.taverna.reference.T2Reference;
-import org.apache.taverna.scufl2.api.configurations.Configuration;
 import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import com.fasterxml.jackson.databind.JsonNode;
 
-//FIXME configuration generics
-public class CwlDumyActivity extends AbstractAsynchronousActivity<Configuration>{
-	private Configuration conf;	
+public class CwlDumyActivity extends AbstractAsynchronousActivity<JsonNode>{
+	private JsonNode conf;	
 	public static final URI ACTIVITY_TYPE = URI.create("https://taverna.apache.org/ns/2016/activity/cwl");
 	@Override
-	public void configure(Configuration conf) throws ActivityConfigurationException {
+	public void configure(JsonNode conf) throws ActivityConfigurationException {
 		this.conf=conf;
-		
 	}
 	@Override
-	public Configuration getConfiguration() {
+	public JsonNode getConfiguration() {
 		return conf;
 	}
 	@Override

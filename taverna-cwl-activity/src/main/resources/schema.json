@@ -9,11 +9,21 @@
         "@context": {
             "description": "JSON-LD context for interpreting the configuration as RDF",
             "required": true,
-            "enum": ["http://ns.taverna.org.uk/2016/activity/gis.context.json"]
+            "enum": ["https://taverna.apache.org/ns/2016/activity/cwl/cwl.context.json"]
         },
         "toolName": {
             "title": "Tool name",
             "description": "CWL command Line Tool Name",
+            "type": "string",
+            "required": true
+        },
+        "cwl_conf":{
+        	"description": "CWL command Line Tool configuration",
+            "type": "object",
+            "required": true
+        },
+        "cwl_path":{
+        	"description": "Location of the CWl Tool",
             "type": "string",
             "required": true
         }

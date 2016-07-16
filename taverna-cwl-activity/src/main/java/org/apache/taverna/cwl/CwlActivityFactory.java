@@ -41,8 +41,7 @@ public class CwlActivityFactory implements ActivityFactory {
 	private static final int DEPTH_0 = 0;
 	private static final int DEPTH_1 = 1;
 	private Edits edits;
-
-	private static final String  CONFIG ="config";
+	public static final String  CWL_CONF ="cwl_conf";
 	@Override
 	public Activity<?> createActivity() {
 		CwlDumyActivity activity = new CwlDumyActivity();
@@ -55,10 +54,10 @@ public class CwlActivityFactory implements ActivityFactory {
 		return CwlDumyActivity.ACTIVITY_TYPE;
 	}
 
-	@Override // FIXME
+	@Override 
 	public JsonNode getActivityConfigurationSchema() {
 		ObjectMapper objectMapper = new ObjectMapper();
-		try {//FIXME What is schema
+		try {
 			return objectMapper.readTree(getClass().getResource("/schema.json"));
 		} catch (IOException e) {
 			return objectMapper.createObjectNode();
@@ -67,7 +66,7 @@ public class CwlActivityFactory implements ActivityFactory {
 
 	@Override
 	public Set<ActivityInputPort> getInputPorts(JsonNode configuration) throws ActivityConfigurationException {
-		CWLUtil cwlUtil = new CWLUtil(configuration.get(CONFIG).path("map"));
+		CWLUtil cwlUtil = new CWLUtil(configuration.get(CWL_CONF));
 
 		Set<ActivityInputPort> inputs = new HashSet<>();
 			
@@ -87,7 +86,7 @@ public class CwlActivityFactory implements ActivityFactory {
 
 	@Override
 	public Set<ActivityOutputPort> getOutputPorts(JsonNode configuration) throws ActivityConfigurationException {
-		CWLUtil cwlUtil = new CWLUtil(configuration.get(CONFIG).path("map"));
+		CWLUtil cwlUtil = new CWLUtil(configuration.get(CWL_CONF));
 
 		Set<ActivityOutputPort> outputs = new HashSet<>();
 		

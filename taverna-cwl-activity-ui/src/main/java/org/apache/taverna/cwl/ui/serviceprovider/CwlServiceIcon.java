@@ -17,7 +17,6 @@
 package org.apache.taverna.cwl.ui.serviceprovider;
 
 import java.net.URI;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -31,7 +30,7 @@ public class CwlServiceIcon implements ActivityIconSPI {
 
 	public static Icon getIcon() {
 		if (icon == null) {
-			icon = new ImageIcon("/Icon/cwl-logo-header.png");
+			icon = new ImageIcon(CwlServiceIcon.class.getResource("/Icons/cwl-logo-header.png"));
 		}
 		return icon;
 	}

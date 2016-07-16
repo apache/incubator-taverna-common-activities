@@ -26,20 +26,17 @@ import org.apache.taverna.scufl2.api.configurations.Configuration;
 import org.apache.taverna.servicedescriptions.ServiceDescription;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class CwlServiceDesc extends ServiceDescription {
 
 	private static final String DESCRIPTION = "description";
-	public static final String  CONFIG ="config";
 	public static final URI ACTIVITY_TYPE = URI.create("https://taverna.apache.org/ns/2016/activity/cwl");
 
 	@Override
 	public Configuration getActivityConfiguration() {
 		Configuration c = new Configuration();
-		c.setType(ACTIVITY_TYPE.resolve("#Config"));	// FIXME ask what to do
-		ObjectNode json = c.getJsonAsObjectNode();
-		json.put(CONFIG, cwlConfiguration);
+		c.setType(ACTIVITY_TYPE);
+		c.setJson(cwlConfiguration);
 		return c;
 	}
 
@@ -48,7 +45,7 @@ public class CwlServiceDesc extends ServiceDescription {
 
 		// see whether description is too long
 		if (cwlConfiguration.has(DESCRIPTION)) {
-			String description = cwlConfiguration.path(DESCRIPTION).asText();
+			String description = cwlConfiguration.get(CwlServiceProvider.CWL_CONF).path(DESCRIPTION).asText();
 			if ((description.length() < 40))
 				return description;
 			else
@@ -63,8 +60,6 @@ public class CwlServiceDesc extends ServiceDescription {
 		this.cwlConfiguration = cwlConfiguration;
 	}
 
-	
-
 	@Override
 	public Icon getIcon() {
 		return CwlServiceIcon.getIcon();
@@ -76,11 +71,9 @@ public class CwlServiceDesc extends ServiceDescription {
 	}
 
 	@Override
-	protected List<? extends Object> getIdentifyingData() {	// FIXME ask what to do
-		return Arrays.<Object>asList(toolName);
+	protected List<? extends Object> getIdentifyingData() { 
+		return Arrays.<Object> asList(getCwlPath(),toolName);
 	}
-
-	
 
 	@Override
 	public URI getActivityType() {
@@ -88,16 +81,20 @@ public class CwlServiceDesc extends ServiceDescription {
 	}
 
 	@Override
-	public List<? extends Comparable<?>> getPath() {	// FIXME ask what to do
-		return null;
+	public List<? extends Comparable<?>> getPath() { 
+		return Arrays.<Comparable <String>> asList(getCwlPath());
 	}
+
 	private String toolName;
-	
+
 	public String getToolName() {
 		return toolName;
 	}
 
 	public void setToolName(String toolName) {
 		this.toolName = toolName;
+	}
+	private String getCwlPath(){
+		return cwlConfiguration.get(CwlServiceProvider.CWL_PATH).asText();
 	}
 }

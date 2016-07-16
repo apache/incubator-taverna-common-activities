@@ -20,15 +20,12 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import org.apache.taverna.cwl.CwlDumyActivity;
-import org.apache.taverna.cwl.ui.serviceprovider.CwlServiceDesc;
 import org.apache.taverna.cwl.ui.serviceprovider.CwlServiceProvider;
+import org.apache.taverna.cwl.utilities.CWLUtil;
 import org.apache.taverna.cwl.utilities.PortDetail;
 import org.apache.taverna.scufl2.api.activity.Activity;
 import org.apache.taverna.scufl2.api.configurations.Configuration;
@@ -36,9 +33,6 @@ import org.apache.taverna.workbench.configuration.colour.ColourManager;
 import org.apache.taverna.workbench.ui.actions.activity.HTMLBasedActivityContextualView;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import org.apache.taverna.cwl.utilities.CWLUtil;
-
 
 /*
  * This class is responsible for producing service detail panel for each tool
@@ -48,17 +42,16 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 
 	private static final String DESCRIPTION = "description";
 	private static final String LABEL = "label";
-	private static final String TABLE_COLOR = "59A9CB";// this is color in RGB
+	//private static final String TABLE_COLOR = "59A9CB";// this is color in RGB
 														// hex value
 	private static final String TABLE_BORDER = "2";
 	private static final String TABLE_WIDTH = "100%";
 	private static final String TABLE_CELL_PADDING = "5%";
 	private static final String SPACE = " ";
-	private static final String LINE_BREAK="\n";
+	private static final String LINE_BREAK = "\n";
 	private static final int MAX_LINE_LENG = 80;
 	private static ColourManager colourManager;
-	
-	
+
 	public static ColourManager getColourManager() {
 		return colourManager;
 	}
@@ -72,11 +65,11 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 	private JsonNode CwlMap;
 	private CWLUtil cwlutil;
 
-	public CwlContextualView(Activity activity) {
-		super( activity, colourManager);// FIXME ask colourManager
+	public CwlContextualView(Activity activity,ColourManager colourManager) {
+		super(activity, colourManager);
 		this.activity = activity;
 		this.configurationNode = activity.getConfiguration();
-		CwlMap=configurationNode.getJsonAsObjectNode().get(CwlServiceDesc.CONFIG).get(CwlServiceProvider.MAP);
+		CwlMap = configurationNode.getJson().get(CwlServiceProvider.CWL_CONF);
 		cwlutil = new CWLUtil(CwlMap);
 		super.initView();
 	}
@@ -134,8 +127,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 
 	@Override
 	protected String getRawTableRowsHtml() {
-		String summery = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" bgcolor=\""
-				+ TABLE_COLOR + "\" cellpadding=\"" + TABLE_CELL_PADDING + "\" >";
+		String summery = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" cellpadding=\"" + TABLE_CELL_PADDING + "\" >";
 
 		String description = "";
 
@@ -146,7 +138,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 		}
 		if (CwlMap.has(LABEL)) {
 			summery += "<tr><th colspan='2' align='left'>Label</th></tr>";
-			summery += "<tr><td colspan='2' align='left'>" +  CwlMap.get(LABEL).asText() + "</td></tr>";
+			summery += "<tr><td colspan='2' align='left'>" + CwlMap.get(LABEL).asText() + "</td></tr>";
 		}
 		summery += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
 
