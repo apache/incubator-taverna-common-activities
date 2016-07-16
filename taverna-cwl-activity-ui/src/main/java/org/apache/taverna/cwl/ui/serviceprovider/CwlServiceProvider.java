@@ -111,7 +111,12 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	private Path getPath() {
 		return Paths.get(getConfiguration().getJsonAsObjectNode().get("path").asText());
 	}
-
+	/**
+	 * This method is creating a JsonNode object which contains Tool as a map and it's Path,Name
+	 * @param p Path of the CWL tool
+	 * @param cwlFile Output of the YAML reader
+	 * @return
+	 */
 	private JsonNode createJsonNode(Path p, Map cwlFile) {
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.createObjectNode();
@@ -121,6 +126,12 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 		((ObjectNode) root).put(CWL_PATH, p.toString());
 		return root;
 	}
+	/**
+	 * 
+	 * This method creates CwlServiceDesc which hold the configuration of the tool and the tool name
+	 * @param node JsonnNode which holds the final configuration of the tool
+	 * @return
+	 */
 
 	private CwlServiceDesc createCWLDesc(JsonNode node) {
 		CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
