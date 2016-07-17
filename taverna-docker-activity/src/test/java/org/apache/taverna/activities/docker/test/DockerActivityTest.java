@@ -51,7 +51,11 @@ public class DockerActivityTest {
 
     public static final String DOCKER_REGISTRY = "https://registry-1.docker.io/v2";
 
-
+    public static void main(String[] args) throws Exception {
+    DockerActivityTest activityTest = new DockerActivityTest();
+        activityTest.setup();
+        activityTest.testAll();
+    }
 
     @Before
 	public void setup() throws Exception {
@@ -75,12 +79,20 @@ public class DockerActivityTest {
 
     }
 
+    @Test
+    public void testAll() throws Exception {
+//        testCreateContainer();
+        testInspectImage();
+//        testListContainers();
+//        testStartContainer();
+//        testStopContainer();
+//        testDeleteContainer();
+    }
 
-	/**
-	 * Tests a simple script (String output = input + "_returned") to ensure the script is invoked correctly.
-	 * @throws Exception
-	 */
-	@Test
+    /**
+     * Tests a simple script (String output = input + "_returned") to ensure the script is invoked correctly.
+     * @throws Exception
+     */
 	public void testInspectImage() throws Exception {
         containerConfiguration.getInternalPropertyMap().put(DockerContainerConfiguration.IMAGE,IMAGE_NAME);
         DockerActivity activity = new DockerActivity(containerConfiguration);
@@ -102,7 +114,6 @@ public class DockerActivityTest {
      * Creates container with a given container configuration
      * @throws Exception
      */
-    @Test
     public void testCreateContainer() throws Exception {
         RemoteClient remoteClient = new RemoteClient(containerConfiguration);
         Container container = getContainerFromName(remoteClient.listContainers(), CONTAINER_NAME);
@@ -133,7 +144,6 @@ public class DockerActivityTest {
 
     }
 
-    @Test
     public void testListContainers() throws Exception {
         DockerActivity activity = new DockerActivity(containerConfiguration);
         activity.configure(activityConfiguration);
@@ -149,14 +159,45 @@ public class DockerActivityTest {
         Assert.assertNotNull(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
     }
 
-    @Test
     public void testStartContainer() throws Exception {
-        String id = "9e7a5252c1a948149c4e0ca6b4ef7945c9ef11b27cfa251b37abc7d43391680d";
         DockerActivity activity = new DockerActivity(containerConfiguration);
         activity.configure(activityConfiguration);
         Map<String,Object> inputs = new HashMap<String,Object>();
         inputs.put(DockerActivity.ACTION, DockerActivity.START_CONTAINER);
-        inputs.put(DockerActivity.CONTAINER_ID, id);
+        inputs.put(DockerActivity.CONTAINER_NAME, CONTAINER_NAME);
+        inputs.put(DockerActivity.IN_CONTAINER_START_CMD, "python app.py");
+
+        Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
+        expectedOutputs.put(DockerActivity.RESPONSE_BODY_KEY, String.class);
+
+        Map<String,Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputs);
+        System.out.println(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
+        Assert.assertNotNull(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
+    }
+
+    public void testStopContainer() throws Exception {
+        DockerActivity activity = new DockerActivity(containerConfiguration);
+        activity.configure(activityConfiguration);
+        Map<String,Object> inputs = new HashMap<String,Object>();
+        inputs.put(DockerActivity.ACTION, DockerActivity.STOP_CONTAINER);
+        inputs.put(DockerActivity.CONTAINER_NAME, CONTAINER_NAME);
+        inputs.put(DockerActivity.IN_CONTAINER_START_CMD, "python app.py");
+
+        Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
+        expectedOutputs.put(DockerActivity.RESPONSE_BODY_KEY, String.class);
+
+        Map<String,Object> outputs = ActivityInvoker.invokeAsyncActivity(activity, inputs, expectedOutputs);
+        System.out.println(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
+        Assert.assertNotNull(outputs.get(DockerActivity.RESPONSE_BODY_KEY));
+    }
+
+
+    public void testDeleteContainer() throws Exception {
+        DockerActivity activity = new DockerActivity(containerConfiguration);
+        activity.configure(activityConfiguration);
+        Map<String,Object> inputs = new HashMap<String,Object>();
+        inputs.put(DockerActivity.ACTION, DockerActivity.DELETE_CONTAINER);
+        inputs.put(DockerActivity.CONTAINER_NAME, CONTAINER_NAME);
         inputs.put(DockerActivity.IN_CONTAINER_START_CMD, "python app.py");
 
         Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();

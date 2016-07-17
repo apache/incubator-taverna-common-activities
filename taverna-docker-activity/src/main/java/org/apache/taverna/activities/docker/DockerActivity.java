@@ -57,11 +57,15 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
     public static final String START_CONTAINER = "start-container";
 
+    public static final String DELETE_CONTAINER = "delete-container";
+
     public static final String STOP_CONTAINER = "stop-container";
 
     public static final String LIST_CONTAINERS = "list-containers";
 
     public static final String CONTAINER_ID = "container-id";
+
+    public static final String CONTAINER_NAME = "container-name";
 
     public static final String OUT_IMAGE_ID = "image-id";
 
@@ -134,14 +138,42 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
 
                 } else if (START_CONTAINER.equalsIgnoreCase(action)) {
 
-                    String id = getRenderedParam(referenceService, context, map.get(CONTAINER_ID));
-                    remoteClient.startContainer(id);
-                    outJson = factory.objectNode();
-                    ((ObjectNode)outJson).put("started", id);
+                    String name = getRenderedParam(referenceService, context, map.get(CONTAINER_NAME));
+                    Container container = getContainerFromName(remoteClient, name);
+                    if(!isStarted(container)) {
+                        remoteClient.startContainer(container.getId());
+                        outJson = factory.objectNode();
+                        ((ObjectNode) outJson).put("started", container.getId());
+                    } else {
+                        outJson = factory.objectNode();
+                        ((ObjectNode) outJson).put("already-started", container.getId());
+                    }
 
                 } else if (STOP_CONTAINER.equalsIgnoreCase(action)) {
 
-                    // TODO
+                    String name = getRenderedParam(referenceService, context, map.get(CONTAINER_NAME));
+                    Container container = getContainerFromName(remoteClient, name);
+                    if(isStarted(container)) {
+                        remoteClient.stopContainer(container.getId());
+                        outJson = factory.objectNode();
+                        ((ObjectNode) outJson).put("stopped", container.getId());
+                    } else {
+                        outJson = factory.objectNode();
+                        ((ObjectNode) outJson).put("already-stopped", container.getId());
+                    }
+
+                } else if (DELETE_CONTAINER.equalsIgnoreCase(action)) {
+
+                    String name = getRenderedParam(referenceService, context, map.get(CONTAINER_NAME));
+                    Container container = getContainerFromName(remoteClient, name);
+                    if(container != null) {
+                        remoteClient.deleteContainer(container.getId());
+                        outJson = factory.objectNode();
+                        ((ObjectNode) outJson).put("deleted", container.getId());
+                    } else {
+                        outJson = factory.objectNode();
+                        ((ObjectNode) outJson).put("container-not-found", name);
+                    }
 
                 } else {
                     // Creates empty node
@@ -171,5 +203,24 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
         out.put("status",container.getStatus());
         out.put("network-mode",container.getHostConfig().getNetworkMode());
     return out;
+    }
+
+    private boolean isStarted(Container container){
+        return  container.getStatus() != null
+                && container.getStatus().startsWith("Up");
+    }
+
+    private Container getContainerFromName(RemoteClient remoteClient, String containerName){
+        List<Container> containerList = remoteClient.listContainers();
+        for(Container container : containerList){
+            if(container.getNames().length > 0){
+                for(String name : container.getNames()){
+                    if(name.endsWith(containerName)){
+                        return container;
+                    }
+                }
+            }
+        }
+    return null;
     }
 }
