@@ -23,7 +23,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -51,71 +53,102 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 
 	public static final String DEFAULT_PATH_1 = "/usr/share/commonwl/";
 	public static final String DEFAULT_PATH_2 = "/usr/local/share/commonwl/";
-	public static final String DEFAULT_PATH_3 = "$HOME/.local/share/commonwl";
-	
+	public static final String XDF_DATA_HOME = "XDF_DATA_HOME";
+	public static final String COMMONWL = "commonwl/";
 	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
 
 	CwlServiceProvider() {
-		//FIXME
+		// FIXME
 		super(getDefaultConfiguration());
 	}
 
 	private static final String providerName = "CWL Services";
 	private static final URI providerId = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");
 
-	
-
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 
-		// TODO default and configurable provider
-
 		// get the location of the cwl tool from the workbench
-		Path path = getPath();
-		// figure out the dots in the path ex: /maanadev/../cwltools
-		Path normalizedPath = path.normalize();
+		ArrayList<Path> paths = getPath();
 
-		DirectoryStream<Path> stream = null;
-		try {
-			stream = Files.newDirectoryStream(normalizedPath, "*.cwl");
-		} catch (IOException e) {
-			logger.warn("Path is not correct !");
-			return;
-		}
-		// create stream with parallel capabilities
-		Stream<Path> paralleStream = StreamSupport.stream(stream.spliterator(), true);
+		for (Path path : paths) {
+			// figure out the dots in the path ex: /maanadev/../cwltools
+			Path normalizedPath = path.normalize();
 
-		paralleStream.forEach(p -> {
-			Yaml reader = getYamlReader();
-
-			Map cwlFile;
-			try (FileInputStream file = new FileInputStream(path.toFile())) {
-				cwlFile = (Map) reader.load(file);
-				JsonNode config = createJsonNode(p, cwlFile);
-				// Creating CWl service Description
-				CwlServiceDesc cwlServiceDesc = createCWLDesc(config);
-				// return the service description
-				callBack.partialResults(Arrays.asList(cwlServiceDesc));
-
+			DirectoryStream<Path> stream = null;
+			try {
+				stream = Files.newDirectoryStream(normalizedPath, "*.cwl");
 			} catch (IOException e) {
-
-				logger.warn("File not Found !");
-
+				logger.warn("Path is not correct !");
+				return;
 			}
+			// create stream with parallel capabilities
+			Stream<Path> paralleStream = StreamSupport.stream(stream.spliterator(), true);
 
-		});
+			paralleStream.forEach(p -> {
+				Yaml reader = getYamlReader();
 
-		callBack.finished();
+				Map cwlFile;
+				try (FileInputStream file = new FileInputStream(path.toFile())) {
+					cwlFile = (Map) reader.load(file);
+					JsonNode config = createJsonNode(p, cwlFile);
+					// Creating CWl service Description
+					CwlServiceDesc cwlServiceDesc = createCWLDesc(config);
+					// return the service description
+					callBack.partialResults(Arrays.asList(cwlServiceDesc));
+
+				} catch (IOException e) {
+
+					logger.warn("File not Found !");
+
+				}
+
+			});
+
+			callBack.finished();
+		}
 
 	}
+/**
+ * This method checks whether provided path is valid or not and if it's valid the it's added to the list
+ * @param defaultPaths arrylist to hold valid paths
+ * @param path 
+ * @param path1 if there is no second path argument this should be set to null
+ */
+	public void addPath(ArrayList<Path> defaultPaths, String path, String path1) {
 
-	private Path getPath() {
-		return Paths.get(getConfiguration().getJsonAsObjectNode().get("path").asText());
+		Path defaultPath;
+		if (path1 == null)
+			defaultPath = Paths.get(path);
+		else
+			defaultPath = Paths.get(path, path1);
+
+		if (defaultPath.isAbsolute())
+			defaultPaths.add(defaultPath);
 	}
+
+	private ArrayList<Path> getPath() {
+		String userInput = getConfiguration().getJsonAsObjectNode().get("path").asText();
+		// If user haven't provided a PATH 
+		if (userInput.isEmpty()||userInput==null) {
+			ArrayList<Path> defaultPaths = new ArrayList<>();
+			addPath(defaultPaths, DEFAULT_PATH_1, null);
+			addPath(defaultPaths, DEFAULT_PATH_2, null);
+			addPath(defaultPaths, XDF_DATA_HOME, COMMONWL);
+			return defaultPaths;
+		}
+
+		return (ArrayList<Path>) Arrays.asList(Paths.get(userInput));
+	}
+
 	/**
-	 * This method is creating a JsonNode object which contains Tool as a map and it's Path,Name
-	 * @param p Path of the CWL tool
-	 * @param cwlFile Output of the YAML reader
+	 * This method is creating a JsonNode object which contains Tool as a map
+	 * and it's Path,Name
+	 * 
+	 * @param p
+	 *            Path of the CWL tool
+	 * @param cwlFile
+	 *            Output of the YAML reader
 	 * @return
 	 */
 	private JsonNode createJsonNode(Path p, Map cwlFile) {
@@ -127,10 +160,14 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 		((ObjectNode) root).put(CWL_PATH, p.toString());
 		return root;
 	}
+
 	/**
 	 * 
-	 * This method creates CwlServiceDesc which hold the configuration of the tool and the tool name
-	 * @param node JsonnNode which holds the final configuration of the tool
+	 * This method creates CwlServiceDesc which hold the configuration of the
+	 * tool and the tool name
+	 * 
+	 * @param node
+	 *            JsonnNode which holds the final configuration of the tool
 	 * @return
 	 */
 
@@ -186,7 +223,6 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 		return false;
 	}
 
-	
 	private static Configuration getDefaultConfiguration() {
 		Configuration c = new Configuration();
 		ObjectNode conf = c.getJsonAsObjectNode();

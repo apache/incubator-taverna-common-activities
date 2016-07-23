@@ -52,7 +52,7 @@ outputs:
     description: this is a short description of output 1
     format: just a string
 
-  - id: ouput_2
+  - id: output_2
     type: String
     label: output 2 testing label
     description: this is a short description of output 2

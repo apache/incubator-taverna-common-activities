@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.taverna.cwl.CwlDumyActivity;
 import org.apache.taverna.scufl2.api.activity.Activity;
 import org.apache.taverna.workbench.configuration.colour.ColourManager;
 import org.apache.taverna.workbench.ui.views.contextualviews.ContextualView;
