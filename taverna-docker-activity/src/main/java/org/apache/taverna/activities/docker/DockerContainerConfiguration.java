@@ -20,6 +20,7 @@ package org.apache.taverna.activities.docker;
 
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.Volume;
 
 import java.util.Map;
 
@@ -75,8 +76,6 @@ public interface DockerContainerConfiguration {
 
     public static final String CMD = "cmd";
 
-    public static final String CMD_DELIMITER = ",";
-
     public static final String ENTRY_POINT = "entrypoint";
 
     /**
@@ -117,20 +116,60 @@ public interface DockerContainerConfiguration {
 
     public void setDockerRemoteConfig(DockerRemoteConfig dockerRemoteConfig);
 
+    public DockerRemoteConfig getDockerRemoteConfig();
+
     public Map<String, String> getInternalPropertyMap();
 
     public String getName();
 
     public String getImage();
 
-    public String[] getCmd();
-
-    public DockerRemoteConfig getDockerRemoteConfig();
-
     public ExposedPort[] getExposedPorts();
 
     public Ports.Binding[] getBindings();
 
-    //TODO add all remaining getters
+    public String getHostName();
+
+    public String getDomainName();
+
+    public String getUser();
+
+    public String getWorkingDir();
+
+    public String getMacAddress();
+
+    public String getStopSignal();
+
+    public String getIpv4Address();
+
+    public String getIpv6Address();
+
+    public boolean getAttachStdin();
+
+    public boolean getAttachStdout();
+
+    public boolean getAttachStderr();
+
+    public boolean getTty();
+
+    public boolean getStdinOpen();
+
+    public boolean getStdinOnce();
+
+    public boolean getNetworkDisabled();
+
+    public String[] getPortSpecs();
+
+    public String[] getEnv();
+
+    public String[] getEntryPoint();
+
+    public String[] getCmd();
+
+    public Volume[] getVolumes();
+
+    public String[] getAliases();
+
+    public Map<String, String> getLabels();
 
 }

@@ -125,14 +125,89 @@ public class RemoteClient {
 
     private CreateContainerCmd buildCreateContainerCmd(){
         CreateContainerCmd createCmd = dockerClient.createContainerCmd(containerConfig.getImage());
-        createCmd.withCmd(containerConfig.getCmd());
-        createCmd.withName(containerConfig.getName());
-        Ports portBindings = new Ports();
-        for(int i=0; i< containerConfig.getBindings().length; i++){
-            portBindings.bind(containerConfig.getExposedPorts()[i], containerConfig.getBindings()[i]);
+
+        if(containerConfig.getCmd() != null) {
+            createCmd.withCmd(containerConfig.getCmd());
         }
-        createCmd.withExposedPorts(containerConfig.getExposedPorts());
-        createCmd.withPortBindings(portBindings);
+
+        if(containerConfig.getName() != null) {
+            createCmd.withName(containerConfig.getName());
+        }
+
+        if(containerConfig.getBindings() != null && containerConfig.getExposedPorts() != null) {
+            Ports portBindings = new Ports();
+            for (int i = 0; i < containerConfig.getBindings().length; i++) {
+                portBindings.bind(containerConfig.getExposedPorts()[i], containerConfig.getBindings()[i]);
+            }
+            createCmd.withExposedPorts(containerConfig.getExposedPorts());
+            createCmd.withPortBindings(portBindings);
+        }
+
+        if(containerConfig.getHostName() != null) {
+            createCmd.withHostName(containerConfig.getHostName());
+        }
+
+        if(containerConfig.getDomainName() != null) {
+            createCmd.withDomainName(containerConfig.getDomainName());
+        }
+
+        if(containerConfig.getUser() != null) {
+            createCmd.withUser(containerConfig.getUser());
+        }
+
+        if(containerConfig.getWorkingDir() != null) {
+            createCmd.withWorkingDir(containerConfig.getWorkingDir());
+        }
+
+        if(containerConfig.getMacAddress() != null) {
+            createCmd.withMacAddress(containerConfig.getMacAddress());
+        }
+
+        if(containerConfig.getStopSignal() != null) {
+            createCmd.withStopSignal(containerConfig.getStopSignal());
+        }
+
+        if(containerConfig.getIpv4Address() != null) {
+            createCmd.withIpv4Address(containerConfig.getIpv4Address());
+        }
+
+        if(containerConfig.getIpv6Address() != null) {
+            createCmd.withIpv6Address(containerConfig.getIpv6Address());
+        }
+
+        createCmd.withAttachStdin(containerConfig.getAttachStdin());
+        createCmd.withAttachStdout(containerConfig.getAttachStdout());
+        createCmd.withAttachStderr(containerConfig.getAttachStderr());
+        createCmd.withTty(containerConfig.getTty());
+        createCmd.withStdInOnce(containerConfig.getStdinOnce());
+        createCmd.withStdinOpen(containerConfig.getStdinOpen());
+        createCmd.withNetworkDisabled(containerConfig.getNetworkDisabled());
+
+
+        if(containerConfig.getPortSpecs() != null) {
+            createCmd.withPortSpecs(containerConfig.getPortSpecs());
+        }
+
+        if(containerConfig.getEnv() != null) {
+            createCmd.withEnv(containerConfig.getEnv());
+        }
+
+        if(containerConfig.getEntryPoint() != null) {
+            createCmd.withEntrypoint(containerConfig.getEntryPoint());
+        }
+
+        if(containerConfig.getVolumes() != null) {
+            createCmd.withVolumes(containerConfig.getVolumes());
+        }
+
+        if(containerConfig.getAliases() != null) {
+            createCmd.withAliases(containerConfig.getAliases());
+        }
+
+        if(containerConfig.getLabels() != null) {
+            createCmd.withLabels(containerConfig.getLabels());
+        }
+        
         return createCmd;
     }
 

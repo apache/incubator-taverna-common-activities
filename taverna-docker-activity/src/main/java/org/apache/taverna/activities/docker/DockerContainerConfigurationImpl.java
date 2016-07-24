@@ -27,6 +27,18 @@ public class DockerContainerConfigurationImpl extends AbstractConfigurable imple
 
     private DockerRemoteConfig dockerRemoteConfig;
 
+    private static final String ARR_DELIMITER = ",";
+
+    private static final String MAP_DELIMITER = ":";
+
+    private ExposedPort[] exposedPorts = null;
+
+    private Ports.Binding[] bindings = null;
+
+    private Volume[] volumes = null;
+
+    private Map<String, String> labels = null;
+
 
     public DockerContainerConfigurationImpl(ConfigurationManager configurationManager){
         super(configurationManager);
@@ -45,130 +57,162 @@ public class DockerContainerConfigurationImpl extends AbstractConfigurable imple
     }
 
     public String getName() {
-       return this.getInternalPropertyMap().get(NAME);
-    }
-
-    public String getHostName() {
-        return HOST_NAME;
-    }
-
-    public String getDomainName() {
-        return DOMAIN_NAME;
-    }
-
-    public String getUser() {
-        return USER;
+       return this.getInternalPropertyMap().get(NAME) != null? this.getInternalPropertyMap().get(NAME) : null;
     }
 
     public String getImage() {
-        return this.getInternalPropertyMap().get(IMAGE);
-    }
-
-    public String getWorkingDir() {
-        return WORKING_DIR;
-    }
-
-    public String getMacAddress() {
-        return MAC_ADDRESS;
-    }
-
-    public String getStopSignal() {
-        return STOP_SIGNAL;
-    }
-
-    public String getIpv4Address() {
-        return IPV4_ADDRESS;
-    }
-
-    public String getIpv6Address() {
-        return IPV6_ADDRESS;
-    }
-
-    public String getAttachStdin() {
-        return ATTACH_STDIN;
-    }
-
-    public String getAttachStdout() {
-        return ATTACH_STDOUT;
-    }
-
-    public String getAttachStderr() {
-        return ATTACH_STDERR;
-    }
-
-    public String getTty() {
-        return TTY;
-    }
-
-    public String getStdinOpen() {
-        return STDIN_OPEN;
-    }
-
-    public String getStdinOnce() {
-        return STDIN_ONCE;
-    }
-
-    public String getNetworkDisabled() {
-        return NETWORK_DISABLED;
-    }
-
-    public String getPortSpecs() {
-        return PORT_SPECS;
-    }
-
-    public String getEnv() {
-        return ENV;
-    }
-
-    public String[] getCmd() {
-        return this.getInternalPropertyMap().get(CMD).split(CMD_DELIMITER);
-    }
-
-    public String getEntryPoint() {
-        return ENTRY_POINT;
-    }
-
-    public String getVolumes() {
-        return VOLUMES;
-    }
-
-    public Ports.Binding[] getBindings() {
-       String bindingsStr = this.getInternalPropertyMap().get(BINDINGS);
-        List<Ports.Binding> bindingList = new ArrayList<Ports.Binding>();
-        if(bindingsStr != null) {
-            for(String bind : bindingsStr.split(",")){
-             bindingList.add(Ports.Binding.bindPort(Integer.valueOf(bind)));
-          }
-        }
-        return bindingList.toArray(new Ports.Binding[0]);
-    }
-
-    public String getAliases() {
-        return ALIASES;
+        return this.getInternalPropertyMap().get(IMAGE) != null?this.getInternalPropertyMap().get(IMAGE):null;
     }
 
     public ExposedPort[] getExposedPorts() {
-       String exposedPortStr =  this.getInternalPropertyMap().get(EXPOSED_PORTS);
-        List<ExposedPort> exposedPortList = new ArrayList<ExposedPort>();
-        if(exposedPortStr != null){
-            for(String portStr: exposedPortStr.split(",")){
-                exposedPortList.add(ExposedPort.tcp(Integer.valueOf(portStr)));
+        if(exposedPorts == null) {
+            String exposedPortStr = this.getInternalPropertyMap().get(EXPOSED_PORTS);
+            if(exposedPortStr == null){
+                return null;
+            }
+            List<ExposedPort> exposedPortList = new ArrayList<ExposedPort>();
+            if (exposedPortStr != null) {
+                for (String portStr : exposedPortStr.split(ARR_DELIMITER)) {
+                    exposedPortList.add(ExposedPort.tcp(Integer.valueOf(portStr)));
+                }
+            }
+           exposedPorts =  exposedPortList.toArray(new ExposedPort[0]);
+        }
+
+        return exposedPorts;
+    }
+
+    public Ports.Binding[] getBindings() {
+        if(bindings == null) {
+            String bindingsStr = this.getInternalPropertyMap().get(BINDINGS);
+            if(bindingsStr == null){
+                return null;
+            }
+            List<Ports.Binding> bindingList = new ArrayList<Ports.Binding>();
+            if (bindingsStr != null) {
+                for (String bind : bindingsStr.split(ARR_DELIMITER)) {
+                    bindingList.add(Ports.Binding.bindPort(Integer.valueOf(bind)));
+                }
+            }
+            bindings = bindingList.toArray(new Ports.Binding[0]);
+        }
+        return bindings;
+    }
+
+    public String getHostName() {
+        return this.getInternalPropertyMap().get(HOST_NAME);
+    }
+
+    public String getDomainName() {
+        return this.getInternalPropertyMap().get(DOMAIN_NAME);
+    }
+
+    public String getUser() {
+        return this.getInternalPropertyMap().get(USER);
+    }
+
+    public String getWorkingDir() {
+        return this.getInternalPropertyMap().get(WORKING_DIR);
+    }
+
+    public String getMacAddress() {
+        return this.getInternalPropertyMap().get(MAC_ADDRESS);
+    }
+
+    public String getStopSignal() {
+        return this.getInternalPropertyMap().get(STOP_SIGNAL);
+    }
+
+    public String getIpv4Address() {
+        return this.getInternalPropertyMap().get(IPV4_ADDRESS);
+    }
+
+    public String getIpv6Address() {
+        return this.getInternalPropertyMap().get(IPV6_ADDRESS);
+    }
+
+    public boolean getAttachStdin() {
+        return Boolean.parseBoolean(this.getInternalPropertyMap().get(ATTACH_STDIN));
+    }
+
+    public boolean getAttachStdout() {
+        return Boolean.parseBoolean(this.getInternalPropertyMap().get(ATTACH_STDOUT));
+    }
+
+    public boolean getAttachStderr() {
+        return Boolean.parseBoolean(this.getInternalPropertyMap().get(ATTACH_STDERR));
+    }
+
+    public boolean getTty() {
+        return Boolean.parseBoolean(this.getInternalPropertyMap().get(TTY));
+    }
+
+    public boolean getStdinOpen() {
+        return Boolean.parseBoolean(this.getInternalPropertyMap().get(STDIN_OPEN));
+    }
+
+    public boolean getStdinOnce() {
+        return Boolean.parseBoolean(this.getInternalPropertyMap().get(STDIN_ONCE));
+    }
+
+    public boolean getNetworkDisabled() {
+        return Boolean.parseBoolean(this.getInternalPropertyMap().get(NETWORK_DISABLED));
+    }
+
+    public String[] getPortSpecs() {
+        return this.getInternalPropertyMap().get(PORT_SPECS) != null ?
+                this.getInternalPropertyMap().get(PORT_SPECS).split(ARR_DELIMITER): null;
+    }
+
+    public String[] getEnv() {
+        return this.getInternalPropertyMap().get(ENV) != null ?
+                this.getInternalPropertyMap().get(ENV).split(ARR_DELIMITER):null;
+    }
+
+    public String[] getEntryPoint() {
+        return this.getInternalPropertyMap().get(ENTRY_POINT) != null ?
+                this.getInternalPropertyMap().get(ENTRY_POINT).split(ARR_DELIMITER):null;
+    }
+
+    public String[] getCmd() {
+        return this.getInternalPropertyMap().get(CMD) != null ?
+                this.getInternalPropertyMap().get(CMD).split(ARR_DELIMITER): null;
+    }
+
+    public Volume[] getVolumes() {
+        if(volumes == null) {
+            if(this.getInternalPropertyMap().get(VOLUMES) == null){
+                return null;
+            }
+            String[] arr = this.getInternalPropertyMap().get(VOLUMES).split(ARR_DELIMITER);
+            volumes = new Volume[arr.length];
+            for (int i = 0; i < arr.length; i++) {
+                volumes[i] = new Volume(arr[i]);
             }
         }
-        return exposedPortList.toArray(new ExposedPort[0]);
+        return volumes;
     }
 
-    public String getLabels() {
-        return LABELS;
+    public String[] getAliases() {
+        return this.getInternalPropertyMap().get(ALIASES) != null ?
+                this.getInternalPropertyMap().get(ALIASES).split(ARR_DELIMITER): null;
     }
 
-    public String getHostConfig() {
-        return HOST_CONFIG;
+    public Map<String, String> getLabels() {
+        if (labels == null) {
+            labels = new HashMap<>();
+            if(this.getInternalPropertyMap().get(LABELS) == null){
+                return null;
+            }
+            String[] entries = this.getInternalPropertyMap().get(LABELS).split(MAP_DELIMITER);
+            for (String entry : entries) {
+             String[] kv = entry.split(ARR_DELIMITER);
+                labels.put(kv[0], kv[1]);
+            }
+        }
+        return labels;
     }
 
-    public String getNetworkingConfig() {
-        return NETWORKING_CONFIG;
-    }
 
     @Override
     public Map<String, String> getDefaultPropertyMap() {
