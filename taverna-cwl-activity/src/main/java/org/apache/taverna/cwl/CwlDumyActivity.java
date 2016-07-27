@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.taverna.reference.T2Reference;
 import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
+import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivity;
 import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
 import com.fasterxml.jackson.databind.JsonNode;
 

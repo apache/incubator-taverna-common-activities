@@ -24,6 +24,8 @@ import java.util.Map;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import org.apache.taverna.cwl.CwlDumyActivity;
 import org.apache.taverna.cwl.ui.serviceprovider.CwlServiceProvider;
 import org.apache.taverna.cwl.utilities.CWLUtil;
 import org.apache.taverna.cwl.utilities.PortDetail;
@@ -66,6 +68,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 	private CWLUtil cwlutil;
 
 	public CwlContextualView(Activity activity,ColourManager colourManager) {
+		//FIXME activty=>CWLActivity
 		super(activity, colourManager);
 		this.activity = activity;
 		this.configurationNode = activity.getConfiguration();
