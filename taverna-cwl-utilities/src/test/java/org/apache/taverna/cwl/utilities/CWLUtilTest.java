@@ -19,7 +19,6 @@ package org.apache.taverna.cwl.utilities;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +40,7 @@ public class CWLUtilTest {
 	public void setUp() throws Exception {
 		Yaml reader = new Yaml();
 		ObjectMapper mapper = new  ObjectMapper();
-		cwlFile = mapper.valueToTree(reader.load(new FileInputStream(CWLUtilTest.class.getResource("/CWLFiles/customtool1.cwl").getPath()))); 
+		cwlFile = mapper.valueToTree(reader.load(getClass().getResourceAsStream("/customtool1.cwl"))); 
 	
 		cwlUtil = new CWLUtil(cwlFile);
 		input =  cwlFile.get("inputs").get(0);

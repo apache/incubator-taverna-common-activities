@@ -68,7 +68,6 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 	private CWLUtil cwlutil;
 
 	public CwlContextualView(Activity activity,ColourManager colourManager) {
-		//FIXME activty=>CWLActivity
 		super(activity, colourManager);
 		this.activity = activity;
 		this.configurationNode = activity.getConfiguration();

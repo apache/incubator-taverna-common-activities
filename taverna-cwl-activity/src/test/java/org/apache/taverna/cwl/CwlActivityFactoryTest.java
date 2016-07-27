@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.apache.taverna.cwl.utilities.CWLUtilTest;
 import org.apache.taverna.workflowmodel.Edits;
 import org.apache.taverna.workflowmodel.impl.EditsImpl;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
@@ -37,15 +38,17 @@ public class CwlActivityFactoryTest {
 		cwlActivityFactory.setEdits(edits);
 
 		Yaml reader = new Yaml();
+		
 		ObjectMapper mapper = new ObjectMapper();
-		ObjectNode cwlFile = null;
+		JsonNode cwlFile = null;
 		try {
 			cwlFile = mapper.valueToTree(
-					reader.load(new FileInputStream(getClass().getResource("/CWLFiles/customtool1.cwl").getPath())));
-		} catch (IllegalArgumentException | FileNotFoundException e) {
-			System.out.println(e);
+					reader.load(getClass().getResourceAsStream("/customtool1.cwl")));
+		} catch (IllegalArgumentException e) {
+			
+			logger.error(e.getMessage());
 		}
-
+		
 		root = mapper.createObjectNode();
 		((ObjectNode) root).put(CWL_CONF, cwlFile);
 	}
@@ -62,7 +65,7 @@ public class CwlActivityFactoryTest {
 
 	}
 
-	@Test // FIXME
+	@Test 
 	public void testgetInputPorts() {
 		Set<ActivityInputPort> set = null;
 		try {
@@ -84,7 +87,7 @@ public class CwlActivityFactoryTest {
 		}
 	}
 
-	@Test // FIXME
+	@Test 
 	public void testgetOutputPorts() {
 		Set<ActivityOutputPort> set = null;
 		try {

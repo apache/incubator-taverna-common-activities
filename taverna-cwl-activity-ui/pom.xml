@@ -95,17 +95,22 @@
 			later !!! =============================================================== -->
 
 		<dependency>
-			<groupId>org.apache.taverna.commonactivities</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>taverna-cwl-utilities</artifactId>
 			<version>${project.version}</version>
-			<type>bundle</type>
 		</dependency>
 		<dependency>
 			<artifactId>taverna-cwl-activity</artifactId>
 			<groupId>${project.groupId}</groupId>
 			<version>${project.version}</version>
 		</dependency>
-			
+				<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>taverna-cwl-utilities</artifactId>
+			<version>${project.version}</version>
+			<classifier>tests-sources</classifier> 
+			<scope>test</scope>
+		</dependency>
 	<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

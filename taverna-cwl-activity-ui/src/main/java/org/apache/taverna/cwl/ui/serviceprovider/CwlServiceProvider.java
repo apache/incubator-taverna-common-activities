@@ -69,7 +69,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 
 		// get the location of the cwl tool from the workbench
-		ArrayList<Path> paths = getPath();
+		List<Path> paths = getPath();
 
 		for (Path path : paths) {
 			// figure out the dots in the path ex: /maanadev/../cwltools
@@ -115,7 +115,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
  * @param path 
  * @param path1 if there is no second path argument this should be set to null
  */
-	public void addPath(ArrayList<Path> defaultPaths, String path, String path1) {
+	public void addPath(List<Path> defaultPaths, String path, String path1) {
 
 		Path defaultPath;
 		if (path1 == null)
@@ -127,18 +127,18 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 			defaultPaths.add(defaultPath);
 	}
 
-	private ArrayList<Path> getPath() {
+	private List<Path> getPath() {
 		String userInput = getConfiguration().getJsonAsObjectNode().get("path").asText();
 		// If user haven't provided a PATH 
 		if (userInput.isEmpty()||userInput==null) {
-			ArrayList<Path> defaultPaths = new ArrayList<>();
+			List<Path> defaultPaths = new ArrayList<>();
 			addPath(defaultPaths, DEFAULT_PATH_1, null);
 			addPath(defaultPaths, DEFAULT_PATH_2, null);
 			addPath(defaultPaths, XDF_DATA_HOME, COMMONWL);
 			return defaultPaths;
 		}
 
-		return (ArrayList<Path>) Arrays.asList(Paths.get(userInput));
+		return  Arrays.asList(Paths.get(userInput));
 	}
 
 	/**
@@ -222,7 +222,10 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	public boolean accept(Visitor arg0) {
 		return false;
 	}
-
+	/**
+	 * Set the Configuration such that when service provider is created user is asked for the PATH
+	 * @return
+	 */
 	private static Configuration getDefaultConfiguration() {
 		Configuration c = new Configuration();
 		ObjectNode conf = c.getJsonAsObjectNode();
