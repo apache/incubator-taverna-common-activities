@@ -22,9 +22,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class CwlContextualUtil extends CWLUtil {
-	private static final int MAX_LINE_LENG = 80;
-	private static final String LINE_BREAK = "\n";
-	private static final String SPACE = " ";
+	
 
 	public CwlContextualUtil(JsonNode cwlFile) {
 		super(cwlFile);

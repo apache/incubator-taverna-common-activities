@@ -121,10 +121,10 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 		String summary = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" cellpadding=\""
 				+ TABLE_CELL_PADDING + "\" >";
 
-		String description = "";
+		
 		// Get the CWL tool Description
 		if (cwlToolConfiguration.has(DESCRIPTION)) {
-			description = cwlToolConfiguration.get(DESCRIPTION).asText();
+			String description = cwlToolConfiguration.get(DESCRIPTION).asText();
 			summary = cwlutil.paragraphToHtml(summary, description);
 
 		}

@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -111,7 +110,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	}
 /**
  * This method checks whether provided path is valid or not and if it's valid the it's added to the list
- * @param defaultPaths arrylist to hold valid paths
+ * @param defaultPaths List to hold valid paths
  * @param path 
  * @param path1 if there is no second path argument this should be set to null
  */
