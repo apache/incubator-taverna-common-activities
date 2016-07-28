@@ -20,14 +20,12 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.taverna.cwl.CwlDumyActivity;
 import org.apache.taverna.scufl2.api.activity.Activity;
 import org.apache.taverna.workbench.configuration.colour.ColourManager;
 import org.apache.taverna.workbench.ui.views.contextualviews.ContextualView;
 import org.apache.taverna.workbench.ui.views.contextualviews.activity.ContextualViewFactory;
 
 
-//FIXME generics
 public class CwlActivityContextViewFactory implements ContextualViewFactory<Activity> {
 	public static final URI ACTIVITY_TYPE = URI.create("https://taverna.apache.org/ns/2016/activity/cwl");
 	private  ColourManager colourManager;

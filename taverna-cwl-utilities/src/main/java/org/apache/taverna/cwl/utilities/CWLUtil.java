@@ -58,13 +58,14 @@ public class CWLUtil {
 	public JsonNode getNameSpace() {
 		return nameSpace;
 	}
-/**
- * This method is processing the CWL NameSpace for later use
- *  such as figuring out the Format of a input or output
- */
+
+	/**
+	 * This method is processing the CWL NameSpace for later use such as
+	 * figuring out the Format of a input or output
+	 */
 	public void processNameSpace() {
 
-		if (cwlFile.has("$namespaces")) {
+		if (cwlFile != null && cwlFile.has("$namespaces")) {
 			nameSpace = cwlFile.path("$namespaces");
 		}
 
@@ -85,11 +86,16 @@ public class CWLUtil {
 	public Map<String, PortDetail> processOutputDetails() {
 		return processdetails(cwlFile.get(OUTPUTS));
 	}
-/**
- * This method will go through CWL tool input or out puts and figure outs their IDs and the respective depths  
- * @param inputs This is JsonNode object which contains the Inputs or outputs of the respective CWL tool 
- * @return This the respective, ID and the depth of the input or output
- */
+
+	/**
+	 * This method will go through CWL tool input or out puts and figure outs
+	 * their IDs and the respective depths
+	 * 
+	 * @param inputs
+	 *            This is JsonNode object which contains the Inputs or outputs
+	 *            of the respective CWL tool
+	 * @return This the respective, ID and the depth of the input or output
+	 */
 	public Map<String, Integer> process(JsonNode inputs) {
 
 		Map<String, Integer> result = new HashMap<>();
@@ -99,7 +105,7 @@ public class CWLUtil {
 
 			while (iterator.hasNext()) {
 				JsonNode input = iterator.next();
-				String currentInputId =  input.get(ID).asText();
+				String currentInputId = input.get(ID).asText();
 
 				JsonNode typeConfigurations;
 				try {
@@ -130,29 +136,31 @@ public class CWLUtil {
 
 			}
 		} else if (inputs.getClass() == ObjectNode.class) {
-			for (JsonNode parameter :inputs) {
+			for (JsonNode parameter : inputs) {
 				if (parameter.asText().startsWith("$"))
 					System.out.println("Exception");
 			}
-			
-			
-			
+
 		}
 		return result;
 	}
-/**
- * This method is used for extracting details of the CWL tool inputs or outputs.
- * ex:Lable, Format, Description 
- * @param inputs This is JsonNode object which contains the Inputs or outputs of the respective CWL tool 
- * @return 
- */
+
+	/**
+	 * This method is used for extracting details of the CWL tool inputs or
+	 * outputs. ex:Lable, Format, Description
+	 * 
+	 * @param inputs
+	 *            This is JsonNode object which contains the Inputs or outputs
+	 *            of the respective CWL tool
+	 * @return
+	 */
 	private Map<String, PortDetail> processdetails(JsonNode inputs) {
 
 		Map<String, PortDetail> result = new HashMap<>();
 
 		if (inputs.getClass() == ArrayNode.class) {
 
-			for (JsonNode input :inputs) {
+			for (JsonNode input : inputs) {
 				PortDetail detail = new PortDetail();
 				String currentInputId = input.get(ID).asText();
 
@@ -165,18 +173,22 @@ public class CWLUtil {
 
 			}
 		} else if (inputs.getClass() == ObjectNode.class) {
-			for (JsonNode parameter :inputs) {
+			for (JsonNode parameter : inputs) {
 				if (parameter.asText().startsWith("$"))
 					System.out.println("Exception");
 			}
 		}
 		return result;
 	}
-/**
- * This method is used for extracting the Label of a CWL input or Output
- * @param input Single CWL input or output as a JsonNode 
- * @param detail respective PortDetail Object to hold the extracted Label
- */
+
+	/**
+	 * This method is used for extracting the Label of a CWL input or Output
+	 * 
+	 * @param input
+	 *            Single CWL input or output as a JsonNode
+	 * @param detail
+	 *            respective PortDetail Object to hold the extracted Label
+	 */
 	public void extractLabel(JsonNode input, PortDetail detail) {
 		if (input != null)
 			if (input.has(LABEL)) {
@@ -185,11 +197,14 @@ public class CWLUtil {
 				detail.setLabel(null);
 			}
 	}
-/**
- * 
- * @param input  Single CWL input or output as a JsonNode 
- * @param detail respective PortDetail Object to hold the extracted Label
- */
+
+	/**
+	 * 
+	 * @param input
+	 *            Single CWL input or output as a JsonNode
+	 * @param detail
+	 *            respective PortDetail Object to hold the extracted Label
+	 */
 	public void extractDescription(JsonNode input, PortDetail detail) {
 		if (input != null)
 			if (input.has(DESCRIPTION)) {
@@ -198,12 +213,16 @@ public class CWLUtil {
 				detail.setDescription(null);
 			}
 	}
-/**
- *  This method is used for extracting the Formats of a CWL input or Output
- *  Single argument(Input or Output) can have multiple Formats.   
- * @param input Single CWL input or output as a JsonNode 
- * @param detail respective PortDetail Object to hold the extracted Label
- */
+
+	/**
+	 * This method is used for extracting the Formats of a CWL input or Output
+	 * Single argument(Input or Output) can have multiple Formats.
+	 * 
+	 * @param input
+	 *            Single CWL input or output as a JsonNode
+	 * @param detail
+	 *            respective PortDetail Object to hold the extracted Label
+	 */
 	public void extractFormat(JsonNode input, PortDetail detail) {
 		if (input != null)
 			if (input.has(FORMAT)) {
@@ -224,13 +243,17 @@ public class CWLUtil {
 
 			}
 	}
-/**
- * Re Format the CWL format using the NameSpace in CWL Tool if possible otherwise it doesn't change the current
- * nameSpace => edam:http://edam.org
- * format : edam :1245 =>   http://edamontology.org/1245
- * @param formatInfoString Single Format
- * @param detail respective PortDetail Object to hold the extracted Label
- */
+
+	/**
+	 * Re Format the CWL format using the NameSpace in CWL Tool if possible
+	 * otherwise it doesn't change the current nameSpace => edam:http://edam.org
+	 * format : edam :1245 => http://edamontology.org/1245
+	 * 
+	 * @param formatInfoString
+	 *            Single Format
+	 * @param detail
+	 *            respective PortDetail Object to hold the extracted Label
+	 */
 	public void figureOutFormats(String formatInfoString, PortDetail detail) {
 		if (formatInfoString.startsWith("$")) {
 
@@ -239,28 +262,32 @@ public class CWLUtil {
 			String format[] = formatInfoString.split(":");
 			String namespaceKey = format[0];
 			String urlAppednd = format[1];
-		
-				if (nameSpace.has(namespaceKey))
-					detail.addFormat(nameSpace.get(namespaceKey).asText() + urlAppednd);
-				else
-					// can't figure out the format
-					detail.addFormat(formatInfoString);
-		
+
+			if (nameSpace.has(namespaceKey))
+				detail.addFormat(nameSpace.get(namespaceKey).asText() + urlAppednd);
+			else
+				// can't figure out the format
+				detail.addFormat(formatInfoString);
+
 		} else {
 			// can't figure out the format
 			detail.addFormat(formatInfoString);
 		}
 	}
-/**
- * This method is used to check whether the input/output is valid CWL TYPE when the type is represented as type: ["null","int"]
- * @param typeConfigurations Type of the CWl input or output
- * @return 
- */
+
+	/**
+	 * This method is used to check whether the input/output is valid CWL TYPE
+	 * when the type is represented as type: ["null","int"]
+	 * 
+	 * @param typeConfigurations
+	 *            Type of the CWl input or output
+	 * @return
+	 */
 	public boolean isValidDataType(JsonNode typeConfigurations) {
-		for (JsonNode  type : typeConfigurations) {
-			if (!( type.asText().equals(FLOAT) ||  type.asText().equals(NULL) ||  type.asText().equals(BOOLEAN)
-					||  type.asText().equals(INT) ||  type.asText().equals(STRING) ||  type.asText().equals(DOUBLE)
-					||  type.asText().equals(FILE)))
+		for (JsonNode type : typeConfigurations) {
+			if (!(type.asText().equals(FLOAT) || type.asText().equals(NULL) || type.asText().equals(BOOLEAN)
+					|| type.asText().equals(INT) || type.asText().equals(STRING) || type.asText().equals(DOUBLE)
+					|| type.asText().equals(FILE)))
 				return false;
 		}
 		return true;
