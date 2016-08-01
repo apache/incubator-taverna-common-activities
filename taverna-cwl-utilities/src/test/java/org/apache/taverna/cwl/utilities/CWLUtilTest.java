@@ -30,6 +30,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class CWLUtilTest {
 	JsonNode cwlFile;
@@ -115,5 +116,38 @@ public class CWLUtilTest {
 		for (Map.Entry<String, Integer> input : expected.entrySet()) {
 			assertEquals(input.getValue(), actual.get(input.getKey()));
 		}
+	}
+	@Test
+	public void isValidDataTypeTest() {
+
+			ObjectMapper mapper = new ObjectMapper();
+			ArrayNode node = mapper.createArrayNode();
+			node.add("int");
+			node.add("\"null\"");
+			node.add("float");
+			node.add("string");
+			node.add("double");
+			node.add("int");
+			node.add("file");
+			node.add("boolean");
+			
+			assertTrue(cwlUtil.isValidDataType(node));
+			assertTrue(!cwlUtil.isValidDataType(null));
+			node.add("blah blah");
+			assertTrue(!cwlUtil.isValidDataType(node));
+	}
+	
+	@Test
+	public void isValidArrayTypeTest() {
+
+			String validType="int[]";
+			String wrongType="blah[]";
+			String wrongType2="int []";
+			
+			assertTrue(cwlUtil.isValidArrayType(validType));
+			assertTrue(!cwlUtil.isValidArrayType(wrongType));
+			assertTrue(!cwlUtil.isValidArrayType(wrongType2));
+			assertTrue(!cwlUtil.isValidArrayType(null));
+			
 	}
 }

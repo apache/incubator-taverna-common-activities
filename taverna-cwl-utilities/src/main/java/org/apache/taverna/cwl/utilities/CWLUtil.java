@@ -17,7 +17,6 @@
 package org.apache.taverna.cwl.utilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,7 +44,7 @@ public class CWLUtil {
 	private static final int DEPTH_2 = 2;
 
 	private static final String FLOAT = "float";
-	private static final String NULL = "null";
+	private static final String NULL = "\"null\"";
 	private static final String BOOLEAN = "boolean";
 	private static final String INT = "int";
 	private static final String DOUBLE = "double";
@@ -292,6 +291,7 @@ public class CWLUtil {
 	 * @return
 	 */
 	public boolean isValidDataType(JsonNode typeConfigurations) {
+		if(typeConfigurations==null) return false;
 		for (JsonNode type : typeConfigurations) {
 			if (!(type.asText().equals(FLOAT) || type.asText().equals(NULL) || type.asText().equals(BOOLEAN)
 					|| type.asText().equals(INT) || type.asText().equals(STRING) || type.asText().equals(DOUBLE)
@@ -310,6 +310,7 @@ public class CWLUtil {
 	 * @return
 	 */
 	public boolean isValidArrayType(String type){
+		if(type==null) return false;
 		Pattern pattern= Pattern.compile(ARRAY_SIGNATURE_BRACKETS);
 		Matcher matcher = pattern.matcher(type);
 		ObjectMapper mapper = new ObjectMapper();
