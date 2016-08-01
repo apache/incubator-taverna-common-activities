@@ -17,17 +17,23 @@
 package org.apache.taverna.cwl.utilities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 public class CWLUtil {
 
+	public static final String ARRAY_SPLIT_BRACKETS = "\\[\\]";
+	public static final String ARRAY_SIGNATURE_BRACKETS = "\\[\\]$";
 	private static final String INPUTS = "inputs";
 	private static final String OUTPUTS = "outputs";
 	private static final String ID = "id";
@@ -113,7 +119,9 @@ public class CWLUtil {
 					typeConfigurations = input.get(TYPE);
 					// if type :single argument
 					if (typeConfigurations.getClass() == TextNode.class) {
-
+						if(isValidArrayType(typeConfigurations.asText()))
+							result.put(currentInputId, DEPTH_1);
+						else
 						result.put(currentInputId, DEPTH_0);
 						// type : defined as another map which contains type:
 					} else if (typeConfigurations.getClass() == ObjectNode.class) {
@@ -291,5 +299,23 @@ public class CWLUtil {
 				return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * 
+	 * This method is for figure out whether the parameter is an array or not.
+	 * As from CWL document v1.0, array can be defined as "TYPE[]". For Example : int[]
+	 * This method will look for "[]" sequence of characters in the end of the type and is provided type is a valid CWL TYPE or not    
+	 * @param type type of the CWL parameter
+	 * @return
+	 */
+	public boolean isValidArrayType(String type){
+		Pattern pattern= Pattern.compile(ARRAY_SIGNATURE_BRACKETS);
+		Matcher matcher = pattern.matcher(type);
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode node =mapper.createArrayNode();
+		node.add(type.split(ARRAY_SPLIT_BRACKETS)[0]);
+		if(matcher.find() && isValidDataType(node))return true;
+		else return false;
 	}
 }
