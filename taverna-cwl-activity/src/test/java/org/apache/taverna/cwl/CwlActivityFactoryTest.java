@@ -2,8 +2,6 @@ package org.apache.taverna.cwl;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.apache.taverna.cwl.utilities.CWLUtilTest;
 import org.apache.taverna.workflowmodel.Edits;
 import org.apache.taverna.workflowmodel.impl.EditsImpl;
 import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
