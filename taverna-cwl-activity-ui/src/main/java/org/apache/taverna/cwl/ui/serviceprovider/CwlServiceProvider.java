@@ -78,7 +78,9 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 			try {
 				stream = Files.newDirectoryStream(normalizedPath, "*.cwl");
 			} catch (IOException e) {
+				
 				logger.warn("Path is not correct !");
+				callBack.finished();
 				return;
 			}
 			// create stream with parallel capabilities
@@ -103,7 +105,6 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 				}
 
 			});
-
 			callBack.finished();
 		}
 
@@ -225,7 +226,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	 * Set the Configuration such that when service provider is created user is asked for the PATH
 	 * @return
 	 */
-	private static Configuration getDefaultConfiguration() {
+	public static Configuration getDefaultConfiguration() {
 		Configuration c = new Configuration();
 		ObjectNode conf = c.getJsonAsObjectNode();
 		conf.put("path", "");
