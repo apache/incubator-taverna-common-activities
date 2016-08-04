@@ -19,10 +19,13 @@ package org.apache.taverna.cwl.utilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -105,6 +108,9 @@ public class CWLUtil {
 
 		Map<String, Integer> result = new HashMap<>();
 
+		if (inputs == null)
+			return result;
+
 		if (inputs.getClass() == ArrayNode.class) {
 			Iterator<JsonNode> iterator = inputs.iterator();
 
@@ -118,17 +124,31 @@ public class CWLUtil {
 					typeConfigurations = input.get(TYPE);
 					// if type :single argument
 					if (typeConfigurations.getClass() == TextNode.class) {
-						if(isValidArrayType(typeConfigurations.asText()))
+						// inputs:
+						//	-id: input_1
+						//	 type: int[]  
+						if (isValidArrayType(typeConfigurations.asText()))
 							result.put(currentInputId, DEPTH_1);
+						// inputs:
+						//	-id: input_1
+						//	 type: int  or int?
 						else
-						result.put(currentInputId, DEPTH_0);
+							result.put(currentInputId, DEPTH_0);
 						// type : defined as another map which contains type:
 					} else if (typeConfigurations.getClass() == ObjectNode.class) {
+						// inputs:
+						//	-id: input_1
+						//	 type:
+						//		type: array or int[]
 						String inputType = typeConfigurations.get(TYPE).asText();
-						if (inputType.equals(ARRAY)) {
+						if (inputType.equals(ARRAY)||isValidArrayType(inputType)) {
 							result.put(currentInputId, DEPTH_1);
 
 						}
+						// inputs:
+						//	-id: input_1
+						//	 type:
+						//		type: ["null",int] 
 					} else if (typeConfigurations.getClass() == ArrayNode.class) {
 						if (isValidDataType(typeConfigurations)) {
 							result.put(currentInputId, DEPTH_0);
@@ -143,9 +163,44 @@ public class CWLUtil {
 
 			}
 		} else if (inputs.getClass() == ObjectNode.class) {
-			for (JsonNode parameter : inputs) {
-				if (parameter.asText().startsWith("$"))
-					System.out.println("Exception");
+			 
+			Iterator<Entry<String, JsonNode>> iterator = inputs.fields();
+
+			while (iterator.hasNext()) {
+				Entry<String, JsonNode> entry = iterator.next();
+				String currentInputId = entry.getKey();
+				JsonNode typeConfigurations = entry.getValue();
+
+				
+				if (typeConfigurations.getClass() == TextNode.class) {
+					if (typeConfigurations.asText().startsWith("$")){
+						 System.out.println("Exception");
+						 }
+					// inputs:
+					//	input_1: int[]
+					else if (isValidArrayType(typeConfigurations.asText()))
+						result.put(currentInputId, DEPTH_1);
+					// inputs:
+					//	input_1: int
+					else
+						result.put(currentInputId, DEPTH_0);
+
+				} else if (typeConfigurations.getClass() == ObjectNode.class) {
+						
+					if (typeConfigurations.has(TYPE)) {
+						String inputType = typeConfigurations.get(TYPE).asText();
+						// inputs:
+						//	input_1: 
+						//	 type: array or int[]	
+						if (inputType.equals(ARRAY) || isValidArrayType(inputType))
+							result.put(currentInputId, DEPTH_1);
+						// inputs:
+						//	input_1: 
+						//	 type: int or int?
+						else
+							result.put(currentInputId, DEPTH_0);
+					}
+				}
 			}
 
 		}
@@ -171,21 +226,30 @@ public class CWLUtil {
 				PortDetail detail = new PortDetail();
 				String currentInputId = input.get(ID).asText();
 
-				extractDescription(input, detail);
-
-				extractFormat(input, detail);
-
-				extractLabel(input, detail);
-				result.put(currentInputId, detail);
+				getParamDetails(result, input, detail, currentInputId);
 
 			}
 		} else if (inputs.getClass() == ObjectNode.class) {
-			for (JsonNode parameter : inputs) {
-				if (parameter.asText().startsWith("$"))
-					System.out.println("Exception");
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode inputs_json=mapper.valueToTree(inputs);
+			Iterator<Entry<String, JsonNode>> iterator = inputs_json.fields();
+			while(iterator.hasNext()){
+				PortDetail detail = new PortDetail();
+				Entry<String, JsonNode> s=iterator.next();
+				getParamDetails(result, s.getValue(), detail, s.getKey());
 			}
 		}
 		return result;
+	}
+
+	private void getParamDetails(Map<String, PortDetail> result, JsonNode input, PortDetail detail,
+			String currentInputId) {
+		extractDescription(input, detail);
+
+		extractFormat(input, detail);
+
+		extractLabel(input, detail);
+		result.put(currentInputId, detail);
 	}
 
 	/**
@@ -291,7 +355,8 @@ public class CWLUtil {
 	 * @return
 	 */
 	public boolean isValidDataType(JsonNode typeConfigurations) {
-		if(typeConfigurations==null) return false;
+		if (typeConfigurations == null)
+			return false;
 		for (JsonNode type : typeConfigurations) {
 			if (!(type.asText().equals(FLOAT) || type.asText().equals(NULL) || type.asText().equals(BOOLEAN)
 					|| type.asText().equals(INT) || type.asText().equals(STRING) || type.asText().equals(DOUBLE)
@@ -300,23 +365,29 @@ public class CWLUtil {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 
 	 * This method is for figure out whether the parameter is an array or not.
-	 * As from CWL document v1.0, array can be defined as "TYPE[]". For Example : int[]
-	 * This method will look for "[]" sequence of characters in the end of the type and is provided type is a valid CWL TYPE or not    
-	 * @param type type of the CWL parameter
+	 * As from CWL document v1.0, array can be defined as "TYPE[]". For Example
+	 * : int[] This method will look for "[]" sequence of characters in the end
+	 * of the type and is provided type is a valid CWL TYPE or not
+	 * 
+	 * @param type
+	 *            type of the CWL parameter
 	 * @return
 	 */
-	public boolean isValidArrayType(String type){
-		if(type==null) return false;
-		Pattern pattern= Pattern.compile(ARRAY_SIGNATURE_BRACKETS);
+	public boolean isValidArrayType(String type) {
+		if (type == null)
+			return false;
+		Pattern pattern = Pattern.compile(ARRAY_SIGNATURE_BRACKETS);
 		Matcher matcher = pattern.matcher(type);
 		ObjectMapper mapper = new ObjectMapper();
-		ArrayNode node =mapper.createArrayNode();
+		ArrayNode node = mapper.createArrayNode();
 		node.add(type.split(ARRAY_SPLIT_BRACKETS)[0]);
-		if(matcher.find() && isValidDataType(node))return true;
-		else return false;
+		if (matcher.find() && isValidDataType(node))
+			return true;
+		else
+			return false;
 	}
 }

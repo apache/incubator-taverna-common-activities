@@ -105,6 +105,12 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 				}
 
 			});
+			if(stream!=null)
+				try {
+					stream.close();
+				} catch (IOException e) {
+					logger.warn("Can't close Stream !");
+				}
 			callBack.finished();
 		}
 
