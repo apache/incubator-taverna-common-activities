@@ -42,14 +42,14 @@ public class CwlActivityFactory implements ActivityFactory {
 	public static final String  CWL_CONF ="cwl_conf";
 	@Override
 	public Activity<?> createActivity() {
-		CwlDumyActivity activity = new CwlDumyActivity();
+		CwlDummyActivity activity = new CwlDummyActivity();
 		activity.setEdits(edits);
 		return activity;
 	}
 
 	@Override
 	public URI getActivityType() {
-		return CwlDumyActivity.ACTIVITY_TYPE;
+		return CwlDummyActivity.ACTIVITY_TYPE;
 	}
 
 	@Override 

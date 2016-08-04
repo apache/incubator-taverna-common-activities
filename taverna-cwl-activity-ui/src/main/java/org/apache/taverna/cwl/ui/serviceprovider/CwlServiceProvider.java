@@ -61,8 +61,8 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 		super(getDefaultConfiguration());
 	}
 
-	private static final String providerName = "CWL Services";
-	private static final URI providerId = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");
+	private static final String PROVIDER_NAME = "CWL Services";
+	private static final URI PROVIDER_ID = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");
 
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
@@ -185,12 +185,12 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 
 	@Override
 	public String getId() {
-		return providerId.toASCIIString();
+		return PROVIDER_ID.toASCIIString();
 	}
 
 	@Override
 	public String getName() {
-		return providerName;
+		return PROVIDER_NAME;
 	}
 
 	@Override
@@ -210,7 +210,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 
 	@Override
 	public URI getType() {
-		return providerId;
+		return PROVIDER_ID;
 	}
 
 	@Override
