@@ -19,13 +19,11 @@ package org.apache.taverna.cwl.utilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -125,30 +123,30 @@ public class CWLUtil {
 					// if type :single argument
 					if (typeConfigurations.getClass() == TextNode.class) {
 						// inputs:
-						//	-id: input_1
-						//	 type: int[]  
+						// -id: input_1
+						// type: int[]
 						if (isValidArrayType(typeConfigurations.asText()))
 							result.put(currentInputId, DEPTH_1);
 						// inputs:
-						//	-id: input_1
-						//	 type: int  or int?
+						// -id: input_1
+						// type: int or int?
 						else
 							result.put(currentInputId, DEPTH_0);
 						// type : defined as another map which contains type:
 					} else if (typeConfigurations.getClass() == ObjectNode.class) {
 						// inputs:
-						//	-id: input_1
-						//	 type:
-						//		type: array or int[]
+						// -id: input_1
+						// type:
+						// type: array or int[]
 						String inputType = typeConfigurations.get(TYPE).asText();
-						if (inputType.equals(ARRAY)||isValidArrayType(inputType)) {
+						if (inputType.equals(ARRAY) || isValidArrayType(inputType)) {
 							result.put(currentInputId, DEPTH_1);
 
 						}
 						// inputs:
-						//	-id: input_1
-						//	 type:
-						//		type: ["null",int] 
+						// -id: input_1
+						// type:
+						// type: ["null",int]
 					} else if (typeConfigurations.getClass() == ArrayNode.class) {
 						if (isValidDataType(typeConfigurations)) {
 							result.put(currentInputId, DEPTH_0);
@@ -163,7 +161,7 @@ public class CWLUtil {
 
 			}
 		} else if (inputs.getClass() == ObjectNode.class) {
-			 
+
 			Iterator<Entry<String, JsonNode>> iterator = inputs.fields();
 
 			while (iterator.hasNext()) {
@@ -171,34 +169,41 @@ public class CWLUtil {
 				String currentInputId = entry.getKey();
 				JsonNode typeConfigurations = entry.getValue();
 
-				
 				if (typeConfigurations.getClass() == TextNode.class) {
-					if (typeConfigurations.asText().startsWith("$")){
-						 System.out.println("Exception");
-						 }
+					if (typeConfigurations.asText().startsWith("$")) {
+						System.out.println("Exception");
+					}
 					// inputs:
-					//	input_1: int[]
+					// input_1: int[]
 					else if (isValidArrayType(typeConfigurations.asText()))
 						result.put(currentInputId, DEPTH_1);
 					// inputs:
-					//	input_1: int
+					// input_1: int or int?
 					else
 						result.put(currentInputId, DEPTH_0);
 
 				} else if (typeConfigurations.getClass() == ObjectNode.class) {
-						
+
 					if (typeConfigurations.has(TYPE)) {
-						String inputType = typeConfigurations.get(TYPE).asText();
+						JsonNode inputType = typeConfigurations.get(TYPE);
 						// inputs:
-						//	input_1: 
-						//	 type: array or int[]	
-						if (inputType.equals(ARRAY) || isValidArrayType(inputType))
+						// input_1:
+						// type: [int,"null"]
+						if (inputType.getClass() == ArrayNode.class){
+							if (isValidDataType(inputType))
+								result.put(currentInputId, DEPTH_0);
+						}else{
+						// inputs:
+						// input_1:
+						// type: array or int[]
+						if (inputType.asText().equals(ARRAY) || isValidArrayType(inputType.asText()))
 							result.put(currentInputId, DEPTH_1);
 						// inputs:
-						//	input_1: 
-						//	 type: int or int?
+						// input_1:
+						// type: int or int? or ["null" ,int]
 						else
 							result.put(currentInputId, DEPTH_0);
+						}
 					}
 				}
 			}
@@ -231,11 +236,11 @@ public class CWLUtil {
 			}
 		} else if (inputs.getClass() == ObjectNode.class) {
 			ObjectMapper mapper = new ObjectMapper();
-			JsonNode inputs_json=mapper.valueToTree(inputs);
+			JsonNode inputs_json = mapper.valueToTree(inputs);
 			Iterator<Entry<String, JsonNode>> iterator = inputs_json.fields();
-			while(iterator.hasNext()){
+			while (iterator.hasNext()) {
 				PortDetail detail = new PortDetail();
-				Entry<String, JsonNode> s=iterator.next();
+				Entry<String, JsonNode> s = iterator.next();
 				getParamDetails(result, s.getValue(), detail, s.getKey());
 			}
 		}
