@@ -1,11 +1,13 @@
 package org.apache.taverna.cwl.utilities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -130,8 +132,23 @@ public class CWLUtilTestResource {
 		PortDetail detail = new PortDetail();
 		detail.setFormat(new ArrayList<String>());
 
-		return new Object[] { new Object[] { cwlUtil, "edam:1245", detail, "http://edamontology.org/1245",0 },
-				new Object[] { cwlUtil, "$formatExpression", detail, "$formatExpression",1 },
-				new Object[] { cwlUtil2, "formatkey: not Defined", detail, "formatkey: not Defined",2 } };
+		return new Object[] { new Object[] { cwlUtil, "edam:1245", detail, "http://edamontology.org/1245", 0 },
+				new Object[] { cwlUtil, "$formatExpression", detail, "$formatExpression", 1 },
+				new Object[] { cwlUtil2, "formatkey: not Defined", detail, "formatkey: not Defined", 2 } };
+	}
+
+	public static Object[] processDetailsResources() {
+		setup();
+		ObjectMapper mapper = new ObjectMapper();
+		
+		Map<String, PortDetail> expected1=null;
+		Map<String, PortDetail> expected2=null;
+		try {
+			expected1 = mapper.readValue(CWLUtilTestResource.class.getResourceAsStream("/inputDetails1.json"), new TypeReference<Map<String, PortDetail>>() {});
+			expected2 = mapper.readValue(CWLUtilTestResource.class.getResourceAsStream("/inputDetails2.json"), new TypeReference<Map<String, PortDetail>>() {});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return new Object []{new Object[]{cwlUtil,expected1},new Object[]{cwlUtil2,expected2}};
 	}
 }

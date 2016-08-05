@@ -2,7 +2,6 @@ package org.apache.taverna.cwl.utilities;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.util.Map;
 
 import org.junit.Test;
@@ -93,5 +92,19 @@ public class CWLUtil2Test {
 		
 		cwlUtil.figureOutFormats(format, detail);
 		assertEquals(expected, detail.getFormat().get(index));
+	}
+	@Test
+	@Parameters(source=CWLUtilTestResource.class,method="processDetailsResources")
+	public void processDetailsTest(CWLUtil cwlUtil,Map<String, PortDetail> expected) {
+
+		 Map<String, PortDetail> actual=cwlUtil.processInputDetails();
+		 for (Map.Entry<String, PortDetail> input : expected.entrySet()) {
+			 PortDetail expectedDetail=input.getValue();
+			 PortDetail actualDetail =actual.get(input.getKey());
+				assertEquals(expectedDetail.getFormat(), actualDetail.getFormat());
+				assertEquals(expectedDetail.getLabel(), actualDetail.getLabel());
+				assertEquals(expectedDetail.getDescription(), actualDetail.getDescription());
+			}
+		
 	}
 }
