@@ -20,7 +20,7 @@
 	<artifactId>taverna-cwl-utilities</artifactId>
 	<packaging>bundle</packaging>
 	<name>Apache Taverna CWL Activity</name>
-<dependencies>
+	<dependencies>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -33,5 +33,11 @@
 			<version>1.17</version>
 			<type>bundle</type>
 		</dependency>
-</dependencies>
+		<dependency>
+			<groupId>pl.pragmatists</groupId>
+			<artifactId>JUnitParams</artifactId>
+			<version>1.0.5</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>

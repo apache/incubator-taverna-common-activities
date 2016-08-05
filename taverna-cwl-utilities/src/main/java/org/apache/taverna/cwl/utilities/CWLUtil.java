@@ -45,13 +45,14 @@ public class CWLUtil {
 	private static final int DEPTH_2 = 2;
 
 	private static final String FLOAT = "float";
-	private static final String NULL = "\"null\"";
+	private static final String NULL = "null";
 	private static final String BOOLEAN = "boolean";
 	private static final String INT = "int";
 	private static final String DOUBLE = "double";
 	private static final String STRING = "string";
 	private static final String LABEL = "label";
 	private static final String FILE = "file";
+	private static final String DIRECTORY = "directory";
 	private static final String FORMAT = "format";
 	private JsonNode nameSpace;
 	private JsonNode cwlFile;
@@ -123,21 +124,21 @@ public class CWLUtil {
 					// if type :single argument
 					if (typeConfigurations.getClass() == TextNode.class) {
 						// inputs:
-						// -id: input_1
-						// type: int[]
+						/// -id: input_1
+						//// type: int[]
 						if (isValidArrayType(typeConfigurations.asText()))
 							result.put(currentInputId, DEPTH_1);
 						// inputs:
-						// -id: input_1
-						// type: int or int?
+						/// -id: input_1
+						//// type: int or int?
 						else
 							result.put(currentInputId, DEPTH_0);
 						// type : defined as another map which contains type:
 					} else if (typeConfigurations.getClass() == ObjectNode.class) {
 						// inputs:
-						// -id: input_1
-						// type:
-						// type: array or int[]
+						/// -id: input_1
+						//// type:
+						///// type: array or int[]
 						String inputType = typeConfigurations.get(TYPE).asText();
 						if (inputType.equals(ARRAY) || isValidArrayType(inputType)) {
 							result.put(currentInputId, DEPTH_1);
@@ -174,11 +175,11 @@ public class CWLUtil {
 						System.out.println("Exception");
 					}
 					// inputs:
-					// input_1: int[]
+					/// input_1: int[]
 					else if (isValidArrayType(typeConfigurations.asText()))
 						result.put(currentInputId, DEPTH_1);
 					// inputs:
-					// input_1: int or int?
+					/// input_1: int or int?
 					else
 						result.put(currentInputId, DEPTH_0);
 
@@ -187,22 +188,22 @@ public class CWLUtil {
 					if (typeConfigurations.has(TYPE)) {
 						JsonNode inputType = typeConfigurations.get(TYPE);
 						// inputs:
-						// input_1:
-						// type: [int,"null"]
-						if (inputType.getClass() == ArrayNode.class){
+						/// input_1:
+						//// type: [int,"null"]
+						if (inputType.getClass() == ArrayNode.class) {
 							if (isValidDataType(inputType))
 								result.put(currentInputId, DEPTH_0);
-						}else{
-						// inputs:
-						// input_1:
-						// type: array or int[]
-						if (inputType.asText().equals(ARRAY) || isValidArrayType(inputType.asText()))
-							result.put(currentInputId, DEPTH_1);
-						// inputs:
-						// input_1:
-						// type: int or int? or ["null" ,int]
-						else
-							result.put(currentInputId, DEPTH_0);
+						} else {
+							// inputs:
+							/// input_1:
+							//// type: array or int[]
+							if (inputType.asText().equals(ARRAY) || isValidArrayType(inputType.asText()))
+								result.put(currentInputId, DEPTH_1);
+							// inputs:
+							/// input_1:
+							//// type: int or int?
+							else
+								result.put(currentInputId, DEPTH_0);
 						}
 					}
 				}
@@ -235,13 +236,11 @@ public class CWLUtil {
 
 			}
 		} else if (inputs.getClass() == ObjectNode.class) {
-			ObjectMapper mapper = new ObjectMapper();
-			JsonNode inputs_json = mapper.valueToTree(inputs);
-			Iterator<Entry<String, JsonNode>> iterator = inputs_json.fields();
+			Iterator<Entry<String, JsonNode>> iterator = inputs.fields();
 			while (iterator.hasNext()) {
 				PortDetail detail = new PortDetail();
-				Entry<String, JsonNode> s = iterator.next();
-				getParamDetails(result, s.getValue(), detail, s.getKey());
+				Entry<String, JsonNode> entry = iterator.next();
+				getParamDetails(result, entry.getValue(), detail, entry.getKey());
 			}
 		}
 		return result;
@@ -254,6 +253,7 @@ public class CWLUtil {
 		extractFormat(input, detail);
 
 		extractLabel(input, detail);
+		
 		result.put(currentInputId, detail);
 	}
 
@@ -365,7 +365,7 @@ public class CWLUtil {
 		for (JsonNode type : typeConfigurations) {
 			if (!(type.asText().equals(FLOAT) || type.asText().equals(NULL) || type.asText().equals(BOOLEAN)
 					|| type.asText().equals(INT) || type.asText().equals(STRING) || type.asText().equals(DOUBLE)
-					|| type.asText().equals(FILE)))
+					|| type.asText().equals(FILE)||type.asText().equals(DIRECTORY)))
 				return false;
 		}
 		return true;

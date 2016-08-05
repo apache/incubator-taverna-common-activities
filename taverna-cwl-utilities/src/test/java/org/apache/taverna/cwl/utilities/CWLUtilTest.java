@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
@@ -33,15 +33,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class CWLUtilTest {
-	JsonNode cwlFile;
-	CWLUtil cwlUtil;
-	JsonNode input;
+	static JsonNode cwlFile;
+	static CWLUtil  cwlUtil;
+	static JsonNode input;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeClass
+	public  static void setUp() throws Exception {
 		Yaml reader = new Yaml();
 		ObjectMapper mapper = new  ObjectMapper();
-		cwlFile = mapper.valueToTree(reader.load(getClass().getResourceAsStream("/customtool1.cwl"))); 
+		cwlFile = mapper.valueToTree(reader.load(CWLUtilTest.class.getResourceAsStream("/customtool1.cwl"))); 
 	
 		cwlUtil = new CWLUtil(cwlFile);
 		input =  cwlFile.get("inputs").get(0);
@@ -123,13 +123,14 @@ public class CWLUtilTest {
 			ObjectMapper mapper = new ObjectMapper();
 			ArrayNode node = mapper.createArrayNode();
 			node.add("int");
-			node.add("\"null\"");
+			node.add("null");
 			node.add("float");
 			node.add("string");
 			node.add("double");
 			node.add("int");
 			node.add("file");
 			node.add("boolean");
+			node.add("directory");
 			
 			assertTrue(cwlUtil.isValidDataType(node));
 			assertTrue(!cwlUtil.isValidDataType(null));
