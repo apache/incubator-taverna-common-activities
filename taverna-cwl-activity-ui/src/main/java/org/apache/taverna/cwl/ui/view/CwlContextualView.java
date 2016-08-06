@@ -61,7 +61,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 	private final Activity activity;
 	private JsonNode cwlActivityConfiguration;
 	private JsonNode cwlToolConfiguration;//This is output of the YAML parser
-	private CwlContextualUtil cwlutil;
+	private CwlContextualUtil cwlUtil;
 
 	public CwlContextualView(Activity activity, ColourManager colourManager) {
 		super(activity, colourManager);
@@ -75,7 +75,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 	}
 
 	public void setUpCwlContextualUtil() {
-		cwlutil = new CwlContextualUtil(cwlToolConfiguration);
+		cwlUtil = new CwlContextualUtil(cwlToolConfiguration);
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 		// Get the CWL tool Description
 		if (cwlToolConfiguration.has(DESCRIPTION)) {
 			String description = cwlToolConfiguration.get(DESCRIPTION).asText();
-			summary = cwlutil.paragraphToHtml(summary, description);
+			summary = cwlUtil.paragraphToHtml(summary, description);
 
 		}
 		// Get the CWL tool Label
@@ -135,11 +135,11 @@ public class CwlContextualView extends HTMLBasedActivityContextualView {
 		}
 		summary += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
 
-		summary = cwlutil.setUpInputDetails(summary);
+		summary = cwlUtil.setUpInputDetails(summary);
 
 		summary += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
 
-		summary = cwlutil.setUpOutputDetails(summary);
+		summary = cwlUtil.setUpOutputDetails(summary);
 		summary += "</table>";
 		return summary;
 	}
