@@ -18,9 +18,20 @@ public class CWLUtilTestResource {
 	private static CWLUtil cwlUtil;
 	private static CWLUtil cwlUtil2;
 	private static JsonNode input1;
+	private static boolean initialized = false;
+
 	private static JsonNode input2;
 
-	private static void setup() {
+	public CWLUtilTestResource() {
+		if (!initialized) {
+			setUp();
+			initialized = true;
+		}
+
+	}
+
+	public  Object[] setUp() {
+
 		Yaml reader = new Yaml();
 		ObjectMapper mapper = new ObjectMapper();
 		cwlFile = mapper.valueToTree(reader.load(CWLUtilTestResource.class.getResourceAsStream("/customtool1.cwl")));
@@ -30,18 +41,16 @@ public class CWLUtilTestResource {
 		cwlUtil2 = new CWLUtil(cwlFile2);
 		input1 = cwlFile.get("inputs").get(0);
 		input2 = cwlFile2.get("inputs").get("input_2");
+		return new Object[] {};
 	}
 
 	public static Object[] extractDescriptionResources() {
-		setup();
-
 		return new Object[] { new Object[] { cwlUtil, "this is a short description of input 1", input1 },
 				new Object[] { cwlUtil, null, null },
 				new Object[] { cwlUtil2, "this is a short description of input 1 cwl v1.0", input2 } };
 	}
 
 	public static Object[] processResources() {
-		setup();
 		HashMap<String, Integer> expected = new HashMap<>();
 		expected.put("input_1", 0);
 		expected.put("input_2", 1);
@@ -69,18 +78,15 @@ public class CWLUtilTestResource {
 	}
 
 	public static Object[] isValidArrayTypeTrueResources() {
-		setup();
 		return new Object[] { new Object[] { cwlUtil, "int[]" } };
 	}
 
 	public static Object[] isValidArrayTypeFalseResources() {
-		setup();
 		return new Object[] { new Object[] { cwlUtil, "int []" }, new Object[] { cwlUtil, "blah[]" },
 				new Object[] { cwlUtil, null } };
 	}
 
 	public static Object[] isValidDataTypeTrueResources() {
-		setup();
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode node = mapper.createArrayNode();
 		node.add("int");
@@ -96,7 +102,6 @@ public class CWLUtilTestResource {
 	}
 
 	public static Object[] isValidDataTypeFalseResources() {
-		setup();
 		ObjectMapper mapper = new ObjectMapper();
 		ArrayNode node = mapper.createArrayNode();
 		node.add("int");
@@ -112,14 +117,11 @@ public class CWLUtilTestResource {
 	}
 
 	public static Object[] processNameSpaceResources() {
-		setup();
-
 		return new Object[] { new Object[] { cwlUtil, "edam", "http://edamontology.org/", 1 },
 				new Object[] { cwlUtil2, "edam2", "http://edamontologytest.org/", 2 } };
 	}
 
 	public static Object[] extractLabelResources() {
-		setup();
 
 		return new Object[] { new Object[] { cwlUtil, input1, "input 1 testing label" },
 				new Object[] { cwlUtil, null, null },
@@ -128,7 +130,6 @@ public class CWLUtilTestResource {
 	}
 
 	public static Object[] figureOutFormatsResources() {
-		setup();
 		PortDetail detail = new PortDetail();
 		detail.setFormat(new ArrayList<String>());
 
@@ -138,17 +139,20 @@ public class CWLUtilTestResource {
 	}
 
 	public static Object[] processDetailsResources() {
-		setup();
 		ObjectMapper mapper = new ObjectMapper();
-		
-		Map<String, PortDetail> expected1=null;
-		Map<String, PortDetail> expected2=null;
+
+		Map<String, PortDetail> expected1 = null;
+		Map<String, PortDetail> expected2 = null;
 		try {
-			expected1 = mapper.readValue(CWLUtilTestResource.class.getResourceAsStream("/inputDetails1.json"), new TypeReference<Map<String, PortDetail>>() {});
-			expected2 = mapper.readValue(CWLUtilTestResource.class.getResourceAsStream("/inputDetails2.json"), new TypeReference<Map<String, PortDetail>>() {});
+			expected1 = mapper.readValue(CWLUtilTestResource.class.getResourceAsStream("/inputDetails1.json"),
+					new TypeReference<Map<String, PortDetail>>() {
+					});
+			expected2 = mapper.readValue(CWLUtilTestResource.class.getResourceAsStream("/inputDetails2.json"),
+					new TypeReference<Map<String, PortDetail>>() {
+					});
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return new Object []{new Object[]{cwlUtil,expected1},new Object[]{cwlUtil2,expected2}};
+		return new Object[] { new Object[] { cwlUtil, expected1 }, new Object[] { cwlUtil2, expected2 } };
 	}
 }

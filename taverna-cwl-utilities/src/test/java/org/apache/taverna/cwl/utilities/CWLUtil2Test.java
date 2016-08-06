@@ -2,8 +2,12 @@ package org.apache.taverna.cwl.utilities;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -14,12 +18,14 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 @RunWith(JUnitParamsRunner.class)
+
 public class CWLUtil2Test {
 
 	
 	
 	@Test
 	@Parameters(source=CWLUtilTestResource.class,method="extractDescriptionResources")
+	
 	public void extractDescriptionTest(CWLUtil cwlUtil,String expected,JsonNode input ) {
 		PortDetail detail = new PortDetail();
 
