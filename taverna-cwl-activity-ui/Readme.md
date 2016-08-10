@@ -12,7 +12,7 @@ The class [CwlContextualView](https://github.com/ThilinaManamgoda/incubator-tave
 
 ##Abstract view of the plugin
 
-tool.cwl -> Yaml Parser -> Map -> Json Node -> CWlServiceDesc
+ ![](https://github.com/ThilinaManamgoda/incubator-taverna-common-activities/blob/master/taverna-cwl-activity-ui/images/Cwl-activity-Ui.png)
   </content>
 
 
