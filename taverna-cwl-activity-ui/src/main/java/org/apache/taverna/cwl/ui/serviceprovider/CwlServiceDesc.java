@@ -16,54 +16,47 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.ui.serviceprovider;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.apache.taverna.cwl.CwlActivityConfigurationBean;
-import org.apache.taverna.cwl.CwlDumyActivity;
+import org.apache.taverna.scufl2.api.configurations.Configuration;
+import org.apache.taverna.servicedescriptions.ServiceDescription;
 
-import net.sf.taverna.t2.servicedescriptions.ServiceDescription;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
+import com.fasterxml.jackson.databind.JsonNode;
 
-public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationBean> {
+public class CwlServiceDesc extends ServiceDescription {
 
 	private static final String DESCRIPTION = "description";
+	public static final URI ACTIVITY_TYPE = URI.create("https://taverna.apache.org/ns/2016/activity/cwl");
+
+	@Override
+	public Configuration getActivityConfiguration() {
+		Configuration c = new Configuration();
+		c.setType(ACTIVITY_TYPE);
+		c.setJson(cwlConfiguration);
+		return c;
+	}
 
 	@Override
 	public String getDescription() {
-		String description = (String) cwlConfiguration.get(DESCRIPTION);
-		//see  whether description is too long
-		if (description == null || (description.length()>40))
+
+		// see whether description is too long
+		if (cwlConfiguration.has(DESCRIPTION)) {
+			String description = cwlConfiguration.get(CwlServiceProvider.CWL_CONF).path(DESCRIPTION).asText();
+			if ((description.length() < 40))
+				return description;
+			else
+				return "";
+		} else
 			return "";
-		else
-			return description;
 	}
 
-	private Map cwlConfiguration;
-	private String toolName;
+	private JsonNode cwlConfiguration;
 
-	@Override
-	public Class<? extends Activity<CwlActivityConfigurationBean>> getActivityClass() {
-		return (Class<? extends Activity<CwlActivityConfigurationBean>>) CwlDumyActivity.class;
-	}
-
-	@Override
-	public CwlActivityConfigurationBean getActivityConfiguration() {
-		// Creating the CWL configuration bean
-		CwlActivityConfigurationBean configurationBean = new CwlActivityConfigurationBean();
-		configurationBean.setCwlConfigurations(cwlConfiguration);
-		configurationBean.setToolName(toolName);
-		return configurationBean;
-	}
-
-	public Map getCwlConfiguration() {
-		return cwlConfiguration;
-	}
-
-	public void setCwlConfiguration(Map cwlConfiguration) {
+	public void setCwlConfiguration(JsonNode cwlConfiguration) {
 		this.cwlConfiguration = cwlConfiguration;
 	}
 
@@ -78,14 +71,21 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 	}
 
 	@Override
-	public List<? extends Comparable> getPath() {
-		return null;
+	protected List<? extends Object> getIdentifyingData() { 
+		return Arrays.<Object> asList(getCwlPath(),toolName);
 	}
 
 	@Override
-	protected List<? extends Object> getIdentifyingData() {
-		return Arrays.asList("CWL Services " + toolName);
+	public URI getActivityType() {
+		return ACTIVITY_TYPE;
 	}
+
+	@Override
+	public List<? extends Comparable<?>> getPath() { 
+		return Arrays.<Comparable <String>> asList(getCwlPath());
+	}
+
+	private String toolName;
 
 	public String getToolName() {
 		return toolName;
@@ -94,5 +94,7 @@ public class CwlServiceDesc extends ServiceDescription<CwlActivityConfigurationB
 	public void setToolName(String toolName) {
 		this.toolName = toolName;
 	}
-
+	private String getCwlPath(){
+		return cwlConfiguration.get(CwlServiceProvider.CWL_PATH).asText();
+	}
 }

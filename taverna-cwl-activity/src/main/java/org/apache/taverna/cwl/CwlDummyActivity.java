@@ -14,14 +14,31 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
  *******************************************************************************/
-package org.apache.taverna.cwl.ui;
+package org.apache.taverna.cwl;
 
-import java.net.URISyntaxException;
+import java.net.URI;
+import java.util.Map;
+import org.apache.taverna.reference.T2Reference;
+import org.apache.taverna.workflowmodel.processor.activity.AbstractAsynchronousActivity;
+import org.apache.taverna.workflowmodel.processor.activity.ActivityConfigurationException;
+import org.apache.taverna.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import net.sf.taverna.t2.workbench.dev.DeveloperWorkbench;
-
-public class TestWorkBench {
-public static void main(String[] args) throws URISyntaxException {
-	DeveloperWorkbench.main(args);
-}
+public class CwlDummyActivity extends AbstractAsynchronousActivity<JsonNode>{
+	private JsonNode conf;	
+	public static final URI ACTIVITY_TYPE = URI.create("https://taverna.apache.org/ns/2016/activity/cwl");
+	@Override
+	public void configure(JsonNode conf) throws ActivityConfigurationException {
+		this.conf=conf;
+	}
+	@Override
+	public JsonNode getConfiguration() {
+		return conf;
+	}
+	@Override
+	public void executeAsynch(Map<String, T2Reference> data, AsynchronousActivityCallback callback) {
+		
+	}
+	
+	
 }

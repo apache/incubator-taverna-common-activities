@@ -16,72 +16,173 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.ui.serviceprovider;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.swing.Icon;
 
+import org.apache.log4j.Logger;
+import org.apache.taverna.scufl2.api.common.Visitor;
+import org.apache.taverna.scufl2.api.configurations.Configuration;
+import org.apache.taverna.servicedescriptions.AbstractConfigurableServiceProvider;
+import org.apache.taverna.servicedescriptions.ConfigurableServiceProvider;
+import org.apache.taverna.servicedescriptions.ServiceDescriptionProvider;
 import org.yaml.snakeyaml.Yaml;
 
-import net.sf.taverna.t2.servicedescriptions.AbstractConfigurableServiceProvider;
-import net.sf.taverna.t2.servicedescriptions.ConfigurableServiceProvider;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlServiceProviderConfig>
-		implements ConfigurableServiceProvider<CwlServiceProviderConfig> {
+public class CwlServiceProvider extends AbstractConfigurableServiceProvider implements ConfigurableServiceProvider {
+
+	public static final String TOOL_NAME = "toolName";
+	public static final String CWL_CONF = "cwl_conf";
+	public static final String CWL_PATH = "cwl_path";
+
+	public static final String DEFAULT_PATH_1 = "/usr/share/commonwl/";
+	public static final String DEFAULT_PATH_2 = "/usr/local/share/commonwl/";
+	public static final String XDF_DATA_HOME = "XDF_DATA_HOME";
+	public static final String COMMONWL = "commonwl/";
+	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
 
 	CwlServiceProvider() {
-		super(new CwlServiceProviderConfig());
+		// FIXME
+		super(getDefaultConfiguration());
 	}
-	private static final String providerName ="CWL Services";
-	private static final URI providerId = URI
-			.create("http://cwl.com/2016/service-provider/cwlcommandlinetools");
-	private File cwlFilesLocation;
+
+	private static final String PROVIDER_NAME = "CWL Services";
+	private static final URI PROVIDER_ID = CwlServiceDesc.ACTIVITY_TYPE.resolve("#provider");
 
 	@Override
 	public void findServiceDescriptionsAsync(FindServiceDescriptionsCallBack callBack) {
 
 		// get the location of the cwl tool from the workbench
-		cwlFilesLocation = new File(getConfiguration().getPath());
-		// This is holding the CWL configuration beans
-		List<CwlServiceDesc> result = new ArrayList<CwlServiceDesc>();
+		List<Path> paths = getPath();
 
-		File[] cwlFiles = getCwlFiles();
+		for (Path path : paths) {
+			// figure out the dots in the path ex: /maanadev/../cwltools
+			Path normalizedPath = path.normalize();
 
-		// Load the CWL file using SnakeYaml lib
-		Yaml cwlReader = new Yaml();
-
-		for (File file : cwlFiles) {
-			Map cwlFile = null;
-
+			DirectoryStream<Path> stream = null;
 			try {
-				cwlFile = (Map) cwlReader.load(new FileInputStream(file));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				stream = Files.newDirectoryStream(normalizedPath, "*.cwl");
+			} catch (IOException e) {
+				
+				logger.warn("Path is not correct !");
+				callBack.finished();
+				return;
 			}
-			if (cwlFile != null) {
-				// Creating CWl service Description
-				CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
-				cwlServiceDesc.setCwlConfiguration(cwlFile);
-				cwlServiceDesc.setToolName(file.getName().split("\\.")[0]);
+			// create stream with parallel capabilities
+			Stream<Path> paralleStream = StreamSupport.stream(stream.spliterator(), true);
 
-				// add to the result
-				result.add(cwlServiceDesc);
-				// return the service description
-				callBack.partialResults(result);
-			}
+			paralleStream.forEach(p -> {
+				Yaml reader = getYamlReader();
 
+				Map cwlFile;
+				try (FileInputStream file = new FileInputStream(path.toFile())) {
+					cwlFile = (Map) reader.load(file);
+					JsonNode config = createJsonNode(p, cwlFile);
+					// Creating CWl service Description
+					CwlServiceDesc cwlServiceDesc = createCWLDesc(config);
+					// return the service description
+					callBack.partialResults(Arrays.asList(cwlServiceDesc));
+
+				} catch (IOException e) {
+
+					logger.warn("File not Found !");
+
+				}
+
+			});
+			if(stream!=null)
+				try {
+					stream.close();
+				} catch (IOException e) {
+					logger.warn("Can't close Stream !");
+				}
+			callBack.finished();
 		}
-		callBack.finished();
 
 	}
+/**
+ * This method checks whether provided path is valid or not and if it's valid the it's added to the list
+ * @param defaultPaths List to hold valid paths
+ * @param path 
+ * @param path1 if there is no second path argument this should be set to null
+ */
+	public void addPath(List<Path> defaultPaths, String path, String path1) {
 
-	
+		Path defaultPath;
+		if (path1 == null)
+			defaultPath = Paths.get(path);
+		else
+			defaultPath = Paths.get(path, path1);
+
+		if (defaultPath.isAbsolute())
+			defaultPaths.add(defaultPath);
+	}
+
+	private List<Path> getPath() {
+		String userInput = getConfiguration().getJsonAsObjectNode().get("path").asText();
+		// If user haven't provided a PATH 
+		if (userInput.isEmpty()||userInput==null) {
+			List<Path> defaultPaths = new ArrayList<>();
+			addPath(defaultPaths, DEFAULT_PATH_1, null);
+			addPath(defaultPaths, DEFAULT_PATH_2, null);
+			addPath(defaultPaths, XDF_DATA_HOME, COMMONWL);
+			return defaultPaths;
+		}
+
+		return  Arrays.asList(Paths.get(userInput));
+	}
+
+	/**
+	 * This method is creating a JsonNode object which contains Tool as a map
+	 * and it's Path,Name
+	 * 
+	 * @param p
+	 *            Path of the CWL tool
+	 * @param cwlFile
+	 *            Output of the YAML reader
+	 * @return
+	 */
+	private JsonNode createJsonNode(Path p, Map cwlFile) {
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode root = mapper.createObjectNode();
+		JsonNode cwl_map = mapper.valueToTree(cwlFile);
+		((ObjectNode) root).put(TOOL_NAME, p.getFileName().toString().split("\\.")[0]);
+		((ObjectNode) root).put(CWL_CONF, cwl_map);
+		((ObjectNode) root).put(CWL_PATH, p.toString());
+		return root;
+	}
+
+	/**
+	 * 
+	 * This method creates CwlServiceDesc which hold the configuration of the
+	 * tool and the tool name
+	 * 
+	 * @param node
+	 *            JsonnNode which holds the final configuration of the tool
+	 * @return
+	 */
+
+	private CwlServiceDesc createCWLDesc(JsonNode node) {
+		CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
+		cwlServiceDesc.setCwlConfiguration(node);
+		cwlServiceDesc.setToolName(node.get(CwlServiceProvider.TOOL_NAME).asText());
+		return cwlServiceDesc;
+	}
 
 	@Override
 	public Icon getIcon() {
@@ -90,41 +191,51 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider<CwlS
 
 	@Override
 	public String getId() {
-		return providerId.toASCIIString();
+		return PROVIDER_ID.toASCIIString();
 	}
 
 	@Override
 	public String getName() {
-		return providerName;
-	}
-
-	private File[] getCwlFiles() {
-		// Get the .cwl files in the directory using the FileName Filter
-		FilenameFilter fileNameFilter = new FilenameFilter() {
-
-			@Override
-			public boolean accept(File dir, String name) {
-				if (name.lastIndexOf('.') > 0) {
-					// get last index for '.' char
-					int lastIndex = name.lastIndexOf('.');
-
-					// get extension
-					String str = name.substring(lastIndex);
-
-					// match path name extension
-					if (str.equals(".cwl")) {
-						return true;
-					}
-				}
-				return false;
-			}
-		};
-
-		return cwlFilesLocation.listFiles(fileNameFilter);
+		return PROVIDER_NAME;
 	}
 
 	@Override
 	protected List<? extends Object> getIdentifyingData() {
-		return null;
+		return Arrays.<Object> asList(getPath());
+	}
+
+	public Yaml getYamlReader() {
+		Yaml reader = new Yaml();
+		return reader;
+	}
+
+	@Override
+	public ServiceDescriptionProvider newInstance() {
+		return new CwlServiceProvider();
+	}
+
+	@Override
+	public URI getType() {
+		return PROVIDER_ID;
+	}
+
+	@Override
+	public void setType(URI arg0) {
+
+	}
+
+	@Override
+	public boolean accept(Visitor arg0) {
+		return false;
+	}
+	/**
+	 * Set the Configuration such that when service provider is created user is asked for the PATH
+	 * @return
+	 */
+	public static Configuration getDefaultConfiguration() {
+		Configuration c = new Configuration();
+		ObjectNode conf = c.getJsonAsObjectNode();
+		conf.put("path", "");
+		return c;
 	}
 }
