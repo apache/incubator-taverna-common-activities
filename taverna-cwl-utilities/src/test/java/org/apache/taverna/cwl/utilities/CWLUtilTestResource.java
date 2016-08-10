@@ -151,7 +151,7 @@ public class CWLUtilTestResource {
 					new TypeReference<Map<String, PortDetail>>() {
 					});
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		return new Object[] { new Object[] { cwlUtil, expected1 }, new Object[] { cwlUtil2, expected2 } };
 	}
