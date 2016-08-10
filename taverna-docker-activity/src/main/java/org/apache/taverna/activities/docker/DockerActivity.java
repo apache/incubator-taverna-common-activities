@@ -189,6 +189,10 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
     }
 
 
+    public DockerContainerConfiguration getContainerConfiguration() {
+        return containerConfiguration;
+    }
+
     private String getRenderedParam(ReferenceService referenceService, InvocationContext context, T2Reference key) {
         return (String) referenceService.renderIdentifier(key, String.class, context);
 

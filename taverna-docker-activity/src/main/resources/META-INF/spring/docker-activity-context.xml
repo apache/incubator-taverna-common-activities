@@ -26,4 +26,6 @@
         <constructor-arg name="configurationManager" ref="configurationManager" />
     </bean>
 
+    <bean id="dockerActivityHealthChecker" class="org.apache.taverna.activities.docker.DockerActivityHealthChecker" />
+
 </beans>
