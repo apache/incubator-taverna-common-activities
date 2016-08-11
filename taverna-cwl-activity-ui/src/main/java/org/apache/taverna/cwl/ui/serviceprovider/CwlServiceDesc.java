@@ -44,7 +44,7 @@ public class CwlServiceDesc extends ServiceDescription {
 	public String getDescription() {
 
 		// see whether description is too long
-		if (cwlConfiguration.has(DESCRIPTION)) {
+		if (cwlConfiguration.get(CwlServiceProvider.CWL_CONF).has(DESCRIPTION)) {
 			String description = cwlConfiguration.get(CwlServiceProvider.CWL_CONF).path(DESCRIPTION).asText();
 			if ((description.length() < 40))
 				return description;
@@ -87,9 +87,6 @@ public class CwlServiceDesc extends ServiceDescription {
 
 	private String toolName;
 
-	public String getToolName() {
-		return toolName;
-	}
 
 	public void setToolName(String toolName) {
 		this.toolName = toolName;
