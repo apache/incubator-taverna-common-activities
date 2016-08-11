@@ -1,154 +1,113 @@
-/*******************************************************************************
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *     contributor license agreements.  See the NOTICE file distributed with
- *     this work for additional information regarding copyright ownership.
- *     The ASF licenses this file to You under the Apache License, Version 2.0
- *     (the "License"); you may not use this file except in compliance with
- *     the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *     Unless required by applicable law or agreed to in writing, software
- *     distributed under the License is distributed on an "AS IS" BASIS,
- *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *     See the License for the specific language governing permissions and
- *     limitations under the License.
- *******************************************************************************/
 package org.apache.taverna.cwl.utilities;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
-
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.yaml.snakeyaml.Yaml;
+import org.junit.runner.RunWith;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+
+@RunWith(JUnitParamsRunner.class)
+
 public class CWLUtilTest {
-	static JsonNode cwlFile;
-	static CWLUtil  cwlUtil;
-	static JsonNode input;
 
-	@BeforeClass
-	public  static void setUp() throws Exception {
-		Yaml reader = new Yaml();
-		ObjectMapper mapper = new  ObjectMapper();
-		cwlFile = mapper.valueToTree(reader.load(CWLUtilTest.class.getResourceAsStream("/customtool1.cwl"))); 
 	
-		cwlUtil = new CWLUtil(cwlFile);
-		input =  cwlFile.get("inputs").get(0);
-	}
-
+	
 	@Test
-	public void processNameSpaceTest() {
-		JsonNode nameSpace = cwlUtil.getNameSpace();
-
-		assertEquals(1, nameSpace.size());
-		assertTrue(nameSpace.has("edam"));
-		assertEquals("http://edamontology.org/", nameSpace.get("edam").asText());
-	}
-
-	@Test
-	public void extractLabelTest() {
+	@Parameters(source=CWLUtilTestResource.class,method="extractDescriptionResources")
+	
+	public void extractDescriptionTest(CWLUtil cwlUtil,String expected,JsonNode input ) {
 		PortDetail detail = new PortDetail();
-
-		cwlUtil.extractLabel(null, detail);
-		assertEquals(null, detail.getLabel());
-
-		cwlUtil.extractLabel(input, detail);
-		assertEquals("input 1 testing label", detail.getLabel());
-
-	}
-
-	@Test
-	public void extractDescriptionTest() {
-		PortDetail detail = new PortDetail();
-
-		cwlUtil.extractDescription(null, detail);
-		assertEquals(null, detail.getDescription());
 
 		cwlUtil.extractDescription(input, detail);
-		assertEquals("this is a short description of input 1", detail.getDescription());
+		assertEquals(expected, detail.getDescription());
+
 
 	}
-
 	@Test
-	public void figureOutFormatsTest() {
-		PortDetail detail = new PortDetail();
-		detail.setFormat(new ArrayList<String>());
-		cwlUtil.figureOutFormats("edam:1245", detail);
-		assertEquals("http://edamontology.org/1245", detail.getFormat().get(0));
+	@Parameters(source=CWLUtilTestResource.class,method="processResources")
+	public void processTest(Map<String, Integer> expected,Map<String, Integer> actual) {
 
-		cwlUtil.figureOutFormats("$formatExpression", detail);
-		assertEquals("$formatExpression", detail.getFormat().get(1));
-
-		// format that doesn't defined in the name space
-
-		cwlUtil.figureOutFormats("formatkey: not Defined", detail);
-		assertEquals("formatkey: not Defined", detail.getFormat().get(2));
-	}
-
-	@Test
-	public void processTest() {
-
-		Map<String, Integer> actual = cwlUtil.process( cwlFile.get("inputs"));
-
-		HashMap<String, Integer> expected = new HashMap<>();
-		expected.put("input_1", 0);
-		expected.put("input_2", 1);
-		expected.put("input_3", 0);
 		for (Map.Entry<String, Integer> input : expected.entrySet()) {
 			assertEquals(input.getValue(), actual.get(input.getKey()));
 		}
-		
-		actual = cwlUtil.process((cwlFile.get("outputs")));
-		expected = new HashMap<>();
-		expected.put("output_1", 0);
-		expected.put("output_2", 0);
-		for (Map.Entry<String, Integer> input : expected.entrySet()) {
-			assertEquals(input.getValue(), actual.get(input.getKey()));
-		}
+			
+	}
+	
+	@Test
+	@Parameters(source=CWLUtilTestResource.class,method="isValidArrayTypeTrueResources")
+	public void isValidArrayTypeTrueTest(CWLUtil cwlUtil,String input) {
+
+			
+			assertTrue(cwlUtil.isValidArrayType(input));
 	}
 	@Test
-	public void isValidDataTypeTest() {
+	@Parameters(source=CWLUtilTestResource.class,method="isValidArrayTypeFalseResources")
+	public void isValidArrayTypeFalseTest(CWLUtil cwlUtil,String input) {
 
-			ObjectMapper mapper = new ObjectMapper();
-			ArrayNode node = mapper.createArrayNode();
-			node.add("int");
-			node.add("null");
-			node.add("float");
-			node.add("string");
-			node.add("double");
-			node.add("int");
-			node.add("file");
-			node.add("boolean");
-			node.add("directory");
+			
+			assertTrue(!cwlUtil.isValidArrayType(input));
+			
+	}
+	
+	
+	@Test
+	@Parameters(source=CWLUtilTestResource.class,method="isValidDataTypeTrueResources")
+	public void isValidDataTypeTrueTest(CWLUtil cwlUtil,ArrayNode node) {
 			
 			assertTrue(cwlUtil.isValidDataType(node));
-			assertTrue(!cwlUtil.isValidDataType(null));
-			node.add("blah blah");
+	}
+	@Test
+	@Parameters(source=CWLUtilTestResource.class,method="isValidDataTypeFalseResources")
+	public void isValidDataTypeFalseTest(CWLUtil cwlUtil,ArrayNode node ) {
+			
 			assertTrue(!cwlUtil.isValidDataType(node));
 	}
 	
 	@Test
-	public void isValidArrayTypeTest() {
+	@Parameters(source=CWLUtilTestResource.class,method="processNameSpaceResources")
+	public void processNameSpaceTest(CWLUtil cwlUtil,String tag, String format,int size) {
+		JsonNode nameSpace = cwlUtil.getNameSpace();
 
-			String validType="int[]";
-			String wrongType="blah[]";
-			String wrongType2="int []";
-			
-			assertTrue(cwlUtil.isValidArrayType(validType));
-			assertTrue(!cwlUtil.isValidArrayType(wrongType));
-			assertTrue(!cwlUtil.isValidArrayType(wrongType2));
-			assertTrue(!cwlUtil.isValidArrayType(null));
-			
+		assertEquals(size, nameSpace.size());
+		assertTrue(nameSpace.has(tag));
+		assertEquals(format, nameSpace.get(tag).asText());
+	}
+	@Test
+	@Parameters(source=CWLUtilTestResource.class,method="extractLabelResources")
+	public void extractLabelTest(CWLUtil cwlUtil,JsonNode input,String expected) {
+		PortDetail detail = new PortDetail();
+
+		cwlUtil.extractLabel(input, detail);
+		assertEquals(expected, detail.getLabel());
+
+	}
+	@Test
+	@Parameters(source=CWLUtilTestResource.class,method="figureOutFormatsResources")
+	public void figureOutFormatsTest(CWLUtil cwlUtil,String format,PortDetail detail,String expected, int index) {
+		
+		cwlUtil.figureOutFormats(format, detail);
+		assertEquals(expected, detail.getFormat().get(index));
+	}
+	@Test
+	@Parameters(source=CWLUtilTestResource.class,method="processDetailsResources")
+	public void processDetailsTest(CWLUtil cwlUtil,Map<String, PortDetail> expected) {
+
+		 Map<String, PortDetail> actual=cwlUtil.processInputDetails();
+		 for (Map.Entry<String, PortDetail> input : expected.entrySet()) {
+			 PortDetail expectedDetail=input.getValue();
+			 PortDetail actualDetail =actual.get(input.getKey());
+				assertEquals(expectedDetail.getFormat(), actualDetail.getFormat());
+				assertEquals(expectedDetail.getLabel(), actualDetail.getLabel());
+				assertEquals(expectedDetail.getDescription(), actualDetail.getDescription());
+			}
+		
 	}
 }
