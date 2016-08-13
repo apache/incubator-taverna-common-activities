@@ -215,7 +215,7 @@ public class CWLUtil {
 
 	/**
 	 * This method is used for extracting details of the CWL tool inputs or
-	 * outputs. ex:Lable, Format, Description
+	 * outputs. ex:Label, Format, Description
 	 * 
 	 * @param inputs
 	 *            This is JsonNode object which contains the Inputs or outputs
