@@ -29,14 +29,15 @@ public class DockerActivityHealthChecker implements HealthChecker<Object> {
                     HealthCheck.NO_PROBLEM, VisitReport.Status.OK));
         } else {
             reports.add(new VisitReport(HealthCheck.getInstance(), activity,
-                    "REST Activity - bad configuration",
+                    "Docker container creation health check failed. " +
+                            "A container with name " + containerName + " already exists.",
                     HealthCheck.INVALID_CONFIGURATION, VisitReport.Status.SEVERE));
         }
 
         // collection all reports together
         VisitReport.Status worstStatus = VisitReport.getWorstStatus(reports);
         VisitReport report = new VisitReport(HealthCheck.getInstance(), activity,
-                "REST Activity Report", HealthCheck.NO_PROBLEM, worstStatus, reports);
+                "Docker Activity Health Report", HealthCheck.NO_PROBLEM, worstStatus, reports);
 
         return report;
     }
