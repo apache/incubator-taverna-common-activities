@@ -1,0 +1,31 @@
+{
+  "http://purl.org/dc/terms/rights": "Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file to You under the Apache License, Version 2.0 (the 'License'); you may not use this file except in compliance with the License.  You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.",
+  "http://purl.org/dc/terms/license": {"@id": "http://www.apache.org/licenses/LICENSE-2.0"},  
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "id": "https://taverna.apache.org/ns/2016/activity/cwl/schema.json",
+    "title": "CWL activity configuration",
+    "type": "object",
+    "properties": {
+        "@context": {
+            "description": "JSON-LD context for interpreting the configuration as RDF",
+            "required": true,
+            "enum": ["https://taverna.apache.org/ns/2016/activity/cwl/cwl.context.json"]
+        },
+        "toolName": {
+            "title": "Tool name",
+            "description": "CWL command Line Tool Name",
+            "type": "string",
+            "required": true
+        },
+        "cwl_conf":{
+        	"description": "CWL command Line Tool configuration",
+            "type": "object",
+            "required": true
+        },
+        "cwl_path":{
+        	"description": "Location of the CWl Tool",
+            "type": "string",
+            "required": true
+        }
+    }
+}

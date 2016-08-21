@@ -14,15 +14,21 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.apache.taverna.commonactivities</groupId>
-		<artifactId>apache-taverna-common-activities</artifactId>
-		<version>2.1.1-incubating-SNAPSHOT</version>
+    <artifactId>apache-taverna-common-activities</artifactId>
+    <version>2.1.1-incubating-SNAPSHOT</version>
 	</parent>
 	<artifactId>taverna-cwl-activity-ui</artifactId>
 	<packaging>bundle</packaging>
 	<name>Apache Taverna CWL Activity</name>
 
+	
 	<dependencies>
 
+		<dependency>
+			<groupId>org.apache.taverna.engine</groupId>
+			<artifactId>taverna-workflowmodel-api</artifactId>
+			<version>${taverna.engine.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.taverna.engine</groupId>
 			<artifactId>taverna-reference-api</artifactId>
@@ -30,166 +36,99 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.taverna.engine</groupId>
-			<artifactId>taverna-workflowmodel-api</artifactId>
+			<artifactId>taverna-workflowmodel-impl</artifactId>
 			<version>${taverna.engine.version}</version>
+			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.taverna.osgi</groupId>
-			<artifactId>taverna-app-configuration-api</artifactId>
-			<version>${taverna.osgi.version}</version>
-		</dependency>
+		 <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-activity-palette-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-edits-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-selection-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-menu-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-activity-icons-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-helper-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-ui</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-configuration-ui-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-contextual-views-api</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.taverna.workbench</groupId>
+            <artifactId>taverna-activity-tools</artifactId>
+            <version>${taverna.workbench.version}</version>
+        </dependency>
+		<!-- =====================================These Dependencies were added 
+			later !!! =============================================================== -->
 
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>taverna-cwl-utilities</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+	<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.taverna.engine</groupId>
-			<artifactId>taverna-activity-test-utils</artifactId>
-			<version>${taverna.engine.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.taverna.engine</groupId>
-			<artifactId>taverna-workflowmodel-impl</artifactId>
-			<version>${taverna.engine.version}</version>
-			<scope>test</scope>
-		</dependency>
-
+		
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-		<!-- =====================================These Dependencies were added 
-			later !!! =============================================================== -->
-		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<version>1.17</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.taverna.t2.ui-api</groupId>
-			<artifactId>activity-palette-api</artifactId>
-			<version>${t2.ui.api.version}</version>
-		</dependency>
-
-		<dependency>
-			<artifactId>taverna-cwl-activity</artifactId>
-			<groupId>${project.groupId}</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.taverna.t2.taverna-workbench</groupId>
-			<artifactId>workbench-dev</artifactId>
-			<version>${t2.workbench.version}</version>
-			<scope>test</scope>
-
-			<exclusions>
-
-				<!-- Disable various activities that are not relevant to testing our 
-					example activity. If you want to re-enable for instance WSDL activity, remember 
-					to comment out the exclusion for both wsdl-activity-ui and wsdl-activity 
-					further down. -->
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-activities</groupId>
-					<artifactId>apiconsumer-activity-ui</artifactId>
-				</exclusion>
-
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-activities</groupId>
-					<artifactId>biomoby-activity-ui</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-activities</groupId>
-					<artifactId>biomart-activity-ui</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-activities</groupId>
-					<artifactId>soaplab-activity-ui</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-activities</groupId>
-					<artifactId>ncbi-activity-ui</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-activities</groupId>
-					<artifactId>rshell-activity-ui</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-activities</groupId>
-					<artifactId>spreadsheet-import-activity-ui</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-activities</groupId>
-					<artifactId>wsdl-activity-ui</artifactId>
-				</exclusion>
-
-				<!-- .. and the t2.activities counterparts -->
-				<exclusion>
-					<groupId>net.sf.taverna.t2.activities</groupId>
-					<artifactId>apiconsumer-activity</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.activities</groupId>
-					<artifactId>biomoby-activity</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.activities</groupId>
-					<artifactId>biomart-activity</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.activities</groupId>
-					<artifactId>soaplab-activity</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.activities</groupId>
-					<artifactId>ncbi-activity</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.activities</groupId>
-					<artifactId>rshell-activity</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.activities</groupId>
-					<artifactId>spreadsheet-import-activity</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.activities</groupId>
-					<artifactId>wsdl-activity</artifactId>
-				</exclusion>
-				<!-- Perspectives pulling in too many dependencies -->
-				<exclusion>
-					<!-- fails due to direct dependency to WSDL -->
-					<groupId>net.sf.taverna.t2.ui-exts</groupId>
-					<artifactId>perspective-biocatalogue</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.taverna.t2.ui-exts</groupId>
-					<artifactId>perspective-myexperiment</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- ==================================================================================================== -->
-
 	</dependencies>
 
 	<!-- Added these properties to configure new dependencies -->
 	<properties>
-		<t2.ui.api.version>1.5</t2.ui.api.version>
-		<t2.workbench.version>2.5.0</t2.workbench.version>
+	<taverna.language.version>0.15.1-incubating</taverna.language.version>
+		<taverna.osgi.version>0.2.1-incubating</taverna.osgi.version>
+		<taverna.workbench.version>3.1.0-incubating-SNAPSHOT</taverna.workbench.version>
 	</properties>
 	<repositories>
-		<repository>
-			<id>mygrid-repository</id>
-			<name>myGrid Repository</name>
-			<url>http://www.mygrid.org.uk/maven/repository</url>
-			<releases />
-			<snapshots>
+	<repository>
+			<id>apache.snapshots</id>
+			<name>Apache Snapshot Repository</name>
+			<url>http://repository.apache.org/snapshots</url>
+			<releases>
 				<enabled>false</enabled>
-			</snapshots>
+			</releases>
 		</repository>
+		
 	</repositories>
 </project>

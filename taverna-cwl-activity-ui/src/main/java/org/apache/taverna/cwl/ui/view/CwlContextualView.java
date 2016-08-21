@@ -19,40 +19,63 @@ package org.apache.taverna.cwl.ui.view;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import org.apache.taverna.cwl.CwlActivityConfigurationBean;
-import org.apache.taverna.cwl.CwlDumyActivity;
-import org.apache.taverna.cwl.PortDetail;
-import net.sf.taverna.t2.workbench.ui.actions.activity.HTMLBasedActivityContextualView;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
+
+import org.apache.taverna.cwl.ui.serviceprovider.CwlServiceProvider;
+import org.apache.taverna.cwl.utilities.CwlContextualUtil;
+import org.apache.taverna.scufl2.api.activity.Activity;
+import org.apache.taverna.scufl2.api.configurations.Configuration;
+import org.apache.taverna.workbench.configuration.colour.ColourManager;
+import org.apache.taverna.workbench.ui.actions.activity.HTMLBasedActivityContextualView;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /*
  * This class is responsible for producing service detail panel for each tool
  * 
  * */
-public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivityConfigurationBean> {
+public class CwlContextualView extends HTMLBasedActivityContextualView {
 
 	private static final String DESCRIPTION = "description";
 	private static final String LABEL = "label";
-	private static final String TABLE_COLOR = "59A9CB";// this is color in RGB
-														// hex value
+	// private static final String TABLE_COLOR = "59A9CB";// this is color in
+	// RGB
+	// hex value
 	private static final String TABLE_BORDER = "2";
 	private static final String TABLE_WIDTH = "100%";
 	private static final String TABLE_CELL_PADDING = "5%";
 
-	private final CwlActivityConfigurationBean configurationBean;
-	private final CwlDumyActivity activity;
+	private static ColourManager colourManager;
 
-	public CwlContextualView(CwlDumyActivity activity) {
-		super((Activity) activity);
+	public static ColourManager getColourManager() {
+		return colourManager;
+	}
+
+	public static void setColourManager(ColourManager colourManager) {
+		CwlContextualView.colourManager = colourManager;
+	}
+
+	private final Configuration configurationNode;
+	private final Activity activity;
+	private JsonNode cwlActivityConfiguration;
+	private JsonNode cwlToolConfiguration;//This is output of the YAML parser
+	private CwlContextualUtil cwlUtil;
+
+	public CwlContextualView(Activity activity, ColourManager colourManager) {
+		super(activity, colourManager);
 		this.activity = activity;
-		this.configurationBean = activity.getConfiguration();
+		this.configurationNode = activity.getConfiguration();
+		cwlActivityConfiguration = configurationNode.getJson();
+
+		cwlToolConfiguration = cwlActivityConfiguration.get(CwlServiceProvider.CWL_CONF);
+		setUpCwlContextualUtil();
 		super.initView();
+	}
+
+	public void setUpCwlContextualUtil() {
+		cwlUtil = new CwlContextualUtil(cwlToolConfiguration);
 	}
 
 	@Override
@@ -70,7 +93,7 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 
 	@Override
 	public String getViewTitle() {
-		return configurationBean.getToolName();
+		return cwlActivityConfiguration.get(CwlServiceProvider.TOOL_NAME).asText();
 	}
 
 	/**
@@ -93,99 +116,32 @@ public class CwlContextualView extends HTMLBasedActivityContextualView<CwlActivi
 		return null;
 	}
 
-	// format long description using html <p> tags
-	private String paragraphToHtml(String summery, String paragraph) {
-
-		summery += "<tr><td colspan='2' align='left'>";
-
-		for (String line : paragraph.split("[\n|\r]"))
-			summery += "<p>" + line + "</p>";
-
-		summery += "</td></tr>";
-
-		return summery;
-	}
-
 	@Override
 	protected String getRawTableRowsHtml() {
-		String summery = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" bgcolor=\""
-				+ TABLE_COLOR + "\" cellpadding=\"" + TABLE_CELL_PADDING + "\" >";
+		String summary = "<table border=\"" + TABLE_BORDER + "\" style=\"width:" + TABLE_WIDTH + "\" cellpadding=\""
+				+ TABLE_CELL_PADDING + "\" >";
 
-		Map cwlFile = configurationBean.getCwlConfigurations();
-		String description = "";
-
-		if (cwlFile.containsKey(LABEL)) {
-			summery += "<tr><th colspan='2' align='left'>Label</th></tr>";
-			summery += "<tr><td colspan='2' align='left'>" + (String) cwlFile.get(LABEL) + "</td></tr>";
-		}
-		if (cwlFile.containsKey(DESCRIPTION)) {
-
-			description = (String) cwlFile.get(DESCRIPTION);
-			summery = paragraphToHtml(summery, description);
+		
+		// Get the CWL tool Description
+		if (cwlToolConfiguration.has(DESCRIPTION)) {
+			String description = cwlToolConfiguration.get(DESCRIPTION).asText();
+			summary = cwlUtil.paragraphToHtml(summary, description);
 
 		}
+		// Get the CWL tool Label
+		if (cwlToolConfiguration.has(LABEL)) {
+			summary += "<tr><th colspan='2' align='left'>Label</th></tr>";
+			summary += "<tr><td colspan='2' align='left'>" + cwlToolConfiguration.get(LABEL).asText() + "</td></tr>";
+		}
+		summary += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
 
-		summery += "<tr><th colspan='2' align='left'>Inputs</th></tr>";
+		summary = cwlUtil.setUpInputDetails(summary);
 
-		HashMap<String, PortDetail> inputs = activity.getProcessedInputs();
+		summary += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
 
-		if (inputs != null && !inputs.isEmpty())
-			for (String id : inputs.keySet()) {
-
-				PortDetail detail = inputs.get(id);
-
-				summery = extractSummery(summery, id, detail);
-			}
-
-		summery += "<tr><th colspan='2' align='left'>Outputs</th></tr>";
-
-		HashMap<String, PortDetail> outPuts = activity.getProcessedOutputs();
-
-		if (outPuts != null && !outPuts.isEmpty())
-			for (String id : outPuts.keySet()) {
-
-				PortDetail detail = outPuts.get(id);
-
-				summery = extractSummery(summery, id, detail);
-			}
-		summery += "</table>";
-		return summery;
+		summary = cwlUtil.setUpOutputDetails(summary);
+		summary += "</table>";
+		return summary;
 	}
 
-	private String extractSummery(String summery, String id, PortDetail detail) {
-
-		summery += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + detail.getDepth() + "</td></tr>";
-
-		if (detail.getLabel() != null) {
-			summery += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
-		}
-
-		if (detail.getDescription() != null) {
-
-			summery = paragraphToHtml(summery, detail.getDescription());
-
-		}
-
-		if (detail.getFormat() != null) {
-			summery += "<tr><td  align ='left' colspan ='2'>Format: ";
-			ArrayList<String> formats = detail.getFormat();
-
-			int Size = formats.size();
-
-			if (Size == 1) {
-				// single format
-				summery += formats.get(0);
-			} else {
-
-				// array of formats
-				for (int i = 0; i < (Size - 1); i++) {
-					summery += formats.get(i) + ", ";
-				}
-				summery += formats.get(Size - 1);
-			}
-			summery += "</td></tr>";
-		}
-		summery += "<tr></tr>";
-		return summery;
-	}
 }
