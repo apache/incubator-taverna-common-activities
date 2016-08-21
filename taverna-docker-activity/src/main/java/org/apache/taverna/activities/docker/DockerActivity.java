@@ -189,6 +189,10 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
     }
 
 
+    public DockerContainerConfiguration getContainerConfiguration() {
+        return containerConfiguration;
+    }
+
     private String getRenderedParam(ReferenceService referenceService, InvocationContext context, T2Reference key) {
         return (String) referenceService.renderIdentifier(key, String.class, context);
 
@@ -205,11 +209,6 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
     return out;
     }
 
-    private boolean isStarted(Container container){
-        return  container.getStatus() != null
-                && container.getStatus().startsWith("Up");
-    }
-
     private Container getContainerFromName(RemoteClient remoteClient, String containerName){
         List<Container> containerList = remoteClient.listContainers();
         for(Container container : containerList){
@@ -221,6 +220,13 @@ public class DockerActivity extends AbstractAsynchronousActivity<JsonNode> {
                 }
             }
         }
-    return null;
+        return null;
     }
+
+    private boolean isStarted(Container container){
+        return  container.getStatus() != null
+                && container.getStatus().startsWith("Up");
+    }
+
+
 }

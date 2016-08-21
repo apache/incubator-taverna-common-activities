@@ -52,7 +52,7 @@ public class DockerActivityTest {
     public static final String DOCKER_REGISTRY = "https://registry-1.docker.io/v2";
 
     public static void main(String[] args) throws Exception {
-    DockerActivityTest activityTest = new DockerActivityTest();
+        DockerActivityTest activityTest = new DockerActivityTest();
         activityTest.setup();
         activityTest.testAll();
     }
@@ -81,12 +81,12 @@ public class DockerActivityTest {
 
     @Test
     public void testAll() throws Exception {
-//        testCreateContainer();
+        testCreateContainer();
         testInspectImage();
-//        testListContainers();
-//        testStartContainer();
-//        testStopContainer();
-//        testDeleteContainer();
+        testListContainers();
+        testStartContainer();
+        testStopContainer();
+        testDeleteContainer();
     }
 
     /**
