@@ -2,7 +2,7 @@
 <snippet>
   <content>
 # Taverna-CWL-Activity-UI Plugin
-This module contains the UI plugin implementaion of the [Common Workflow Language(CWL)](http://www.commonwl.org/). The basic functionality of this plugin is to find the CWL tool in the given directory and extract configuration information from the tools. 
+This module contains the UI plugin implementation of the [Common Workflow Language(CWL)](http://www.commonwl.org/). The basic functionality of this plugin is to find the CWL tool in the given directory and extract configuration information from the tools. 
 
 ##Implementation Approach
 
