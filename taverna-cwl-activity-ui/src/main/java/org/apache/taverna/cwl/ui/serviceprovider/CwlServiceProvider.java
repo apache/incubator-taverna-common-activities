@@ -180,7 +180,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	private CwlServiceDesc createCWLDesc(JsonNode node) {
 		CwlServiceDesc cwlServiceDesc = new CwlServiceDesc();
 		cwlServiceDesc.setCwlConfiguration(node);
-		cwlServiceDesc.setToolName(node.get(CwlServiceProvider.TOOL_NAME).asText());
+		cwlServiceDesc.setName(node.get(CwlServiceProvider.TOOL_NAME).asText());
 		return cwlServiceDesc;
 	}
 
