@@ -56,7 +56,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	public static final String COMMONWL = "commonwl/";
 	private static Logger logger = Logger.getLogger(CwlServiceProvider.class);
 
-	CwlServiceProvider() {
+	public CwlServiceProvider() {
 		// FIXME
 		super(getDefaultConfiguration());
 	}
@@ -136,7 +136,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	private List<Path> getPath() {
 		String userInput = getConfiguration().getJsonAsObjectNode().get("path").asText();
 		// If user haven't provided a PATH 
-		if (userInput.isEmpty()||userInput==null) {
+		if (userInput==null || userInput.isEmpty()) {
 			List<Path> defaultPaths = new ArrayList<>();
 			addPath(defaultPaths, DEFAULT_PATH_1, null);
 			addPath(defaultPaths, DEFAULT_PATH_2, null);
