@@ -118,48 +118,40 @@ public class CWLUtil {
 				String currentInputId = input.get(ID).asText();
 
 				JsonNode typeConfigurations;
-				try {
 
-					typeConfigurations = input.get(TYPE);
-					// if type :single argument
-					if (typeConfigurations.getClass() == TextNode.class) {
-						// inputs:
-						/// -id: input_1
-						//// type: int[]
-						if (isValidArrayType(typeConfigurations.asText()))
-							result.put(currentInputId, DEPTH_1);
-						// inputs:
-						/// -id: input_1
-						//// type: int or int?
-						else
-							result.put(currentInputId, DEPTH_0);
-						// type : defined as another map which contains type:
-					} else if (typeConfigurations.getClass() == ObjectNode.class) {
-						// inputs:
-						/// -id: input_1
-						//// type:
-						///// type: array or int[]
-						String inputType = typeConfigurations.get(TYPE).asText();
-						if (inputType.equals(ARRAY) || isValidArrayType(inputType)) {
-							result.put(currentInputId, DEPTH_1);
-
-						}
-						// inputs:
-						// -id: input_1
-						// type:
-						// type: ["null",int]
-					} else if (typeConfigurations.getClass() == ArrayNode.class) {
-						if (isValidDataType(typeConfigurations)) {
-							result.put(currentInputId, DEPTH_0);
-						}
+				typeConfigurations = input.get(TYPE);
+				// if type :single argument
+				if (typeConfigurations.getClass() == TextNode.class) {
+					// inputs:
+					/// -id: input_1
+					//// type: int[]
+					if (isValidArrayType(typeConfigurations.asText()))
+						result.put(currentInputId, DEPTH_1);
+					// inputs:
+					/// -id: input_1
+					//// type: int or int?
+					else
+						result.put(currentInputId, DEPTH_0);
+					// type : defined as another map which contains type:
+				} else if (typeConfigurations.getClass() == ObjectNode.class) {
+					// inputs:
+					/// -id: input_1
+					//// type:
+					///// type: array or int[]
+					String inputType = typeConfigurations.get(TYPE).asText();
+					if (inputType.equals(ARRAY) || isValidArrayType(inputType)) {
+						result.put(currentInputId, DEPTH_1);
 
 					}
-
-				} catch (ClassCastException e) {
-
-					System.out.println("Class cast exception !!!");
+					// inputs:
+					// -id: input_1
+					// type:
+					// type: ["null",int]
+				} else if (typeConfigurations.getClass() == ArrayNode.class) {
+					if (isValidDataType(typeConfigurations)) {
+						result.put(currentInputId, DEPTH_0);
+					}
 				}
-
 			}
 		} else if (inputs.getClass() == ObjectNode.class) {
 
