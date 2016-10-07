@@ -163,18 +163,15 @@ public class CWLUtil {
 				JsonNode typeConfigurations = entry.getValue();
 
 				if (typeConfigurations.getClass() == TextNode.class) {
-					if (typeConfigurations.asText().startsWith("$")) {
-						System.out.println("Exception");
-					}
 					// inputs:
 					/// input_1: int[]
-					else if (isValidArrayType(typeConfigurations.asText()))
-						result.put(currentInputId, DEPTH_1);
-					// inputs:
-					/// input_1: int or int?
-					else
-						result.put(currentInputId, DEPTH_0);
-
+                    if (isValidArrayType(typeConfigurations.asText())) {
+                        result.put(currentInputId, DEPTH_1);
+                        // inputs:
+                        /// input_1: int or int?
+                    } else {
+                        result.put(currentInputId, DEPTH_0);
+                    }
 				} else if (typeConfigurations.getClass() == ObjectNode.class) {
 
 					if (typeConfigurations.has(TYPE)) {
