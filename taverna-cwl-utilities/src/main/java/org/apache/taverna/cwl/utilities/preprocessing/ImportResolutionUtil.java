@@ -16,19 +16,12 @@
  *******************************************************************************/
 package org.apache.taverna.cwl.utilities.preprocessing;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -36,17 +29,15 @@ import java.util.List;
  */
 public class ImportResolutionUtil extends LinkedResolutionUtil {
 
-    final private static Logger logger = Logger.getLogger(ImportResolutionUtil.class);
-
     final public static String IMPORT = "$import";
-
+    final private static Logger logger = Logger.getLogger(ImportResolutionUtil.class);
     private JsonNode cwlToolDescription;
     private Path path;
 
     public ImportResolutionUtil(JsonNode cwlToolDescription, Path path) {
-        super(cwlToolDescription,path);
+        super(cwlToolDescription, path);
         this.cwlToolDescription = cwlToolDescription;
-        this.path=path;
+        this.path = path;
     }
 
     @Override
@@ -55,7 +46,7 @@ public class ImportResolutionUtil extends LinkedResolutionUtil {
     }
 
 
-    public  void processNode(JsonNode node) throws URISyntaxException {
+    public void processNode(JsonNode node) throws URISyntaxException {
 
         replace(node);
         if (node.has(IMPORT)) {
@@ -68,20 +59,20 @@ public class ImportResolutionUtil extends LinkedResolutionUtil {
                     try {
                         processNode(x);
                     } catch (URISyntaxException e) {
-                        logger.error("URI is not valid",e);
+                        logger.error("URI is not valid", e);
                     }
                 }
             });
         }
     }
 
-    public   void replace(JsonNode node) {
+    public void replace(JsonNode node) {
         JsonNode importedNode = null;
         try {
             ImportNode importNode = new ImportNodeImpl();
             importedNode = importNode.importNode(super.process(node.get(IMPORT)));
         } catch (URISyntaxException e) {
-            logger.error("URI is not valid",e);
+            logger.error("URI is not valid", e);
         }
         ((ObjectNode) node).remove(IMPORT);
         importedNode.fields().forEachRemaining(y -> {

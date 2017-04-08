@@ -17,9 +17,12 @@
 package org.apache.taverna.cwl.utilities.preprocessing;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import java.net.URI;
 
-
+/**
+ * This class provides abstract between node importing and how it's imported
+ */
 public class ImportNodeImpl implements ImportNode {
 
     @Override

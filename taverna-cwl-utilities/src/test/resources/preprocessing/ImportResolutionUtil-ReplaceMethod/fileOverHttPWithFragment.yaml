@@ -1,2 +1,0 @@
-$base: http://localhost:8000/
-$import: import.yaml#hello

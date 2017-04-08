@@ -19,12 +19,13 @@ package org.apache.taverna.cwl.utilities.preprocessing;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.net.URI;
-import java.nio.file.Path;
 
-/**
- * Created by maanadev on 4/7/17.
- */
+
 public interface ImportNode {
-
+    /**
+     * This is method can be used to import the Json Node referred by the CWL Tool description. If a fragment is defined then the required portion of the imported node is returned
+     * @param uri This must be an absolute uri.
+     * @return The node that is been imported. It can be a portion of a node as well
+     */
     JsonNode importNode(URI uri);
 }

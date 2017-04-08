@@ -163,7 +163,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.createObjectNode();
 		JsonNode cwl_map = mapper.valueToTree(cwlFile);
-		CwlPreprocessor cwlPreprocessor = new ImportResolutionUtil(cwl_map);
+		CwlPreprocessor cwlPreprocessor = new ImportResolutionUtil(cwl_map,p.getParent());
 		try {
 			cwlPreprocessor.process();
 		} catch (URISyntaxException e) {

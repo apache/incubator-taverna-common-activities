@@ -17,17 +17,17 @@
 package org.apache.taverna.cwl.utilities.preprocessing;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-
+/**
+ * This class is Util class which is used for resolving Linked resolution
+ * Rules are defined at: http://www.commonwl.org/draft-3/SchemaSalad.html#Link_resolution
+ */
 public class LinkedResolutionUtil implements CwlPreprocessor {
 
     final private static Logger logger = Logger.getLogger(LinkedResolutionUtil.class);
@@ -37,18 +37,25 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
     private URI BASE;
     private Path path;
 
-
-    private void setBASE(URI BASE) {
-        this.BASE = BASE;
-    }
-
-
+    /**
+     *
+     * @param cwlToolDescription CWL tool description
+     * @param path This must be the directory where CWL tool is located and resolving is done assuming required other files
+     *             in the same directory
+     */
     public LinkedResolutionUtil(JsonNode cwlToolDescription, Path path) {
         this.cwlToolDescription = cwlToolDescription;
         this.path = path;
         setup();
     }
 
+    private void setBASE(URI BASE) {
+        this.BASE = BASE;
+    }
+
+    /**
+     * This method setup the initial resources for the process
+     */
     private void setup() {
         try {
             if (cwlToolDescription.has("$base"))
@@ -65,7 +72,12 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
         this.nameSpace = nameSpace;
     }
 
-
+    /**
+     * This method is resolving the uri based on the rules mentioned in the CWL Schema Salad
+     * @param val This is a ValueNode (subclass of a JsonNode) which holds the link. This must be a single node
+     * @return An URI object which contains absolute is returned
+     * @throws URISyntaxException
+     */
     @Override
     public URI process(JsonNode val) throws URISyntaxException {
 
@@ -87,14 +99,13 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
             return uri;
         }
 
-        Path absolutePath = path.resolve(uriString);
-
+        Path absolutePath = path.resolve(uri.getPath());
         File file = new File(absolutePath.toString());
 
         if (file.isFile()) {
-            return absolutePath.toUri();
+            final String fragment = uri.getFragment();
+            return (fragment != null) ? absolutePath.toUri().resolve("#" + fragment) : absolutePath.toUri();
         }
-
 
         if (BASE == null) {
 
@@ -103,6 +114,7 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
         }
         return BASE.resolve(uriString);
     }
+
     @Override
     public void process() throws URISyntaxException {
 

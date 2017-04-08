@@ -23,6 +23,17 @@ import java.net.URISyntaxException;
 
 
 public interface CwlPreprocessor {
-     URI process(JsonNode val) throws URISyntaxException;
-     void process()throws URISyntaxException;
+    /**
+     * This method is used to pre process part of  the node
+     * @param val
+     * @return
+     * @throws URISyntaxException
+     */
+    URI process(JsonNode val) throws URISyntaxException;
+
+    /**
+     * This method is used to apply pre processing to whole object
+     * @throws URISyntaxException
+     */
+    void process() throws URISyntaxException;
 }
