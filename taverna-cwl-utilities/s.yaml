@@ -1,0 +1,25 @@
+
+cwlVersion: v1.0
+class: Workflow
+$import: a.yaml
+$base: http://localhost:8000/
+requirements:
+  $import: a.yaml
+$namespaces:
+ local: http://localhost:8000/
+ edam2: http://edamontologytest.org/
+inputs:
+  hello: "schemadef-type.yml#HelloType"
+
+outputs:
+  output:
+    type: File
+    outputSource: step1/output
+    $import: import.yaml#hello
+
+steps:
+  step1:
+    in:
+      hello: hello
+    out: [output,{$import: "local:import.yaml"}]
+    run: schemadef-tool.cwl

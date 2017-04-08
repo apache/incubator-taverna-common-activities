@@ -1,0 +1,5 @@
+$namespaces:
+ local: http://localhost:8000/
+hello:
+ see: world
+key: value

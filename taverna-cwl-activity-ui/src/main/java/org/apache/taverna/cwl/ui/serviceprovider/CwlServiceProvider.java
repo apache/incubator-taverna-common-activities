@@ -19,6 +19,7 @@ package org.apache.taverna.cwl.ui.serviceprovider;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,11 +34,12 @@ import java.util.stream.StreamSupport;
 import javax.swing.Icon;
 
 import org.apache.log4j.Logger;
+import org.apache.taverna.cwl.utilities.preprocessing.CwlPreprocessor;
+import org.apache.taverna.cwl.utilities.preprocessing.ImportResolutionUtil;
 import org.apache.taverna.scufl2.api.common.Visitor;
 import org.apache.taverna.scufl2.api.configurations.Configuration;
 import org.apache.taverna.servicedescriptions.AbstractConfigurableServiceProvider;
 import org.apache.taverna.servicedescriptions.ConfigurableServiceProvider;
-import org.apache.taverna.servicedescriptions.ServiceDescriptionProvider;
 import org.yaml.snakeyaml.Yaml;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -161,6 +163,12 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.createObjectNode();
 		JsonNode cwl_map = mapper.valueToTree(cwlFile);
+		CwlPreprocessor cwlPreprocessor = new ImportResolutionUtil(cwl_map);
+		try {
+			cwlPreprocessor.process();
+		} catch (URISyntaxException e) {
+			logger.error("Invalid uri",e);
+		}
 		((ObjectNode) root).put(TOOL_NAME, p.getFileName().toString().split("\\.")[0]);
 		((ObjectNode) root).put(CWL_CONF, cwl_map);
 		((ObjectNode) root).put(CWL_PATH, p.toString());
@@ -210,7 +218,7 @@ public class CwlServiceProvider extends AbstractConfigurableServiceProvider impl
 	}
 
 	@Override
-	public ServiceDescriptionProvider newInstance() {
+	public AbstractConfigurableServiceProvider newInstance() {
 		return new CwlServiceProvider();
 	}
 

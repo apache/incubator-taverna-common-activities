@@ -1,0 +1,4 @@
+$namespaces:
+ local: http://localhost:8000/
+
+$import: "local:import.yaml"
