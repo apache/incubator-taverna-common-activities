@@ -19,7 +19,10 @@
 package org.apache.taverna.cwl.utilities.preprocessing;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.InputStream;
 import java.net.URI;
 
 
@@ -30,4 +33,13 @@ public interface ImportNode {
      * @return The node that is been imported. It can be a portion of a node as well
      */
     JsonNode importNode(URI uri);
+
+    default JsonNode getNode(InputStream inputStream, String fragment) {
+        Yaml reader = new Yaml();
+        ObjectMapper mapper = new ObjectMapper();
+        if (fragment != null) {
+            return mapper.valueToTree(reader.load(inputStream)).get(fragment);
+        }
+        return mapper.valueToTree(reader.load(inputStream));
+    }
 }

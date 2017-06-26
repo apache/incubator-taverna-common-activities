@@ -19,6 +19,9 @@
 package org.apache.taverna.cwl.utilities.preprocessing;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import org.eclipse.jetty.server.Server;
 import org.junit.*;
 
 import java.io.File;
@@ -26,23 +29,22 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
-import static org.apache.taverna.cwl.utilities.ImportNodeViaFile.getNode;
+import static org.apache.taverna.cwl.utilities.preprocessing.ImportNodeViaFile.getNode;
 import static org.junit.Assert.assertEquals;
 
 public class ImportResolutionUtilTest {
-    static Process exec;
     JsonNode localFile, localFileResult, fileOverHttPWithFragment, fileOverHttPWithFragmentResult,
             fileOverHttpWithNamespace, fileOverHttpWithNamespaceResult, testProcessNode, testProcessNodeResult;
 
     @BeforeClass
     public static void setUpHttPServer() throws IOException {
-        String cmd[] = {"python", "-m", "SimpleHTTPServer", "8000"};
-        exec = Runtime.getRuntime().exec(cmd, null, new File(ImportResolutionUtilTest.class.getResource("/preprocessing/serverContent/").getPath()));
+        JettyFileServer.startServer();
+
     }
 
     @AfterClass
     public static void stopHttPServer() {
-        exec.destroy();
+     JettyFileServer.stopServer();
     }
 
     @Before
@@ -56,7 +58,22 @@ public class ImportResolutionUtilTest {
         fileOverHttpWithNamespaceResult = getNode("/preprocessing/ImportResolutionUtil-replace-Method/fileOverHttpWithNamespaceResult.yaml");
         testProcessNode = getNode("/preprocessing/ImportResoultionUtil-processNode-Method/processNode.yaml");
         testProcessNodeResult = getNode("/preprocessing/ImportResoultionUtil-processNode-Method/processNodeResult.yaml");
-        System.out.println(testProcessNode);
+        setupPort();
+    }
+    private void setupPort(){
+        int port=JettyFileServer.getPort();
+        ((ObjectNode)fileOverHttPWithFragment).replace("$base",new TextNode("http://localhost:"+port+"/"));
+        ((ObjectNode)fileOverHttPWithFragmentResult).replace("$base",new TextNode("http://localhost:"+port+"/"));
+
+        ((ObjectNode)fileOverHttpWithNamespace.get("$namespaces")).replace("local",new TextNode("http://localhost:"+port+"/"));
+        ((ObjectNode)fileOverHttpWithNamespaceResult.get("$namespaces")).replace("local",new TextNode("http://localhost:"+port+"/"));
+
+        ((ObjectNode)testProcessNode).replace("$base",new TextNode("http://localhost:"+port+"/"));
+        ((ObjectNode)testProcessNode.get("$namespaces")).replace("local",new TextNode("http://localhost:"+port+"/"));
+        ((ObjectNode)testProcessNodeResult).replace("$base",new TextNode("http://localhost:"+port+"/"));
+        ((ObjectNode)testProcessNodeResult.get("$namespaces")).replace("local",new TextNode("http://localhost:"+port+"/"));
+
+
     }
 
     @Test

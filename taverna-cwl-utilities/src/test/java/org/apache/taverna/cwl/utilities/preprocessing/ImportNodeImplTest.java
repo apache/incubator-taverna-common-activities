@@ -18,8 +18,6 @@
 */
 package org.apache.taverna.cwl.utilities.preprocessing;
 
-/**
- * Created by maanadev on 4/9/17.
- */
+
 public class ImportNodeImplTest {
 }

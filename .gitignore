@@ -4,6 +4,9 @@
 target/
 .svn
 Testing.java
-
+.idea/
+.DS_Store
+*.log
+*.iml
 # remove emacs
 *~

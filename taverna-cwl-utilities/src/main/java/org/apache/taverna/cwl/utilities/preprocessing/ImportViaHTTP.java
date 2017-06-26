@@ -26,11 +26,11 @@ import java.io.IOException;
 import java.net.URI;
 
 
-public class ImportViaHTTP implements ImportData {
+public class ImportViaHTTP implements ImportNode {
     final private static Logger logger = Logger.getLogger(ImportViaHTTP.class);
 
     @Override
-    public JsonNode importData(URI uri) {
+    public JsonNode importNode(URI uri) {
 
         try (BufferedInputStream inputStream = new BufferedInputStream(uri.toURL().openStream())) {
             return getNode(inputStream, uri.getFragment());

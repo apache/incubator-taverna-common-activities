@@ -26,9 +26,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 
-/**
- * Created by maanadev on 4/3/17.
- */
 public class ImportResolutionUtil extends LinkedResolutionUtil {
 
     final public static String IMPORT = "$import";
@@ -71,7 +68,7 @@ public class ImportResolutionUtil extends LinkedResolutionUtil {
     public void replace(JsonNode node) {
         JsonNode importedNode = null;
         try {
-            ImportNode importNode = new ImportNodeImpl();
+            ImportNode importNode = new ImportViaHTTP();
             importedNode = importNode.importNode(super.process(node.get(IMPORT)));
         } catch (URISyntaxException e) {
             logger.error("URI is not valid", e);

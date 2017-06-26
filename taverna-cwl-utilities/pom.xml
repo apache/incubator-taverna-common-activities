@@ -20,7 +20,14 @@
 	<artifactId>taverna-cwl-utilities</artifactId>
 	<packaging>bundle</packaging>
 	<name>Apache Taverna CWL Activity</name>
+
 	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.6.v20170531</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
