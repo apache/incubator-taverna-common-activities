@@ -16,33 +16,18 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.apache.taverna.cwl.utilities;
+package org.apache.taverna.cwl.utilities.preprocessing;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.taverna.cwl.utilities.preprocessing.ImportResolutionUtilTest;
+import org.yaml.snakeyaml.Yaml;
 
-public class CwlScripting {
 
-	
-	public static void main(String[] args) {
-		ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("nashorn");
+public class ImportNodeViaFile {
+    public static JsonNode getNode(String path){
+        Yaml reader = new Yaml();
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node=mapper.createObjectNode();
-        node.put("hello", "world");
-        engine.put("import.yml", node);
-        // evaluate JavaScript code
-        try {
-			engine.eval("print(\"import.yml\");");
-		} catch (ScriptException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
+        return mapper.valueToTree(reader.load(ImportResolutionUtilTest.class.getResourceAsStream(path)));
+    }
 }

@@ -16,45 +16,26 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.apache.taverna.cwl.utilities;
+package org.apache.taverna.cwl.utilities.preprocessing;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.databind.JsonNode;
 
-public class PortDetail {
+import java.net.URI;
+import java.net.URISyntaxException;
 
-	
-	private String label;
-	
-	private int depth;
-	private String description;
-	private ArrayList<String> format;
-	public int getDepth() {
-		return depth;
-	}
-	public void setDepth(int depth) {
-		this.depth = depth;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
-	}
-	public ArrayList<String> getFormat() {
-		return format;
-	}
-	public void setFormat(ArrayList<String> format) {
-		this.format = format;
-	}
-	
-	public void addFormat(String format){
-		this.format.add(format);
-	}
-	
+
+public interface CwlPreprocessor {
+    /**
+     * This method is used to pre process part of  the node
+     * @param val
+     * @return
+     * @throws URISyntaxException
+     */
+    URI process(JsonNode val) throws URISyntaxException;
+
+    /**
+     * This method is used to apply pre processing to whole object
+     * @throws URISyntaxException
+     */
+    void process() throws URISyntaxException;
 }

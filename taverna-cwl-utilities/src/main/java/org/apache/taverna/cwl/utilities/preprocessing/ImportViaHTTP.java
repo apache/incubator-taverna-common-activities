@@ -16,45 +16,28 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.apache.taverna.cwl.utilities;
+package org.apache.taverna.cwl.utilities.preprocessing;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.log4j.Logger;
 
-public class PortDetail {
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.URI;
 
-	
-	private String label;
-	
-	private int depth;
-	private String description;
-	private ArrayList<String> format;
-	public int getDepth() {
-		return depth;
-	}
-	public void setDepth(int depth) {
-		this.depth = depth;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
-	}
-	public ArrayList<String> getFormat() {
-		return format;
-	}
-	public void setFormat(ArrayList<String> format) {
-		this.format = format;
-	}
-	
-	public void addFormat(String format){
-		this.format.add(format);
-	}
-	
+
+public class ImportViaHTTP implements ImportNode {
+    final private static Logger logger = Logger.getLogger(ImportViaHTTP.class);
+
+    @Override
+    public JsonNode importNode(URI uri) {
+
+        try (BufferedInputStream inputStream = new BufferedInputStream(uri.toURL().openStream())) {
+            return getNode(inputStream, uri.getFragment());
+        } catch (IOException e) {
+            logger.error("Cannot connect to the source", e);
+        }
+        return null;
+    }
+
 }

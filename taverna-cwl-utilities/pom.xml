@@ -20,7 +20,14 @@
 	<artifactId>taverna-cwl-utilities</artifactId>
 	<packaging>bundle</packaging>
 	<name>Apache Taverna CWL Activity</name>
+
 	<dependencies>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>9.4.6.v20170531</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -28,10 +35,14 @@
 			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
-			<version>1.17</version>
-			<type>bundle</type>
+			<version>1.18</version>
 		</dependency>
 		<dependency>
 			<groupId>pl.pragmatists</groupId>

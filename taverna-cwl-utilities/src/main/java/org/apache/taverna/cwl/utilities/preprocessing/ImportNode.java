@@ -16,33 +16,30 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.apache.taverna.cwl.utilities;
+package org.apache.taverna.cwl.utilities.preprocessing;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.yaml.snakeyaml.Yaml;
 
-public class CwlScripting {
+import java.io.InputStream;
+import java.net.URI;
 
-	
-	public static void main(String[] args) {
-		ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("nashorn");
+
+public interface ImportNode {
+    /**
+     * This is method can be used to import the Json Node referred by the CWL Tool description. If a fragment is defined then the required portion of the imported node is returned
+     * @param uri This must be an absolute uri.
+     * @return The node that is been imported. It can be a portion of a node as well
+     */
+    JsonNode importNode(URI uri);
+
+    default JsonNode getNode(InputStream inputStream, String fragment) {
+        Yaml reader = new Yaml();
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode node=mapper.createObjectNode();
-        node.put("hello", "world");
-        engine.put("import.yml", node);
-        // evaluate JavaScript code
-        try {
-			engine.eval("print(\"import.yml\");");
-		} catch (ScriptException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	
+        if (fragment != null) {
+            return mapper.valueToTree(reader.load(inputStream)).get(fragment);
+        }
+        return mapper.valueToTree(reader.load(inputStream));
+    }
 }
