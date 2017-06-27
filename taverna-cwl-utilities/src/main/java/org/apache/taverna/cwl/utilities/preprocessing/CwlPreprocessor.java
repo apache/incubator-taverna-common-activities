@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 public interface CwlPreprocessor {
     /**
      * This method is used to pre process part of  the node
+     *
      * @param val
      * @return
      * @throws URISyntaxException
@@ -35,6 +36,7 @@ public interface CwlPreprocessor {
 
     /**
      * This method is used to apply pre processing to whole object
+     *
      * @throws URISyntaxException
      */
     void process() throws URISyntaxException;

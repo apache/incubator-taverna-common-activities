@@ -40,10 +40,9 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
     private Path path;
 
     /**
-     *
      * @param cwlToolDescription CWL tool description
-     * @param path This must be the directory where CWL tool is located and resolving is done assuming required other files
-     *             in the same directory
+     * @param path               This must be the directory where CWL tool is located and resolving is done assuming required other files
+     *                           in the same directory
      */
     public LinkedResolutionUtil(JsonNode cwlToolDescription, Path path) {
         this.cwlToolDescription = cwlToolDescription;
@@ -76,6 +75,7 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
 
     /**
      * This method is resolving the uri based on the rules mentioned in the CWL Schema Salad
+     *
      * @param val This is a ValueNode (subclass of a JsonNode) which holds the link. This must be a single node
      * @return An URI object which contains absolute is returned
      * @throws URISyntaxException

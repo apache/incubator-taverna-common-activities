@@ -19,110 +19,105 @@
 
 package org.apache.taverna.cwl.utilities;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.ArrayList;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 public class CwlContextualUtil extends CWLUtil {
-	
 
-	public CwlContextualUtil(JsonNode cwlFile) {
-		super(cwlFile);
-	}
 
-	/**
-	 * This method creates HTML representation of the String paragraph
-	 * 
-	 * @param summary
-	 * @param paragraph
-	 * @return
-	 */
-	public String paragraphToHtml(String summary, String paragraph) {
+    public CwlContextualUtil(JsonNode cwlFile) {
+        super(cwlFile);
+    }
 
-		summary += "<tr><td colspan='2' align='left'>";
-		
-		for (String line : paragraph.split("[\n|\r]"))
-			summary += "<p>" + line + "</p>";
+    /**
+     * This method creates HTML representation of the String paragraph
+     *
+     * @param summary
+     * @param paragraph
+     * @return
+     */
+    public String paragraphToHtml(String summary, String paragraph) {
 
-		summary += "</td></tr>";
+        summary += "<tr><td colspan='2' align='left'>";
 
-		return summary;
-	}
+        for (String line : paragraph.split("[\n|\r]"))
+            summary += "<p>" + line + "</p>";
 
-	/**
-	 * This method creates the HTML tags and details of each input/output for
-	 * service detail panel
-	 * 
-	 * @param summary
-	 *            current String summary
-	 * @param id
-	 *            input/output Id
-	 * @param detail
-	 *            PortDetail object of the input/output
-	 * @param depth
-	 *            depth of the input/output
-	 * @return
-	 */
-	public String extractSummary(String summary, String id, PortDetail detail, int depth) {
-		summary += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + depth + "</td></tr>";
-		if (detail.getLabel() != null) {
-			summary += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
-		}
-		if (detail.getDescription() != null) {
+        summary += "</td></tr>";
 
-			summary = paragraphToHtml(summary, detail.getDescription());
+        return summary;
+    }
 
-		}
-		if (detail.getFormat() != null) {
-			summary += "<tr><td  align ='left' colspan ='2'>Format: ";
-			ArrayList<String> formats = detail.getFormat();
+    /**
+     * This method creates the HTML tags and details of each input/output for
+     * service detail panel
+     *
+     * @param summary current String summary
+     * @param id      input/output Id
+     * @param detail  PortDetail object of the input/output
+     * @param depth   depth of the input/output
+     * @return
+     */
+    public String extractSummary(String summary, String id, PortDetail detail, int depth) {
+        summary += "<tr align='left'><td> ID: " + id + " </td><td>Depth: " + depth + "</td></tr>";
+        if (detail.getLabel() != null) {
+            summary += "<tr><td  align ='left' colspan ='2'>Label: " + detail.getLabel() + "</td></tr>";
+        }
+        if (detail.getDescription() != null) {
 
-			int Size = formats.size();
+            summary = paragraphToHtml(summary, detail.getDescription());
 
-			if (Size == 1) {
-				summary += formats.get(0);
-			} else {
-				for (int i = 0; i < (Size - 1); i++) {
-					summary += formats.get(i) + ", ";
-				}
-				summary += formats.get(Size - 1);
-			}
-			summary += "</td></tr>";
-		}
-		summary += "<tr></tr>";
-		return summary;
-	}
+        }
+        if (detail.getFormat() != null) {
+            summary += "<tr><td  align ='left' colspan ='2'>Format: ";
+            ArrayList<String> formats = detail.getFormat();
 
-	
+            int Size = formats.size();
 
-	public String setUpInputDetails(String summary) {
+            if (Size == 1) {
+                summary += formats.get(0);
+            } else {
+                for (int i = 0; i < (Size - 1); i++) {
+                    summary += formats.get(i) + ", ";
+                }
+                summary += formats.get(Size - 1);
+            }
+            summary += "</td></tr>";
+        }
+        summary += "<tr></tr>";
+        return summary;
+    }
 
-		Map<String, PortDetail> inputs = processInputDetails();
-		Map<String, Integer> inputDepths = processInputDepths();
-		return extracSummaries(summary, inputs, inputDepths);
-	}
 
-	public String setUpOutputDetails(String summary) {
-		Map<String, PortDetail> outPuts = processOutputDetails();
-		Map<String, Integer> outputDepths = processOutputDepths();
-		return extracSummaries(summary, outPuts, outputDepths);
-	}
-/**
- * 
- * @param summary current String 
- * @param parameters  respective PortDetail Object which hold the label, description  
- * @param parameterDepths Map containing parameter Id and the corresponding depth
- * @return
- */
-	public String extracSummaries(String summary, Map<String, PortDetail> parameters,
-			Map<String, Integer> parameterDepths) {
-		if ((parameters != null && !parameters.isEmpty()) && (parameterDepths != null && !parameterDepths.isEmpty()))
-			for (String id : parameters.keySet()) {
-				PortDetail detail = parameters.get(id);
-				if (parameterDepths.containsKey(id))
-					summary = extractSummary(summary, id, detail, parameterDepths.get(id));
-			}
-		return summary;
-	}
+    public String setUpInputDetails(String summary) {
+
+        Map<String, PortDetail> inputs = processInputDetails();
+        Map<String, Integer> inputDepths = processInputDepths();
+        return extracSummaries(summary, inputs, inputDepths);
+    }
+
+    public String setUpOutputDetails(String summary) {
+        Map<String, PortDetail> outPuts = processOutputDetails();
+        Map<String, Integer> outputDepths = processOutputDepths();
+        return extracSummaries(summary, outPuts, outputDepths);
+    }
+
+    /**
+     * @param summary         current String
+     * @param parameters      respective PortDetail Object which hold the label, description
+     * @param parameterDepths Map containing parameter Id and the corresponding depth
+     * @return
+     */
+    public String extracSummaries(String summary, Map<String, PortDetail> parameters,
+                                  Map<String, Integer> parameterDepths) {
+        if ((parameters != null && !parameters.isEmpty()) && (parameterDepths != null && !parameterDepths.isEmpty()))
+            for (String id : parameters.keySet()) {
+                PortDetail detail = parameters.get(id);
+                if (parameterDepths.containsKey(id))
+                    summary = extractSummary(summary, id, detail, parameterDepths.get(id));
+            }
+        return summary;
+    }
 }
