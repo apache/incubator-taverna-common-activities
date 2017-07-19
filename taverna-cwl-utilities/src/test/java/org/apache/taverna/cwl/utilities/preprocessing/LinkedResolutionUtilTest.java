@@ -28,31 +28,41 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 
 import static org.apache.taverna.cwl.utilities.preprocessing.ImportNodeViaFile.getNode;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class LinkedResolutionUtilTest {
-    JsonNode processUri;
+    JsonNode processUri,relativeUri;
+
     @Before
     public void setUp() throws Exception {
 
         processUri = getNode("/preprocessing/LinkedResoultionUtil-process-method/processURI.yaml");
+        relativeUri = getNode("/preprocessing/LinkedResoultionUtil-process-method/relativeURI.yaml");
     }
 
     @Test
     public void testProcess() throws URISyntaxException {
-        String path =LinkedResolutionUtil.class.getResource("/preprocessing/LinkedResoultionUtil-process-method/").getPath();
+        String path = LinkedResolutionUtil.class.getResource("/preprocessing/LinkedResoultionUtil-process-method/").getPath();
         LinkedResolutionUtil linkedResolutionUtil = new LinkedResolutionUtil(processUri, Paths.get(path));
-        assertEquals(new URI("http://example.com/one"),getUri1(linkedResolutionUtil,"uri1"));
-        assertEquals(new URI("http://example.com/base#two"),getUri1(linkedResolutionUtil,"uri2"));
-        assertEquals(new URI("http://example.com/four#five"),getUri1(linkedResolutionUtil,"uri3"));
-        assertEquals(new URI("http://example.com/acid#six"),getUri1(linkedResolutionUtil,"uri4"));
-        assertEquals(new URI("file://"+path+"dummy1.yaml"),getUri1(linkedResolutionUtil,"uri5"));
-        assertEquals(new URI("file://"+path+"dummy1.yaml#hello"),getUri1(linkedResolutionUtil,"uri6"));
+        assertEquals(new URI("http://example.com/one"), getUri(linkedResolutionUtil, "uri1",processUri));
+        assertEquals(new URI("http://example.com/base#two"), getUri(linkedResolutionUtil, "uri2",processUri));
+        assertEquals(new URI("http://example.com/four#five"), getUri(linkedResolutionUtil, "uri3",processUri));
+        assertEquals(new URI("http://example.com/acid#six"), getUri(linkedResolutionUtil, "uri4",processUri));
+        assertEquals(new URI("file://" + path + "dummy1.yaml"), getUri(linkedResolutionUtil, "uri5",processUri));
+        assertEquals(new URI("file://" + path + "dummy1.yaml#hello"), getUri(linkedResolutionUtil, "uri6",processUri));
+
+
 
     }
+    @Test
+    public void testRelativeURI() throws URISyntaxException {
+        String path = LinkedResolutionUtil.class.getResource("/preprocessing/LinkedResoultionUtil-process-method/").getPath();
+        LinkedResolutionUtil linkedResolutionUtil = new LinkedResolutionUtil(relativeUri, Paths.get(path));
+        assertEquals(new URI("http://example.com/a/b.cwl"), getUri(linkedResolutionUtil, "uri1",relativeUri));
+    }
 
-    private URI getUri1(LinkedResolutionUtil linkedResolutionUtil,String uri) throws URISyntaxException {
-        return linkedResolutionUtil.process(processUri.get(uri));
+    private URI getUri(LinkedResolutionUtil linkedResolutionUtil, String uri, JsonNode node) throws URISyntaxException {
+        return linkedResolutionUtil.process(node.get(uri));
     }
 
     @After

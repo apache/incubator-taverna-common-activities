@@ -1,1 +1,26 @@
-{"input_1":{"label":"input 1 testing label","depth":0,"description":"this is a short description of input 1","format":["http://edamontology.org/format_2323"]},"input_2":{"label":"input 2 testing label","depth":0,"description":"this is a short description of input 2","format":["$expression"]},"input_3":{"label":"input 3 testing label","depth":0,"description":"this is a short description of input 3","format":["noNameSpace:testing"]}}
+{
+  "input_1": {
+    "label": "input 1 testing label",
+    "depth": 0,
+    "description": "this is a short description of input 1",
+    "format": [
+      "http://edamontology.org/format_2323"
+    ]
+  },
+  "input_2": {
+    "label": "input 2 testing label",
+    "depth": 0,
+    "description": "this is a short description of input 2",
+    "format": [
+      "$expression"
+    ]
+  },
+  "input_3": {
+    "label": "input 3 testing label",
+    "depth": 0,
+    "description": "this is a short description of input 3",
+    "format": [
+      "noNameSpace:testing"
+    ]
+  }
+}

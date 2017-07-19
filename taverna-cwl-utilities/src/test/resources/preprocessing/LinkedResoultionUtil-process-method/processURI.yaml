@@ -25,3 +25,4 @@ uri4: acid:six
 
 uri5: dummy1.yaml
 uri6: dummy1.yaml#hello
+uri7: ../a/b.cwl

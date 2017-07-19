@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -50,6 +51,17 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
         setup();
     }
 
+    public static void main(String[] args) throws URISyntaxException, MalformedURLException {
+
+        URI base = new URI("acid:#base");
+        URI uri1 = new URI("http://example.com/acid#six");
+
+
+        System.out.println(base.getScheme());
+
+
+    }
+
     private void setBASE(URI BASE) {
         this.BASE = BASE;
     }
@@ -68,7 +80,6 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
         }
     }
 
-
     private void setNameSpace(JsonNode nameSpace) {
         this.nameSpace = nameSpace;
     }
@@ -82,35 +93,27 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
      */
     @Override
     public URI process(JsonNode val) throws URISyntaxException {
-
         String uriString = val.asText();
         URI uri = new URI(uriString);
 
-        if (uri.isAbsolute()) {
-            if (uriString.contains(":")) {
+        if (uriString.contains(":")) {
+            String valSplit[] = uriString.split(":");
+            String key = valSplit[0];
 
-                String valSplit[] = uriString.split(":");
-                String key = valSplit[0];
-
-                if (nameSpace.has(key)) {
-
-                    return new URI((nameSpace.get(key).asText() + valSplit[1]));
-                }
+            if (nameSpace.has(key)) {
+                return new URI((nameSpace.get(key).asText() + valSplit[1]));
             }
-
-            return uri;
         }
+        if (uri.getScheme() == null) {
+            Path absolutePath = path.resolve(uri.getPath());
+            File file = new File(absolutePath.toString());
 
-        Path absolutePath = path.resolve(uri.getPath());
-        File file = new File(absolutePath.toString());
-
-        if (file.isFile()) {
-            final String fragment = uri.getFragment();
-            return (fragment != null) ? absolutePath.toUri().resolve("#" + fragment) : absolutePath.toUri();
+            if (file.isFile()) {
+                final String fragment = uri.getFragment();
+                return (fragment != null) ? absolutePath.toUri().resolve("#" + fragment) : absolutePath.toUri();
+            }
         }
-
         if (BASE == null) {
-
             logger.warn("Base is null !");
             return null;
         }
@@ -121,6 +124,5 @@ public class LinkedResolutionUtil implements CwlPreprocessor {
     public void process() throws URISyntaxException {
 
     }
-
 }
 

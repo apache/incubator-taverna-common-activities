@@ -14,30 +14,9 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #################################################################################
-
-
-
-cwlVersion: v1.0
-class: Workflow
-$import: firstImport.yaml
-$base: http://localhost:8000/
-requirements:
-  $import: firstImport.yaml
+$base: http://example.com/base/a.cwl
 $namespaces:
- local: http://localhost:8000/
- edam2: http://edamontologytest.org/
-inputs:
-  hello: "schemadef-type.yml#HelloType"
+ acid: http://example.com/acid#
 
-outputs:
-  output:
-    type: File
-    outputSource: step1/output
-    $import: import.yaml#hello
 
-steps:
-  step1:
-    in:
-      hello: hello
-    out: [output,{$import: "local:import.yaml"}]
-    run: schemadef-tool.cwl
+uri1: ../a/b.cwl

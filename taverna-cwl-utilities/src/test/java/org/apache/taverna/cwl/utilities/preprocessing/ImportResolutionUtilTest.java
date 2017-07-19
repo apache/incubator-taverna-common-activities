@@ -42,7 +42,7 @@ public class ImportResolutionUtilTest {
 
     @AfterClass
     public static void stopHttPServer() {
-     JettyFileServer.stopServer();
+        JettyFileServer.stopServer();
     }
 
     @Before
@@ -58,18 +58,19 @@ public class ImportResolutionUtilTest {
         testProcessNodeResult = getNode("/preprocessing/ImportResoultionUtil-processNode-Method/processNodeResult.yaml");
         setupPort();
     }
-    private void setupPort(){
-        int port=JettyFileServer.getPort();
-        ((ObjectNode)fileOverHttPWithFragment).replace("$base",new TextNode("http://localhost:"+port+"/"));
-        ((ObjectNode)fileOverHttPWithFragmentResult).replace("$base",new TextNode("http://localhost:"+port+"/"));
 
-        ((ObjectNode)fileOverHttpWithNamespace.get("$namespaces")).replace("local",new TextNode("http://localhost:"+port+"/"));
-        ((ObjectNode)fileOverHttpWithNamespaceResult.get("$namespaces")).replace("local",new TextNode("http://localhost:"+port+"/"));
+    private void setupPort() {
+        int port = JettyFileServer.getPort();
+        ((ObjectNode) fileOverHttPWithFragment).replace("$base", new TextNode("http://localhost:" + port + "/"));
+        ((ObjectNode) fileOverHttPWithFragmentResult).replace("$base", new TextNode("http://localhost:" + port + "/"));
 
-        ((ObjectNode)testProcessNode).replace("$base",new TextNode("http://localhost:"+port+"/"));
-        ((ObjectNode)testProcessNode.get("$namespaces")).replace("local",new TextNode("http://localhost:"+port+"/"));
-        ((ObjectNode)testProcessNodeResult).replace("$base",new TextNode("http://localhost:"+port+"/"));
-        ((ObjectNode)testProcessNodeResult.get("$namespaces")).replace("local",new TextNode("http://localhost:"+port+"/"));
+        ((ObjectNode) fileOverHttpWithNamespace.get("$namespaces")).replace("local", new TextNode("http://localhost:" + port + "/"));
+        ((ObjectNode) fileOverHttpWithNamespaceResult.get("$namespaces")).replace("local", new TextNode("http://localhost:" + port + "/"));
+
+        ((ObjectNode) testProcessNode).replace("$base", new TextNode("http://localhost:" + port + "/"));
+        ((ObjectNode) testProcessNode.get("$namespaces")).replace("local", new TextNode("http://localhost:" + port + "/"));
+        ((ObjectNode) testProcessNodeResult).replace("$base", new TextNode("http://localhost:" + port + "/"));
+        ((ObjectNode) testProcessNodeResult.get("$namespaces")).replace("local", new TextNode("http://localhost:" + port + "/"));
 
 
     }

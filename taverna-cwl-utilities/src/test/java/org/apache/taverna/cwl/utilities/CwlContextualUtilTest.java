@@ -18,47 +18,46 @@
 */
 package org.apache.taverna.cwl.utilities;
 
-import static org.junit.Assert.*;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.Assert.assertEquals;
 
 public class CwlContextualUtilTest {
-	JsonNode cwlFile;
-	CwlContextualUtil cwlContextualUtil;
-	JsonNode input;
+    JsonNode cwlFile;
+    CwlContextualUtil cwlContextualUtil;
+    JsonNode input;
 
-	@Before
-	public void setUp() throws Exception {
-		Yaml reader = new Yaml();
-		ObjectMapper mapper = new ObjectMapper();
-		cwlFile = mapper.valueToTree(reader.load(getClass().getResourceAsStream("/customtool1.cwl")));
-		cwlContextualUtil = new CwlContextualUtil(cwlFile);
-	}
+    @Before
+    public void setUp() throws Exception {
+        Yaml reader = new Yaml();
+        ObjectMapper mapper = new ObjectMapper();
+        cwlFile = mapper.valueToTree(reader.load(getClass().getResourceAsStream("/customtool1.cwl")));
+        cwlContextualUtil = new CwlContextualUtil(cwlFile);
+    }
 
-	@Test
-	public void paragraphToHtmlTest() {
-		String summary = "";
-		String para = "This is for just testing purposese******************* ****************************\n"
-				+ "********************************** *5**************************** ******** ******\n";
-		String expected = "<tr><td colspan='2' align='left'><p>This is for just testing purposese******************* ****************************</p><p>********************************** *5**************************** ******** ******</p></td></tr>";
-		assertEquals(expected, cwlContextualUtil.paragraphToHtml(summary, para));
-	}
+    @Test
+    public void paragraphToHtmlTest() {
+        String summary = "";
+        String para = "This is for just testing purposese******************* ****************************\n"
+                + "********************************** *5**************************** ******** ******\n";
+        String expected = "<tr><td colspan='2' align='left'><p>This is for just testing purposese******************* ****************************</p><p>********************************** *5**************************** ******** ******</p></td></tr>";
+        assertEquals(expected, cwlContextualUtil.paragraphToHtml(summary, para));
+    }
 
-	@Test
-	public void extractSummaryTest() {
-		String summary = "";
-		String id = "parameter_1";
-		int depth = 0;
-		PortDetail detail = new PortDetail();
-		detail.setLabel("Test Label");
-		detail.setDescription("Test Description");
-		String expected ="<tr align='left'><td> ID: parameter_1 </td><td>Depth: 0</td></tr><tr><td  align ='left' colspan ='2'>Label: Test Label</td></tr><tr><td colspan='2' align='left'><p>Test Description</p></td></tr><tr></tr>";
-		assertEquals(expected, cwlContextualUtil.extractSummary(summary, id, detail, depth));
-	}
-	
+    @Test
+    public void extractSummaryTest() {
+        String summary = "";
+        String id = "parameter_1";
+        int depth = 0;
+        PortDetail detail = new PortDetail();
+        detail.setLabel("Test Label");
+        detail.setDescription("Test Description");
+        String expected = "<tr align='left'><td> ID: parameter_1 </td><td>Depth: 0</td></tr><tr><td  align ='left' colspan ='2'>Label: Test Label</td></tr><tr><td colspan='2' align='left'><p>Test Description</p></td></tr><tr></tr>";
+        assertEquals(expected, cwlContextualUtil.extractSummary(summary, id, detail, depth));
+    }
+
 }
