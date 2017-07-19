@@ -88,7 +88,7 @@ public class CwlServiceDesc extends ServiceDescription {
 	private String toolName;
 
 
-	public void setToolName(String toolName) {
+	public void setName(String toolName) {
 		this.toolName = toolName;
 	}
 	private String getCwlPath(){
