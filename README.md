@@ -28,7 +28,7 @@ the actual workflow execution.
 ## License
 
 * (c) 2007-2014 University of Manchester
-* (c) 2014-2016 Apache Software Foundation
+* (c) 2014-2018 Apache Software Foundation
 
 This product includes software developed at The
 [Apache Software Foundation](http://www.apache.org/).
@@ -44,7 +44,7 @@ details about embedded third-party libraries and source code.
 # Contribute
 
 Please subscribe to and contact the
-[dev@taverna](https://taverna.incubator.apache.org/community/lists#dev mailing list)
+[dev@taverna](https://taverna.incubator.apache.org/community/lists#dev) mailing list
 mailing list for any questions, suggestions and discussions about
 Apache Taverna.
 
