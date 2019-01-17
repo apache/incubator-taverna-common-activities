@@ -85,10 +85,10 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>    
+    </build>
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/incubator-taverna-common-activities.git</connection>
-        <developerConnection>scm:git:git@github.com:apache/incubator-taverna-common-activities.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:apache/incubator-taverna-common-activities.git</developerConnection>        
         <url>https://github.com/apache/incubator-taverna-common-activities</url>
         <tag>HEAD</tag>
     </scm>
