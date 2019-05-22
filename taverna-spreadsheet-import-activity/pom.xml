@@ -126,7 +126,7 @@
     <repository>
         <id>mygrid-ext-release-local</id>
         <name>myGrid ext-release-local</name>
-        <url>http://repository.mygrid.org.uk/artifactory/ext-release-local</url>
+        <url>https://repository.mygrid.org.uk/artifactory/ext-release-local</url>
         <releases />
         <snapshots>
           <enabled>false</enabled>
