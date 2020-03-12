@@ -15,20 +15,64 @@
    limitations under the License.
 -->
 
-# Apache Taverna Common Activities
+
+## Taverna Project Retired
+
+> tl;dr: The Taverna code base is **no longer maintained** 
+> and is provided here for archival purposes.
+
+From 2014 till 2020 this code base was maintained by the 
+[Apache Incubator](https://incubator.apache.org/) project _Apache Taverna (incubating)_
+(see [web archive](https://web.archive.org/web/20200312133332/https://taverna.incubator.apache.org/)
+and [podling status](https://incubator.apache.org/projects/taverna.html)).
+
+In 2020 the Taverna community 
+[voted](https://lists.apache.org/thread.html/r559e0dd047103414fbf48a6ce1bac2e17e67504c546300f2751c067c%40%3Cdev.taverna.apache.org%3E)
+to **retire** Taverna as a project and withdraw the code base from the Apache Software Foundation. 
+
+This code base remains available under the Apache License 2.0 
+(see _License_ below), but is now simply called 
+_Taverna_ rather than ~~Apache Taverna (incubating)~~.
+
+While the code base is no longer actively maintained, 
+Pull Requests are welcome to the 
+[GitHub organization taverna](http://github.com/taverna/), 
+which may infrequently be considered by remaining 
+volunteer caretakers.
+
+
+### Previous releases
+
+Releases 2015-2018 during incubation at Apache Software Foundation
+are available from the ASF Download Archive <http://archive.apache.org/dist/incubator/taverna/>
+
+Releases 2014 from the University of Manchester are on BitBucket <https://bitbucket.org/taverna/>
+
+Releases 2009-2013 from myGrid are on LaunchPad <https://launchpad.net/taverna/>
+
+Releases 2003-2009 are on SourceForge <https://sourceforge.net/projects/taverna/files/taverna/>
+
+Binary JARs for Taverna are available from 
+Maven Central <https://repo.maven.apache.org/maven2/org/apache/taverna/>
+or the myGrid Maven repository <https://repository.mygrid.org.uk/>
+
+
+
+
+# Taverna Common Activities
 
 Common Activities to be invoked as part of 
-[Apache Taverna](https://taverna.incubator.apache.org/) workflows.
+[Taverna](https://web.archive.org/web/*/https://taverna.incubator.apache.org/) workflows.
 
 Note that this module relies on other
-[Apache Taverna modules](https://taverna.incubator.apache.org/code) for
+[Taverna modules](https://web.archive.org/web/*/https://taverna.incubator.apache.org/code) for
 the actual workflow execution.
 
 
 ## License
 
 * (c) 2007-2014 University of Manchester
-* (c) 2014-2018 Apache Software Foundation
+* (c) 2014-2020 Apache Software Foundation
 
 This product includes software developed at The
 [Apache Software Foundation](http://www.apache.org/).
@@ -43,37 +87,10 @@ details about embedded third-party libraries and source code.
 
 # Contribute
 
-Please subscribe to and contact the
-[dev@taverna](https://taverna.incubator.apache.org/community/lists#dev) mailing list
-mailing list for any questions, suggestions and discussions about
-Apache Taverna.
-
-Bugs and planned features are tracked in the Jira
-[Issue tracker](https://issues.apache.org/jira/browse/TAVERNA/component/12326811)
-under the `TAVERNA` component _Taverna Common Activities._ Feel free
-to add an issue!
-
-To suggest changes to this source code, feel free to raise a
-[GitHub pull request](https://github.com/apache/incubator-taverna-common-activities/pulls).
 Any contributions received are assumed to be covered by the [Apache License
 2.0](https://www.apache.org/licenses/LICENSE-2.0). We might ask you
 to sign a [Contributor License Agreement](https://www.apache.org/licenses/#clas)
 before accepting a larger contribution.
-
-## Disclaimer
-
-Apache Taverna is an effort undergoing incubation at the
-[Apache Software Foundation (ASF)](http://www.apache.org/),
-sponsored by the [Apache Incubator PMC](http://incubator.apache.org/).
-
-[Incubation](http://incubator.apache.org/incubation/Process_Description.html)
-is required of all newly accepted projects until a further review
-indicates that the infrastructure, communications, and decision-making process
-have stabilized in a manner consistent with other successful ASF projects.
-
-While incubation status is not necessarily a reflection of the completeness
-or stability of the code, it does indicate that the project has yet to be
-fully endorsed by the ASF.
 
 
 
@@ -84,15 +101,15 @@ fully endorsed by the ASF.
   versions probably also work)
 
 This code relies on other
-[Apache Taverna modules](https://taverna.incubator.apache.org/download/code/),
+[Taverna modules](https://web.archive.org/web/*/https://taverna.incubator.apache.org/download/code/),
 which Maven shuold automatically
 download from
-[Apache's Maven repository](https://taverna.incubator.apache.org/download/maven/);
+[Apache's Maven repository](https://web.archive.org/web/*/https://taverna.incubator.apache.org/download/maven/);
 however you might want to compile these yourself in the below order:
 
-* [taverna-language](https://taverna.incubator.apache.org/download/language/)
-* [taverna-osgi](https://taverna.incubator.apache.org/download/osgi/)
-* [taverna-engine](https://taverna.incubator.apache.org/download/engine/)
+* [taverna-language](https://web.archive.org/web/*/https://taverna.incubator.apache.org/download/language/)
+* [taverna-osgi](https://web.archive.org/web/*/https://taverna.incubator.apache.org/download/osgi/)
+* [taverna-engine](https://web.archive.org/web/*/https://taverna.incubator.apache.org/download/engine/)
 
 Please see the `<properties>` of this [pom.xml](pom.xml) to find the
 correct versions to build.
@@ -125,7 +142,7 @@ To skip the tests (these can be time-consuming), use:
 
 
 If you are modifying this source code independent of the
-Apache Taverna project, you may not want to run the
+Taverna project, you may not want to run the
 [Rat Maven plugin](https://creadur.apache.org/rat/apache-rat-plugin/)
 that enforces Apache headers in every source file - to disable it, try:
 
@@ -134,23 +151,23 @@ that enforces Apache headers in every source file - to disable it, try:
 # Modules
 
 Each module implement a particular type of 
-Taverna [Activity](https://taverna.incubator.apache.org/javadoc/taverna-engine/org/apache/taverna/workflowmodel/processor/activity/Activity.html).
+Taverna [Activity](https://web.archive.org/web/*/https://taverna.incubator.apache.org/javadoc/taverna-engine/org/apache/taverna/workflowmodel/processor/activity/Activity.html).
 
-* [taverna-beanshell-activity](taverna-beanshell-activity/): Apache Taverna Beanshell Activity, 
+* [taverna-beanshell-activity](taverna-beanshell-activity/): Taverna Beanshell Activity, 
   runs [Beanshell](https://github.com/beanshell/beanshell/) scripts.
-* [taverna-external-tool-activity](taverna-external-tool-activity/): Apache Taverna External Tool Activity, 
+* [taverna-external-tool-activity](taverna-external-tool-activity/): Taverna External Tool Activity, 
   run command line locally or over SSH
-* [taverna-interaction-activity](taverna-interaction-activity/): Apache Taverna Interaction Activity, 
+* [taverna-interaction-activity](taverna-interaction-activity/): Taverna Interaction Activity, 
   ask questions to the user through a browser
-* [taverna-rest-activity](taverna-rest-activity/): Apache Taverna REST Activity, 
+* [taverna-rest-activity](taverna-rest-activity/): Taverna REST Activity, 
   invoke [RESTful](https://en.wikipedia.org/wiki/Representational_state_transfer) HTTP(S) web services based on a URI template.
-* [taverna-spreadsheet-import-activity](taverna-spreadsheet-import-activity/): Apache Taverna Spreadsheet Import Activity, 
+* [taverna-spreadsheet-import-activity](taverna-spreadsheet-import-activity/): Taverna Spreadsheet Import Activity, 
   imports from CSV, Excel and OpenOffice.
-* [taverna-wsdl-activity](taverna-wsdl-activity/): Apache Taverna WSDL Activity, 
+* [taverna-wsdl-activity](taverna-wsdl-activity/): Taverna WSDL Activity, 
   invoke [WSDL](https://en.wikipedia.org/wiki/Web_Services_Description_Language)-described SOAP services.
-* [taverna-wsdl-generic](taverna-wsdl-generic/): Apache Taverna WSDL-generic Library, 
+* [taverna-wsdl-generic](taverna-wsdl-generic/): Taverna WSDL-generic Library, 
   library for parsing WSDL and calling SOAP services
-* [taverna-xpath-activity](taverna-xpath-activity/): Apache Taverna XPath Activity, 
+* [taverna-xpath-activity](taverna-xpath-activity/): Taverna XPath Activity, 
   select XML fragments using [XPath](https://www.w3.org/TR/xpath/) expressions
 
 
@@ -189,8 +206,8 @@ The following provides more details on the included cryptographic software:
   [Apache WSS4J](https://ws.apache.org/wss4j/),
   [Apache XML Security for Java](https://santuario.apache.org/javaindex.html)
   for accessing secure SOAP Web Services.
-* Apache Taverna Common Activities depends on the
-  [Apache Taverna Engine](http://taverna.incubator.apache.org/download/engine/)
+* Taverna Common Activities depends on the
+  [Taverna Engine](http://taverna.incubator.apache.org/download/engine/)
   Credential Manager API for
   management of username/password and client/server SSL certificates.
 * [taverna-interaction-activity](taverna-interaction-activity) depends on
