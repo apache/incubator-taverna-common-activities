@@ -99,6 +99,7 @@ public class ThreadLocalSSLSocketFactory extends SSLSocketFactory {
 	private static SSLSocketFactory createAlwaysTrustingFactory() {
 		SSLContext sc = null;
 		try {
+			/**SSL is not security when build connection, recommend sc = SSLContext.getInstance("TLSv1.3");*/
 			sc = SSLContext.getInstance("SSL");
 		} catch (NoSuchAlgorithmException e1) {
 
